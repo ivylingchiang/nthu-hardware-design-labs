@@ -1,0 +1,769 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Record</title><meta name="data-notion-page-icon" content="/icons/airplane_lightgray.svg"/><link rel="icon" href="https://app.notion.com/icons/airplane_lightgray.svg"/><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+/* Override strong tags inside headings to maintain consistent weight */
+h1 strong,
+h2 strong,
+h3 strong {
+	font-weight: 600;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 10px;
+	padding: 1rem;
+}
+
+/* For default-background callouts, render the border outline. */
+.callout.block-color-default_background {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+figure,
+aside,
+details {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+
+	table.collection-content {
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	table.collection-content th,
+	table.collection-content td {
+		overflow-wrap: anywhere;
+	}
+
+	table.collection-content td > .user,
+	table.collection-content td > time {
+		white-space: pre-wrap;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content-wrapper {
+	overflow-x: auto;
+}
+
+@media only print {
+	.collection-content-wrapper {
+		overflow-x: visible;
+	}
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.collection-content td {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.column-list {
+	display: flex;
+	gap: 46px;
+}
+
+.column {
+	min-width: 0;
+	overflow: hidden;
+}
+
+.column > *:first-child {
+	margin-top: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding-inline: 0.125rem;
+	padding-block: 0.375rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+table {
+	border-collapse: collapse;
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol.numbered-list.numbered-list-digits-2 {
+	padding-inline-start: 2em;
+}
+
+ol.numbered-list.numbered-list-digits-3plus {
+	padding-inline-start: 2.4em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+/*
+ * Render emoji icons using a ::before pseudo-element to keep the glyph
+ * out of the DOM textContent traversal. This avoids double-rendering icons
+ * in callouts and page titles.
+ * NOTE(slim/html-export-pseudo-icons): I can't tagref this because it will
+ * flag as a duplicate tag after codegen.
+ */
+.icon[data-emoji]::before {
+	content: attr(data-emoji);
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.callout img.notion-static-icon {
+	width: 1em;
+	height: 1em;
+}
+
+.callout p {
+	margin: 0;
+}
+
+.callout h1,
+.callout h2,
+.callout h3 {
+	margin: 0 0 0.6rem;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	margin-right: 0.4em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+blockquote.quote-large {
+	font-size: 1.25em;
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.tab {
+	margin: 1.25em 0;
+	padding-inline: 1rem;
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.highlight-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.highlight-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.highlight-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.highlight-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.highlight-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.highlight-default_background {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray_background {
+	background: rgba(42, 28, 0, 0.07);
+}
+.highlight-brown_background {
+	background: rgba(139, 46, 0, 0.086);
+}
+.highlight-orange_background {
+	background: rgba(224, 101, 1, 0.129);
+}
+.highlight-yellow_background {
+	background: rgba(211, 168, 0, 0.137);
+}
+.highlight-teal_background {
+	background: rgba(0, 100, 45, 0.09);
+}
+.highlight-blue_background {
+	background: rgba(0, 124, 215, 0.094);
+}
+.highlight-purple_background {
+	background: rgba(102, 0, 178, 0.078);
+}
+.highlight-pink_background {
+	background: rgba(197, 0, 93, 0.086);
+}
+.highlight-red_background {
+	background: rgba(223, 22, 0, 0.094);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.block-color-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.block-color-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.block-color-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.block-color-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.block-color-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(240, 239, 237, 1);
+}
+.block-color-brown_background {
+	background: rgba(245, 237, 233, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 235, 222, 1);
+}
+.block-color-yellow_background {
+	background: rgba(249, 243, 220, 1);
+}
+.block-color-teal_background {
+	background: rgba(232, 241, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(229, 242, 252, 1);
+}
+.block-color-purple_background {
+	background: rgba(243, 235, 249, 1);
+}
+.block-color-pink_background {
+	background: rgba(250, 233, 241, 1);
+}
+.block-color-red_background {
+	background: rgba(252, 233, 231, 1);
+}
+.select-value-color-default { background-color: rgba(42, 28, 0, 0.07); }
+.select-value-color-gray { background-color: rgba(28, 19, 1, 0.11); }
+.select-value-color-brown { background-color: rgba(127, 51, 0, 0.156); }
+.select-value-color-orange { background-color: rgba(196, 88, 0, 0.203); }
+.select-value-color-yellow { background-color: rgba(209, 156, 0, 0.282); }
+.select-value-color-green { background-color: rgba(0, 96, 38, 0.156); }
+.select-value-color-blue { background-color: rgba(0, 118, 217, 0.203); }
+.select-value-color-purple { background-color: rgba(92, 0, 163, 0.141); }
+.select-value-color-pink { background-color: rgba(183, 0, 78, 0.152); }
+.select-value-color-red { background-color: rgba(206, 24, 0, 0.164); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style><style>@import url('https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex-swap.min.css')</style></head><body><article id="344a15e2-9005-8077-b9f6-fea577fcd7dc" class="page serif" data-notion-page-icon="/icons/airplane_lightgray.svg"><header><img class="page-cover-image" src="https://app.notion.com/images/page-cover/usda_oranges.png" style="object-position:center 35%"/><div class="page-header-icon page-header-icon-with-cover"><img class="icon notion-static-icon" src="https://app.notion.com/icons/airplane_lightgray.svg"/></div><h1 class="page-title" dir="auto">Record</h1><p class="page-description" dir="auto"></p></header><div class="page-body"><div id="344a15e2-9005-8049-bcbb-d7e9860d35cb" class="column-list" data-notion-column-list="" dir="auto"><div id="344a15e2-9005-8051-8be0-c36508072d2b" style="width:18.75%" class="column" data-notion-column-ratio="0.1875" dir="auto"><hr id="344a15e2-9005-804c-aa32-dc82802d598f" dir="auto"/><figure id="344a15e2-9005-80bb-b04c-dbe700f10326" class="image" data-notion-image="Record/99fcf9f02677bed26fe6e9969ed278db.jpg" dir="ltr"><a href="Record/99fcf9f02677bed26fe6e9969ed278db.jpg"><img style="width:625.375px" src="Record/99fcf9f02677bed26fe6e9969ed278db.jpg"/></a></figure></div><div id="344a15e2-9005-80de-bade-ce4a6352f83a" style="width:81.25%" class="column" data-notion-column-ratio="0.8125" dir="auto"><details open="" class="" dir="auto"><summary style="font-weight:600;font-size:1.5em;line-height:1.3;margin:0"><h2 id="27bc988c-73c8-47d4-a50a-8156f44d319b" style="display:inline-block">Jaccard Similarity</h2></summary><div class="indented"><p id="bcb16fa4-0390-4e65-a58d-2b324fc2fe19" class="" dir="auto">The <strong>Jaccard Similarity</strong>, also called the <em>Jaccard Index</em> or <em>Intersection over Union (IoU)</em>, is a statistical measure used to compare the similarity and diversity of sample sets. It quantifies how similar two finite sets are by comparing their intersection to their union.</p><h3 id="6a34182c-1f38-43b2-8ac9-e2a5e234c1e7" class="" dir="auto">Key facts</h3><ul id="a7b9fd50-cbf6-4337-8b66-8fdb87868cf0" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Formula:</strong> |A ∩ B| / |A ∪ B|</li></ul><ul id="2eba79a2-21e6-428a-b953-27ce6dbfb146" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Range:</strong> 0 (no overlap) to 1 (identical sets)</li></ul><ul id="f1491de5-de77-45d9-87a1-1731208e7992" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Invented by:</strong> Paul Jaccard, 1901</li></ul><ul id="9faf4473-3940-484d-86b7-ee3c46f32712" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Applications:</strong> Data mining, natural language processing, image analysis</li></ul><h3 id="0f472f1d-4a2c-4c0e-827a-ef8d13091983" class="" dir="auto">Definition and calculation</h3><p id="d28d6be1-a5c6-4945-b3c8-f3a4731f321c" class="" dir="auto">Jaccard Similarity is defined as the size of the intersection divided by the size of the union of two sets. Mathematically,</p><p id="6423f78d-ce7b-4040-86cc-e86380ce7ec9" class="" dir="auto"><strong>J(A, B) = |A ∩ B| / |A ∪ B|.</strong></p><p id="a940d0bb-5408-4e17-92be-a21b693622f0" class="" dir="auto">If both sets are empty, the similarity is often defined as 1 by convention. It captures the proportion of shared elements relative to the total distinct elements across both sets.</p><h3 id="52862f85-f385-407d-bbc2-31844527f078" class="" dir="auto">Uses in data science and machine learning</h3><p id="b5b0b018-1b62-466f-9663-ccc2f5e70a84" class="" dir="auto">This metric is widely used for comparing binary attributes or categorical data, such as text documents, user preference sets, and image segmentation masks. In clustering and classification, it serves as a measure of pairwise similarity for items represented as sets or binary vectors. The complement, <em>Jaccard distance (1 − Jaccard similarity)</em>, is frequently used in distance-based algorithms like k-means and hierarchical clustering.</p><h3 id="ac6058fd-d41a-46a2-a107-fb13fbb92818" class="" dir="auto">Relation to other similarity measures</h3><p id="8d240b51-0b42-458b-959c-ad84307aaa04" class="" dir="auto">While similar to the <em>Cosine Similarity</em>, Jaccard Similarity focuses on set membership rather than vector magnitude. It is more appropriate for sparse, discrete data where only presence or absence of features matters, whereas cosine similarity accounts for frequency or intensity of features.</p></div></details><details open="" class="" dir="auto"><summary style="font-weight:600;font-size:1.5em;line-height:1.3;margin:0"><h2 id="28530383-7e55-4a9e-a041-b3e51d6883c4" style="display:inline-block"><strong>FAISS</strong></h2></summary><div class="indented"><p id="41480d96-2746-49ec-a3bc-360d934465d8" class="" dir="auto"><strong>FAISS (Facebook AI Similarity Search)</strong> is an open-source software library developed by Meta AI for efficient similarity search and clustering of dense vectors. It enables fast nearest-neighbor retrieval across very large datasets, supporting both CPU and GPU acceleration. FAISS is widely used in machine learning and information retrieval applications.</p><h3 id="1b75539e-229a-4b9e-9917-37bc2da4332b" class="" dir="auto"><strong>Key facts</strong></h3><ul id="cd0ba079-e19f-4fea-a2b3-e6f048efa12b" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Developer:</strong> Meta AI (formerly Facebook AI Research)</li></ul><ul id="00580e2b-de59-43e9-b290-0981d3df6827" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Initial release:</strong> 2017</li></ul><ul id="848f0b07-027d-4a40-9cdd-600a52220d27" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Primary language:</strong> C++ with Python bindings</li></ul><ul id="d8e35fd3-725a-4b33-a78e-84d085952ece" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Core purpose:</strong> High-dimensional vector similarity search</li></ul><ul id="6f95709b-3381-47d6-aa3f-3a2d2f73d47a" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>License:</strong> MIT License</li></ul><h3 id="be1abaf7-5b04-42a9-9629-dc5515275d3b" class="" dir="auto"><strong>Architecture and Functionality</strong></h3><p id="f311bc26-1391-4555-8f68-14fc0100b0e5" class="" dir="auto">FAISS provides a suite of algorithms and data structures optimized for large-scale vector search. It supports exact and approximate nearest neighbor (ANN) methods, using quantization and indexing techniques to balance speed and accuracy. Its modular design allows flexible choice of index types such as flat, IVF (inverted file), HNSW (hierarchical navigable small world), and PQ (product quantization).</p><h3 id="3f9e61f8-86f4-41c2-8ff7-804011f9aae0" class="" dir="auto"><strong>GPU and Performance Optimization</strong></h3><p id="5e2b4308-192d-4866-aded-c0c30f5a1213" class="" dir="auto">A key advantage of FAISS is its support for GPU acceleration, enabling search operations across billions of vectors in milliseconds. The library implements CUDA-optimized kernels and provides multi-GPU and distributed search capabilities. These optimizations make FAISS suitable for large-scale deployment in recommendation systems, semantic search, and embedding retrieval.</p><h3 id="781af380-889d-4f56-9922-3fa91634a75a" class="" dir="auto"><strong>Applications and Ecosystem</strong></h3><p id="f0f249de-2212-45bd-a4d4-ea18c33e4551" class="" dir="auto">FAISS underpins many real-world machine learning pipelines, particularly for tasks requiring similarity-based retrieval—such as image or text embedding search, clustering, and deduplication. It integrates with frameworks like PyTorch and is often paired with vector databases and AI platforms to provide scalable vector indexing infrastructure.</p><h3 id="dfa60a0b-712c-4167-86cf-c63242fa9ebd" class="" dir="auto"><strong>Development and Community</strong></h3><p id="a54e9b14-0696-42a9-938e-802e22f991a7" class="" dir="auto">Since its release, FAISS has been actively maintained by Meta and open-source contributors. Its extensive documentation, tutorials, and benchmarks have established it as a de facto standard in the vector similarity search domain. The project continues to evolve with support for new index types and performance improvements.</p></div></details><details open="" class="" dir="auto"><summary style="font-weight:600;font-size:1.5em;line-height:1.3;margin:0"><h2 id="344a15e2-9005-80c8-957f-ed3d11d627d1" style="display:inline-block">20260416</h2></summary><div class="indented"><h4 id="344a15e2-9005-804e-bbff-e4542d146b52" class="" dir="auto"><strong>總結</strong></h4><p id="344a15e2-9005-80f0-bb93-eb4921a89a44" class="" dir="auto">現在訓練 LLM 的資料去重面臨一個極端的兩難：要嘛用極度便宜但只能抓「逐字抄襲」的 <strong>MinHash</strong>；要嘛用能抓出「換句話說 (改寫)」但貴到無法在大規模資料上運作的 <strong>SemDeDup</strong> (Transformer 模型)。</p><p id="344a15e2-9005-80e2-af3b-c3007711cd5f" class="" dir="auto">這個研究的核心點子是：借鏡資料庫（如 LSM-Tree）的<strong>分層過濾 (Filter-and-Verify Cascade)</strong> 設計。先用便宜的技術（如 Static Embedding 或 MinHash）以極低的成本過濾掉 90% 「明顯不重複」或「完全一模一樣」的資料，只把剩下 10% 處於「模糊地帶」的資料，送交給昂貴的 Transformer 模型做最終判定。</p><hr id="344a15e2-9005-80f3-a1ce-fe57b3b367f3" dir="auto"/><h4 id="344a15e2-9005-800d-8962-e16adc8fe745" class="" dir="auto"><strong>關鍵技術</strong></h4><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-icon="💡" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="344a15e2-9005-80cc-b90b-fe7b02b12301" dir="ltr"><div style="font-size:1.5em"><span class="icon" data-emoji="💡"></span></div><div style="width:100%"><ol type="1" id="344a15e2-9005-8069-8593-fd6975a95856" class="numbered-list" start="1" dir="auto"><li><strong>MinHash (Min-wise Independent Permutations)</strong><ol type="a" id="344a15e2-9005-802c-bb24-d424dcdec1e0" class="numbered-list" start="1" dir="auto"><li><strong>概念</strong>：一種用來快速估算兩個集合相似度（Jaccard Similarity）的降維技術。</li></ol><ol type="a" id="344a15e2-9005-8023-8463-c17577ba4065" class="numbered-list" start="2" dir="auto"><li><strong>原理</strong>：<p id="344a15e2-9005-80ce-9afe-d00cec56b437" class="" dir="auto">將文章切成多個 N-gram (Shingles)，通過多個 Hash 函數映射，只保留每個 Hash 的最小值組成 Signature。<br/>比較 Signature 相同的比例，就能推算出原文的重疊度。</p></li></ol><ol type="a" id="344a15e2-9005-800b-b3b7-d19e659f1ab2" class="numbered-list" start="3" dir="auto"><li><strong>限制</strong>：<p id="344a15e2-9005-800f-a215-e1a859abcd2e" class="" dir="auto">它是基於<strong>字面 (Syntactic)</strong> 的比對。如果一句話從「這是一隻可愛的狗」改成「這隻小狗長得很討喜」，字面重疊極低，MinHash 就會判定為不重複。</p></li></ol></li></ol></div></aside><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-icon="💡" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="344a15e2-9005-801c-af8f-dccdb68ca688" dir="ltr"><div style="font-size:1.5em"><span class="icon" data-emoji="💡"></span></div><div style="width:100%"><ol type="1" id="344a15e2-9005-801d-968a-e820ab1a6491" class="numbered-list" start="1" dir="auto"><li><strong>SemDeDup (Semantic Deduplication)</strong><ol type="a" id="344a15e2-9005-80c4-b5cb-c8e5e237def5" class="numbered-list" start="1" dir="auto"><li><strong>概念</strong>：基於<strong>語意理解</strong>的去重。</li></ol><ol type="a" id="344a15e2-9005-804c-880b-d9ad505a07ec" class="numbered-list" start="2" dir="auto"><li><strong>原理</strong>：<p id="344a15e2-9005-8007-b964-cec3c6651896" class="" dir="auto">利用 Transformer（如 Sentence-Transformers）將文章轉化為高維度向量 (Dense Embedding)。<br/>在向量空間中，如果兩個點的 Cosine Similarity 很高（例如 &gt; 0.9），就代表語意相似。<br/>為了避免 <span data-notion-inline-equation="O(N^2)" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></span> 的全域兩兩比對，通常會先用 K-Means 進行聚類 (Clustering)，只在同一個 Cluster 內做比對。</p></li></ol></li></ol></div></aside><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-icon="💡" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="344a15e2-9005-80a5-bbd1-f2507d6c9aa0" dir="ltr"><div style="font-size:1.5em"><span class="icon" data-emoji="💡"></span></div><div style="width:100%"><ol type="1" id="344a15e2-9005-8025-aad8-d57ecfbbf639" class="numbered-list" start="1" dir="auto"><li><strong>Static Embedding (如 Model2Vec)</strong><ol type="a" id="344a15e2-9005-80d1-b77c-d53b263b2e4b" class="numbered-list" start="1" dir="auto"><li><strong>概念</strong>：Transformer 的「輕量化平替」。</li></ol><ol type="a" id="344a15e2-9005-80f8-aa11-f9245bcd7f32" class="numbered-list" start="2" dir="auto"><li><strong>原理</strong>：<p id="344a15e2-9005-805b-8d02-fbb28882cd9c" class="" dir="auto">傳統 Transformer 會根據上下文動態計算每個字的向量（Attention 機制），計算量巨大。Model2Vec 這類技術則是把 Transformer 的知識「蒸餾」成一個固定的靜態詞典（類似傳統的 Word2Vec）。查詢時只需把句子中每個字的向量查表並加總（或平均），省去了極度耗時的矩陣運算，速度可提升百倍以上。</p></li></ol></li></ol></div></aside><hr id="344a15e2-9005-80ba-8f56-cd16b7f5ff2b" dir="auto"/><h4 id="344a15e2-9005-8023-8611-dfe40bd52e06" class="" dir="auto"><strong>重點筆記</strong></h4><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-icon="💡" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="344a15e2-9005-80a5-b350-cfe70f5f7139" dir="ltr"><div style="font-size:1.5em"><span class="icon" data-emoji="💡"></span></div><div style="width:100%"><p id="344a15e2-9005-80cd-9429-e5b20d24617f" class="" dir="auto"><strong>核心假設：語意相似度的「雙峰分佈 (Bimodal Distribution)」</strong><div class="indented"><p id="344a15e2-9005-802c-bdf3-f4f5d617e9c9" class="" dir="auto"><strong>重點</strong>：<div class="indented"><p id="344a15e2-9005-80fd-86cc-dd4397b88c44" class="" dir="auto">這是整個 Cascade 架構能否成功的生死關鍵。如果多數資料的相似度都落在 0.7 - 0.95 的「模糊地帶」，那分層過濾就沒有意義，因為多數資料最終還是得送進 Transformer。只有當資料呈現兩極化（絕大多數毫不相干，少數完全重複），這個架構才能發揮巨大的 Cost-saving 效益。</p></div></p></div></p></div></aside><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-icon="💡" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="344a15e2-9005-8088-ad5c-fef9776543ca" dir="ltr"><div style="font-size:1.5em"><span class="icon" data-emoji="💡"></span></div><div style="width:100%"><p id="344a15e2-9005-8015-8f45-c887e724760d" class="" dir="auto"><strong>跨界思維：將 LSM-Tree 最佳化引入 LLM Pipeline</strong><div class="indented"><p id="344a15e2-9005-80ca-9847-e198da285b25" class="" dir="auto"><strong>重點</strong>：<div class="indented"><p id="344a15e2-9005-8015-9b08-e01ff9c27c25" class="" dir="auto">LSM-Tree 中的 Bloom Filter 是為了減少不必要的 Disk I/O；而這裡的「便宜模型」是為了減少不必要的 GPU Compute (Transformer)。</p></div></p><p id="344a15e2-9005-80f5-86a7-db3b4f3f9761" class="" dir="auto"><strong>補充說明</strong>：<div class="indented"><p id="344a15e2-9005-80f8-93c3-e89e72eae273" class="" dir="auto">如同 <em>Monkey</em> 論文中對 False Positive Rate (FPR) 的最佳化分配，這個去重架構可以建立一個成本數學模型：<div class="indented"><p id="344a15e2-9005-80a9-856d-e3d23569e7d0" class="" dir="auto"> <span data-notion-inline-equation="E[Cost] = Cost_{cheap} + P(Escalate) \times Cost_{expensive}" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="mord mathnormal">os</span><span class="mord mathnormal">t</span><span class="mclose">]</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="mord mathnormal">os</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">c</span><span class="mord mathnormal mtight">h</span><span class="mord mathnormal mtight">e</span><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight">p</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span><span class="mord mathnormal">sc</span><span class="mord mathnormal">a</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">a</span><span class="mord mathnormal">t</span><span class="mord mathnormal">e</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="mord mathnormal">os</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">e</span><span class="mord mathnormal mtight">x</span><span class="mord mathnormal mtight">p</span><span class="mord mathnormal mtight">e</span><span class="mord mathnormal mtight">n</span><span class="mord mathnormal mtight">s</span><span class="mord mathnormal mtight">i</span><span class="mord mathnormal mtight" style="margin-right:0.03588em;">v</span><span class="mord mathnormal mtight">e</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span></span></p></div></p><p id="344a15e2-9005-8036-9fc4-c526e4861b29" class="" dir="auto">系統工程師的目標，就是透過調整 Threshold，在保證召回率 (Recall) 的前提下，最小化整體的 Expected Cost。</p></div></p></div></p></div></aside><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-icon="💡" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="344a15e2-9005-8018-9dce-fdfd8c888c28" dir="ltr"><div style="font-size:1.5em"><span class="icon" data-emoji="💡"></span></div><div style="width:100%"><p id="344a15e2-9005-80b4-8b2d-e7cec845b039" class="" dir="auto"><strong>系統瓶頸的轉移：從 Compute Bound 到 I/O Bound</strong><div class="indented"><p id="344a15e2-9005-80bc-86f1-e2e6a8c6a9cb" class="" dir="auto"><strong>重點</strong>：<div class="indented"><p id="344a15e2-9005-803e-9156-cfed3e050aec" class="" dir="auto">目前的去重工具多採用 Batch 處理（讀取 → 處理 → 寫入 Parquet → 下一階段再讀取）。當算力成本被 Static Embedding 壓低後，Pipeline 的瓶頸將立刻轉移到 Storage I/O 上。</p></div></p><p id="344a15e2-9005-80e9-8264-e24487a02019" class="" dir="auto"><strong>補充說明 (架構優化)</strong>：<div class="indented"><p id="344a15e2-9005-80ff-bff0-d3e8af9f8c69" class="" dir="auto">如果能將多層級去重改寫為 <strong>Streaming Pipeline</strong>，利用 In-memory 資料傳遞（如 Apache Arrow），或者在底層採用更高效的 I/O 堆疊（例如繞過 Kernel 的 Zero-copy 機制或 <code>io_uring</code> 非同步 I/O 讀取原始語料），可以大幅減少 Intermediate 檔案落地的開銷，這會是工程實作上一個極大的亮點。</p></div></p></div></p></div></aside><hr id="344a15e2-9005-80cc-b01f-d8fd1a3d6f87" dir="auto"/><p id="344a15e2-9005-8006-abe8-f3cbb2cc82ca" class="" dir="auto"><strong>核心問題</strong></p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-icon="💡" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="344a15e2-9005-80b5-8b05-cfdec5eeb1e0" dir="ltr"><div style="font-size:1.5em"><span class="icon" data-emoji="💡"></span></div><div style="width:100%"><p id="344a15e2-9005-80a3-9ec4-f4d35d58de42" class="" dir="auto"><strong>1. 現有的去重方法到底怎麼運作？</strong><div class="indented"><p id="344a15e2-9005-8057-8f93-eb5d01302538" class="" dir="auto"><strong>MinHash 估算 Jaccard</strong>：<div class="indented"><p id="344a15e2-9005-80d4-91aa-d02fb8f73071" class="" dir="auto">透過計算兩篇文章 N-gram 集合的交集除以聯集。它只能抓 Syntactic 重複是因為它把文章視為「字串的集合」，無法理解詞彙背後的關聯（如「開心」與「快樂」對它來說是完全不同的字串）。</p></div></p><p id="344a15e2-9005-8018-86a6-c5b90dcdd07c" class="" dir="auto"><strong>SemDeDup 運作</strong>：<div class="indented"><p id="344a15e2-9005-809a-b2fc-f29712a8cf7c" class="" dir="auto">使用如 <code>all-mpnet-base-v2</code> 等模型提取特徵。為了避免兩兩比對爆炸，它先對整個 Corpus 進行 K-Means 分群，然後只計算同群內文件對的 Cosine Similarity，超過設定的 Threshold（如 0.8）就刪除。</p></div></p><p id="344a15e2-9005-806b-981a-f90563356a4f" class="" dir="auto"><strong>Static vs. Transformer</strong>：<div class="indented"><p id="344a15e2-9005-80d1-b983-e593796ae082" class="" dir="auto">Static Embedding（如 Model2Vec）沒有 Attention 機制，無法處理一詞多義或複雜語境，因此在「模糊地帶」的精準度會斷崖式下降。但它快在只需「查表 + 矩陣相加」，沒有龐大的線性層運算。</p></div></p></div></p></div></aside><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-icon="💡" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="344a15e2-9005-80ab-8282-f66dfb57fe09" dir="ltr"><div style="font-size:1.5em"><span class="icon" data-emoji="💡"></span></div><div style="width:100%"><p id="344a15e2-9005-80eb-bef2-ca2f672b5b4f" class="" dir="auto"><strong>2. 語意相似度的分佈長什麼樣？</strong><div class="indented"><p id="344a15e2-9005-8070-9b5f-da2ba09f8882" class="" dir="auto">根據 <em>SemDeDup (Abbas et al., 2023)</em> 的觀察，網頁文本（如 C4）的相似度分佈<strong>並非完全的雙峰</strong>，而是呈現「右尾極長」的偏態分佈。絕大多數的文件對相似度低於 0.3，而在 0.8 以上會有一個微小的隆起（代表改寫或抄襲的網頁）。</p><p id="344a15e2-9005-80ef-82b0-f935a885f89a" class="" dir="auto"><strong>領域差異</strong>：<div class="indented"><p id="344a15e2-9005-80cb-ab99-ed43191e33be" class="" dir="auto">Code Corpus (如 The Stack) 的分佈會更偏向高相似度，因為程式碼有大量的樣板 (Boilerplate) 和重複的開源授權聲明；Scientific Text 則會在特定的專業術語上有較高的 Baseline 重疊。</p></div></p></div></p></div></aside><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-icon="💡" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="344a15e2-9005-80f8-acee-fc0783a46747" dir="ltr"><div style="font-size:1.5em"><span class="icon" data-emoji="💡"></span></div><div style="width:100%"><p id="344a15e2-9005-80fc-a256-e30ad2055d06" class="" dir="auto"><strong>3. 便宜的近似方法在「模糊地帶」的可靠性如何？</strong><div class="indented"><p id="344a15e2-9005-8020-87a2-c18c6f611fc6" class="" dir="auto">在 Cosine 0.7 - 0.95 這個區間，Static Embedding 的可靠度會顯著下降。因為這個區間通常包含大量「句型結構不同但語意一致」的改寫，Static Embedding 缺乏全局 Attention，容易將它們誤判為低相似度（False Negative）。</p><p id="344a15e2-9005-8091-96ab-ec68775438f7" class="" dir="auto"><strong>策略</strong>：這正是 Cascade 架構存在的理由。便宜模型不需要在模糊地帶很準，它只需要能極度精準地判斷出「絕對不相似 (&lt; 0.7)」的 case 並把它們剔除即可。</p></div></p></div></aside><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-icon="💡" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="344a15e2-9005-8038-ab67-fdf9c3209135" dir="ltr"><div style="font-size:1.5em"><span class="icon" data-emoji="💡"></span></div><div style="width:100%"><p id="344a15e2-9005-8084-9337-d625af42f3b8" class="" dir="auto"><strong>4. Filter-and-verify cascade 的 Cost Model 怎麼建？</strong><div class="indented"><p id="344a15e2-9005-800e-9a24-fa8e383ac47d" class="" dir="auto"><strong>參數</strong>：<div class="indented"><p id="344a15e2-9005-8073-b4a3-d456a9757199" class="" dir="auto">你需要定義 <span data-notion-inline-equation="C_1" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span> (第一層處理單篇文件的時間/算力成本)、<span data-notion-inline-equation="C_2" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span> (第二層成本)、<span data-notion-inline-equation="T_L" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">L</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span> (直接丟棄的下限閾值)、<span data-notion-inline-equation="T_H" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.08125em;">H</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span> (直接判定重複的上限閾值)，以及 <span data-notion-inline-equation="P(Escalate)" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span><span class="mord mathnormal">sc</span><span class="mord mathnormal">a</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">a</span><span class="mord mathnormal">t</span><span class="mord mathnormal">e</span><span class="mclose">)</span></span></span></span></span> (落在 <span data-notion-inline-equation="T_L" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">L</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span> 到 <span data-notion-inline-equation="T_H" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.08125em;">H</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span> 之間的機率)。</p></div></p><p id="344a15e2-9005-8061-ab9e-e81a2c3a721f" class="" dir="auto"><strong>借鏡 Monkey</strong>：<div class="indented"><p id="344a15e2-9005-8045-a605-cc4bd9e6c499" class="" dir="auto">Monkey 是在給定記憶體下最小化 I/O；在這裡，你是在給定的去重品質（以完整的 SemDeDup 輸出為 Ground Truth，計算 F1-score）下，尋找最佳的 <span data-notion-inline-equation="T_L" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">L</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span> 和 <span data-notion-inline-equation="T_H" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.08125em;">H</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span> 以最小化整體 Compute Cost。</p></div></p></div></p></div></aside><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-icon="💡" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="344a15e2-9005-807e-9851-cfa15876e724" dir="ltr"><div style="font-size:1.5em"><span class="icon" data-emoji="💡"></span></div><div style="width:100%"><p id="344a15e2-9005-80a8-86c9-c11ca8d4be64" class="" dir="auto"><strong>Pipeline 的 I/O 行為可以怎麼改善？</strong><div class="indented"><p id="344a15e2-9005-800c-ba03-f26548d351dc" class="" dir="auto"><strong>現狀</strong>：<div class="indented"><p id="344a15e2-9005-801c-b52c-fad56bff2a8c" class="" dir="auto">HuggingFace <code>datasets</code> 配合 <code>text-dedup</code> 往往會在每個階段產生大量的 <code>.arrow</code> 或 <code>.parquet</code> 快取檔案落地。</p></div></p><p id="344a15e2-9005-80a4-938c-fb44610f9682" class="" dir="auto"><strong>改善</strong>：<div class="indented"><p id="344a15e2-9005-80c0-8d8c-ced89f12c75c" class="" dir="auto">將階段一（MinHash / Static Embedding）和階段二（Transformer Verify）整合在同一個進程的 Generator 中。當第一階段發現一個疑似 Pair 時，不要寫入磁碟，直接透過記憶體中的 Queue 傳遞給駐留在 GPU 中的 Transformer 模型進行即時驗證。這不僅省下磁碟寫入，更能大幅減少重複序列化/反序列化 (Serialization) 的 CPU 負擔。</p></div></p></div></p></div></aside><p id="344a15e2-9005-80ba-82d9-ed7c945a0509" class="" dir="auto">
+</p></div></details></div></div><p id="344a15e2-9005-8041-b78c-cf7a52370c5e" class="" dir="auto">
+</p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

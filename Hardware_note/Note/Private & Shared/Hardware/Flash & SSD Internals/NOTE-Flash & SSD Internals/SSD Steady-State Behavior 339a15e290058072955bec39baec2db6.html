@@ -1,0 +1,769 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>SSD Steady-State Behavior</title><meta name="data-notion-page-icon" content="🔧"/><link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2290%22%3E%F0%9F%94%A7%3C%2Ftext%3E%3C%2Fsvg%3E"/><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+/* Override strong tags inside headings to maintain consistent weight */
+h1 strong,
+h2 strong,
+h3 strong {
+	font-weight: 600;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 10px;
+	padding: 1rem;
+}
+
+/* For default-background callouts, render the border outline. */
+.callout.block-color-default_background {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+figure,
+aside,
+details {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+
+	table.collection-content {
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	table.collection-content th,
+	table.collection-content td {
+		overflow-wrap: anywhere;
+	}
+
+	table.collection-content td > .user,
+	table.collection-content td > time {
+		white-space: pre-wrap;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content-wrapper {
+	overflow-x: auto;
+}
+
+@media only print {
+	.collection-content-wrapper {
+		overflow-x: visible;
+	}
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.collection-content td {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.column-list {
+	display: flex;
+	gap: 46px;
+}
+
+.column {
+	min-width: 0;
+	overflow: hidden;
+}
+
+.column > *:first-child {
+	margin-top: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding-inline: 0.125rem;
+	padding-block: 0.375rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+table {
+	border-collapse: collapse;
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol.numbered-list.numbered-list-digits-2 {
+	padding-inline-start: 2em;
+}
+
+ol.numbered-list.numbered-list-digits-3plus {
+	padding-inline-start: 2.4em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+/*
+ * Render emoji icons using a ::before pseudo-element to keep the glyph
+ * out of the DOM textContent traversal. This avoids double-rendering icons
+ * in callouts and page titles.
+ * NOTE(slim/html-export-pseudo-icons): I can't tagref this because it will
+ * flag as a duplicate tag after codegen.
+ */
+.icon[data-emoji]::before {
+	content: attr(data-emoji);
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.callout img.notion-static-icon {
+	width: 1em;
+	height: 1em;
+}
+
+.callout p {
+	margin: 0;
+}
+
+.callout h1,
+.callout h2,
+.callout h3 {
+	margin: 0 0 0.6rem;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	margin-right: 0.4em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+blockquote.quote-large {
+	font-size: 1.25em;
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.tab {
+	margin: 1.25em 0;
+	padding-inline: 1rem;
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.highlight-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.highlight-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.highlight-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.highlight-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.highlight-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.highlight-default_background {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray_background {
+	background: rgba(42, 28, 0, 0.07);
+}
+.highlight-brown_background {
+	background: rgba(139, 46, 0, 0.086);
+}
+.highlight-orange_background {
+	background: rgba(224, 101, 1, 0.129);
+}
+.highlight-yellow_background {
+	background: rgba(211, 168, 0, 0.137);
+}
+.highlight-teal_background {
+	background: rgba(0, 100, 45, 0.09);
+}
+.highlight-blue_background {
+	background: rgba(0, 124, 215, 0.094);
+}
+.highlight-purple_background {
+	background: rgba(102, 0, 178, 0.078);
+}
+.highlight-pink_background {
+	background: rgba(197, 0, 93, 0.086);
+}
+.highlight-red_background {
+	background: rgba(223, 22, 0, 0.094);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.block-color-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.block-color-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.block-color-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.block-color-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.block-color-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(240, 239, 237, 1);
+}
+.block-color-brown_background {
+	background: rgba(245, 237, 233, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 235, 222, 1);
+}
+.block-color-yellow_background {
+	background: rgba(249, 243, 220, 1);
+}
+.block-color-teal_background {
+	background: rgba(232, 241, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(229, 242, 252, 1);
+}
+.block-color-purple_background {
+	background: rgba(243, 235, 249, 1);
+}
+.block-color-pink_background {
+	background: rgba(250, 233, 241, 1);
+}
+.block-color-red_background {
+	background: rgba(252, 233, 231, 1);
+}
+.select-value-color-default { background-color: rgba(42, 28, 0, 0.07); }
+.select-value-color-gray { background-color: rgba(28, 19, 1, 0.11); }
+.select-value-color-brown { background-color: rgba(127, 51, 0, 0.156); }
+.select-value-color-orange { background-color: rgba(196, 88, 0, 0.203); }
+.select-value-color-yellow { background-color: rgba(209, 156, 0, 0.282); }
+.select-value-color-green { background-color: rgba(0, 96, 38, 0.156); }
+.select-value-color-blue { background-color: rgba(0, 118, 217, 0.203); }
+.select-value-color-purple { background-color: rgba(92, 0, 163, 0.141); }
+.select-value-color-pink { background-color: rgba(183, 0, 78, 0.152); }
+.select-value-color-red { background-color: rgba(206, 24, 0, 0.164); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style><style>@import url('https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex-swap.min.css')</style></head><body><article id="339a15e2-9005-8072-955b-ec39baec2db6" class="page serif" data-notion-page-icon="🔧"><header><img class="page-cover-image" src="https://app.notion.com/images/page-cover/met_william_morris_1877_willow.jpg" style="object-position:center 90%"/><div class="page-header-icon page-header-icon-with-cover"><span class="icon" data-emoji="🔧"></span></div><h1 class="page-title" dir="auto"><mark class="highlight-red" data-notion-highlight="red">SSD Steady-State Behavior</mark></h1><p class="page-description" dir="auto"></p><table class="properties"><tbody></tbody></table></header><div class="page-body"><div id="339a15e2-9005-8058-821b-f04584128d0f" class="column-list" data-notion-column-list="" dir="auto"><div id="339a15e2-9005-80fc-b887-f3bd2295739f" style="width:18.75%" class="column" data-notion-column-ratio="0.1875" dir="auto"><hr id="339a15e2-9005-8031-b2d3-cc09edaf6f4d" dir="auto"/><figure id="339a15e2-9005-804d-a4c7-eee506f55839" class="image" data-notion-image="Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg" dir="ltr"><a href="Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg"><img style="width:548.375px" src="Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg"/></a></figure><p id="339a15e2-9005-8061-ba73-c3e66fcabffe" class="" dir="auto">
+</p></div><div id="339a15e2-9005-800d-8168-f8f9710f1b3b" style="width:81.25%" class="column" data-notion-column-ratio="0.8125" dir="auto"><h3 id="339a15e2-9005-80a6-852a-ecfe9bec26bb" class="" dir="auto"><mark class="highlight-default" data-notion-highlight="default">SSD Steady-State Behavior</mark></h3><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80a0-9422-e74c0215ca10" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80b7-829f-cb85b4d59043" class="" dir="auto">YouTube 開箱影片裡，評測者拿到一顆全新的 NVMe SSD，打開 CrystalDiskMark，跑出 sequential read 7,000 MB/s 的成績，彈幕一片「好猛」。但如果你把同一顆 SSD 拿來當 OS 碟用了半年，每天承受系統 log、瀏覽器 cache、各種應用程式的零碎寫入，再跑一次同樣的 benchmark，數字會不太一樣。</p><p id="33aa15e2-9005-808c-a236-d84a9dea3247" class="" dir="auto">差距不是因為 SSD 壞了，而是因為第一次測的是 fresh state，第二次面對的是 steady state，這是兩個完全不同的運作條件。只看開箱成績就下單的 SSD 評測，跟只看入學成績不看畢業率的大學排名一樣，只說了故事的前半段。</p></div></aside><blockquote id="339a15e2-9005-807e-9cd3-f42711c00797" class="" dir="auto">Reference: <a href="https://www.youtube.com/watch?v=3SmhaBZQ4ew">https://www.youtube.com/watch?v=3SmhaBZQ4ew</a></blockquote><hr id="339a15e2-9005-8036-8685-dc715a634811" dir="auto"/><details id="339a15e2-9005-8067-b3f5-eab92b5dd39d" open="" class="toggle" dir="auto"><summary><strong>Classification</strong></summary><div class="indented"><p id="339a15e2-9005-809e-9c3f-d2a959b0223b" class="" dir="auto">
+</p><hr id="339a15e2-9005-8063-943a-d9e1a5da8f17" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80e4-8a4f-d32f987cb71b" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80df-88b5-d245b038726c" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Extra Component</mark></p><hr id="339a15e2-9005-801a-b5bd-cd334a30d9ae" dir="auto"/><p id="339a15e2-9005-808d-8690-d9880d161a5a" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Reference:</mark></p></div></aside><hr id="339a15e2-9005-809c-a499-c0c6c7862d36" dir="auto"/></div></details><details id="339a15e2-9005-8023-b9af-db5e67e0cab5" open="" class="toggle" dir="auto"><summary><strong>Key Word Definition/ Discussion</strong></summary><div class="indented"><details id="339a15e2-9005-80c2-90db-fbc87b6e4ecb" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Steady state vs fresh state</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-800e-b08e-fe95b5bfcabb" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-809c-987d-f362512bd5b0" class="" dir="auto"><strong>Fresh state:</strong> SSD 剛開始使用時的狀態，所有 NAND block 幾乎都是空的（erased）。</p><p id="33aa15e2-9005-801f-b6ea-e780cc4585c5" class="" dir="auto"><strong>Steady state: </strong>SSD 經過長時間使用後，進入GC 持續發生、效能穩定但較低的狀態。</p></div></aside><hr id="339a15e2-9005-80e6-894d-cfc53c057536" dir="auto"/><div id="33aa15e2-9005-805f-90e4-f4632b3bea35" class="column-list" data-notion-column-list="" dir="auto"><div id="33aa15e2-9005-8044-9407-c39880b9dcfe" style="width:50%" class="column" data-notion-column-ratio="0.5" dir="auto"><p id="15a5e733-8a86-4fb1-b01c-3274d0a36b7d" class="" dir="auto"><strong>Fresh state</strong> 的特徵：</p><ul id="c1b8b18f-cc36-49bf-9478-070515da1364" class="bulleted-list" dir="auto"><li style="list-style-type:disc">NAND flash 上所有 block 都是 erased 的（空白的）</li></ul><ul id="0eba1307-5067-4400-bae1-ae0caef3ed27" class="bulleted-list" dir="auto"><li style="list-style-type:disc">每次寫入都直接找一個空白 page，零 GC 開銷</li></ul><ul id="ede45b89-7e4c-4c51-b54b-d75b73b8911c" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Write amplification 接近 1（幾乎沒有額外寫入）</li></ul><ul id="2696c42b-fb30-4fda-8622-b93b5245b8e5" class="bulleted-list" dir="auto"><li style="list-style-type:disc">寫入延遲非常穩定，幾乎看不到 tail latency spike</li></ul><hr id="33aa15e2-9005-8069-a86e-dea629a63667" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8041-abbd-e8eedb48271d" dir="ltr"><div style="width:100%"><ul id="e32bbf63-84f7-4582-a6d7-3645a13d9f5d" class="bulleted-list" dir="auto"><li style="list-style-type:disc">規格表（spec）通常測的是這個狀態 </li></ul><ul id="33aa15e2-9005-8041-a514-d95bc35697bd" class="bulleted-list" dir="auto"><li style="list-style-type:disc">幾乎不會出現在真實長期運行系統中</li></ul></div></aside></div><div id="33aa15e2-9005-803c-aa3d-f834f669d45e" style="width:50%" class="column" data-notion-column-ratio="0.5" dir="auto"><p id="ac0083c2-8e56-4d94-a3c2-f7b0e9ab6e37" class="" dir="auto"><strong>Steady state</strong> 的特徵：</p><ul id="3666c557-a417-4f04-b1a4-e09bc7be2b3b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">NAND flash 上大部分 block 都已經被寫過</li></ul><ul id="1664cefa-9fc7-4812-a891-f6d41a9f77c9" class="bulleted-list" dir="auto"><li style="list-style-type:disc">每次寫入都可能觸發 GC 來回收空間</li></ul><ul id="170f7736-5ce5-40f2-9932-8e18ba013971" class="bulleted-list" dir="auto"><li style="list-style-type:disc">WAF 明顯大於 1（典型值 2-5，取決於 workload 和 OP）</li></ul><ul id="6ab56207-1aa8-4f0a-b89b-36019db45070" class="bulleted-list" dir="auto"><li style="list-style-type:disc">寫入延遲出現顯著的 tail latency spike（p99 延遲可能是 p50 的 10-100 倍）</li></ul><hr id="33aa15e2-9005-802f-97e1-fea29c3c3da8" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80a7-ae49-df3cf99f10cf" dir="ltr"><div style="width:100%"><ul id="700e77b4-06e3-486a-b437-f9729b3ef02e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">steady state throughput ≈ <strong>fresh 的 30–50%</strong></li></ul><ul id="8071c57a-c572-46d9-ae5b-3760b52fddc4" class="bulleted-list" dir="auto"><li style="list-style-type:disc">真實系統（DB / server）幾乎都在這個狀態</li></ul><ul id="945b23d2-d63e-4f1f-a8af-13f1a88610b0" class="bulleted-list" dir="auto"><li style="list-style-type:disc">設計系統時應以這個為準</li></ul></div></aside></div></div><hr id="311f4737-bc98-4fd4-9236-7b0a17ec1bab" dir="auto"/><p id="33aa15e2-9005-8055-8ade-fe55d5eaa8a1" class="" dir="auto"><strong>Transition</strong><div class="indented"><p id="33aa15e2-9005-804c-93bf-c5547c9aceb7" class="" dir="auto">從 fresh state 過渡到 steady state 的過程很簡單：<div class="indented"><p id="33aa15e2-9005-8042-aff5-ca31d66dc001" class="" dir="auto">持續寫入資料，直到 SSD 第一次耗盡所有空白 block、開始觸發 GC。對於消費級 SSD（7% OP），這大約是寫滿 SSD 容量一次之後就會開始進入 steady state。對於企業級 SSD（28% OP），可能需要寫滿 1-2 次。</p></div></p><p id="9d4ac3e4-b650-4564-b66c-7c83ab4f9b61" class="" dir="auto">一個常被忽略的事實是：steady state 的效能可能只有 fresh state 的 30-50%。也就是說，規格表上 500K IOPS 的 SSD，在 steady state 下可能只剩 150-250K IOPS。這不是 SSD 壞了，這是正常行為。</p></div></p><hr id="339a15e2-9005-807c-b5d1-cdc4ae5fc9af" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-804f-a319-f7af925edf1a" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8068-b8f7-cde11db5f340" class="" dir="auto">Reference: </p></div></aside><hr id="339a15e2-9005-80bf-b5da-fecbbc12df2c" dir="auto"/></div></details><details id="33aa15e2-9005-8097-8aef-df38f04115e4" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Tail latency</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8041-ae43-c0bf64877c00" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8015-98ff-e72023e70ee8" class="" dir="auto">延遲分佈中「最慢的那一段」</p></div></aside><hr id="33aa15e2-9005-804e-a712-d385f2503f54" dir="auto"/><p id="33aa15e2-9005-802e-8021-e930a88918ff" class="" dir="auto"><strong>為什麼 steady state 的效能會下降？</strong><div class="indented"><p id="33aa15e2-9005-80b8-bf66-cf4f3f066b85" class="" dir="auto">根本原因是 GC 和使用者的 I/O 請求在競爭 NAND flash 的頻寬。</p><p id="33aa15e2-9005-80f7-9ccf-f7b39356e14e" class="" dir="auto">NAND flash 的 die/plane 在任何時刻只能做一件事：要嘛服務使用者的讀寫請求，要嘛執行 GC 的資料搬移和 block erase。當 GC 正在搬移 valid page 時，使用者的寫入請求必須等待（或者被路由到其他 die，如果有空閒的話）。</p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80f7-94d7-c4273c7e3853" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80ce-aafb-d389d2238d7c" class="" dir="auto">GC ↑ → user I/O ↓</p></div></aside></div></p><hr id="33aa15e2-9005-80c9-9146-fea0fae85725" dir="auto"/><p id="e9f46156-81f9-4365-a2bc-b93bfd71120d" class="" dir="auto"><strong>平均 throughput 下降</strong>：<div class="indented"><p id="33aa15e2-9005-80c0-92ae-fd11325c4b83" class="" dir="auto">假設 NAND flash 的總頻寬是 2 GB/s。如果 GC 需要消耗其中 40% 的頻寬來搬移 valid page 和做 block erase，那使用者實際可用的頻寬只剩 1.2 GB/s。WAF 越高，GC 消耗的頻寬比例越大，使用者可用的頻寬越少。</p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8043-9cf8-e5b138812e37" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8077-bed6-f130d7cdb397" class="" dir="auto">WAF ↑ → GC 頻寬消耗 ↑</p></div></aside></div></p><p id="196c6ef4-94c3-4856-9e41-e52594f6e268" class="" dir="auto"><strong>Tail latency spike：</strong><div class="indented"><p id="33aa15e2-9005-803e-b0d5-e22755f4906c" class="" dir="auto">更大的問題不是平均值下降，而是延遲的「不可預測性」。GC 操作是 bursty 的：有時候 SSD 有足夠的 free block，GC 不需要工作，延遲很低；有時候 free block 快耗盡，GC 緊急介入，一口氣要搬移大量資料，期間使用者的 I/O 全部被阻塞。</p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8024-9eff-d06d1226de34" dir="ltr"><div style="width:100%"><p id="c95ea19f-4612-4101-ac5d-6e53fb2ee017" class="" dir="auto">GC 是 <strong>bursty</strong></p><ul id="551e73de-3ad3-445b-b5fd-2d80b3c2bf3b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">平常：低延遲</li></ul><ul id="fdeb6a09-f7c5-48a7-9e2f-95fad86707df" class="bulleted-list" dir="auto"><li style="list-style-type:disc">緊急 GC：大量搬資料 → I/O 被 block</li></ul></div></aside></div></p><hr id="33aa15e2-9005-802c-957b-ebb708fbd807" dir="auto"/><figure id="33aa15e2-9005-80c6-a59c-e943c8e76275" class="image" data-notion-image="SSD%20Steady-State%20Behavior/image.png" dir="ltr"><a href="SSD%20Steady-State%20Behavior/image.png"><img style="width:950.2625122070312px" src="SSD%20Steady-State%20Behavior/image.png"/></a></figure><p id="5b9f8b98-e5d2-4c3c-ada1-be1f2d09bbf8" class="" dir="auto">在一些對延遲敏感的應用場景（例如資料庫的 transaction processing），p99 latency 比 average latency 更重要。一個平均延遲 0.1 ms 但 p99 延遲 50 ms 的 SSD，在這些場景下可能不如一個平均延遲 0.2 ms 但 p99 延遲 2 ms 的 SSD。</p><hr id="33aa15e2-9005-80e1-a325-f39c020d2498" dir="auto"/><p id="288f93df-e715-4962-9d83-367c490ebf03" class="" dir="auto">SSD 韌體可以用一些策略來緩解 tail latency：<div class="indented"><ul id="8a2fef20-c000-46a7-877c-625eb224814c" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Background GC</strong>：<aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8058-8a78-c22717e7fc21" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80f4-acea-c2c7807af4f3" class="" dir="auto">在 SSD idle 的時候主動做 GC，預先回收空間。但如果 workload 持續不停，idle 時間很少，background GC 幫助有限。</p></div></aside></li></ul><ul id="96b83751-56b1-4d25-b201-9d75908815e5" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>GC pacing</strong>：<aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80ec-8212-e6028c5d7d1c" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8089-97f1-ce1dd98299f9" class="" dir="auto">限制 GC 的頻寬佔比，避免 GC 一次性佔用太多資源。但這可能導致 free block 耗盡的情況更容易發生。</p></div></aside></li></ul><ul id="488bf36e-739d-4ccb-934e-0290de956e56" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Multi-stream write</strong>：<aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80a8-86b9-ff5d4e3f661a" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-805c-81ad-e0cb61ac1a76" class="" dir="auto">讓 host 端告知 SSD 資料的冷熱屬性，SSD 把冷熱資料分開放在不同 block 中，提高 GC 效率。</p></div></aside></li></ul></div></p><hr id="33aa15e2-9005-80e1-bdd7-e8fdb8f21d3c" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80bd-8b1b-dfc45696d007" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-806a-ab83-d5b74fea0292" class="" dir="auto">Reference: </p></div></aside><hr id="33aa15e2-9005-808c-b449-ce432caeffd5" dir="auto"/></div></details><details id="33aa15e2-9005-80ab-aba3-c9077e869c1d" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Over-provisioning  →  Steady state</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-801e-93ed-f508d9135ba6" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-806b-b5dd-ef18bf2d7d39" class="" dir="auto">Over-provisioning（OP）比例是影響 steady state 效能最直接的因素。</p></div></aside><hr id="33aa15e2-9005-80cb-a5e9-e1f8bf812567" dir="auto"/><p id="09d0b586-b187-4b0e-9900-cd280e22b752" class="" dir="auto">用一組具體數字來說明。假設一顆 SSD 有 1,024 GB 的 NAND flash：</p><table id="a3686e3d-e638-48cc-8ad5-498de5488377" class="simple-table" dir="ltr"><thead class="simple-table-header"><tr id="c9f9f549-e804-441d-b995-ed24e2114792" dir="ltr"><th id="wdr_" class="simple-table-header-color simple-table-header"><strong>標示容量</strong></th><th id="D^nD" class="simple-table-header-color simple-table-header"><strong>OP 比例</strong></th><th id="Q|MO" class="simple-table-header-color simple-table-header"><strong>OP 空間</strong></th><th id="cLv{" class="simple-table-header-color simple-table-header"><strong>Steady state WAF</strong></th><th id="Ioms" class="simple-table-header-color simple-table-header"><strong>Steady state throughput（相對）</strong></th></tr></thead><tbody><tr id="3de59a10-4395-4ca4-a710-fcd49deaec46" dir="ltr"><td id="wdr_" class="">960 GB</td><td id="D^nD" class="">7%</td><td id="Q|MO" class="">64 GB</td><td id="cLv{" class="">~3-5</td><td id="Ioms" class="">低</td></tr><tr id="23d5d4b4-76a7-44f5-bfe7-d4d2132d07cd" dir="ltr"><td id="wdr_" class="">800 GB</td><td id="D^nD" class="">28%</td><td id="Q|MO" class="">224 GB</td><td id="cLv{" class="">~1.5-2</td><td id="Ioms" class="">中</td></tr><tr id="904ef36f-daba-489d-a80d-91fa07b0e007" dir="ltr"><td id="wdr_" class="">640 GB</td><td id="D^nD" class="">60%</td><td id="Q|MO" class="">384 GB</td><td id="cLv{" class="">~1.1-1.3</td><td id="Ioms" class="">高</td></tr></tbody></table><p id="85e7ff23-d3ab-4ff9-811e-b1358408acc4" class="" dir="auto">OP 比例從 7% 提高到 28%，WAF 可以降低一半以上，steady state throughput 明顯提升。但代價是使用者可用容量從 960 GB 減少到 800 GB。</p><p id="d9c07c88-cc72-4ff9-9cf3-14633ee73de8" class="" dir="auto">為什麼 OP 能這麼有效？因為更多的 OP 代表：<div class="indented"><ol type="1" id="f7f6e567-ea82-4a9d-8fd2-018dd28dc5eb" class="numbered-list" start="1" dir="auto"><li>任何時刻都有更多 free block 可用，GC 不需要在空間緊迫時才啟動</li></ol><ol type="1" id="4c26e867-3f20-49a9-81b0-2f98854510de" class="numbered-list" start="2" dir="auto"><li>GC 有更多選擇，可以挑選 invalid page 比例高的 block 來回收，搬移的 valid page 更少</li></ol><ol type="1" id="0b43b3ee-f81d-4ff1-b3fd-ec0aeb61b9d8" class="numbered-list" start="3" dir="auto"><li>GC 的啟動頻率更低，與 user I/O 的競爭更少</li></ol></div></p><figure id="33aa15e2-9005-808d-a57d-c2a7e2a4d75e" class="image" data-notion-image="SSD%20Steady-State%20Behavior/image%201.png" dir="ltr"><a href="SSD%20Steady-State%20Behavior/image%201.png"><img style="width:950.25px" src="SSD%20Steady-State%20Behavior/image%201.png"/></a></figure><p id="33aa15e2-9005-8094-a565-f3fe08c12fda" class="" dir="auto">這也解釋了為什麼企業級 SSD 通常提供多種容量版本（例如 800 GB、1.6 TB、3.2 TB）但使用相同的 NAND flash 總量。800 GB 版本有更多 OP，效能和壽命都更好，適合 write-intensive workload；3.2 TB 版本 OP 較少，適合 read-intensive workload。</p><hr id="33aa15e2-9005-80d7-8cc1-d2febbf4c42d" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-808c-b4d2-c975b171acb9" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80d6-a4fe-e591e626c2b9" class="" dir="auto">Reference: </p></div></aside><hr id="33aa15e2-9005-80af-b6c4-f35746f1bd22" dir="auto"/></div></details><details id="33aa15e2-9005-8076-8caf-fcde48eb6cac" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>GC interference →  Steady state</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8044-a551-c6515edfee65" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80df-a04a-d4166759ae1d" class="" dir="auto">GC 與 user I/O 同時競爭 NAND 資源，導致效能下降與延遲增加。</p></div></aside><hr id="33aa15e2-9005-8010-975e-e45e5f4da666" dir="auto"/><ul id="d7c9aa0d-8c60-4d2b-970f-1c89daa36de4" class="bulleted-list" dir="auto"><li style="list-style-type:disc">GC 需要：<ul id="9cc21b85-1a7e-4b43-8590-422ba2f4ab8d" class="bulleted-list" dir="auto"><li style="list-style-type:circle">read valid page</li></ul><ul id="cf6ea753-243b-4a0b-aa39-80dfe540f519" class="bulleted-list" dir="auto"><li style="list-style-type:circle">write 到新 block</li></ul><ul id="7983d315-ecab-4283-910b-d27c3c9b449a" class="bulleted-list" dir="auto"><li style="list-style-type:circle">erase 舊 block</li></ul></li></ul><p id="4a88ec31-63f4-4225-bfb8-520a55b3509c" class="" dir="auto">這些操作和 user write 用同一資源</p><hr id="33aa15e2-9005-80b4-bea8-d82fd55d324b" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80f7-a011-d9cbfbdeac40" dir="ltr"><div style="width:100%"><ul id="079f6b1d-1dd3-4ef5-a316-736f566cf0fe" class="bulleted-list" dir="auto"><li style="list-style-type:disc">本質 = <strong>resource contention</strong></li></ul><ul id="1c4f1208-66ed-4c22-a1cf-3a4d32cf4413" class="bulleted-list" dir="auto"><li style="list-style-type:disc">和 CPU context switching 很像</li></ul></div></aside><hr id="33aa15e2-9005-80e1-b156-eb8466131766" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80c6-9a26-d421860f0681" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8040-b1f1-f26cd12a14df" class="" dir="auto">Reference: </p></div></aside><hr id="33aa15e2-9005-80ad-8601-c893e98d2367" dir="auto"/></div></details><details id="33aa15e2-9005-8033-8e08-cd573a3c1930" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Benchmarking methodology</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80be-b32b-e95a17b19d41" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-809f-ab9d-fd09c5369d70" class="" dir="auto">理解了 fresh state 和 steady state 的差異後，最重要的實務意義就是：<strong>SSD 的效能測試必須在 steady state 下進行</strong>，否則結果沒有參考價值。</p></div></aside><hr id="33aa15e2-9005-80f5-8ade-caed429905f8" dir="auto"/><p id="53ebe855-bbcf-4e80-a309-1026e4ce43ac" class="" dir="auto"><strong>正確的 benchmarking 流程</strong></p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80dd-b336-f7f7786e9ea8" dir="ltr"><div style="width:100%"><p id="b0d6c05b-81a1-4634-a54d-ea81fb5060a7" class="" dir="auto"><strong>Step 1: Preconditioning（預處理）</strong><div class="indented"><p id="9eacc6fb-3b4f-4a13-b1b8-5e17bb659ad4" class="" dir="auto">在正式測量前，先用與實際 workload 類似的 I/O pattern 對 SSD 進行持續寫入，直到效能指標穩定下來。「穩定」的判斷標準通常是：連續多個測量週期（例如每個週期 1 分鐘）的 throughput 或 IOPS 變異係數（coefficient of variation）低於某個閾值（例如 10%）。</p><p id="da1013de-d4af-49ad-9f8f-5f450e22c1dc" class="" dir="auto">對於 random write 測試，preconditioning 通常需要：<div class="indented"><ul id="cdb73ed6-7573-46a5-8183-99415e48e0fc" class="bulleted-list" dir="auto"><li style="list-style-type:disc">先用 sequential write 填滿整顆 SSD 兩次（確保所有 block 都被寫過）</li></ul><ul id="387debb3-1695-41a1-848a-6ea55243f25e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">再用目標 random write pattern 持續寫入，直到效能穩定</li></ul></div></p><p id="c75325db-0b30-4adb-8873-0e6f7876e337" class="" dir="auto">整個 preconditioning 可能需要數小時甚至一天。</p></div></p></div></aside><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80a5-9bdc-c77a31c5186a" dir="ltr"><div style="width:100%"><p id="a1ce2b4b-ac77-42f2-973c-a96da03452cd" class="" dir="auto"><strong>Step 2: Steady-state measurement（穩態測量）</strong><div class="indented"><p id="36e62d03-879e-4114-89b0-158c783127f9" class="" dir="auto">Preconditioning 完成後，開始正式的效能測量。測量時間要足夠長，覆蓋多個 GC cycle，才能準確反映 GC 對效能的影響。通常建議至少測量 30 分鐘到 1 小時。</p></div></p></div></aside><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8071-8a03-f895490a39d1" dir="ltr"><div style="width:100%"><p id="a27995a0-7b0f-4b89-adb6-b79b2ce34af7" class="" dir="auto"><strong>Step 3: 記錄完整的延遲分佈</strong><div class="indented"><p id="3d7efa16-55e3-4b27-928d-2d94c18c4575" class="" dir="auto">只報告 average throughput 或 average latency 是不夠的。必須記錄完整的延遲分佈，包括 p50、p90、p95、p99、p99.9、p99.99 甚至 max latency。因為 GC 造成的 tail latency spike 只會出現在高百分位數，average 值會完全掩蓋這個問題。</p></div></p></div></aside><hr id="33aa15e2-9005-803c-804e-d785567e666e" dir="auto"/><figure id="33aa15e2-9005-8007-b948-cfb4525aa166" class="image" data-notion-image="SSD%20Steady-State%20Behavior/image%202.png" dir="ltr"><a href="SSD%20Steady-State%20Behavior/image%202.png"><img style="width:950.25px" src="SSD%20Steady-State%20Behavior/image%202.png"/></a></figure><p id="33aa15e2-9005-80f6-9a3d-d959d0551476" class="" dir="auto">很多 SSD review 網站和廠商的規格表只報告 fresh state 下的數字。下次你看到論壇上有人說「我這顆 SSD 跑分比你快」，先問一個問題：他測的是剛開箱的成績，還是用了三個月之後的成績？身為系統設計者，你需要知道這些數字在 steady state 下可能縮水 50% 以上。如果你在設計一個 latency-sensitive 的系統，你必須用 steady state 下的 p99 甚至 p99.9 latency 來做 capacity planning，而不是用 fresh state 的 average latency。</p><hr id="33aa15e2-9005-8028-a6eb-fcac2f9967fb" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-802c-854e-c1a5ccd14988" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80c3-a5eb-d626c152219a" class="" dir="auto">Reference: </p></div></aside><hr id="33aa15e2-9005-80e2-ba16-f30c4521be32" dir="auto"/></div></details><details id="33aa15e2-9005-8098-9304-ef4e6209650e" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Precondition</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80e9-835d-f9789d1d9662" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8097-9485-f0a45aded439" class="" dir="auto">在正式測試前，先對 SSD 施加 workload，使其進入 steady state。</p></div></aside><hr id="33aa15e2-9005-80c8-942c-c7b41a535ee2" dir="auto"/><ul id="28866ea7-5e3b-4ff8-8b68-8c3e8d8a3d7a" class="bulleted-list" dir="auto"><li style="list-style-type:disc">sequential write × 2（填滿 SSD）</li></ul><ul id="022142ca-e468-4a39-948f-1ad72b2535b5" class="bulleted-list" dir="auto"><li style="list-style-type:disc">使用目標 workload（如 random write）</li></ul><ul id="243be8e7-08bb-4bcb-97e7-254f10fcfc90" class="bulleted-list" dir="auto"><li style="list-style-type:disc">持續寫直到效能穩定</li></ul><hr id="33aa15e2-9005-8011-b72f-f4f8f41bd550" dir="auto"/><p id="c99584cd-9802-4802-9d97-2e28206ad3ad" class="" dir="auto"><strong>穩定判斷</strong></p><ul id="3d560a2a-43e4-45cf-8c24-f0c9893476fd" class="bulleted-list" dir="auto"><li style="list-style-type:disc">多個時間區間（如每分鐘）</li></ul><ul id="39f0ce2f-d5d9-4ecd-a476-8f214a5654cb" class="bulleted-list" dir="auto"><li style="list-style-type:disc">throughput / IOPS 變異係數 &lt; 10%</li></ul><hr id="33aa15e2-9005-80d7-806a-ecbee67c2ebf" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8064-8dd8-d1a62403b711" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-801e-9e1e-f69df3f827e8" class="" dir="auto">Reference: </p></div></aside><hr id="33aa15e2-9005-804a-a24a-ee656d9bbe13" dir="auto"/></div></details></div></details><details id="339a15e2-9005-808d-ac5f-c96d984c7cf8" open="" class="toggle" dir="auto"><summary><strong>Test</strong></summary><div class="indented"><details id="339a15e2-9005-80b6-a127-fae9cb2d21d0" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Key Concepts</strong></mark></summary><div class="indented"><details id="339a15e2-9005-8092-9e61-e6162673e59b" open="" class="toggle" dir="auto"><summary>理解 fresh state 與 steady state 的差異：fresh state 下所有 block 都是乾淨的，效能表現無法代表真實使用情境</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-804a-b64e-e9cbaf6abab7" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80f1-8d6e-cbe8db480b78" class="" dir="auto">Answer<div class="indented"><p id="339a15e2-9005-805b-9aee-ef0c7e79ce33" class="" dir="auto">Fresh state（全新狀態）時 SSD 充滿空白區塊，寫入時不需額外清理；Steady state（穩定狀態）則是空間寫滿後，寫入前必須先進行垃圾回收（GC），這才是真實環境長久運作後的效能。</p></div></p><hr id="339a15e2-9005-8097-b9a4-e45c82a6ac55" dir="auto"/><p id="339a15e2-9005-80ea-aa37-fc27e0e446bd" class="" dir="auto">Key Concept<div class="indented"><ul id="8489fe88-f9f8-479d-9ea7-95f6c7bac337" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Fresh State:</strong> 只有單純的寫入動作 (Write)，沒有背景干擾。</li></ul><ul id="85f5e7a8-d70a-4f01-bae0-4b6912347ac6" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Steady State:</strong> 寫入動作必須伴隨讀取、搬移與抹除 (Read-Modify-Write / Erase)，寫入放大 (WAF) 增加。</li></ul></div></p><hr id="339a15e2-9005-800d-84a2-cc087d542e79" dir="auto"/><p id="339a15e2-9005-8092-99ee-db88fe2b895e" class="" dir="auto">Detail<div class="indented"><p id="339a15e2-9005-8069-a3c6-dff1628a2a1c" class="" dir="auto">當 SSD 剛開箱 (Fresh Out of the Box, FOB) 時，NAND Flash 內所有的 Block 都是處於已抹除 (Erased) 的乾淨狀態。此時控制器收到主機的寫入請求，可以直接將資料寫入空白的 Page 中，速度極快。然而，隨著硬碟被寫滿，SSD 必須開始回收包含無效資料 (Invalid pages) 的 Block。在 Steady state 下，每一次的主機寫入都可能觸發底層的 Garbage Collection (GC)，導致系統必須先將有效資料搬移到新 Block，然後抹除舊 Block，最後才能寫入新資料。這個過程會大幅消耗底層頻寬，使得效能顯著下降並趨於平穩，這才是評估 SSD 在生產環境中真實表現的唯一指標。</p></div></p></div></aside><hr id="339a15e2-9005-80b5-ab87-cbcb62bf86b2" dir="auto"/></div></details><details id="33aa15e2-9005-809e-a39e-ebe24f49493e" open="" class="toggle" dir="auto"><summary>了解在 steady state 下 GC 會與使用者 I/O 競爭 NAND flash 頻寬，導致 tail latency 出現明顯的 spike</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8004-9c3e-fc50ab435793" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-800a-b486-f2099105ec3e" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-807e-98ca-d805e0356ab2" class="" dir="auto">Garbage Collection 需要在 NAND 晶片內部進行資料的讀取、寫入與區塊抹除，這些操作會佔用匯流排與晶片資源，迫使同時發生的使用者 I/O 請求必須排隊等待，導致延遲瞬間飆高 (Spike)。</p></div></p><hr id="33aa15e2-9005-80ce-a118-e31a61e7a5db" dir="auto"/><p id="33aa15e2-9005-801b-a12e-c0fef178e29c" class="" dir="auto">Key Concept<div class="indented"><ul id="b8e3308d-6ae3-4401-86d8-8b84898d381a" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>資源競爭:</strong> GC 的內部操作與主機端的外部 I/O 共享同一條通道與 Die 資源。</li></ul><ul id="58af0b69-724d-4229-abb2-72bda8502838" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>抹除延遲 (Erase Latency):</strong> NAND Flash 的 Block Erase 操作極度耗時（通常達數毫秒），在此期間該 Die 無法服務任何讀寫請求。</li></ul></div></p><hr id="33aa15e2-9005-80cd-9432-c5cd9c53ecaa" dir="auto"/><p id="33aa15e2-9005-805e-b4a9-d42882a9cc4e" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-805e-a974-f6ba42941ecb" class="" dir="auto">在 SSD 內部，GC 是一個極度耗費資源的過程。當 GC 啟動時，SSD 控制器必須發送指令到 NAND Flash 執行讀取（找出現存的 Valid pages）、寫入（搬移到新 Block）以及抹除（清空舊 Block）。特別是「抹除」動作，其物理延遲遠高於讀寫。如果使用者的 I/O 請求剛好被分配到正在執行 GC 或 Erase 操作的 NAND Die 上，該請求就必須在佇列中等待操作完成。這種硬體層級的阻塞現象 (Blocking) 反映在應用程式端，就是平時原本只有微秒級的延遲，偶爾會突波 (Spike) 到數十毫秒，形成嚴重的 Tail Latency (如 P99 或 P99.9 延遲)。</p></div></p></div></aside><hr id="33aa15e2-9005-800c-9895-e9f556182469" dir="auto"/></div></details><details id="33aa15e2-9005-8091-bb9c-edd74c81ae77" open="" class="toggle" dir="auto"><summary>理解 over-provisioning 比例如何影響 steady state 的效能：OP 越高，GC 的負擔越輕，tail latency 越穩定</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-801c-9451-e93236a5b1da" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8027-b123-f13bc3fab4e3" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-80aa-9d24-f6eee84e0470" class="" dir="auto">Over-provisioning (OP) 提供了隱藏的備用空間，讓控制器有更多餘裕尋找「無效資料最多」的區塊來進行回收，大幅減少需要搬移的有效資料量，從而提升效能並穩定延遲。</p></div></p><hr id="33aa15e2-9005-8036-9e43-c1a5cf979333" dir="auto"/><p id="33aa15e2-9005-8031-bbcf-cadb3d0d7201" class="" dir="auto">Key Concept<div class="indented"><ul id="fac737fb-30ac-41d8-9d9a-d4e3a75bf9b2" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>降低寫入放大 (WAF):</strong> OP 越大，GC 需要搬移的 Valid Pages 越少。</li></ul><ul id="d7d2dbd4-8567-4381-aa6d-e40dade9d8f9" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>提升吞吐量與穩定性:</strong> 減少內部資料搬移，代表保留更多可用頻寬給主機 I/O。</li></ul></div></p><hr id="33aa15e2-9005-801d-a236-d6c03a38c098" dir="auto"/><p id="33aa15e2-9005-80da-a628-fa9918c80d8d" class="" dir="auto">Detail<div class="indented"><p id="8af2c922-4b24-49a8-840f-2b4cdd7c7338" class="" dir="auto">Over-provisioning 是 SSD 總物理容量與使用者可用容量之間的差值。在 Steady state 下，控制器在進行 GC 時，會使用貪婪演算法 (Greedy Algorithm) 優先挑選 Invalid pages 比例最高的 Block 來抹除。如果 OP 只有 7%，SSD 處於擁擠狀態，每個 Block 可能都塞滿了 Valid pages，導致 GC 必須搬移大量資料才能清出一個 Block。反之，如果 OP 高達 28%，SSD 隨時保有大量備用空間，控制器可以輕易找到幾乎全是無效資料的 Block 進行抹除，幾乎不需要搬移有效資料。這不僅顯著降低了寫入放大因子 (WAF)，也解除了 GC 對系統頻寬的佔用，使 IOPS 維持高檔，Tail Latency 也能保持穩定。</p></div></p></div></aside><hr id="33aa15e2-9005-80ce-9eb4-cd3c719cd53e" dir="auto"/></div></details><details id="33aa15e2-9005-80e5-929d-deae5cd2dfa2" open="" class="toggle" dir="auto"><summary>知道正確的 SSD benchmarking methodology 需要先進行 precondition 讓 SSD 進入 steady state，才能反映真實效能</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80ba-9a31-e712505d21e3" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-809a-8f58-cd0eeb9c72a5" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-8056-8fbd-e09461785921" class="" dir="auto">正確的測試必須先透過大量且持續的寫入（Preconditioning）耗盡 SSD 的空白區塊，強迫其進入必須一邊 GC 一邊寫入的 Steady state，這樣測得的數據才具有伺服器佈署的參考價值。</p></div></p><hr id="33aa15e2-9005-80b6-9eb3-dbfc8abb4a91" dir="auto"/><p id="33aa15e2-9005-8062-8c96-d564c0f4f508" class="" dir="auto">Key Concept<div class="indented"><ul id="dc5cbe7f-8fe4-49fa-8b9b-47f8f146ffda" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>排除快取干擾:</strong> 填滿 DRAM 快取與 SLC Cache。</li></ul><ul id="1414f4ec-ee0d-4e17-9595-fecb2227525b" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>強迫觸發 GC:</strong> 將所有實體空間寫滿，讓 WAF 達到穩定的最大值。</li></ul></div></p><hr id="33aa15e2-9005-804b-97ee-d323e06f6ce7" dir="auto"/><p id="33aa15e2-9005-8070-b603-d801702308c5" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-80bb-bcae-dca7254fb501" class="" dir="auto">企業級儲存 SNIA (Storage Networking Industry Association) 規範了嚴格的測試標準。如果只對剛開箱的 SSD 跑十分鐘的測試，你測到的只是「DRAM 速度」或是「SLC Cache 的爆發速度」，完全沒有觸發 GC。正確的流程 (Preconditioning) 通常包含：先完整抹除整顆磁碟 (Secure Erase)，接著以連續寫入 (Sequential Write) 填滿 2 倍以上的磁碟容量，最後再套用目標的隨機讀寫負載 (Random Workload) 持續數小時，直到效能曲線呈現水平的直線（變化率極小）。只有在這個平台上取得的 IOPS 與 Latency 數據，才能保證 SSD 在未來上線運作三年後，依然能維持這個水準。</p></div></p></div></aside><hr id="33aa15e2-9005-8074-ac32-fe923d65d899" dir="auto"/></div></details></div></details><details id="339a15e2-9005-809f-ad0a-c1db5005d960" open="" class="toggle" dir="auto"><summary><mark class="highlight-teal" data-notion-highlight="teal"><strong>Test your understanding</strong></mark></summary><div class="indented"><details id="339a15e2-9005-80b5-8819-fb3e52f2866f" open="" class="toggle" dir="auto"><summary>一顆消費級 SSD（7% OP）和一顆企業級 SSD（28% OP）使用相同的 NAND flash。在 fresh state 下它們的 sequential write 效能幾乎相同。為什麼在 steady state 下企業級 SSD 的效能明顯優於消費級？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80bd-8a93-c1152e1a8217" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-806d-a7f7-f75445e4c0fc" class="" dir="auto">Answer<div class="indented"><p id="339a15e2-9005-8005-9100-c5717a15f99b" class="" dir="auto">因為 28% OP 的企業級 SSD 在穩態下擁有更多備用空間，使 Garbage Collection 能以更低的成本（搬移更少的有效資料）清出可用區塊，寫入放大 (WAF) 較低，從而保留更多內部頻寬給主機。</p></div></p><hr id="339a15e2-9005-80ef-84e4-f2757df1754e" dir="auto"/><p id="339a15e2-9005-801a-ab32-ee46aba43629" class="" dir="auto">Key Concept<div class="indented"><ul id="76de35de-b37b-4aac-87ab-35837c945d6d" class="bulleted-list" dir="auto"><li style="list-style-type:disc">OP 比例直接決定了 Steady State 下的 GC 效率。</li></ul><ul id="bc11173a-9bb9-44fd-ae40-28fff88a338d" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Fresh state 下不需要 GC，因此兩者發揮的是相同的 NAND 物理極限頻寬。</li></ul></div></p><hr id="339a15e2-9005-80c7-9c77-c459a7c484d3" dir="auto"/><p id="339a15e2-9005-8022-a92d-cdc6d53fc8cb" class="" dir="auto">Detail<div class="indented"><p id="339a15e2-9005-80a7-aae1-f4f7ead4caf3" class="" dir="auto">在 Fresh state 下，兩顆 SSD 都是直接將資料寫入空白的 NAND Page，完全不需要進行 GC，因此效能瓶頸在於 NAND Flash 顆粒本身的物理寫入速度與通道數，兩者硬體相同，效能自然一致。然而進入 Steady state 後，SSD 必須先清出空間才能寫入。7% OP 的消費級 SSD 因為空間緊湊，GC 時必須把大量有效的資料搬來搬去（WAF 極高），這消耗了 NAND 絕大部分的 I/O 頻寬。而 28% OP 的企業級 SSD 隨時都有四分之一以上的閒置與無效空間，GC 可以輕易找到充滿垃圾資料的 Block 直接抹除。企業級 SSD 花在內部整理的力氣小，自然有更多力氣處理外部主機的寫入請求。</p></div></p></div></aside><hr id="339a15e2-9005-80fc-b867-ccd57202d4f5" dir="auto"/></div></details><details id="33aa15e2-9005-8028-99d4-dec362313848" open="" class="toggle" dir="auto"><summary>為什麼只看 average latency 不足以評估 SSD 在生產環境的表現？請用一個具體的應用場景（例如 OLTP 資料庫）說明 tail latency spike 會造成什麼實際問題。</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80c3-94a0-ef03f043dd81" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8029-880c-d24a44f13c83" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-80a1-8c7f-f3969cc0e3fb" class="" dir="auto">Average latency 會將極少數極端緩慢的 I/O 請求平均掉，掩蓋了效能卡頓的真相。<br/>在 OLTP 等系統中，一個高延遲突波 (Tail latency spike) 就會卡住整個交易流程，導致嚴重的用戶體驗下降。</p></div></p><hr id="33aa15e2-9005-80bc-baee-fae4a970ece1" dir="auto"/><p id="33aa15e2-9005-80d6-8634-dd63e7b7a49b" class="" dir="auto">Key Concept<div class="indented"><ul id="5f49a877-690a-483a-b428-76909ef5a4e5" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>長尾效應 (Tail Latency):</strong> P99 或 P99.9 代表最慢的 1% 或 0.1% 的請求。</li></ul><ul id="340dc471-2dee-496a-959a-9bd58f6f1450" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>同步依賴:</strong> 資料庫的 ACID 特性要求寫入必須落盤才能繼續下一步。</li></ul></div></p><hr id="33aa15e2-9005-8064-bfe9-c72b51166554" dir="auto"/><p id="33aa15e2-9005-8023-8bcb-c5a63197bab3" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-800a-b432-ef80c714c675" class="" dir="auto">假設一顆 SSD 的平均延遲是 0.5ms，看起來非常優異，但其 P99.9 延遲可能高達 50ms（這是因為遇到了 GC 抹除 Block 的阻塞）。<br/>在 OLTP (線上交易處理) 資料庫中，使用者的每一次購買或轉帳通常涉及數十個平行的 I/O 請求，且為了保證資料一致性，必須等待最慢的那一個 I/O 完成後才能 Commit。<br/>如果系統每秒處理數千個交易，P99.9 的 50ms 延遲會頻繁地成為交易的瓶頸 (Bottleneck)，導致資料庫連線池佔滿、應用程式 Timeout、甚至引發微服務架構中的連鎖效應 (Cascading failure)，這些都是單看 &quot;Average latency&quot; 完全無法預測的災難。</p></div></p></div></aside><hr id="33aa15e2-9005-80be-adf4-fc58afe71137" dir="auto"/></div></details><details id="33aa15e2-9005-80b3-8de5-c4eaa30f5f96" open="" class="toggle" dir="auto"><summary>描述一個完整的 SSD steady-state benchmarking 流程。為什麼 preconditioning 階段需要先 sequential write 填滿 SSD 再切換到目標 workload pattern？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8021-9a46-ff207a438e6c" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8018-a95d-d5e599740579" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-8012-b9b6-f81f0cc321fe" class="" dir="auto">流程：Secure Erase -&gt; Sequential Fill (2x 容量) -&gt; Random Workload Preconditioning -&gt; 測量與驗證。先用 Sequential fill 是為了確保邏輯區塊位址 (LBA) 全面映射到實體區塊，打破控制器資料壓縮或簡化處理的捷徑。</p></div></p><hr id="33aa15e2-9005-804a-9fb4-ccc91c58bb13" dir="auto"/><p id="33aa15e2-9005-807b-8c1f-e4d8dcb71a79" class="" dir="auto">Key Concept<div class="indented"><ul id="761cbdfd-db28-49db-a770-d99d4181074b" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>SNIA 標準流程:</strong> 確保測試的一致性與可重複性。</li></ul><ul id="cab4b2cf-3ffd-4ac0-bbdc-2360f81db6e3" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Sequential Fill 的目的:</strong> 建立完整的 LBA 到 PBA 映射表 (Mapping Table)，消除 FOB 狀態。</li></ul></div></p><hr id="33aa15e2-9005-8017-9935-c23b03bc96a2" dir="auto"/><p id="33aa15e2-9005-80c1-bd74-c953a78c840b" class="" dir="auto">Detail<div class="indented"><p id="f8b7774e-e3b0-44a6-9c0a-f27407ee14e5" class="" dir="auto">一個符合工業標準的 SSD Benchmarking 流程如下：</p><ol type="1" id="0768cbf8-178f-4e8e-8dff-248628f74bce" class="numbered-list" start="1" dir="auto"><li><strong>Purge (淨化):</strong> 下達 NVMe Format 或 Secure Erase 指令，清空 Mapping table。</li></ol><ol type="1" id="7e15db90-2201-4679-af16-3fad324f8a6c" class="numbered-list" start="2" dir="auto"><li><strong>Workload Independent Preconditioning:</strong> 以 128KB 循序寫入將硬碟總容量寫滿至少兩次。這一步非常關鍵，它迫使 FTL (Flash Translation Layer) 為所有 LBA 分配實體 NAND 空間，確保沒有任何 &quot;未分配&quot; 的捷徑可走，同時也確保後續的隨機寫入必定會觸發 GC。</li></ol><ol type="1" id="aecc01f2-ad09-46e1-840a-350615af395c" class="numbered-list" start="3" dir="auto"><li><strong>Workload Specific Preconditioning:</strong> 切換到你要測試的負載（例如 4KB 隨機寫入），持續運行並監控 IOPS，直到效能數據在一個區間內呈現收斂（通常認定連續幾個時間窗口的變異數極小，即視為進入 Steady State）。</li></ol><ol type="1" id="e5f041d9-7bef-4b8e-adbd-fd4156b3a63e" class="numbered-list" start="4" dir="auto"><li><strong>Measurement (測量):</strong> 在確認進入 Steady State 後，才開始記錄接下來的 IOPS 與 Latency 數據。</li></ol></div></p></div></aside><hr id="33aa15e2-9005-80dc-b2ed-db9e6410f16d" dir="auto"/></div></details><details id="33aa15e2-9005-8011-99a7-d596209ce9e7" open="" class="toggle" dir="auto"><summary>一顆 SSD 在 fresh state 下的 random write IOPS 是 400K，steady state 下降到 150K。請推算 GC 大約消耗了多少比例的 NAND flash 頻寬。</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8052-a9e9-eebdaea29366" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-805e-a53e-db58f84bac62" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-806c-91ef-c428eeb3e35b" class="" dir="auto">GC 大約消耗了 62.5% 的 NAND Flash 頻寬。</p></div></p><hr id="33aa15e2-9005-8058-8f4f-f5afd19900e1" dir="auto"/><p id="33aa15e2-9005-8073-a393-f731d01657a2" class="" dir="auto">Key Concept<div class="indented"><ul id="59a4269f-4ec8-4870-b471-585f52dbf8b4" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Fresh state (400K) 代表 NAND Flash 後端的 100% 原始處理能力。</li></ul><ul id="39bfdd13-03da-4ff3-be07-386cb1ab1c3a" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Steady state (150K) 代表主機端實際獲得的效能。</li></ul><ul id="db2cfcea-d452-4077-a861-f7916b8a356f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">消耗比例 = (原始能力 - 實際效能) / 原始能力。</li></ul></div></p><hr id="33aa15e2-9005-807f-9b39-c2a8c710cf2b" dir="auto"/><p id="33aa15e2-9005-80a3-bba1-e40a2b7283ca" class="" dir="auto">Detail<div class="indented"><p id="e088215a-0b64-4541-88df-d9f1e6911452" class="" dir="auto">在 Fresh state 下沒有 GC 干擾，400K IOPS 可以視為該 SSD 控制器與 NAND Flash 陣列能處理的「總可用寫入頻寬」。進入 Steady state 後，主機端測得的 IOPS 掉到 150K。這意味著 SSD 將剩餘的運算與頻寬資源都拿去背景執行 GC (包含讀取 Valid pages、寫入新 Block 以及 Erase 舊 Block) 了。</p><ul id="33aa15e2-9005-801e-a1fd-f1f5eba39e3a" class="bulleted-list" dir="auto"><li style="list-style-type:disc">總頻寬能力 = 400K 操作單位</li></ul><ul id="f6f29611-2e83-43a0-ae18-780e13da436c" class="bulleted-list" dir="auto"><li style="list-style-type:disc">主機佔用 = 150K 操作單位</li></ul><ul id="b3285beb-cee7-4a32-9806-1d84c0b58117" class="bulleted-list" dir="auto"><li style="list-style-type:disc">GC 佔用 = 400K - 150K = 250K 操作單位</li></ul><ul id="ddb4c193-96ee-4ca6-9512-486ab49a4fc9" class="bulleted-list" dir="auto"><li style="list-style-type:disc">GC 消耗比例 = 250K / 400K = 0.625 = 62.5%<br/>換句話說，SSD 內部有超過六成的力氣都在做垃圾回收，只有不到四成的力氣在服務你的應用程式。</li></ul></div></p></div></aside><hr id="33aa15e2-9005-8043-ad11-c4e56979cb9e" dir="auto"/></div></details><details id="33aa15e2-9005-8045-bbd1-cd0bdb9ab0e7" open="" class="toggle" dir="auto"><summary>如果你要設計一個 write-intensive 的 key-value store 系統，在選擇 SSD 時你會優先考慮哪些 steady-state 相關的指標？為什麼 OP 比例可能比標示容量更值得關注？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80be-abad-e7f24c58179c" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80e3-8e03-e07e7a0d8063" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-80d4-8761-ef1dba999ebe" class="" dir="auto">優先考慮 Steady-state Random Write IOPS、P99/P99.9 Tail Latency 以及 DWPD (耐久度)。OP 比例比標示容量重要，因為高 OP 能從硬體底層直接壓制 WAF，確保寫入密集的場景下不會發生延遲失控與提早損壞。</p></div></p><hr id="33aa15e2-9005-80dd-a6ea-e20ab72c3d54" dir="auto"/><p id="33aa15e2-9005-80e3-8922-e97d1eba7c1f" class="" dir="auto">Key Concept<div class="indented"><ul id="034e5fb9-bead-46cb-9068-e7d4938310a2" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>關鍵指標:</strong> Steady-state IOPS、QoS (Tail Latency)、Endurance (TBW/DWPD)。</li></ul><ul id="9442eeaf-8c6f-4c0b-bba5-bf9a69734405" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>OP 的價值:</strong> 用容量換取效能一致性與壽命。</li></ul></div></p><hr id="33aa15e2-9005-805c-9bb7-eeb777b57bf5" dir="auto"/><p id="33aa15e2-9005-80f4-822d-fa3551ee3512" class="" dir="auto">Detail<div class="indented"><p id="b1e8fbd5-ddee-42b0-aef3-17dc70edd797" class="" dir="auto">針對 Write-intensive 的 Key-Value Store (如 RocksDB, Cassandra)，資料會頻繁被覆寫或 Compaction，這會對 SSD 造成龐大的寫入壓力。<br/>選購時不能只看「最高標示速度」，因為那都是 Fresh state 的假象。必須檢視廠商提供的<strong>Steady-state 4K Random Write IOPS</strong>以及<strong>Quality of Service (QoS)</strong>（例如保證 99.99% 的 I/O 在 2ms 內完成）。<br/>為何 OP 比例比總容量更重要？如果你買了 1TB 的消費級 SSD (低 OP) 塞進伺服器，密集的寫入會讓 GC 瘋狂運作，WAF 飆高到 3 或 4 以上。這不僅會讓延遲出現數十毫秒的 Spike 卡死資料庫，高 WAF 更會成倍數消耗 NAND 的 P/E Cycle，讓 SSD 幾個月就報銷。相反地，買 800GB 的企業級 SSD (28% OP)，雖然少了 200GB 的容量，但其高 OP 能將 WAF 壓制在接近 1，提供堅若磐石的延遲與數倍以上的壽命，這才是架構師該在意的。</p></div></p></div></aside><hr id="33aa15e2-9005-8093-a4e6-ccbb1cf0b4cd" dir="auto"/></div></details></div></details><details id="339a15e2-9005-804d-9ab3-e090c95c06d7" open="" class="toggle" dir="auto"><summary><mark class="highlight-red" data-notion-highlight="red"><strong>Quiz Pool</strong></mark></summary><div class="indented"><ol type="1" id="339a15e2-9005-80e4-81b3-c232eb5d8188" class="numbered-list" start="1" dir="auto"><li>一個全新的 SSD（Fresh Out of the Box, FOB）在進行持續的隨機寫入時，其 write amplification (WA) 會經歷一段變化過程。 請分析從 FOB 階段過渡到 Steady-State 的過程中，WAF 的變化趨勢及其物理原因：<blockquote id="339a15e2-9005-80c0-a6e5-ff0e3eec88c4" class="" dir="auto"><ol type="1" id="339a15e2-9005-8062-915f-d7dcc6455936" class="numbered-list" start="1" dir="auto"><li>WAF 會呈現週期性波動，在穩定狀態下會因為 Wear Leveling 的介入而每隔一段時間歸零。</li></ol><ol type="1" id="33aa15e2-9005-8023-a451-de0fdf5464cd" class="numbered-list" start="2" dir="auto"><li>WAF 在整個過程中保持恆定，因為 WAF 只跟 Over-provisioning (OP) 的物理大小有關。</li></ol><ol type="1" id="33aa15e2-9005-803e-80c8-dfd2d443cab2" class="numbered-list" start="3" dir="auto"><li>WAF 最初接近 1.0，直到 free blocks 耗盡並觸發 GC 後，WAF 才開始上升並最終穩定在一個大於 1 的數值。</li></ol><ol type="1" id="33aa15e2-9005-8071-943f-c53e909552ba" class="numbered-list" start="4" dir="auto"><li>WAF 最初會非常高（例如 &gt; 10），隨著 FTL 表格建立完成，WAF 會逐漸下降至穩定值。</li></ol></blockquote><details id="339a15e2-9005-80fd-9ea8-da2e7998683e" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80ba-8711-cfc6e32298da" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80d6-a5a2-fe457b426c11" class="" dir="auto">WAF 最初接近 1.0，直到 free blocks 耗盡並觸發 GC 後，WAF 才開始上升並最終穩定在一個大於 1 的數值。</p><hr id="339a15e2-9005-8045-a91e-e6b91bd2da66" dir="auto"/><p id="339a15e2-9005-80a5-acef-d634ff9c04ea" class="" dir="auto">解析: <div class="indented"><p id="7ce60a8a-d3fa-4e9e-8fda-73b303cbffe1" class="" dir="auto">在 FOB 階段，SSD 有大量的 free blocks，寫入時不需要執行 GC，因此<em>WAF</em>=1。當這些空間被填滿，controller 必須開始搬移 valid pages 以清出空間，WAF 隨之上升。當回收速度等於寫入速度時，分佈穩定，WAF 達到 Steady-state 值。</p></div></p></div></aside></div></details></li></ol><hr id="339a15e2-9005-802f-91ee-cb5bd85c7ce7" dir="auto"/><ol type="1" id="339a15e2-9005-80d3-af5a-ef34ba162d48" class="numbered-list" start="2" dir="auto"><li>考慮兩顆 SSD：Drive A 與 Drive B，兩者使用相同的 NAND 快閃記憶體晶片與控制器。 兩者的實體 NAND 總容量皆為 1024 GB。<aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-808b-b070-ce083a320801" dir="ltr"><div style="width:100%"><ul id="33aa15e2-9005-803b-a94f-c9097e1296d3" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Drive A 配置了 7% 的 OP (可用容量為 960 GB)。</li></ul><ul id="33aa15e2-9005-8055-937e-c49e3e327e70" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Drive B 配置了 28% 的 OP (可用容量為 800 GB)。</li></ul></div></aside><p id="33aa15e2-9005-8006-b3cd-cfa3f857e8c0" class="" dir="auto">當兩顆硬碟在持續隨機寫入負載下達到 <strong>穩態</strong> 後，Drive B 的吞吐量 (throughput) 顯著高於 Drive A。<br/>下列哪一個選項最能解釋這種效能差距？</p><blockquote id="339a15e2-9005-80ec-80f4-faacbd7b6485" class="" dir="auto"><ol type="1" id="339a15e2-9005-805c-83d8-cf930de79079" class="numbered-list" start="1" dir="auto"><li>在穩態下，Drive B 會自動停用 Wear Leveling 以優先處理主機寫入請求，而 Drive A 因容量限制必須持續執行 Wear Leveling。</li></ol><ol type="1" id="33aa15e2-9005-8002-b9da-c28d5c6e02f6" class="numbered-list" start="2" dir="auto"><li>Drive B 擁有更大的實體 NAND 陣列，允許控制器將資料並行分布在更多的 NAND die 上，從而增加了原始匯流排頻寬。</li></ol><ol type="1" id="33aa15e2-9005-8025-bbad-ebbafd51c178" class="numbered-list" start="3" dir="auto"><li>Drive B 較高的 OP 比例降低了 WAF，這代表控制器在 GC 期間搬移有效頁面所消耗的內部頻寬較少，進而保留了更多頻寬給主機 I/O。</li></ol><ol type="1" id="33aa15e2-9005-8013-ba09-c5e306203ba7" class="numbered-list" start="4" dir="auto"><li>由於 Drive B 的可用容量較小，映射表 (Mapping Table) 的總條目數減少，大幅提升了快取映射表 (Cached Mapping Table) 的命中率以減少地址轉換延遲。</li></ol></blockquote><details id="339a15e2-9005-8093-b8da-f0bddeb9fb24" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8054-b719-f70a6b51da3e" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8095-bbcc-ce55cc62d2b9" class="" dir="auto">Drive B 較高的 OP 比例降低了 WAF，這代表控制器在 GC 期間搬移有效頁面所消耗的內部頻寬較少，進而保留了更多頻寬給主機 I/O。</p><hr id="339a15e2-9005-801b-8244-f9ba658f6ca5" dir="auto"/><p id="339a15e2-9005-807f-a8c0-d69717336509" class="" dir="auto">解析: <div class="indented"><p id="339a15e2-9005-8009-97f6-ce3b872dfd0b" class="" dir="auto">較高的 OP 為 GC 提供了更多的「喘息空間」。透過選擇有效頁面較少的區塊進行回收，控制器得以降低 WAF。這節省了內部 NAND 頻寬，使其能更多地用於主機的讀寫請求。</p></div></p><hr id="33aa15e2-9005-807e-8ac2-cf7c66c25939" dir="auto"/><p id="33aa15e2-9005-804a-a79d-cb827028548b" class="" dir="auto">(1) Wear Leveling 對於 NAND 的壽命至關重要，且無法被停用。在穩態下，控制器必須更積極地管理資料存放以尋找可用空間，而非減少管理。</p><p id="33aa15e2-9005-800b-a1e6-dc798ed168d2" class="" dir="auto">(2) 兩顆硬碟擁有相同數量的 NAND die 與實體通道。效能差距是由於韌體管理效率與空間分配所致，而非硬體並行度的差異。</p><p id="33aa15e2-9005-8014-8884-d0e1b27c9e15" class="" dir="auto">(3) 雖然 Drive B 需要映射的 LBA 較少，但映射表大小的微小縮減幾乎可以忽略不計。穩態下的吞吐量提升是由於降低了 GC 開銷，而非映射快取命中率的改善。</p></div></aside></div></details></li></ol><hr id="339a15e2-9005-80ba-a780-cc4f3f194208" dir="auto"/><ol type="1" id="339a15e2-9005-801f-a260-e1dfea796913" class="numbered-list" start="3" dir="auto"><li>大抄中提到從 fresh state 過渡到 steady state 開始 GC 的過程，消費級 SSD（7% OP）大約寫 滿 1 次之後就會進入 steady state，企業級 SSD（28% OP），可能需要寫滿 1-2 次，原因是什麼 ?<blockquote id="339a15e2-9005-80d2-b569-eefd23ea53a6" class="" dir="auto"><ol type="1" id="339a15e2-9005-8013-ab86-e4610a9e21ca" class="numbered-list" start="1" dir="auto"><li>較大的 OP 區域讓 SSD 有位置可以跑 Wear Leveling</li></ol><ol type="1" id="33aa15e2-9005-80d1-9d3d-fb1cad8dc673" class="numbered-list" start="2" dir="auto"><li>企業級 SSD 有較大的 DRAM/SRAM 作為 mapping cache，比較不會發生 Cache Miss</li></ol><ol type="1" id="33aa15e2-9005-8096-ab6f-d983263c252a" class="numbered-list" start="3" dir="auto"><li>較大的 OP 使 SSD 可以容納更多 invalid pages，較晚開始頻繁 GC</li></ol><ol type="1" id="33aa15e2-9005-8047-b8ab-f17cb011a04e" class="numbered-list" start="4" dir="auto"><li>企業級 SSD 使用較高級的 SLC，具有較高的 P/E Cycle 壽命較長</li></ol></blockquote><details id="339a15e2-9005-804b-a73b-cfd98f02519d" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-806f-9d31-e7de33cf2ad0" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8072-a3b9-c206515730d1" class="" dir="auto">較大的 OP 使 SSD 可以容納更多 invalid pages，較晚開始頻繁 GC</p><hr id="339a15e2-9005-8046-bff9-f7cb5fd600ed" dir="auto"/><p id="339a15e2-9005-80b2-bd40-c3fd577f1a68" class="" dir="auto">解析: <div class="indented"><p id="339a15e2-9005-8051-8725-fb88f05f06f4" class="" dir="auto">較大的 OP 提供了更多的實體 free block，在隨機寫入下能容納更多產生的 invalid page，延後了 free block 被耗盡的時間點，因此需要更多的寫入才會觸發 GC。</p></div></p><hr id="33aa15e2-9005-80a8-ab12-e94ffb2bd5df" dir="auto"/><p id="33aa15e2-9005-804c-8036-c3cd7acfb24f" class="" dir="auto">(1) 此敘述與本題無關，進入 steady state 是因為開始頻繁 GC 不是 Wear Leveling。</p><p id="33aa15e2-9005-8027-a79d-ee97b5d291a3" class="" dir="auto">(2) 此敘述與本題無關，不會發生 Cache Miss 可以讓查表很快，但與是否頻繁 GC 無關。</p><p id="33aa15e2-9005-8052-91ef-c29ddd4ff77c" class="" dir="auto">(4) 此敘述與本題無關，從初始 fresh state 到 steady state 原則上還不受 P/E Cycle 影響。</p></div></aside></div></details></li></ol><hr id="339a15e2-9005-80a9-a25c-c2445b92f5e2" dir="auto"/><ol type="1" id="33aa15e2-9005-8003-bd97-ee6add4b3205" class="numbered-list" start="4" dir="auto"><li>一位企業級伺服器管理員正在測試一顆全新的 NVMe SSD。在連續進行隨機寫入的前 30 分鐘，該硬碟能維持 400,000 IOPS 的高標表現。 然而，在持續同樣的負載數小時後，效能下降並穩定在 120,000 IOPS，且之後一直保持在這個水準。 請問造成這 120,000 IOPS 的 Steady State 平台期的主要架構原因為何？<blockquote id="33aa15e2-9005-80e5-b6a0-ecbd22a49228" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8053-9c51-fb4f399309d9" class="numbered-list" start="1" dir="auto"><li>SSD 內部的 DRAM 快取已完全飽和，迫使 FTL 必須將 Mapping Table 儲存在較慢的 NAND Flash 中，而非高速記憶體中。</li></ol><ol type="1" id="33aa15e2-9005-8010-9b3a-f50a3100f2c3" class="numbered-list" start="2" dir="auto"><li>控制器已耗盡了所有乾淨（erased）的區塊，現在必須在處理主機端寫入請求的同時，同步執行 garbage collection 以產生新的可寫入空間。</li></ol><ol type="1" id="33aa15e2-9005-80fb-9362-d84557fa58b5" class="numbered-list" start="3" dir="auto"><li>NAND Flash 儲存單元達到了特定的溫度閾值，觸發了韌體對控制器的永久降頻保護機制，以防止硬碟超過其熱設計功耗。</li></ol><ol type="1" id="33aa15e2-9005-8046-aaaf-ea87cc265343" class="numbered-list" start="4" dir="auto"><li>Wear-leveling 演算法偵測到 SSD 的 P/E cycle 分佈不均，因此暫停了主機端的 I/O 操作，以便將冷資料搬到高 P/E cycle 的 block 上。</li></ol></blockquote><details id="33aa15e2-9005-8048-8c4e-d1d23f7beeb6" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8081-813e-e214ee9a57bc" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80d1-8285-c1613205637b" class="" dir="auto">控制器已耗盡了所有乾淨（erased）的區塊，現在必須在處理主機端寫入請求的同時，同步執行 garbage collection 以產生新的可寫入空間。</p><hr id="33aa15e2-9005-80a3-a740-c77a77e2b01a" dir="auto"/><p id="33aa15e2-9005-80a5-8936-ce49e24092dd" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-80f3-8718-c37e5a5bef4c" class="" dir="auto">在全新出廠狀態下，控制器可以直接寫入已抹除的空區塊。一旦所有區塊都被寫入過一次，之後的每一次新寫入都必須伴隨著「清理舊區塊」的動作。120,000 IOPS 代表了該控制器在「搬移有效資料 + 抹除區塊」與「接收新資料」之間達到的平衡。</p></div></p><hr id="33aa15e2-9005-8020-bbb7-c2d200016dbd" dir="auto"/><p id="33aa15e2-9005-8030-acc2-f06403657ef6" class="" dir="auto">(1) 快取用盡會影響效能，通常會導致 Jitter，而非長期穩定的 steady state。</p><p id="33aa15e2-9005-807a-ae0f-ea41996c897a" class="" dir="auto">(3) thermal throttling 確實會降低效能，但它通常是動態反應。如果環境降溫，效能會回升。</p><p id="33aa15e2-9005-80a1-8feb-d7fe56a4bfd1" class="" dir="auto">(4) Wear-leveling 設計目標是零碎地在背景執行。它不會導致效能從 40 萬驟降至 12 萬並保持水平。 </p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80d9-95e9-f3bc00256939" dir="auto"/><ol type="1" id="33aa15e2-9005-8068-b93d-cb414c7ea746" class="numbered-list" start="5" dir="auto"><li>在 <strong>steady state</strong> 下，一顆 SSD 的 latency 分佈如下：<aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8002-805c-eaf970c7133b" dir="ltr"><div style="width:100%"><ul id="33aa15e2-9005-80e5-a2d1-fe4366aaa81a" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><em>p</em>50=0.1 ms</li></ul><ul id="33aa15e2-9005-80b4-aaff-d90d326fc74f" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><em>p</em>95=0.15 ms</li></ul><ul id="33aa15e2-9005-80ad-8230-ca46100c8eee" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><em>p</em>99=25 ms</li></ul><ul id="33aa15e2-9005-803e-83d1-c5648956dc61" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><em>p</em>99.9=60 ms</li></ul></div></aside><p id="33aa15e2-9005-80a9-a1a2-c4e65b9404de" class="" dir="auto">根據以上數據，最合理的解釋是什麼？</p><blockquote id="33aa15e2-9005-8061-941e-f33fdf232a09" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80b1-8995-f0ceb70e512e" class="numbered-list" start="1" dir="auto"><li>Wear leveling 將資料搬移到較低 P/E cycle 的 block</li></ol><ol type="1" id="33aa15e2-9005-802d-83f6-c1d2700c1fd1" class="numbered-list" start="2" dir="auto"><li>NAND program time 隨著 P/E cycle 增加</li></ol><ol type="1" id="33aa15e2-9005-80b1-bc0d-f9cdb70441c8" class="numbered-list" start="3" dir="auto"><li>Garbage Collection 在 free block 接近耗盡時觸發大量 data migration</li></ol><ol type="1" id="33aa15e2-9005-8019-9241-c217f40ae8dc" class="numbered-list" start="4" dir="auto"><li>SSD controller clock frequency 在高負載時降低</li></ol></blockquote><details id="33aa15e2-9005-809d-9766-ece6aa5c15e6" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8004-a370-f3a982533ec9" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-809d-ba6e-dfeeaa8618f7" class="" dir="auto">Garbage Collection 在 free block 接近耗盡時觸發大量 data migration</p><hr id="33aa15e2-9005-80d5-b82d-e6d516652ada" dir="auto"/><p id="33aa15e2-9005-8094-941d-cb81bf141260" class="" dir="auto">解析: <div class="indented"><p id="18b8bf01-f145-4bcb-8d0e-c15879f4b723" class="" dir="auto">這組數字表示：大多數 request 的延遲非常低，但在高百分位時延遲突然大幅上升， 顯示系統存在明顯的 <strong>tail latency spike</strong>。</p><ul id="6bc111bd-e53b-4c3e-ad93-3aff844fc692" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><em>p</em>50=0.1 ms：代表大多數 request 非常快</li></ul><ul id="a4478841-1f62-45d3-a19e-be4c48e0ccfa" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><em>p</em>95=0.15 ms：代表連大部分偏慢的 request 也仍然很快</li></ul><ul id="59a19052-9f87-4db8-a4ff-8eff9779d475" class="bulleted-list" dir="auto"><li style="list-style-type:disc">但 <em>p</em>99=25 ms、<em>p</em>99.9=60 ms：代表只有極少數 request 突然變得非常慢</li></ul><p id="18056461-1773-4aad-bedf-f74353bf2a67" class="" dir="auto">這正是 steady state 下 GC（garbage collection）造成的典型現象。 原因是在 steady state 中，SSD 裡大部分 block 都已經被寫過</p><ul id="0d13191e-d282-47e8-9e20-e6e79c026b2e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">新寫入不再能永遠直接使用全新的 erased block</li></ul><ul id="c163ada8-ede1-4d5f-a4ad-295034e98621" class="bulleted-list" dir="auto"><li style="list-style-type:disc">controller 必須回收空間 這些 GC 工作會與 user I/O 競爭 NAND die/plane 的時間，導致少數 request 被卡住很久</li></ul></div></p><hr id="33aa15e2-9005-80bc-87c1-c60b7c4d6879" dir="auto"/><p id="33aa15e2-9005-80b5-9303-dd5cd69d731d" class="" dir="auto">(1) Wear leveling 確實會搬移資料，因此看起來也可能造成額外延遲。但它通常是 <strong>較為平滑且 background 的操作</strong>，目的是讓所有 block 的 P/E cycle 分布更平均，而不是在空間即將耗盡時緊急回收空間。 因此 wear leveling 的影響通常是：<div class="indented"><ul id="3a386aeb-8be3-49da-a743-a86bcbb41d43" class="bulleted-list" dir="auto"><li style="list-style-type:disc">輕微增加整體 write latency</li></ul><ul id="80b89d0f-bad4-429d-8739-4a48d9459d8b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">或稍微降低平均 throughput 它通常不會造成題目所描述的極端 tail latency 分佈</li></ul></div></p><p id="33aa15e2-9005-80f9-b792-f9b1dab82965" class="" dir="auto">(2) P/E cycle 增加對 latency 造成的影響通常比較<strong>漸進</strong>，它比較像是整體分佈慢慢右移：<em>p</em>50、<em>p</em>95 可能都會一起增加。不會造成這種「前 95% 幾乎不受影響，但 p99 突然大到數百倍」的形狀</p><p id="33aa15e2-9005-80ec-ba39-edc90f8afd97" class="" dir="auto">(4) 這個選項看起來合理，因為 controller 降頻確實可能讓整體延遲變高；但它不符合題目的延遲分佈形狀。 若是 controller clock frequency 降低，影響通常會比較<strong>全面且連續</strong>： 不只是少數 request 變慢，而是大部分 request 都會一起變慢</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8010-8bbe-de9e1b5d1967" dir="auto"/><ol type="1" id="33aa15e2-9005-8075-9294-ccf191e55664" class="numbered-list" start="6" dir="auto"><li>在相同製程技術與目標容量（如 1TB）的基準下，比較 QLC 與 SLC SSD 的硬體設計與可靠性機制，下列敘述何者最為精確？<blockquote id="33aa15e2-9005-8074-9fbc-fde48fc1cd8a" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80ce-abed-f88c30722040" class="numbered-list" start="1" dir="auto"><li>QLC SSD 因為更頻繁地打電壓進 Cell 中，其資料保存時間 (Retention Time) 優於 SLC</li></ol><ol type="1" id="33aa15e2-9005-8079-9fbe-f3838982a3d2" class="numbered-list" start="2" dir="auto"><li>相較於 QLC，SLC SSD 必須配置更高比例的 OP (Over-Provisioning) 空間來應對垃圾回收 (GC)</li></ol><ol type="1" id="33aa15e2-9005-8002-b2eb-c2efaf528ad2" class="numbered-list" start="3" dir="auto"><li>為了應對較高的原始錯誤率 (RBER)，QLC 的每個物理 Page 通常配備比 SLC 更大的 Spare Area (OOB)</li></ol><ol type="1" id="33aa15e2-9005-8076-8fba-c0f2a00dd0a7" class="numbered-list" start="4" dir="auto"><li>QLC SSD 中的 SLC Cache 通常是由物理上獨立、造價昂貴的專用 SLC 顆粒組成</li></ol></blockquote><details id="33aa15e2-9005-80c7-89fc-f0376a0c58ca" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8073-86e1-cfd86078e9f4" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-803c-bb4e-e49d1412d2cd" class="" dir="auto">為了應對較高的原始錯誤率 (RBER)，QLC 的每個物理 Page 通常配備比 SLC 更大的 Spare Area (OOB)</p><hr id="33aa15e2-9005-80ae-9f4e-eb9cc040c741" dir="auto"/><p id="33aa15e2-9005-8010-90d4-d354c3f20c8e" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8039-bda0-cf9c55276f75" class="" dir="auto">QLC 的電壓層級極為密集（16 層），對雜訊極其敏感導致 RBER 較高。為了維持資料可靠性，控制器必須使用更強大的糾錯碼（如 LDPC），因此每個 Page 需要預留更多的 Spare Area (OOB 空間) 來儲存更長的 ECC 校驗資訊。</p></div></p><hr id="33aa15e2-9005-808a-989f-ea643c51b92f" dir="auto"/><p id="33aa15e2-9005-80f3-8251-fd91b3f1aa38" class="" dir="auto">(1) QLC 的電壓判定區間（Voltage Margin）極窄，微小的電荷洩漏就會導致判讀錯誤，因此其資料保存能力（Retention Time）明顯弱於電壓區間寬廣的 SLC。</p><p id="33aa15e2-9005-8021-ab65-ca11e8fdf2dd" class="" dir="auto">(2) 事實上，QLC 因為 P/E cycle 極低且 WAF 對壽命影響劇烈，在設計上更依賴較大的 OP 空間來降低 WAF 並提升穩態效能；而 SLC 雖然也需要 OP，但其原生耐用度較高，對 OP 比例的依賴程度相對 QLC 較低。</p><p id="33aa15e2-9005-80e7-8579-d6948f7de446" class="" dir="auto">(4) 現代 QLC SSD 多採用「模擬 SLC pSLC 模式」，即透過韌體讓 QLC Cell 僅存儲 1-bit 電壓狀態來充當 Cache，以兼顧效能與成本，而非使用物理獨立的 SLC 顆粒。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8061-9b89-d465dece99de" dir="auto"/><ol type="1" id="33aa15e2-9005-80c4-a5e0-f89335513e9e" class="numbered-list" start="7" dir="auto"><li>一個長期存放冷資料 (Cold Storage) 的資料中心計畫將現有的硬碟汰換為成本較低的 QLC SSD。 考慮到 QLC 的物理特性以及該資料中心「讀多寫極少」的工作負載模式，哪一種機制適合用來防止資料遺失？<blockquote id="33aa15e2-9005-802a-b048-def30b44dee6" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8021-b0ea-fb87ccf4b991" class="numbered-list" start="1" dir="auto"><li>提高損耗均衡 (Wear Leveling) 演算法的執行頻率</li></ol><ol type="1" id="33aa15e2-9005-8072-9a83-dd63ab0b6534" class="numbered-list" start="2" dir="auto"><li>降低裝置的每日寫入量 (DWPD) 額定值</li></ol><ol type="1" id="33aa15e2-9005-80af-93c6-d1cc55b8b868" class="numbered-list" start="3" dir="auto"><li>增加 Over-provisioning (OP) 空間比例</li></ol><ol type="1" id="33aa15e2-9005-8062-b9e0-cdc6b1017bcb" class="numbered-list" start="4" dir="auto"><li>實施定期資料掃描與重刷 (Periodic Data Scrubbing/Refresh)</li></ol></blockquote><details id="33aa15e2-9005-8035-aa60-c73069d951e6" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-809e-9b5f-ce9e2921453e" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8014-9af9-cf6bba660ddd" class="" dir="auto">實施定期資料掃描與重刷 (Periodic Data Scrubbing/Refresh)</p><hr id="33aa15e2-9005-8056-8d11-da913e2bebaf" dir="auto"/><p id="33aa15e2-9005-805a-8883-f6f8aec21e00" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8076-8bc6-e575768b4c6e" class="" dir="auto">在「讀多寫少」的冷儲存情境下，雖然對 Endurance 的磨損極低，但資料長時間存放會面臨 Retention 問題。 由於 QLC 的電壓邊限 (Voltage Margins) 非常窄，電荷洩漏 (Charge Leakage) 極易導致位元翻轉。 定期讀取並重新寫入資料 (Refresh) 能校正漂移的電壓，會是適合的方法。</p></div></p><hr id="33aa15e2-9005-809b-879f-d5950de2a12d" dir="auto"/><p id="33aa15e2-9005-807e-be48-e75e0e56aa66" class="" dir="auto">(1) Wear Leveling 的目的是確保所有 Flash Block 磨損程度一致，主要解決的是 Endurance 問題。 但在「讀多寫極少」的工作負載下，根本沒有足夠的寫入動作去觸發「損耗」，因此提高其頻率對保護「已經寫入且長期靜止」的冷資料沒有意義。</p><p id="33aa15e2-9005-80ec-9de3-f13e1b95e578" class="" dir="auto">(2) DWPD 是衡量 Endurance 的指標。雖然 QLC 的 Endurance 較低，但在「讀多寫極少」的環境中，本來就不會達到寫入上限。 降低 DWPD 對於防止已存放在 NAND 晶片中資料因時間和溫度產生的 Retention 失效沒有物理上的幫助。</p><p id="33aa15e2-9005-80ab-ac8c-c25f68ff133c" class="" dir="auto">(3) 增加 OP 空間主要目的是為了降低 write amplification (WAF) 並提升 Endurance。 但題目設定的工作負載是「寫入極少」，代表 P/E cycles 的消耗並非主要瓶頸，增加 OP 無法解決電荷隨著時間自然洩漏導致的 Retention 問題。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80a1-9cc1-e5b2ecfd4f52" dir="auto"/><ol type="1" id="33aa15e2-9005-8018-af07-e689ddb9c38e" class="numbered-list" start="8" dir="auto"><li>你正在為一間量化交易公司採購企業級 SSD，需要同時服務兩個系統：<aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-805f-8e2e-cd70489b7131" dir="ltr"><div style="width:100%"><ul id="33aa15e2-9005-80e9-8387-fbefbd7b710b" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>系統 X（HFT 交易 Log）</strong>：每秒產生數萬筆 4KB 隨機寫入，24 小時不間斷， 對 <strong>p99 tail latency</strong> 極度敏感，任何超過 5ms 的延遲都可能導致交易損失。</li></ul><ul id="33aa15e2-9005-8075-88fe-d818b60190f5" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>系統 Y（ML 訓練資料集）</strong>：每週批次循序寫入一次，其餘時間幾乎全為隨機讀取， 對延遲無嚴格要求，但希望最大化每 GB 的成本效益。</li></ul></div></aside><p id="33aa15e2-9005-8016-9e99-ee10dfea819d" class="" dir="auto">你手邊有兩款使用相同 NAND Flash 總量（1024 GB 實體顆粒）的企業級 SSD， 預算有限，每個系統只能選一款：</p><table id="450cdb60-68f9-48de-9d6a-126e6453d3e7" class="simple-table" dir="ltr"><thead class="simple-table-header"><tr id="1c86754f-5fb5-4d62-ba52-ae1a19832296" dir="ltr"><th id="KQsR" class="simple-table-header-color simple-table-header" style="width:268.08750915527344px"><strong>規格</strong></th><th id="o\kV" class="simple-table-header-color simple-table-header" style="width:285.8000030517578px"><strong>型號 A（Read-Intensive）</strong></th><th id="oy~j" class="simple-table-header-color simple-table-header" style="width:295.875px"><strong>型號 B（Write-Intensive）</strong></th></tr></thead><tbody><tr id="c502b0f6-0bd8-42aa-949a-76aff40b9c28" dir="ltr"><td id="KQsR" class="" style="width:268.08750915527344px">可用容量</td><td id="o\kV" class="" style="width:285.8000030517578px">960 GB</td><td id="oy~j" class="" style="width:295.875px">800 GB</td></tr><tr id="34899902-b17d-4af3-99f1-89af48b63447" dir="ltr"><td id="KQsR" class="" style="width:268.08750915527344px">Over-Provisioning</td><td id="o\kV" class="" style="width:285.8000030517578px">~7%</td><td id="oy~j" class="" style="width:295.875px">~28%</td></tr><tr id="487c702a-c36b-41fc-9e3c-e195be19f8ad" dir="ltr"><td id="KQsR" class="" style="width:268.08750915527344px">標示隨機寫入 IOPS</td><td id="o\kV" class="" style="width:285.8000030517578px">500K</td><td id="oy~j" class="" style="width:295.875px">300K</td></tr></tbody></table><p id="d77ba20d-563b-45d9-9076-db1fcd9711dc" class="" dir="auto">兩個系統皆已部署三個月，進入 <strong>Steady State</strong>。 請問下列哪一種分配方式，最符合 Steady State 下的效能設計邏輯？</p><blockquote id="33aa15e2-9005-8099-9fb3-fe0d9d37588c" class="" dir="auto"><ol type="1" id="33aa15e2-9005-800c-b91e-ff2cd8af23f8" class="numbered-list" start="1" dir="auto"><li>系統 X 選型號 A，系統 Y 選型號 B。型號 A 標示 500K IOPS 優於型號 B，適合高 IOPS 需求的 HFT；型號 B 高 OP 可保護系統 Y 資料的耐久性。</li></ol><ol type="1" id="33aa15e2-9005-80df-a09f-c91fc2fd7d27" class="numbered-list" start="2" dir="auto"><li>系統 X 選型號 B，系統 Y 選型號 A。系統 X 的持續高強度隨機寫入需要大 OP 來壓制 GC 壓力；系統 Y 寫入頻率極低，GC 壓力幾乎為零，型號 A 的高容量更符合成本效益。</li></ol><ol type="1" id="33aa15e2-9005-80e6-a3d8-c70b295c6f17" class="numbered-list" start="3" dir="auto"><li>系統 X 選型號 B，系統 Y 選型號 A。型號 B 的 OP 較高，GC 必須搬移更多 Valid Pages，controller 對資料的掌控更精細，更適合需要穩定延遲的 HFT 場景。</li></ol><ol type="1" id="33aa15e2-9005-8028-b4b3-c152ac7e5a33" class="numbered-list" start="4" dir="auto"><li>兩個系統都應選型號 B。更高的 OP 在任何 Steady State 場景下都能降低 WAF，改善 tail latency 與資料耐久性，沒有理由選 OP 較低的型號 A。</li></ol></blockquote><details id="33aa15e2-9005-8029-97f2-d3fd230d19d3" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-802a-825e-e5568f66edfb" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8036-8163-cd6f0bc62fc3" class="" dir="auto">系統 X 選型號 B，系統 Y 選型號 A。系統 X 的持續高強度隨機寫入需要大 OP 來壓制 GC 壓力；系統 Y 寫入頻率極低，GC 壓力幾乎為零，型號 A 的高容量更符合成本效益。</p><hr id="33aa15e2-9005-8053-871f-e90e642dbe27" dir="auto"/><p id="33aa15e2-9005-809a-bda4-cef370027cad" class="" dir="auto">解析: <div class="indented"><p id="e6766d9f-0504-46e2-9e95-4eb6397cf096" class="" dir="auto">系統 X → 型號 B 持續高強度隨機寫入會快速耗盡 Free Block Pool。OP 不足時， Greedy GC 只能選到 Valid Ratio 偏高的 Block，WAF 可達 3～5， GC internal write 與 host write 競爭 NAND die，p99 latency spike 因此失控。 28% OP 讓 GC 有足夠「可選空間」找到 Valid Ratio 更低的 Block，WAF 壓至 &lt; 2， tail latency 保持穩定。</p><p id="b2a0c07d-1057-4c77-9bbf-a192a6bd7320" class="" dir="auto">系統 Y → 型號 A 寫入頻率極低，idle time 充裕，controller 早已在背景完成 GC，WAF 接近 1。 此情境下 OP 邊際效益趨近於零；選型號 A 可多得 160 GB 可用容量，成本效益更佳。</p></div></p><hr id="33aa15e2-9005-802d-a5c8-c99abcfe2143" dir="auto"/><p id="33aa15e2-9005-809a-9fd9-de6332462168" class="" dir="auto">(1) 廠商標示的 IOPS 為 Fresh State 測試數據，無法反映 Steady State 下的 tail latency 表現。 此外，系統 Y 寫入頻率極低，高 OP 對耐久性的幫助微乎其微，反而白白損失 160 GB 可用容量。 分配方向與選擇理由皆有誤。</p><p id="33aa15e2-9005-80d4-8ace-c9d968f524c1" class="" dir="auto">(3) 分配方向正確，但理由有誤。 在一般 Greedy-policy-based GC 演算法下，controller 優先選擇 Valid Ratio <strong>最低</strong>的 Block， 目的是最小化搬移成本，而非搬移更多 Valid Pages。 OP 較高讓 GC 能挑到更「划算」的 Block，WAF 因此更小，而非因「掌控更精細」而改善。</p><p id="33aa15e2-9005-801a-a80a-d9cb95bffd31" class="" dir="auto">(4) OP 的效益取決於寫入強度與 Duty Cycle，並非放諸四海皆準。 系統 Y 寫入極為稀少且以循序為主，GC 壓力本就接近於零， 型號 B 多出的 OP 形同閒置，卻讓系統 Y 損失 160 GB 可用容量。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8066-a730-f2434307af0b" dir="auto"/><ol type="1" id="33aa15e2-9005-800b-87bb-ca93710abc02" class="numbered-list" start="9" dir="auto"><li>某新創公司正在評估兩款 1TB 容量的 NVMe SSD 作為核心資料庫的儲存媒體。其中，A 款為消費級 SSD（保留極少的 Over-Provisioning 空間）；B 款為企業級 SSD（保留了高達 28% 的 Over-Provisioning 空間）。<br/>一位資淺工程師對這兩款全新且完全空白（Fresh Out of Box, FOB）的 SSD 執行了 10 分鐘的隨機寫入效能測試（random write benchmark）。測試結果顯示，A 款與 B 款的 IOPS 幾乎一樣高，工程師因此結論：「多花錢買大 OP 空間的企業級 SSD 對隨機寫入效能毫無幫助」。<br/>根據 SSD 的「Steady-State」與「garbage collection」原理，這位工程師的測試方法論犯了什麼致命的錯誤，導致其結論完全失效？<blockquote id="33aa15e2-9005-80e4-a6d6-d32479926f52" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80d5-b94b-f77ef940a1f9" class="numbered-list" start="1" dir="auto"><li>工程師使用了<strong>Random write</strong>來進行測試。在 SSD 的硬體架構中，Over-Provisioning（OP）空間主要是用來加速 sequential write 的頻寬。如果改用大區塊的連續寫入進行測試，即使在全新的 FOB 狀態下，B 款企業級 SSD 也能立刻展現出效能優勢。</li></ol><ol type="1" id="33aa15e2-9005-805a-9ddc-f50155d456be" class="numbered-list" start="2" dir="auto"><li>因為 SSD 處於全新的 FOB 狀態，所有的 physical blocks 都是空白的。在最初的 10 分鐘內，FTL 只需要不斷尋找新的空白區塊寫入，完全不需要啟動背景的 GC，此時的 WAF 完美等於 1。要看出 OP 空間對效能的真實價值，必須先對 SSD 進行<strong>預處理（Preconditioning，例如寫滿整顆磁碟數次）</strong>，迫使其進入缺乏空白區塊、GC 頻繁運作的<strong>Steady-State</strong>後再進行測試。</li></ol><ol type="1" id="33aa15e2-9005-805c-b0c3-e349cb300132" class="numbered-list" start="3" dir="auto"><li>在全新的 FOB 狀態下，SSD 控制器會強制開啟<strong>SLC SLC Caching</strong>。這個模式會將所有的 TLC 或 QLC 顆粒模擬成 SLC 來寫入，從而掩蓋了 OP 空間的大小差異。必須透過軟體指令手動關閉 SLC 快取，才能測出穩定態的真實效能。</li></ol><ol type="1" id="33aa15e2-9005-80dc-86a8-f5c144b9750f" class="numbered-list" start="4" dir="auto"><li>因為 10 分鐘的測試時間太短，NVMe 控制器內部的 DRAM Cache 還沒有被完全寫滿。在快取耗盡之前，所有的隨機寫入都會被暫存在 DRAM 中並回報完成，導致 A 款與 B 款的效能看起來一樣。只要將測試時間延長到 30 分鐘讓 DRAM 滿載，就能看出兩者的差異。</li></ol></blockquote><details id="33aa15e2-9005-809e-b9b9-fab9ca6d4fcc" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80c4-9ed0-f1414523dc92" dir="ltr"><div style="width:100%"><p id="2b5b9fd3-466f-42c9-b627-96b464ff6d3a" class="" dir="auto">因為 SSD 處於全新的 FOB 狀態，所有的 physical blocks 都是空白的。在最初的 10 分鐘內，FTL 只需要不斷尋找新的空白區塊寫入，完全不需要啟動背景的 GC，此時的 WAF 完美等於 1。要看出 OP 空間對效能的真實價值，必須先對 SSD 進行預處理（Preconditioning，例如寫滿整顆磁碟數次），迫使其進入缺乏空白區塊、GC 頻繁運作的Steady-State後再進行測試。</p><hr id="33aa15e2-9005-80e7-8ada-fdcb622b3f15" dir="auto"/><p id="33aa15e2-9005-807d-a1ac-c7ca591ff97b" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-80bd-8a69-d8580f9bd31a" class="" dir="auto">這是正確的。在 SSD 的生命週期中，全新的 FOB（Fresh Out of Box）狀態會展現出極高且不真實的效能，因為此時完全沒有 GC 的開銷。當磁碟被寫滿並開始覆寫時，效能會經歷「懸崖式下跌」並進入 Steady-State。在穩定態下，大容量的 Over-Provisioning（OP）空間能讓 GC 更容易找到 invalid pages 進行回收，大幅降低 WAF 並維持較高的 IOPS 底線。工程師只測了最初的 10 分鐘，根本還沒把磁碟寫滿觸發 GC，因此無法測出 OP 的真實效益。</p></div></p><hr id="33aa15e2-9005-8098-a361-e7e8c24b5daa" dir="auto"/><p id="33aa15e2-9005-8036-8ade-cb89340224a7" class="" dir="auto">(1) 這是對 OP 空間用途的嚴重誤解。Sequential write 會讓整個 Block 依序填滿，失效時也會整塊失效，GC 回收時幾乎不需要搬運有效資料，因此本來就不太依賴 OP 空間。OP 空間最大的價值，正是用來拯救會產生嚴重碎塊與高 WAF 的<strong>Random write</strong>負載。</p><p id="33aa15e2-9005-80f4-81dd-d9fb4ea0caad" class="" dir="auto">(3) 這個選項將不同的快取機制混為一談。SLC Caching 確實是現代消費級 SSD 用來短暫提升效能的機制，但它與 SSD 是否進入「Steady-State」的核心定義（即全碟寫滿、GC 與寫入達到進出平衡）不同。要測量真實的企業級效能，標準的做法是透過全碟覆寫（Preconditioning）來耗盡 SLC 空間與空白區塊，逼出底層的真實速度，而不是單純尋找手動關閉快取的軟體指令。</p><p id="33aa15e2-9005-802b-98fd-c0356ba9605e" class="" dir="auto">(4) 這是一個常見的迷思。雖然 DRAM 快取確實能吸收突發的寫入，但 10 分鐘的連續隨機寫入早就遠遠超過了任何商用 SSD 內部幾 GB 的 DRAM 容量。導致效能看起來一樣的真正原因，是底層 NAND flash 還有大量的 free blocks 可以使用，尚未觸發 GC 導致效能衰退，而不是因為資料還停留在 DRAM 裡。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8083-849c-d7e1b0162ef8" dir="auto"/><ol type="1" id="33aa15e2-9005-8055-8728-e6d4ebf36e22" class="numbered-list numbered-list-digits-2" start="10" dir="auto"><li>你五年前購買了一顆全新的 1 TB TLC SSD，使用至今其平均 P/E cycle count 約為 2500 次。你打算將這顆老化但仍可運作的 SSD 用於個人資料的異地離線備份，且預計未來五年內完全不通電。請問這樣做最主要的風險是什麼？<blockquote id="33aa15e2-9005-80ee-bdf5-c1ba092a2c8d" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80f7-b37c-ee24bc7842a1" class="numbered-list" start="1" dir="auto"><li>即使五年斷電後部分資料發生 bit error，SSD 內部的 ECC 機制在重新通電時能完整修正這些錯誤，因此資料不會遺失。</li></ol><ol type="1" id="33aa15e2-9005-8081-995a-d9b5fa51fd30" class="numbered-list" start="2" dir="auto"><li>SSD 與 HDD 一樣適合長期離線儲存。只要不是 controller 故障或人為物理損害，不會因為長期放置而導致資料損壞。</li></ol><ol type="1" id="33aa15e2-9005-80d9-a05c-d6d5797a4082" class="numbered-list" start="3" dir="auto"><li>長時間斷電後，NAND cell 中的電荷會逐漸洩漏，導致儲存的資料毀損。但這屬於資料層面的損壞，cell 的物理結構並未因此失效，重新抹除並寫入後仍可繼續使用。</li></ol><ol type="1" id="33aa15e2-9005-8012-8166-c945c094e373" class="numbered-list" start="4" dir="auto"><li>由於尚未達到該顆 TLC SSD 的額定 P/E cycle 壽命，且目前仍可正常運作，因此可以安全地長期離線存放資料而不會有資料損壞的風險。</li></ol></blockquote><details id="33aa15e2-9005-806e-8ec2-f924954b855f" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-808e-975c-d264b2b3dbf6" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-809b-9ab2-cc716db02993" class="" dir="auto">長時間斷電後，NAND cell 中的電荷會逐漸洩漏，導致儲存的資料毀損。但這屬於資料層面的損壞，cell 的物理結構並未因此失效，重新抹除並寫入後仍可繼續使用。</p><hr id="33aa15e2-9005-801c-9dce-c74c155394ee" dir="auto"/><p id="33aa15e2-9005-80cb-a5f8-fa65af352641" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-808a-a4c9-da99bd3ff8da" class="" dir="auto">正確。NAND flash 的 data retention 取決於 cell 中電荷的保持能力。隨著 P/E cycle 累積，tunnel oxide 磨損加劇，電荷洩漏速率增加。已使用 2500 次 P/E cycle 的 TLC 接近額定壽命，其 data retention 時間可能從全新時的數年縮短至數週到數月，五年斷電極有可能超出安全範圍。然而 retention failure 的本質是電荷流失，而非 cell 結構的物理失效，因此 cell 仍可被重新抹除與寫入。</p></div></p><hr id="33aa15e2-9005-8062-b415-c6b92a59cb99" dir="auto"/><p id="33aa15e2-9005-800e-b9bb-d897c62f6e68" class="" dir="auto">(1) ECC 確實能修正一定數量的 bit error，但其修正能力有上限。在高 P/E cycle count 加上長時間斷電的雙重條件下，累積的 bit error 數量很可能超出 ECC 的修正能力，產生 uncorrectable error，導致資料永久遺失。</p><p id="33aa15e2-9005-806d-949b-e770871ed1ca" class="" dir="auto">(2) HDD 使用磁性儲存，資料保存期限可達數十年，遠長於 NAND flash 的電荷式儲存。NAND flash 的 cell 依賴電荷維持資料，長時間斷電後電荷會自然洩漏，這是物理特性而非故障。對於長期離線儲存或冷儲存場景，retention 才是主要挑戰，不能將 SSD 與 HDD 等同看待。</p><p id="33aa15e2-9005-80d1-9d7c-ec874f06f38a" class="" dir="auto">(4) 這個選項混淆了 endurance 與 retention。P/E cycle 壽命衡量的是 NAND 能承受多少次寫入（endurance），而非資料在斷電後能保存多久（retention）。高 P/E cycle count 的 NAND 因 tunnel oxide 受損加劇，電荷洩漏速率加快，使得斷電後的 data retention 時間大幅縮短。「還沒寫壞」不代表「能安全放著不通電」。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8042-9cda-ea551864f788" dir="auto"/><ol type="1" id="33aa15e2-9005-8017-b124-fec6c5526e01" class="numbered-list numbered-list-digits-2" start="11" dir="auto"><li>多數人在開箱測試全新 SSD 時，測量到的皆為 fresh state 的高效能，但在真實伺服器環境中，長期運作的 SSD 會進入效能顯著衰退的 steady state，並帶來嚴重的 tail latency spike（如 p99 延遲飆高到數十毫秒）。假設你有一個對延遲極度敏感的 OLTP 系統，並對比了一顆 7% OP 的消費級 SSD 與一顆 28% OP 的企業級 SSD。下列關於 steady state 下延遲變化機制的敘述，何者最符合硬體與系統運作的邏輯？<blockquote id="33aa15e2-9005-804d-a104-c84e826f62a4" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8059-a729-d89a882fed5f" class="numbered-list" start="1" dir="auto"><li>在 steady state 下，NAND flash 必須同時服務使用者的 I/O 請求與 background GC 所需的 block erase 與資料搬移。當 OP 達到 28% 時，SSD 隨時有更多空閒的 block，使得 GC 可以挑選 invalid page 比例更高的 block 來回收。這不僅降低了 WAF，也減少了 GC 與 foreground I/O 競爭底層頻寬的強度，進而大幅減輕 tail latency spike。</li></ol><ol type="1" id="33aa15e2-9005-802e-becc-d57f1ffb924d" class="numbered-list" start="2" dir="auto"><li>steady state 中出現的 tail latency spike，主要是因為 OS page cache 預設採用 write-back caching 機制，導致 dirty page 會以不可預測的巨大 batch 一次性 flush 到硬碟。只要透過 <code>fsync()</code> 強制程式改為 synchronous I/O 模式，即可讓寫入直接下到硬碟，進而消除底層硬體 GC 造成的 tail latency。</li></ol><ol type="1" id="33aa15e2-9005-80b4-9006-f2231800e8c7" class="numbered-list" start="3" dir="auto"><li>為了緩解 steady state 下的 tail latency，企業級 SSD 廣泛依賴 background GC 在系統閒置時主動回收空間。因此在 OLTP 這類持續高負載的環境中，只要有 28% 的 OP 搭配 background GC，就能完全避免寫入時觸發 GC，使 p99 延遲永遠保持與 fresh state 一致。</li></ol><ol type="1" id="33aa15e2-9005-80e5-b500-cd1bf4f7fde7" class="numbered-list" start="4" dir="auto"><li>企業級 SSD 的 28% OP 專門用來將 FTL 的全域 mapping table pin 在內部。在 steady state 時，由於 mapping table 完全不需要在寫入時同步更新至外部 NAND flash，徹底消除了因為 Read-Modify-Write 造成的 latency spike。</li></ol></blockquote><details id="33aa15e2-9005-8068-a025-ef0045a6baa1" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8088-8785-eeccee9d9c83" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8025-9282-f58dd31ab7ca" class="" dir="auto">在 steady state 下，NAND flash 必須同時服務使用者的 I/O 請求與 background GC 所需的 block erase 與資料搬移。當 OP 達到 28% 時，SSD 隨時有更多空閒的 block，使得 GC 可以挑選 invalid page 比例更高的 block 來回收。這不僅降低了 WAF，也減少了 GC 與 foreground I/O 競爭底層頻寬的強度，進而大幅減輕 tail latency spike。</p><hr id="33aa15e2-9005-80f1-a281-eb761f766f61" dir="auto"/><p id="33aa15e2-9005-80d5-b450-e6325a58e65c" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8057-a24c-df16a62c7ec5" class="" dir="auto">Tail latency 的主因來自於 background GC 正在執行耗時較長的 block erase 或搬移大量 valid page，導致 foreground I/O 請求被迫排隊等待。OP 比例越高的企業級 SSD，其 GC 不需要等到空間極度緊迫才啟動，且更容易找到含有大量 invalid page 的 block 進行低成本的回收。這有效降低了 I/O 競爭，是控制 steady state 下 tail latency 的關鍵硬體優勢。</p></div></p><hr id="33aa15e2-9005-8028-a778-d58f43079363" dir="auto"/><p id="33aa15e2-9005-802f-a0f1-fc44d3f44db8" class="" dir="auto">(2) 頻繁呼叫 <code>fsync()</code> 會失去來自 OS page cache 延遲波動的 smoothing 功能，迫使程式進入 blocking state 等待硬體完成操作。在 steady state 下，這反而會讓程式直接受限於 NAND 底層動輒數毫秒的物理抹除延遲，進而惡化觀測到的 tail latency。</p><p id="33aa15e2-9005-8086-a9cc-f49e416ae584" class="" dir="auto">(3) 在持續高負載環境下，SSD 缺乏足夠的 idle time 來執行 background GC，最終會觸發 foreground GC，導致寫入效能受限於回收速度，即使擁有 28% 的 OP，也只能減輕延遲的峰値與頻率，無法完全抵銷 steady state 下邊寫邊收的物理限制，因此無法達到與 fresh state 相同的效能。</p><p id="33aa15e2-9005-8015-9606-eb06e9044718" class="" dir="auto">(4) OP 空間是開放給 GC 靈活運用的隱藏 NAND flash 容量，用來吸收寫入與優化垃圾回收效率。FTL 的 mapping table 主要是存放在 SSD 的內建 DRAM 或藉由 HMB (Host Memory Buffer) 存放於系統記憶體中，並非將龐大的 OP 空間浪費在 pin mapping table 上。</p></div></aside></div></details></li></ol></div></details></div></details></div></div><hr id="339a15e2-9005-80d0-a37d-e40cc04a5782" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80c5-9ea3-fa923ce8ef36" dir="ltr"><div style="width:100%"></div></aside></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

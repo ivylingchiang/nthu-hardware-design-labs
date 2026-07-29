@@ -1,0 +1,770 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>NVMe Protocol</title><meta name="data-notion-page-icon" content="🧱"/><link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2290%22%3E%F0%9F%A7%B1%3C%2Ftext%3E%3C%2Fsvg%3E"/><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+/* Override strong tags inside headings to maintain consistent weight */
+h1 strong,
+h2 strong,
+h3 strong {
+	font-weight: 600;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 10px;
+	padding: 1rem;
+}
+
+/* For default-background callouts, render the border outline. */
+.callout.block-color-default_background {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+figure,
+aside,
+details {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+
+	table.collection-content {
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	table.collection-content th,
+	table.collection-content td {
+		overflow-wrap: anywhere;
+	}
+
+	table.collection-content td > .user,
+	table.collection-content td > time {
+		white-space: pre-wrap;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content-wrapper {
+	overflow-x: auto;
+}
+
+@media only print {
+	.collection-content-wrapper {
+		overflow-x: visible;
+	}
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.collection-content td {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.column-list {
+	display: flex;
+	gap: 46px;
+}
+
+.column {
+	min-width: 0;
+	overflow: hidden;
+}
+
+.column > *:first-child {
+	margin-top: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding-inline: 0.125rem;
+	padding-block: 0.375rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+table {
+	border-collapse: collapse;
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol.numbered-list.numbered-list-digits-2 {
+	padding-inline-start: 2em;
+}
+
+ol.numbered-list.numbered-list-digits-3plus {
+	padding-inline-start: 2.4em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+/*
+ * Render emoji icons using a ::before pseudo-element to keep the glyph
+ * out of the DOM textContent traversal. This avoids double-rendering icons
+ * in callouts and page titles.
+ * NOTE(slim/html-export-pseudo-icons): I can't tagref this because it will
+ * flag as a duplicate tag after codegen.
+ */
+.icon[data-emoji]::before {
+	content: attr(data-emoji);
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.callout img.notion-static-icon {
+	width: 1em;
+	height: 1em;
+}
+
+.callout p {
+	margin: 0;
+}
+
+.callout h1,
+.callout h2,
+.callout h3 {
+	margin: 0 0 0.6rem;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	margin-right: 0.4em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+blockquote.quote-large {
+	font-size: 1.25em;
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.tab {
+	margin: 1.25em 0;
+	padding-inline: 1rem;
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.highlight-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.highlight-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.highlight-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.highlight-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.highlight-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.highlight-default_background {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray_background {
+	background: rgba(42, 28, 0, 0.07);
+}
+.highlight-brown_background {
+	background: rgba(139, 46, 0, 0.086);
+}
+.highlight-orange_background {
+	background: rgba(224, 101, 1, 0.129);
+}
+.highlight-yellow_background {
+	background: rgba(211, 168, 0, 0.137);
+}
+.highlight-teal_background {
+	background: rgba(0, 100, 45, 0.09);
+}
+.highlight-blue_background {
+	background: rgba(0, 124, 215, 0.094);
+}
+.highlight-purple_background {
+	background: rgba(102, 0, 178, 0.078);
+}
+.highlight-pink_background {
+	background: rgba(197, 0, 93, 0.086);
+}
+.highlight-red_background {
+	background: rgba(223, 22, 0, 0.094);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.block-color-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.block-color-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.block-color-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.block-color-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.block-color-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(240, 239, 237, 1);
+}
+.block-color-brown_background {
+	background: rgba(245, 237, 233, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 235, 222, 1);
+}
+.block-color-yellow_background {
+	background: rgba(249, 243, 220, 1);
+}
+.block-color-teal_background {
+	background: rgba(232, 241, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(229, 242, 252, 1);
+}
+.block-color-purple_background {
+	background: rgba(243, 235, 249, 1);
+}
+.block-color-pink_background {
+	background: rgba(250, 233, 241, 1);
+}
+.block-color-red_background {
+	background: rgba(252, 233, 231, 1);
+}
+.select-value-color-default { background-color: rgba(42, 28, 0, 0.07); }
+.select-value-color-gray { background-color: rgba(28, 19, 1, 0.11); }
+.select-value-color-brown { background-color: rgba(127, 51, 0, 0.156); }
+.select-value-color-orange { background-color: rgba(196, 88, 0, 0.203); }
+.select-value-color-yellow { background-color: rgba(209, 156, 0, 0.282); }
+.select-value-color-green { background-color: rgba(0, 96, 38, 0.156); }
+.select-value-color-blue { background-color: rgba(0, 118, 217, 0.203); }
+.select-value-color-purple { background-color: rgba(92, 0, 163, 0.141); }
+.select-value-color-pink { background-color: rgba(183, 0, 78, 0.152); }
+.select-value-color-red { background-color: rgba(206, 24, 0, 0.164); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style><style>@import url('https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex-swap.min.css')</style></head><body><article id="33aa15e2-9005-8082-b84b-f03afb7ec7bf" class="page serif" data-notion-page-icon="🧱"><header><img class="page-cover-image" src="https://app.notion.com/images/page-cover/met_william_morris_1877_willow.jpg" style="object-position:center 90%"/><div class="page-header-icon page-header-icon-with-cover"><span class="icon" data-emoji="🧱"></span></div><h1 class="page-title" dir="auto">NVMe Protocol</h1><p class="page-description" dir="auto"></p><table class="properties"><tbody></tbody></table></header><div class="page-body"><div id="33aa15e2-9005-800f-9e30-cb855d5a9eea" class="column-list" data-notion-column-list="" dir="auto"><div id="33aa15e2-9005-8026-a71d-cf228b13a675" style="width:18.75%" class="column" data-notion-column-ratio="0.1875" dir="auto"><hr id="33aa15e2-9005-805d-bc39-fa22c919a398" dir="auto"/><figure id="33aa15e2-9005-80e0-a42d-d4af952e37c5" class="image" data-notion-image="../../Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg" dir="ltr"><a href="../../Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg"><img style="width:548.375px" src="../../Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg"/></a></figure><p id="33aa15e2-9005-8042-ba12-eafbf102d340" class="" dir="auto">
+</p></div><div id="33aa15e2-9005-807a-8b33-d067a50b305c" style="width:81.25%" class="column" data-notion-column-ratio="0.8125" dir="auto"><h3 id="33aa15e2-9005-804c-be2a-d44433fb61b6" class="" dir="auto">NVMe Protocol</h3><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8010-8e46-fbfc197c2117" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8072-a225-dc3bd667f0ca" class="" dir="auto">把一顆 NVMe SSD 插進主機板的 M.2 插槽，打開 CrystalDiskMark 跑個測試，sequential read 跑出 7000 MB/s。你的舊 SATA SSD 同樣的測試只有 550 MB/s。但如果你把兩顆 SSD 拆開來看，裡面的 NAND flash 顆粒可能是同一家廠商、同一個製程生產的。效能差了十幾倍，不是因為 flash 本身快了十幾倍，而是因為連接 flash 和 CPU 之間的協定和介面完全不同。舊的那套叫 AHCI，是為 HDD 時代設計的；新的叫 NVMe，是專門為 flash storage 從零開始設計的。</p></div></aside><blockquote id="33aa15e2-9005-80b2-9693-c10aef2ece65" class="" dir="auto">Reference: </blockquote><hr id="33aa15e2-9005-8069-9a66-ebea1de549a6" dir="auto"/><details id="33aa15e2-9005-80b3-b278-c48f242e4ac3" open="" class="toggle" dir="auto"><summary><strong>Classification</strong></summary><div class="indented"><p id="33aa15e2-9005-80e9-9854-f35559c73a8e" class="" dir="auto">
+</p><hr id="33aa15e2-9005-802f-aba8-d995d64b2be2" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-801f-9faf-f5f177b0e499" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8001-8ae6-e5aea60730f0" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Extra Component</mark></p><hr id="33aa15e2-9005-80e6-a59d-e5366d31263d" dir="auto"/><p id="33aa15e2-9005-8034-b10c-c05bcad465a4" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Reference:</mark></p></div></aside><hr id="33aa15e2-9005-800e-b22b-f340a26ab41a" dir="auto"/></div></details><details id="33aa15e2-9005-80ab-8eec-c08b923b3691" open="" class="toggle" dir="auto"><summary><strong>Key Word Definition/ Discussion</strong></summary><div class="indented"><details id="33aa15e2-9005-8052-a079-c6206987067c" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>NVMe</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80d5-8b8d-d0fb45f5227f" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80f8-ac90-ee6945d03221" class="" dir="auto">專為基於快閃記憶體（NAND Flash）的高速非揮發性儲存裝置，從零開始設計的高效能、低延遲主機控制器介面與通訊協定。</p></div></aside><hr id="33aa15e2-9005-808b-bcd7-f6b4781a2c13" dir="auto"/><p id="33ca15e2-9005-8020-ae0f-d0fa28084d4f" class="" dir="auto"><strong> NVMe 取代了 AHCI</strong></p><p id="1447182e-67fe-43ef-ab6a-718671c2b52b" class="" dir="auto">在 NVMe 出現之前，SSD 使用的介面是 AHCI（Advanced Host Controller Interface）。AHCI 最初是為 HDD 設計的，它只有一個 command queue，深度最多 32 個 command。</p><p id="b687f6a2-4e2a-4840-a756-26de41cec4f1" class="" dir="auto">HDD 的 random I/O latency 大約 10ms，所以一個 queue 深度 32 就綽綽有餘：32 個 pending command x 每個 10ms 延遲，意味著 HDD 每秒最多也就處理幾百個 IOPS，一個 queue 足以餵飽它。</p><p id="1dbbc48f-67b6-4ea0-8aa1-8dd0551a83bd" class="" dir="auto">但 SSD 的 random read latency 只有大約 100 microseconds，理論 IOPS 可以到幾十萬甚至上百萬。一個深度 32 的 queue 根本不夠用。而且，因為只有一個 queue，多個 CPU core 要發 I/O 就必須搶同一個 lock。在 8 核、16 核甚至更多核心的現代 CPU 上，這個 lock contention 本身就成為嚴重的效能瓶頸。</p><p id="90e57d46-d746-4d84-9c58-886117adf93a" class="" dir="auto">除了 queue 數量的問題，AHCI 協定本身也跑在 SATA bus 上，SATA 3.0 的 bandwidth 上限是 600 MB/s。就算 SSD 本身能做到 3 GB/s 的 sequential read，被 SATA 一卡就只剩 600 MB/s。</p><p id="caa24652-ef16-4bc7-ac69-b96335f07803" class="" dir="auto">NVMe 直接跑在 PCIe bus 上（PCIe 4.0 x4 的 bandwidth 約 8 GB/s），支援最多 65535 個 queue，每個 queue 深度可達 65536 個 command。這兩個數字和 AHCI 的「1 個 queue、32 個 command」相比，差距是三個數量級。</p><hr id="33ca15e2-9005-8030-ac01-edc8442714b0" dir="auto"/><figure id="33ca15e2-9005-8059-8414-f52f40d9900e" class="image" data-notion-image="NVMe%20Protocol/image.png" dir="ltr"><a href="NVMe%20Protocol/image.png"><img style="width:950.2374877929688px" src="NVMe%20Protocol/image.png"/></a></figure><hr id="33aa15e2-9005-8045-8c4d-cc95ab1990a8" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8055-ba89-f2deda7b8c82" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80b8-9f47-ede302eddc16" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: Legacy Boot 支援度</strong></mark><br/>在較舊的主機板或作業系統（如早期的 Windows 7）上，如果沒有內建 NVMe 驅動程式或 UEFI 支援，雖然硬體插得進去，但系統會無法識別裝置，更無法將其作為開機碟（Boot Drive）。</p></div></aside><hr id="33aa15e2-9005-8094-96df-f80ae0a148ca" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8011-9f56-f57ca2e7e187" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80a0-a63c-fdee519fdf5c" class="" dir="auto">Reference: </p></div></aside><hr id="33aa15e2-9005-80c2-a687-c0b8a01f2375" dir="auto"/></div></details><details id="33ca15e2-9005-806e-baa6-c96929259773" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>PCIe</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-809e-97f6-d380eeb68580" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-80d2-afe0-cfa95e85cc23" class="" dir="auto">一種高速的序列電腦擴充匯流排標準，提供 CPU 與週邊裝置（如顯示卡、NVMe SSD）之間的點對點（Point-to-Point）直連通道。</p></div></aside><hr id="33ca15e2-9005-8064-ace1-fb1d080460cc" dir="auto"/><p id="33ca15e2-9005-80d5-9f1c-f08ccc6f5ff5" class="" dir="auto">不同於傳統 SATA 匯流排的半雙工與低頻寬限制，PCIe 採用全雙工傳輸，且頻寬極大。以 PCIe 4.0 x4（NVMe SSD 最常見的規格）為例，理論頻寬約為 8 GB/s。因為 NVMe 直接掛載在 PCIe 匯流排上，資料可以直接從 SSD 透過 DMA 進入系統主記憶體（RAM），中間不需要經過南橋晶片或額外的 SATA 轉譯層，將實體傳輸延遲降到最低。</p><hr id="33ca15e2-9005-808b-8d4e-d357b3358fc3" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-80df-80f3-e42db11bd79b" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-80fe-903e-ebf9b7ad2f69" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: PCIe 通道分拆與降速（Lane Sharing）</strong></mark><br/>主機板上的 PCIe 通道（Lanes）總數是有限的。如果將 NVMe SSD 插在與顯示卡（GPU）或特定 SATA 埠共享通道的 M.2 插槽上，硬體層面可能會將原本的 x4 降速為 x2 運行，導致最高 Bandwidth 直接砍半（例如測速卡在 3500 MB/s 上不去）。</p></div></aside><hr id="33ca15e2-9005-802a-b8f9-fcac4c0442c3" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-8072-8523-c3aa4cf969d1" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-8014-abc4-df1b9b10ad64" class="" dir="auto">Reference: </p></div></aside><hr id="33ca15e2-9005-8098-84c6-d9eead2adb73" dir="auto"/></div></details><details id="33ca15e2-9005-80bd-b149-d83bcdf415df" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Submission queue vs Completion queue</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-8065-bf21-fc2a98cee9e0" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-802c-8fc1-eed7da23d813" class="" dir="auto">NVMe 核心的非同步通訊機制。軟體將 I/O 任務放入 Submission Queue (SQ) 提交給硬體；硬體完成任務後，將結果放回 Completion Queue (CQ) 通知軟體。</p></div></aside><hr id="33ca15e2-9005-8013-ad54-f00be196041d" dir="auto"/><p id="6216202d-7282-4262-8fe7-1d332657f280" class="" dir="auto">NVMe 的核心設計是 <strong>Submission Queue（SQ）</strong> 和 <strong>Completion Queue（CQ）</strong> 的配對機制。<br/>一對 SQ/CQ 叫做一個 <strong>queue pair</strong>。</p><p id="33ca15e2-9005-80c6-9281-f9dc0dbfc9ad" class="" dir="auto">整個 I/O 流程如下：<div class="indented"><p id="13a686e2-22d9-47e2-b358-5fcdb0295b9c" class="" dir="auto"><strong>提交階段 (submission)</strong>：<div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-80ab-bcc5-c81c85e1e81d" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-8010-ad1d-ccabdacfe4ab" class="" dir="auto">軟體（通常是 OS 的 NVMe driver）把一個 I/O command 寫入 SQ 的下一個空位。這個 command 包含操作類型（read/write）、LBA（logical block address）、資料長度、以及 DMA buffer 的 physical address（用 PRP 或 SGL 格式）。寫完之後，軟體更新 SQ 的 <strong>doorbell register</strong>，這是一個 memory-mapped I/O register，寫入它就相當於告訴 NVMe controller：「我放了新的 command 進去，請處理」。</p></div></aside></div></p><p id="5a0189cf-4a53-4e5d-9e82-000c5e15ad88" class="" dir="auto"><strong>處理階段</strong>：<div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-8038-a71b-cae6ea40f11e" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-8071-b5c3-e95daf7a9352" class="" dir="auto">NVMe controller 看到 doorbell 被更新後，從 SQ 裡取出 command，執行 I/O 操作（內部可能涉及 FTL 查表、NAND read/write 等等）。</p></div></aside></div></p><p id="96ad2445-7a2b-4945-bf1e-e2e5d23c51fc" class="" dir="auto"><strong>完成階段 (completion)</strong>：<div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-80d5-af28-c81786981258" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-80dc-87c2-f5ced4893963" class="" dir="auto">Controller 完成 I/O 後，把結果（成功或失敗、以及相關資訊）寫入對應的 CQ 的下一個空位。然後根據配置，可能送一個 interrupt 通知 CPU。軟體收到通知後，去 CQ 裡讀取完成結果，處理完畢後更新 CQ 的 head doorbell，告訴 controller「我已經消費了這些完成結果，你可以覆蓋掉了」。</p></div></aside></div></p></div></p><hr id="33ca15e2-9005-806d-b407-e7a7d801eecf" dir="auto"/><p id="2d08b8ba-877b-441e-a276-f19ecab28cd8" class="" dir="auto">SQ 和 CQ 本身就是一段 host memory 裡面的 ring buffer。Controller 透過 DMA 來讀取 SQ 裡的 command、以及寫入 CQ 裡的 completion entry。軟體和硬體各自維護自己的 head/tail pointer，透過 doorbell register 來同步。</p><hr id="33ca15e2-9005-803f-b5e4-fc0cae6574b4" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-8040-b548-cd1ea73b10c2" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-80de-8481-e3189cadadce" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: SQ 與 CQ 比例不匹配（N:1 mapping）</strong></mark><br/>雖然最常見是 1 個 SQ 對應 1 個 CQ，但 NVMe 允許「多個 SQ 共用一個 CQ」。若配置不當，多個極度繁忙的 SQ 同時將結果塞入同一個 CQ，可能會導致 CQ 溢出（Overrun）或中斷處理常式（ISR）成為單一瓶頸。</p></div></aside><hr id="33ca15e2-9005-80d3-aaf3-d3a1f1b3e3c0" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-801b-bed2-d1b6569a31a2" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-80b7-ba07-f0d9dbd9252a" class="" dir="auto">Reference: <a href="https://liujunming.top/2022/04/02/Notes-about-NVMe/">https://liujunming.top/2022/04/02/Notes-about-NVMe/</a></p></div></aside><hr id="33ca15e2-9005-804f-9ef4-e1d0dae1c209" dir="auto"/></div></details><details id="33ca15e2-9005-805c-8d82-c7e4007dbec1" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Doorbell register</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-8052-b882-f1b82a1493a2" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-80d0-a854-eec37b22c17e" class="" dir="auto">位於 NVMe 控制器（實體硬體端）上的 Memory-mapped I/O (MMIO) 暫存器。作為 CPU 與硬體控制器之間同步 Queue Head/Tail 指標的信號鈴。</p></div></aside><hr id="33ca15e2-9005-8089-9a48-f49f363560ae" dir="auto"/><p id="3d8e9995-0752-48a4-9de3-ba949ed08e04" class="" dir="auto">由於 SQ 和 CQ 是放在主記憶體裡的，NVMe 控制器不會（也不該）時時刻刻去掃描記憶體看有沒有新指令。因此，軟體每當在 SQ 尾端（Tail）放入新指令後，會去「寫入」SQ Tail Doorbell register，這相當於按門鈴提醒控制器：「有新工作了，請透過 DMA 來記憶體拿」。<br/>同樣地，軟體處理完 CQ 裡的結果後，會去寫入 CQ Head Doorbell，告訴硬體：「這個結果我看過了，該 CQ slot 的記憶體空間你可以覆蓋了」。</p><hr id="33ca15e2-9005-8048-ad5c-e0b8b5ea8d2f" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-800f-8d81-d0410509c1c1" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-802c-9e71-ce2f393c53ce" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: 頻繁的 MMIO 寫入開銷</strong></mark><br/>寫入硬體暫存器（MMIO Write）需要經過 PCIe 匯流排，這個動作的延遲比寫入一般記憶體高得多。在幾十萬 IOPS 的極端場景下，如果每一個 I/O 都敲一次門鈴，CPU 會浪費大量時間在等待 MMIO。高效能驅動（如 SPDK）會使用 Doorbell Batching 技術，累積多個指令後只敲一次門鈴。</p></div></aside><hr id="33ca15e2-9005-80b7-85e2-c3e491a10f42" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-8049-a271-cb7e0bd17e38" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-80b9-8069-cff5177adaf0" class="" dir="auto">Reference: </p></div></aside><hr id="33ca15e2-9005-8004-9b3f-d28e947726b1" dir="auto"/></div></details><details id="33ca15e2-9005-8018-b464-fd9055e3ef3c" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Queue pair</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-804f-8e1a-c233f8610b0e" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-80c9-989f-d25a72d55c98" class="" dir="auto">一個 Submission Queue 與一個 Completion Queue 綁定在一起的組合，負責獨立處理一條作業流水線。</p></div></aside><hr id="33ca15e2-9005-803b-86be-ec141ec028a6" dir="auto"/><p id="59e2da89-8e48-469e-ac3d-b25aca25339f" class="" dir="auto">NVMe 支援大量 queue pair 的目的不只是為了增加總 queue depth。更重要的設計意圖是：讓每個 CPU core 擁有自己專屬的 SQ/CQ pair。</p><p id="d00fc632-9098-44b9-aecb-04a6af4ad42e" class="" dir="auto">為什麼這很重要？想像一個繁忙的資料庫 server，16 個 core 同時在處理不同使用者的查詢，每個查詢都需要讀取 SSD 上的資料。在 AHCI 的年代，只有一個 queue，多個 core 要發 I/O 就必須拿鎖。假設你有 16 個 core，每個 core 每秒要發 5 萬個 I/O command，那這把鎖每秒要被 contend 80 萬次。鎖的 overhead 包括 atomic operation（至少幾十個 nanoseconds）和 cache line bouncing（在不同 core 之間同步鎖的 cache line 也要幾十個 nanoseconds）。在高 IOPS 場景下，光是鎖的 overhead 就可能佔到 I/O latency 的 10-20%。</p><hr id="33ca15e2-9005-80b0-a26e-e199667002a1" dir="auto"/><p id="d2b50873-bfbe-490c-874c-4314032849c4" class="" dir="auto"><strong>Per-Core Queue Pair 避免 Lock Contention</strong></p><p id="33ca15e2-9005-8059-a88a-f0f1fe09d119" class="" dir="auto">NVMe 支援海量 Queue Pair 的最大價值在於「硬體配合軟體架構」。<br/>在多核系統中，Linux 會為每一個 CPU Core 配置一組專屬的 Queue Pair。這意味著：Core 0 只負責寫入 SQ0 / 讀取 CQ0；Core 1 只負責寫入 SQ1 / 讀取 CQ1。<br/>因為沒有任何資料結構（Queue）是跨 Core 共享的，所以完全不需要任何軟體鎖（Lock-free），也消除了 Cache line bouncing 的問題。這讓 NVMe SSD 在多核 CPU 下的效能可以做到幾乎線性的成長（Linear Scaling）。</p><p id="4c4acbdb-61d5-4774-9758-611712a0e842" class="" dir="auto">Linux 的 NVMe driver 在初始化的時候，會為系統中的每個 CPU core（或者每個 NUMA node）建立一組 queue pair，然後在 I/O path 中根據 current CPU 選擇對應的 queue pair。這個設計和 NVMe 硬體的 multi-queue 架構完美搭配。</p><p id="289095e2-c979-4930-87f4-0c111810635d" class="" dir="auto">實測數字：一顆高階 NVMe SSD 搭配 per-core queue pair，在 16 核系統上可以達到接近線性的 IOPS scaling。也就是說 16 核的 IOPS 接近單核的 16 倍。如果用單一 queue 加鎖的方式，通常到 4-8 核就開始 saturate 了。</p><hr id="33ca15e2-9005-802d-a735-fe9278680155" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-80b6-9484-ed42e295485a" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-8092-ab4f-c2fbb353e176" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: 記憶體耗損</strong></mark></p><p id="709329bc-2742-4294-9366-efed30bdeb75" class="" dir="auto">每個 Queue Pair 都需要佔用主記憶體空間來維持 Ring Buffer。在擁有超多核心的伺服器（例如 128 核或 256 核）上，如果為了每一個 Core 都開啟最大深度（65536）的 Queue Pair，將會毫無意義地鎖死（Pin）大量且昂貴的實體記憶體空間。</p></div></aside><hr id="33ca15e2-9005-8044-807f-eb1f71065fdc" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-80fc-b46b-e47a3ad35702" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-8016-bda3-d402de227796" class="" dir="auto">Reference: </p></div></aside><hr id="33ca15e2-9005-8073-92b6-d7e9715bcc9b" dir="auto"/></div></details><details id="33ca15e2-9005-806d-9b4e-e14e382eaad9" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Namespace</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-8045-9337-e807b673d8c0" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-80ab-8b4f-f18b50f66290" class="" dir="auto">NVMe 裝置內部的邏輯儲存單元，擁有自己獨立的 Logical Block Address (LBA) 空間（即 LBA 0 到 LBA N）。</p></div></aside><hr id="33ca15e2-9005-8077-a792-d2e75785c191" dir="auto"/><p id="eca88ea1-3bcb-432a-b767-957920060fa9" class="" dir="auto">NVMe 引入了 namespace 的概念來管理裝置上的儲存空間。Namespace 是 NVMe 裝置中的一個邏輯單元，類似於 disk partition，但它是實作於「硬體控制器層級」而非作業系統層級。</p><ol type="1" id="92081c61-92f9-4913-a04b-161592a456d0" class="numbered-list" start="1" dir="auto"><li><strong>隔離性：</strong> Namespace 1 的 LBA 0 和 Namespace 2 的 LBA 0 是完全獨立的實體。在企業級或雲端多租戶（Multi-tenant）環境中，可以用硬體將一顆大 SSD 切成多個獨立裝置直接 Passthrough 給不同的虛擬機。</li></ol><ol type="1" id="073faf27-b91e-46af-a47b-3865445c3a52" class="numbered-list" start="2" dir="auto"><li><strong>獨立設定：</strong> 不同的 Namespace 可以設定不同的 Block Size（如 512B 或 4KB）或資料保護機制。<br/>多數消費級 SSD 預設只建立一個涵蓋所有可用空間的 Namespace。</li></ol><hr id="33ca15e2-9005-805d-ae06-e5f29bd34563" dir="auto"/><p id="6e8541de-99c2-4eb1-926b-8ba06f9216c1" class="" dir="auto">每個 namespace 有自己的 LBA（Logical Block Address）空間，也就是說 namespace 1 的 LBA 0 和 namespace 2 的 LBA 0 是完全獨立的。一顆 NVMe SSD 可以被切成多個 namespace，每個 namespace 可以有不同的 block size、不同的 capacity，甚至不同的 protection 設定。</p><p id="7cdd2030-575b-4679-89a9-d132dd31f044" class="" dir="auto">Namespace 常見的應用場景有幾種。第一，在 multi-tenant 的雲端環境中，一顆 physical SSD 可以被劃分成多個 namespace，分配給不同的 virtual machine，每個 VM 看到的是一個獨立的 NVMe 裝置。第二，在效能隔離的場景中，不同的 namespace 可以對應到裝置內部不同的 NAND channel 或 die，從而在物理層面實現 I/O 隔離。第三，NVMe 標準支援每個 namespace 獨立的格式化操作（format），你可以在不影響其他 namespace 的情況下重新格式化某一個 namespace。</p><p id="924b7298-0201-469d-affe-a74076f56256" class="" dir="auto">不過大部分消費級 NVMe SSD 預設只有一個 namespace，涵蓋整顆裝置的全部容量。Namespace 的多分割特性主要在企業級 SSD 和資料中心場景下才會用到。</p><hr id="33ca15e2-9005-803e-9809-fc7643b90e56" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-80f5-a566-f13b1ee7105e" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-8001-9b77-d833fd17539b" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark><strong>Format (Secure Erase) 的毀滅性範圍。</strong></p><p id="d7db9cb9-8911-4dc3-b160-ae7e27c4f437" class="" dir="auto">執行 NVMe Format 指令時，可以指定針對「特定 Namespace」或是「整個 Controller」。如果不熟悉工具（如nvme-cli），下錯參數可能會連帶將同顆 SSD 上其他正在使用的 Namespace 資料瞬間全部清空。</p></div></aside><hr id="33ca15e2-9005-800b-8414-f330c4c59157" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-801a-8807-d59f7a51ed41" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-8011-8507-f4db911bf11c" class="" dir="auto">Reference: </p></div></aside><hr id="33ca15e2-9005-807a-ab2d-f35984b10fe6" dir="auto"/></div></details><details id="33ca15e2-9005-80b2-96e5-e518b6ab1517" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>AHCI</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-804b-b50e-ff319ae3fda1" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-8008-9c1e-f7a77e4c9f3f" class="" dir="auto">傳統為 SATA 匯流排機械硬碟（HDD）設計的主機控制器介面標準，為 NVMe 普及前的上一代主流標準。</p></div></aside><hr id="33ca15e2-9005-80ab-9788-f495080ff05c" dir="auto"/><p id="33ca15e2-9005-8063-b9b9-c1188f32acb6" class="" dir="auto">AHCI 的設計假想敵是「慢速且具有旋轉物理極限的機械硬碟」，因此它只實作了單一指令佇列，且佇列深度（Queue Depth）硬性限制為 32。在 HDD 時代，32 已經足夠讓磁頭去進行 NCQ（Native Command Queuing，優化讀寫路徑）。但當儲存載體變成微秒級反應的 NAND Flash 時，AHCI 嚴重的架構缺陷（單一佇列導致的排隊等待、多核 CPU 的鎖競爭）反而成為拖累 SSD 效能的最大元兇。</p><hr id="33ca15e2-9005-801c-9626-f3b690f1dafb" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-80c1-be6b-c6d6b1448f6c" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-801b-b17f-cef368143bda" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: 瓶頸在介面不在快閃記憶體</strong></mark></p><p id="3c54269a-ec77-49a9-9501-bd2cd1697089" class="" dir="auto">購買高階 SATA SSD 時，即使內部的 NAND 顆粒再優秀，其 4K 隨機讀寫的 IOPS 依然會因為 AHCI 的 32 佇列限制而迅速撞牆（通常卡在 8 萬~ 10 萬 IOPS 左右），這就是所謂的「硬體架構天花板」。</p></div></aside><hr id="33ca15e2-9005-803a-b7b1-fa25f265fbbc" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-8079-aaa1-ec837c8fa218" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-8081-92d4-e0bec77cd954" class="" dir="auto">Reference: </p></div></aside><hr id="33ca15e2-9005-80af-845a-df2f2863ffb7" dir="auto"/></div></details><details id="33ca15e2-9005-8036-b5bf-e14d754e9fe4" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Command set</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-803d-ad91-ee648637dfc9" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-8020-b962-dcfd5733f0ef" class="" dir="auto">規範主機（Host OS）與 NVMe 控制器（Controller）之間如何溝通與下達指令的標準語言協定。</p></div></aside><hr id="33ca15e2-9005-803d-8660-eca363a6926f" dir="auto"/><p id="33aec18d-8c3c-40e3-9495-5590105728f7" class="" dir="auto">NVMe 協定將指令明確區分為兩大類：</p><ol type="1" id="c11ba95b-1dd7-4b12-b873-432a50625957" class="numbered-list" start="1" dir="auto"><li><strong>Admin Command Set (管理指令)：</strong> 透過獨立的 Admin Queue Pair 傳遞。負責裝置管理任務，例如：建立/刪除 I/O Queue Pair、獲取健康資訊（SMART data）、韌體更新、Namespace 管理等。</li></ol><ol type="1" id="1d2c1512-aba4-40eb-ab48-b6db31701e37" class="numbered-list" start="2" dir="auto"><li><strong>NVM Command Set (I/O 指令)：</strong> 透過 I/O Queue Pair 傳遞。負責實際的資料操作，如 Read、Write、Flush 等。<br/>隨著技術演進，NVMe 標準也持續擴展 Command Set，例如專為分區命名空間設計的 <strong>ZNS (Zoned Namespace) Command Set</strong>，或是 Key-Value Command Set。</li></ol><hr id="33ca15e2-9005-8058-83dd-c7fba9e7c4c7" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-8021-b972-d5a0c3ecad6e" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-80d9-a364-e0317f449185" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: Feature Not Supported (特性不支援)</strong></mark></p><p id="1a51bf97-3de0-422a-af58-5be6f0fd051e" class="" dir="auto">並非所有的 NVMe SSD 都支援標準中定義的所有指令（尤其是消費級產品）。如果驅動程式盲目發送裝置不支援的選用指令（Optional Commands），硬體控制器會回傳<code>Invalid Command Opcode</code>錯誤。因此軟體在初始化時必須先讀取 Controller Capabilities 資料結構來進行特性協商。</p></div></aside><hr id="33ca15e2-9005-80f5-bef9-f296b664ecae" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-8094-84f8-ded97bbff9a1" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-80e4-b735-f1be6eca5d24" class="" dir="auto">Reference: </p></div></aside><hr id="33ca15e2-9005-801f-9621-f10b0d2212eb" dir="auto"/></div></details></div></details><details id="33aa15e2-9005-80ab-86d3-e6123c959f1b" open="" class="toggle" dir="auto"><summary><strong>Test</strong></summary><div class="indented"><details id="33aa15e2-9005-8076-bcdc-f56fde0b9e69" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Key Concepts</strong></mark></summary><div class="indented"><details id="33aa15e2-9005-80c8-8036-fb88fb37061a" open="" class="toggle" dir="auto"><summary>理解為什麼 NVMe 取代了 AHCI：AHCI 只有單一 command queue 且是為 HDD 設計的，無法發揮 SSD 的平行處理能力，而 NVMe 直接運行在 PCIe 上，大幅降低協定延遲</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-806e-88e0-d333a9675aaa" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-8052-8deb-f77917cd4fe8" class="" dir="auto">Answer<div class="indented"><p id="33ca15e2-9005-801e-9522-edcfd717221f" class="" dir="auto">AHCI 的單一佇列（Queue Depth 32）是為慢速且有物理限制的 HDD 所設計，這成為了高速 SSD 的效能瓶頸。NVMe 捨棄了舊有的 SATA 介面包袱，直接讓 SSD 透過頻寬極大的 PCIe 匯流排與 CPU 溝通，大幅降低了協定上的軟硬體延遲，並能徹底釋放 SSD 內部多通道 NAND Flash 的平行讀寫潛力。</p></div></p><hr id="33ca15e2-9005-808b-9d05-ce3581649ed5" dir="auto"/><p id="33ca15e2-9005-8066-ab79-d5b24b187666" class="" dir="auto">Key Concept<div class="indented"><p id="7abd4788-f2c2-43e5-a7f6-9b3d610466eb" class="" dir="auto">PCIe 匯流排 (PCIe Bus)</p><p id="368046cd-d880-4140-adc4-739c018f0cc5" class="" dir="auto">協定延遲 (Protocol Latency)</p><p id="8015091a-cf0f-4224-9f06-8fceace3dffd" class="" dir="auto">佇列深度 (Queue Depth)</p><p id="17543f82-cfc3-4904-9264-aea0a29355ec" class="" dir="auto">硬體平行化 (Hardware Parallelism)</p></div></p><hr id="33ca15e2-9005-806e-836b-ed9453494439" dir="auto"/><p id="33ca15e2-9005-8076-a6ad-c657c32b0ffd" class="" dir="auto">Detail<div class="indented"><p id="33ca15e2-9005-804a-9062-c229c7e1e4a7" class="" dir="auto">AHCI 處理資料需要經過 HBA (Host Bus Adapter) 轉換，過程中 CPU 需要頻繁讀寫暫存器（Uncacheable Register Reads），每次讀寫都會帶來嚴重的延遲（高達數微秒）。隨著 SSD 技術進步，內部控制器可以同時對多個快閃記憶體晶片進行操作；但 AHCI 的單一 Command Queue 無法同時傳遞足夠的指令給 SSD，導致底層硬體常常處於閒置等待狀態。NVMe 標準精簡了指令集，並利用 PCIe 直連 CPU 的特性，將每次 I/O 請求的暫存器讀寫次數降到最低，從根本上解決了「軟體跟不上硬體速度」的問題。</p></div></p></div></aside><hr id="33aa15e2-9005-80ed-ba25-e3c0a3fda8a5" dir="auto"/></div></details><details id="33aa15e2-9005-806a-b423-c3ff4d075bf7" open="" class="toggle" dir="auto"><summary>理解 NVMe 的多 queue 架構，知道它支援多對 submission queue (SQ) 與 completion queue (CQ)，軟體將 command 放入 SQ 並寫入 doorbell register 通知裝置，裝置完成後將結果放入 CQ</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-8081-b38a-ff639db9b3e9" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-80d8-adbe-c7654a9d748e" class="" dir="auto">Answer<div class="indented"><p id="33ca15e2-9005-805e-9c95-f852e0014bcb" class="" dir="auto">NVMe 採用非同步的多佇列機制，主要由 Submission Queue (SQ) 與 Completion Queue (CQ) 組成。作業系統將 I/O 指令放入 SQ 後，會寫入 Doorbell Register 喚醒硬體；SSD 處理完畢後，會把狀態結果放入 CQ，並發送中斷訊號通知 CPU 來讀取結果。</p></div></p><hr id="33ca15e2-9005-8081-ac43-c5011c961848" dir="auto"/><p id="33ca15e2-9005-80b0-88e6-cdbf7ff37d18" class="" dir="auto">Key Concept<div class="indented"><p id="6f2926ac-b27f-43b9-87de-dadbdb1c110a" class="" dir="auto">Submission Queue (SQ)</p><p id="935cc418-76c4-474b-afef-feca2126913d" class="" dir="auto">Completion Queue (CQ)</p><p id="65534bea-f8b2-4e14-9fe6-bc1fdeac0311" class="" dir="auto">Doorbell Register</p><p id="0ddc6123-2bc2-47cb-a348-41c272d370dd" class="" dir="auto">非同步 I/O (Asynchronous I/O)</p><p id="d79c2f70-a2bd-4763-8267-acc5171399c2" class="" dir="auto">環形緩衝區 (Ring Buffer)</p></div></p><hr id="33ca15e2-9005-80b8-9a16-ebbb311fce28" dir="auto"/><p id="33ca15e2-9005-804f-9400-f3b69ed6ff49" class="" dir="auto">Detail<div class="indented"><p id="a6c02ca3-298f-4d44-a6a8-2bfd50204b43" class="" dir="auto">SQ 和 CQ 是配置在主機記憶體 (Host Memory) 中的環形緩衝區。運作流程如下：</p><ol type="1" id="3ccd6155-ab1e-4487-9d2f-d0b9460e7d05" class="numbered-list" start="1" dir="auto"><li><strong>發布指令</strong>：軟體將 Command 寫入 SQ 的尾部 (Tail)，接著敲響 NVMe 控制器上的 <code>SQ Tail Doorbell</code>。這就像按門鈴，通知裝置「有新工作」。</li></ol><ol type="1" id="a1f252f6-49e1-4e3d-9ca4-a1a3479c6476" class="numbered-list" start="2" dir="auto"><li><strong>裝置執行</strong>：SSD 控制器收到通知後，透過 DMA (Direct Memory Access) 從主機記憶體把 SQ 中的 Command 搬到裝置內部執行。</li></ol><ol type="1" id="23095871-28b8-420e-a043-6e52500b4de7" class="numbered-list" start="3" dir="auto"><li><strong>完成回報</strong>：SSD 執行完畢，將結果（包含成功與否、錯誤碼）寫入 CQ 的尾部，並發送中斷（如 MSI-X）通知 CPU。</li></ol><ol type="1" id="3412da41-cd36-4f66-b1c6-083179f6cd97" class="numbered-list" start="4" dir="auto"><li><strong>軟體確認</strong>：CPU 收到中斷，讀取 CQ 處理結果後，更新 <code>CQ Head Doorbell</code>，告訴裝置「我已讀取，可以釋放這段 CQ 空間了」。</li></ol></div></p></div></aside><hr id="33aa15e2-9005-80e0-ab5e-e1b223501969" dir="auto"/></div></details><details id="33aa15e2-9005-809c-895e-d054e9e3fdf3" open="" class="toggle" dir="auto"><summary>理解 per-core queue pair 的設計如何避免多核心之間的 lock contention，每個 CPU core 擁有獨立的 SQ/CQ pair，不需要與其他 core 競爭鎖</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-808d-91cb-f3142206cb19" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-809f-b192-d140784f46ab" class="" dir="auto">Answer<div class="indented"><p id="33ca15e2-9005-8046-a764-dbb80ee500ba" class="" dir="auto">NVMe 支援建立多達 64K 個 Queue，因此作業系統可以為每個 CPU 核心分配一對專屬的 SQ 與 CQ (Queue Pair)。當不同核心同時發出 I/O 請求時，各自只操作自己專屬的記憶體區塊與 Doorbell，完全不需要互相等待或搶奪鎖，實現了真正的無鎖 (Lock-free) 並行處理。</p></div></p><hr id="33ca15e2-9005-80f5-951f-dc0d0192246d" dir="auto"/><p id="33ca15e2-9005-80ee-a3f6-d33f250a0a26" class="" dir="auto">Key Concept<div class="indented"><ul id="c0d3cec8-c27a-45eb-b623-3b1e813a0b7a" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Per-core Queue Pair</li></ul><ul id="4a17bed5-741b-4ee5-9f13-018a305d4dc3" class="bulleted-list" dir="auto"><li style="list-style-type:disc">無鎖設計 (Lock-free Design)</li></ul><ul id="e6211cbd-6624-4eaf-ad50-2de1f0979fcb" class="bulleted-list" dir="auto"><li style="list-style-type:disc">鎖競爭 (Lock Contention)</li></ul><ul id="d3fc453a-33d6-4f13-93d5-1078b3a9cdc7" class="bulleted-list" dir="auto"><li style="list-style-type:disc">執行緒區域變數 (Thread-local Data)</li></ul></div></p><hr id="33ca15e2-9005-80c4-8a97-e485defaf702" dir="auto"/><p id="33ca15e2-9005-804d-8c96-e83cac9cf9d0" class="" dir="auto">Detail<div class="indented"><p id="ceef4999-4106-4c34-bb9d-8564c458958f" class="" dir="auto">在傳統單一佇列（如 AHCI）架構下，如果 16 個 CPU Core 都要讀寫磁碟，作業系統必須在軟體層面上鎖（例如使用 Spinlock 或 Mutex）。當 Core A 拿到鎖在寫入佇列時，其他 15 個 Core 都必須等待。在超高 IOPS 的場景下，這種 Lock Contention 會導致 CPU 耗費大量資源在空轉與快取一致性（Cache Coherency）的同步上。<br/>NVMe 透過 Per-core Queue Pair，讓資料結構變成 Thread-local。Core 0 寫入 Core 0 的 SQ，Core 1 寫入 Core 1 的 SQ，彼此的資料結構在記憶體中完全獨立。這消除了軟體層面的同步瓶頸，讓儲存系統的效能可以隨著 CPU 核心數的增加而線性擴展。</p></div></p></div></aside><hr id="33aa15e2-9005-8047-9d34-c455d39ba3e8" dir="auto"/></div></details><details id="33aa15e2-9005-80a0-83bc-d693f1814117" open="" class="toggle" dir="auto"><summary>了解 NVMe namespace 的概念，知道它是 NVMe 用來劃分與管理裝置儲存空間的邏輯單元</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80a8-8ade-d3d1b452424f" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80f8-b58d-f55f2596d985" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-80e4-90ce-e50f866e74f2" class="" dir="auto">NVMe Namespace 是由 NVMe 控制器劃分出來的邏輯儲存單元。它將一整塊實體的 NVMe 裝置，在硬體/韌體層面切割成多個獨立的虛擬磁碟。對作業系統而言，每一個 Namespace 看起來就像是一顆獨立的實體硬碟。</p></div></p><hr id="33aa15e2-9005-804b-81d9-e52d05bbc68b" dir="auto"/><p id="33aa15e2-9005-8019-abcd-efdffd3c031b" class="" dir="auto">Key Concept<div class="indented"><p id="566e2fe8-3a23-4e75-b6b5-7afbbeca579d" class="" dir="auto">邏輯儲存單元 (Logical Storage Unit)</p><p id="e0827e8e-2fb0-4b56-a29c-6858b181eb74" class="" dir="auto">邏輯區塊定址 (LBA, Logical Block Addressing)</p><p id="09893173-0cb0-401d-a941-f3dc7f7bb375" class="" dir="auto">硬體級隔離 (Hardware-level Isolation)</p></div></p><hr id="33aa15e2-9005-8046-a65c-f10a81baddb7" dir="auto"/><p id="33aa15e2-9005-8002-aa81-f561c37eb0fd" class="" dir="auto">Detail<div class="indented"><p id="7f37cc2d-eb69-4bde-9fdf-a62abd028e10" class="" dir="auto">雖然 Namespace 的概念類似於作業系統中的磁碟分割（Disk Partition），但實作層次完全不同。Partition 是 OS 讀取分區表後在軟體層做出的切割；而 Namespace 是由 SSD 控制器負責管理的。<br/>在 Linux 系統中，<code>/dev/nvme0 </code>代表的是 NVMe 控制器，而 <code>/dev/nvme0n1</code> 和 <code>/dev/nvme0n2</code> 則是底下的兩個 Namespace。每個 Namespace 都可以擁有獨立的屬性設定，例如不同的 LBA 格式（512 Bytes 或 4KB）、獨立的資料保護機制或加密金鑰。這種硬體層級的隔離在企業環境中極具價值，例如在建構 Internal Developer Platform 或處理多租戶架構時，可以直接將不同的 Namespace 指派給不同的節點或虛擬機，確保彼此的 I/O 不互相干擾。</p></div></p></div></aside><hr id="33aa15e2-9005-8010-8595-c622f640222d" dir="auto"/></div></details></div></details><details id="33aa15e2-9005-80cf-bc6f-da3b1bdcbd03" open="" class="toggle" dir="auto"><summary><mark class="highlight-teal" data-notion-highlight="teal"><strong>Test your understanding</strong></mark></summary><div class="indented"><details id="33aa15e2-9005-805d-975b-d1287c331704" open="" class="toggle" dir="auto"><summary>AHCI 的單一 queue 設計為什麼在 HDD 時代不是問題，但到了 SSD 時代卻成為嚴重瓶頸？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-80f4-9178-c51482828935" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-807a-aa03-d674d6a17b0c" class="" dir="auto">Answer<div class="indented"><p id="33ca15e2-9005-80da-9589-df3d21a5d019" class="" dir="auto">HDD 的物理機械結構（磁頭尋道、磁片旋轉）非常慢，硬碟本身的物理延遲遠大於軟體佇列的處理時間，因此單一佇列足夠應付。但 SSD 沒有移動式機械零件，內部由多個 NAND Flash 晶片組成，具備極強的平行讀寫能力；此時 AHCI 單一佇列且深度僅有 32 的設計，反而限制了 SSD 同時處理多筆指令的潛力，讓軟體介面成了最大的效能瓶頸。</p></div></p><hr id="33ca15e2-9005-80ae-8800-d3ec41f51daa" dir="auto"/><p id="33ca15e2-9005-808e-8469-ecca9cb5b782" class="" dir="auto">Key Concept<div class="indented"><p id="33ca15e2-9005-80f5-9dc5-da0aa3c2407a" class="" dir="auto">物理延遲 vs. 電子速度 (Mechanical Latency vs. Electronic Speed)</p><p id="33ca15e2-9005-8090-87f8-c568e3a42a04" class="" dir="auto">佇列深度 (Queue Depth)</p><p id="33ca15e2-9005-8078-a088-f19e7a90f46c" class="" dir="auto">平行處理能力 (Parallelism / Multi-channel NAND)</p><p id="33ca15e2-9005-8049-88c8-eacc26a16a05" class="" dir="auto">I/O 瓶頸轉移 (Bottleneck Shift)</p></div></p><hr id="33ca15e2-9005-803a-a5eb-cc579135a1c7" dir="auto"/><p id="33ca15e2-9005-8035-b165-fa3ec0742cc4" class="" dir="auto">Detail<div class="indented"><p id="33ca15e2-9005-801d-a451-c278f687e924" class="" dir="auto">在傳統 HDD（硬碟機）時代，資料讀寫需要靠機械手臂移動磁頭（Seek time，約數毫秒）以及等待磁片旋轉到正確位置（Rotational latency）。這使得 HDD 的 IOPS（每秒輸入/輸出運作次數）極限大約落在 100 到 200 之間。AHCI 協定只有一個 Command Queue，且最大佇列深度（Queue Depth）為 32。對於慢速的 HDD 來說，CPU 塞 32 個指令給它排隊，它都還來不及消化，所以單一佇列絕對夠用，瓶頸在於硬碟的物理極限。</p><p id="33ca15e2-9005-80b2-87ce-e33a12e3cb95" class="" dir="auto">然而，SSD 是純電子元件，內部控制器連接了多個 NAND Flash 通道，可以「同時」對多個晶片進行讀寫（高度平行化）。現代 NVMe SSD 的 IOPS 動輒百萬起跳，延遲在微秒（µs）等級。如果繼續用 AHCI，SSD 的超大胃口只能被迫透過一根小小的吸管（單一佇列、深度 32）來接收資料，這會導致 SSD 內部大量的 NAND 通道閒置。</p><p id="33ca15e2-9005-8069-bc20-daffca01c584" class="" dir="auto">NVMe 的出現解決了這個問題，它直接走 PCIe 通道，並且支援高達 64K（65,535）個 Queue，每個 Queue 的深度也高達 64K。這讓 OS 可以將海量指令同時下達給 SSD，徹底釋放其平行讀寫的爆發力。</p></div></p></div></aside><hr id="33aa15e2-9005-8085-8cd6-e8884bddbeec" dir="auto"/></div></details><details id="33aa15e2-9005-8041-90e9-dcfe0b1676a2" open="" class="toggle" dir="auto"><summary>為什麼 per-core queue pair 的設計可以避免 lock contention？如果改用「所有 core 共享一個 queue，加一把 spinlock」的方式，在 16 核、每核每秒 5 萬 IOPS 的情境下會有什麼 overhead？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-80bd-a4bf-f4adcf708b49" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-8061-aa4c-e176a4240b61" class="" dir="auto">Answer<div class="indented"><p id="33ca15e2-9005-80d5-a457-c33e2065834b" class="" dir="auto">Per-core queue pair 讓每個 CPU 核心擁有自己專屬的 Submission Queue (SQ) 和 Completion Queue (CQ)，因為不與其他核心共用資料結構，所以發送指令時完全不需要上鎖（Lock-free）。如果所有核心共享一個佇列並使用 Spinlock，在高 IOPS 下會引發嚴重的鎖競爭（Lock contention）與快取顛簸（Cache bouncing），導致 CPU 浪費大量算力在等待解鎖，嚴重拖垮系統效能。</p></div></p><hr id="33ca15e2-9005-8065-923e-c5ab7bb0d358" dir="auto"/><p id="33ca15e2-9005-8066-8d70-d9e937802fe9" class="" dir="auto">Key Concept<div class="indented"><p id="33ca15e2-9005-80e9-aac8-c56439d5ba7a" class="" dir="auto">無鎖設計 (Lock-free / Per-core data structures)</p><p id="33ca15e2-9005-8041-8b36-c8324be8c445" class="" dir="auto">鎖競爭 (Lock Contention)</p><p id="33ca15e2-9005-8064-a92e-d5932c58025c" class="" dir="auto">自旋鎖 (Spinlock)</p><p id="33ca15e2-9005-8026-a3ce-e704ca8aa99a" class="" dir="auto">快取一致性與快取顛簸 (Cache Coherency / Cache Line Bouncing)</p></div></p><hr id="33ca15e2-9005-80ee-ac4a-c31066d542fc" dir="auto"/><p id="33ca15e2-9005-8074-868e-c5cadf3ef777" class="" dir="auto">Detail<div class="indented"><p id="33ca15e2-9005-8038-a2f0-fe88f014d89e" class="" dir="auto">當作業系統要把 I/O 指令放入佇列時，如果系統只有「一個」全域佇列，為了避免多個 CPU 核心同時寫入導致資料覆蓋或毀損，就必須引入鎖（Lock）機制。</p><p id="33ca15e2-9005-80c0-936d-d566d348d5da" class="" dir="auto">讓我們試算您提到的情境：16 核心、每核每秒 5 萬 IOPS。<br/>這意味著整個系統每秒要產生 16 × 50,000 = 800,000 次 I/O 請求。<br/>如果採用「共享佇列 + Spinlock」：<div class="indented"><blockquote id="33ca15e2-9005-80fb-8da5-c72a82482e53" class="" dir="auto"><strong>鎖競爭極度劇烈：</strong> <p id="33ca15e2-9005-8027-aa20-e9fd4ff4ae18" class="" dir="auto">每秒有 80 萬次去爭搶同一把鎖。當 Core 0 拿到鎖時，Core 1 到 Core 15 都只能在旁邊不斷空轉（Spinning）消耗 CPU 資源，什麼事都不能做。</p></blockquote><blockquote id="33ca15e2-9005-8005-9fae-e619a85d4492" class="" dir="auto"><strong>Cache Bouncing（快取顛簸）帶來的災難：</strong> <p id="33ca15e2-9005-80fd-8f15-fb732ba5ca25" class="" dir="auto">現代 CPU 有 L1/L2/L3 快取。當多個核心頻繁修改同一個 Spinlock 的記憶體位址時，為了維持快取一致性（Cache Coherency，例如 MESI 協定），這個鎖所在的 Cache Line 會不斷在各個核心的快取之間失效（Invalidate）並重新載入。這種硬體層級的資料搬移延遲極高，甚至會讓總線（Bus）塞滿無效的同步訊號。</p></blockquote></div></p><p id="33ca15e2-9005-8087-951a-ec40a4aeae28" class="" dir="auto"><strong>NVMe 的解法 (Per-core Queue)：</strong><div class="indented"><p id="33ca15e2-9005-80b0-ac83-d192a8f176cd" class="" dir="auto">作業系統在初始化時，會為每個 CPU 核心在記憶體中配置「專屬」的 SQ 與 CQ，然後映射給 NVMe 控制器。當 Core 0 要寫資料時，它只會把指令放到 Core 0 的 SQ，並敲響專屬的 Doorbell；Core 1 寫入 Core 1 的 SQ。井水不犯河水，從根本上消滅了 Lock contention 和 Cache bouncing 的問題，實現了線性擴展的 I/O 效能。</p></div></p></div></p></div></aside><hr id="33aa15e2-9005-8075-9fea-c60f9d06bbe7" dir="auto"/></div></details><details id="33aa15e2-9005-80d6-a975-d8aa48f880a1" open="" class="toggle" dir="auto"><summary>NVMe namespace 和傳統的 disk partition 有什麼相同和不同之處？namespace 在什麼場景下特別有用？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-8077-a1cb-fd46d60aebce" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-8057-ba2f-cd6d00e4ac79" class="" dir="auto">Answer<div class="indented"><p id="33ca15e2-9005-8092-a1d4-f5682521d4cb" class="" dir="auto">兩者都是將一塊大的儲存空間切分成多個邏輯區塊來使用。不同之處在於，Disk Partition 是「作業系統/軟體層級」的劃分，由 OS 讀取分區表來管理；而 NVMe Namespace 是「硬體/控制器層級」的劃分，對於 OS 來說，每一個 Namespace 看起來就像是一顆獨立的實體硬碟。Namespace 在虛擬化（VMs）、多租戶環境以及需要獨立加密與格式化的企業級場景中最為有用。</p></div></p><hr id="33ca15e2-9005-801f-90cc-f0c4ef64be86" dir="auto"/><p id="33ca15e2-9005-80eb-b9b4-d4568ae9e8ce" class="" dir="auto">Key Concept<div class="indented"><p id="33ca15e2-9005-806b-9c31-f2c1ecadca72" class="" dir="auto">邏輯區塊定址 (LBA, Logical Block Addressing)</p><p id="33ca15e2-9005-80d5-b0de-c7c4c8d0b2b7" class="" dir="auto">硬體層級隔離 (Hardware-level Isolation)</p><p id="33ca15e2-9005-805d-8fc5-cbd8980e445c" class="" dir="auto">虛擬化與 PCIe 穿透 (Virtualization / SR-IOV)</p><p id="33ca15e2-9005-8024-b76c-e4fbb9ed7b4f" class="" dir="auto">多租戶 (Multi-tenancy)</p></div></p><hr id="33ca15e2-9005-8050-9ae6-f462cafe5bc3" dir="auto"/><p id="33ca15e2-9005-8011-b1e6-e14803ebae9e" class="" dir="auto">Detail<div class="indented"><ul id="33ca15e2-9005-80e3-8317-dd711478f1d9" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>相同處：</strong><br/>無論是 Partition 還是 Namespace，目的都是為了把一塊大容量的儲存裝置，邏輯上切分成多個獨立的空間（例如 C 槽、D 槽），以便存放不同類型的資料或安裝不同的作業系統。</li></ul><ul id="33ca15e2-9005-8031-8af6-c7cf75434af8" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>不同處：</strong><ul id="33ca15e2-9005-8048-bacc-ec2984346f22" class="bulleted-list" dir="auto"><li style="list-style-type:circle"><strong>Disk Partition (磁碟分割)：</strong> 是 OS 透過寫入 MBR 或 GPT 分區表來實現的。整顆硬碟（例如 <code>/dev/sda</code>）對底層硬體來說還是一顆裝置，OS 自己知道要從哪個 LBA 讀取哪個分區（例如 <code>/dev/sda1</code>）。所有的 I/O 指令最終還是全部丟給同一個硬碟控制器處理。</li></ul><ul id="33ca15e2-9005-809a-833f-cbb232c2fdb6" class="bulleted-list" dir="auto"><li style="list-style-type:circle"><strong>NVMe Namespace：</strong> 是由 NVMe 控制器在<strong>硬體韌體層</strong>切出來的。當你建立兩個 Namespace 時，OS 會偵測到兩個獨立的區塊裝置（例如 <code>/dev/nvme0n1</code> 和 <code>/dev/nvme0n2</code>）。每個 Namespace 可以擁有完全獨立的屬性，例如：不同的 LBA 大小（512 bytes 或 4K）、獨立的加密金鑰，甚至是獨立的防護機制。</li></ul></li></ul><ul id="33ca15e2-9005-800c-892e-fd90e15d5abc" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>特別有用的場景：</strong><ul id="33ca15e2-9005-8031-a49e-c46940633073" class="bulleted-list" dir="auto"><li style="list-style-type:circle"><strong>虛擬化 (Virtualization) 與 SR-IOV：</strong> 在資料中心，一台伺服器可能跑了數十個虛擬機（VM）。透過 NVMe 的特性，可以將不同的 Namespace 直接指派（Passthrough）給不同的 VM。每個 VM 認為自己拿到了一顆獨立的直連硬碟，這大幅降低了 Hypervisor（如 ESXi 或 KVM）在軟體層模擬儲存裝置的負擔。</li></ul><ul id="33ca15e2-9005-8021-90cc-d1495ebc35ef" class="bulleted-list" dir="auto"><li style="list-style-type:circle"><strong>多租戶隔離與效能保證：</strong> 企業級 NVMe 可以針對不同的 Namespace 設定不同的效能上限或 QoS（服務品質保證）。這樣可以避免「吵鬧的鄰居」問題（Noisy Neighbor），確保租戶 A 的大量寫入不會癱瘓租戶 B 的讀取效能。</li></ul></li></ul></div></p></div></aside><hr id="33aa15e2-9005-80af-8724-d313dbfc3ffe" dir="auto"/></div></details></div></details><details id="33aa15e2-9005-8029-a530-dafd31467311" open="" class="toggle" dir="auto"><summary><mark class="highlight-red" data-notion-highlight="red"><strong>Quiz Pool</strong></mark></summary><div class="indented"><hr id="33aa15e2-9005-80e3-824b-ea8988f0ff94" dir="auto"/><ol type="1" id="33aa15e2-9005-809a-816d-f285c6a66e62" class="numbered-list" start="1" dir="auto"><li>傳統儲存介面（如使用 AHCI 協定的 SATA）通常受限於單一 Request Queue，而 NVMe 規格定義了多組 <strong>Submission Queue (SQ)</strong> 與 <strong>Completion Queue (CQ)</strong>，並允許每個 CPU core 擁有獨立的 Queue Pair。在高併發 I/O workload（例如多執行緒同時發出大量 I/O）下， 以下哪一項最能解釋 NVMe 多 Queue 設計相較於單一 Queue 的效能優勢？<blockquote id="33aa15e2-9005-8061-9e45-f862156368d5" class="" dir="auto"><ol type="1" id="33aa15e2-9005-808a-b42d-dd7182f1aac5" class="numbered-list" start="1" dir="auto"><li>多個 Queue 分散了資料存放的位址，使 Controller 能自動執行負載平衡 (Load Balancing)，避免特定 Flash Die 過熱。</li></ol><ol type="1" id="33aa15e2-9005-8017-a995-f3683803264e" class="numbered-list" start="2" dir="auto"><li>多個 Queue 可提供硬體層級的優先級排序 (Strict Priority)，確保高優先級應用程式能獲得比單一 Queue 更低的平均深度 (queue depth)。</li></ol><ol type="1" id="33aa15e2-9005-80ee-b4e7-c63671ba8df6" class="numbered-list" start="3" dir="auto"><li>多個 Queue 允許不同 CPU core 獨立提交指令，消除了多核心競爭單一鎖 (lock contention) 的軟體開銷，大幅提升平行處理能力。</li></ol><ol type="1" id="33aa15e2-9005-803a-bdad-f0cefe276aca" class="numbered-list" start="4" dir="auto"><li>多個 Queue 設計旨在縮短單一指令的傳輸路徑 (Path Length)，藉此抵消快閃記憶體 (NAND Flash) 先天的物理讀取延遲。</li></ol></blockquote><details id="33aa15e2-9005-8000-a40e-ce35a3f86464" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80a9-bd99-e26153b6a9a1" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80a2-8a58-e2045b6fdae8" class="" dir="auto">多個 Queue 允許不同 CPU core 獨立提交指令，消除了多核心競爭單一鎖 (lock contention) 的軟體開銷，大幅提升平行處理能力。</p><hr id="33aa15e2-9005-800a-ba0c-c8d6c9ebafd6" dir="auto"/><p id="33aa15e2-9005-80e3-b301-dd874e5d61c1" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-809b-876f-d40147cf0b0f" class="" dir="auto">在單一 Queue 設計下，所有 CPU core 必須同步存取同一個佇列，導致嚴重的 lock contention。 NVMe 提供 Per-core queue，讓指令提交與完成確認可以真正平行化，是提升 IOPS 的技術核心。</p></div></p><hr id="33ca15e2-9005-80ae-ae40-db31e7dd9eea" dir="auto"/><p id="33ca15e2-9005-8038-8990-e1d5f773e6e4" class="" dir="auto">(1) 這是將軟體的指令佇列與硬體層級的 Wear Leveling 混為一談。 SQ/CQ 的數量增加主要是為了解決主機端 (Host) 提交指令的瓶頸，而非直接控制後端 Flash 的物理負載。</p><p id="33ca15e2-9005-8015-8218-ea22e39639d1" class="" dir="auto">(2) 雖然 NVMe 支援優先權管理，但多 Queue 架構的主要效能貢獻來自於「平行性」， 而非透過限制 queue depth 來優化效能。實際上 NVMe 支援極大的佇列深度以換取高吞吐量。</p><p id="33ca15e2-9005-800f-915f-d441d5826d91" class="" dir="auto">(4) 傳輸路徑的縮短來自於 NVMe 簡化了軟體協定層次（相較於 SCSI 或 ATA）， 而非單純增加 Queue 的數量。Queue 的數量增加是為了解決「等待」而非「傳輸速度」。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8080-ad8d-f14a6b8b8588" dir="auto"/><ol type="1" id="33aa15e2-9005-80c9-b06b-ff68d567a018" class="numbered-list" start="2" dir="auto"><li>在 NVMe 中，<strong>namespace</strong> 提供邏輯位址空間的分割，使不同應用程式可以使用同一顆 SSD 的不同區域。 同時，NVMe 也提供多組 <strong>Submission Queue (SQ)</strong> 與 <strong>Completion Queue (CQ)</strong>，以支援高併發 I/O。<br/>某系統將一顆 NVMe SSD 分成兩個 namespaces，分別提供給兩個應用：<aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80e2-b9b5-ebd572f6c5a6" dir="ltr"><div style="width:100%"><ul id="33aa15e2-9005-8097-b724-ddab956b2b19" class="bulleted-list" dir="auto"><li style="list-style-type:disc">App A：高 IOPS、低延遲需求（latency-sensitive）</li></ul><ul id="33aa15e2-9005-8012-b459-c84e40a8a0c6" class="bulleted-list" dir="auto"><li style="list-style-type:disc">App B：大量順序寫入（throughput-oriented）</li></ul></div></aside><p id="33aa15e2-9005-8049-9baf-d3b4c190ff48" class="" dir="auto">兩個應用各自使用獨立的 queue（SQ/CQ）， 且假設兩個 namespace 共享相同的底層硬體資源（例如 NAND channels 與 controller）。在此情境下，以下哪一項最能描述此設計的 <strong>performance isolation</strong>？</p><blockquote id="33aa15e2-9005-8002-b116-e3c00e4e6cad" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8060-9f21-d21cdd21eb03" class="numbered-list" start="1" dir="auto"><li>只要使用不同 namespace，即使共用同一組 queue，也能達到完整的效能隔離。</li></ol><ol type="1" id="33aa15e2-9005-8084-83ed-e1242c78cdd3" class="numbered-list" start="2" dir="auto"><li>使用多 queue 已可確保效能隔離，因此 namespace 的主要作用是提升 I/O 平行度。</li></ol><ol type="1" id="33aa15e2-9005-80bb-9a0b-d1262cc1e1da" class="numbered-list" start="3" dir="auto"><li>兩個應用已使用不同 namespace，且各自有獨立的 queue，因此 I/O 效能完全隔離，不會互相影響。</li></ol><ol type="1" id="33aa15e2-9005-8049-950b-d1e5e6dca89a" class="numbered-list" start="4" dir="auto"><li>雖然 namespace 與 queue 都分離，但兩個應用仍可能因為共享底層裝置資源而互相影響效能。</li></ol></blockquote><details id="33aa15e2-9005-80d2-ad11-ee9564771706" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8040-9e5d-fb12720338e2" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80ce-b395-c19dcc67e9a7" class="" dir="auto">雖然 namespace 與 queue 都分離，但兩個應用仍可能因為共享底層裝置資源而互相影響效能。</p><hr id="33aa15e2-9005-80fb-8bc9-e3ead7bf1187" dir="auto"/><p id="33aa15e2-9005-80dd-9792-df0b45b71b6c" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-800f-a59f-e05af7f5ba07" class="" dir="auto">namespace 僅提供邏輯位址空間的分割，而多 queue 則提升 I/O 提交的平行性。 然而在共享底層硬體資源的情況下，不同應用的 I/O 仍可能在 controller、 NAND channels 等資源上競爭，導致效能互相影響，因此無法保證完整的 isolation。</p></div></p><hr id="33ca15e2-9005-8003-b4d2-daa6e91cc108" dir="auto"/><p id="33ca15e2-9005-805f-878d-c6622f55d014" class="" dir="auto">(1) namespace 的功能在於提供邏輯位址空間的分離，而非效能隔離。 即使使用不同 namespace，若底層資源仍然共享，應用之間仍會互相影響。 此外，共用 queue 反而可能增加 contention。</p><p id="33ca15e2-9005-8078-a0a9-de173af71738" class="" dir="auto">(2) 多 queue 的主要目的是提升 I/O 提交的平行性並降低 lock contention， 而非提供效能隔離。namespace 則提供邏輯位址空間的分割。 兩者都無法在共享硬體資源的情況下保證效能完全隔離。</p><p id="33ca15e2-9005-802f-9dfe-d60b4ca353de" class="" dir="auto">(3) 雖然 namespace 提供邏輯位址空間的分離，且多 queue 提供 I/O 提交的平行性， 但底層硬體資源（如 NAND channels、controller）仍然是共享的。 因此兩個應用之間仍可能產生資源競爭，無法達到完全的效能隔離。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-802d-85fd-e991aaf9a5f3" dir="auto"/><ol type="1" id="33aa15e2-9005-80d4-b126-fead9c04dd11" class="numbered-list" start="3" dir="auto"><li>在高效能 NVMe 驅動程式的實作中，提交指令至 Submission Queue 並更新 Doorbell Register 是一項非常重要的操作。 假設驅動程式正在多核心處理器上執行，為了確保 NVMe Controller 能正確且穩定地讀取到最新的指令， 下列關於 Doorbell 更新機制的描述中，哪一項最為正確且符合現代處理器架構與 PCIe 匯流排設計？<blockquote id="33aa15e2-9005-80e2-b5b8-d41dc06ad6f2" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80f8-8c5d-d0a924b98541" class="numbered-list" start="1" dir="auto"><li>由於 Doorbell 屬於硬體暫存器，硬體會自動保證寫入的先後順序。因此，驅動程式在更新 Doorbell 之前，完全不需要使用任何特殊的指令（如 Memory Barrier）來規定順序。</li></ol><ol type="1" id="33aa15e2-9005-801d-93bf-df3eada4c4fb" class="numbered-list" start="2" dir="auto"><li>為了避免多個處理器核心同時寫入 Doorbell 導致硬體發生衝突或當機，驅動程式在每次更新 Doorbell 前，都必須先取得一個 Global Lock，確保同一時間只有一個核心能操作硬體。</li></ol><ol type="1" id="33aa15e2-9005-8054-be47-e0d693623420" class="numbered-list" start="3" dir="auto"><li>驅動程式必須在「寫入指令到記憶體」與「寫入 Doorbell」之間加入一個 Write Barrier，以確保當 Controller 收到通知準備抓取指令時，指令的內容已經在記憶體中準備就緒，能被 Controller 讀取到。</li></ol><ol type="1" id="33aa15e2-9005-80fd-98aa-f8adc9c32eab" class="numbered-list" start="4" dir="auto"><li>驅動程式將指令寫入 Host Memory 中的 SQ 後，必須將完整的 64-byte 指令內容同步寫入 Doorbell Register。這樣可以讓 Controller 直接從暫存器中讀取指令，完全避免啟動 DMA 帶來的延遲。</li></ol></blockquote><details id="33aa15e2-9005-8040-8f59-dcae4f935c1f" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8095-92d9-d38a2194b131" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8036-8866-c9cdf598fad4" class="" dir="auto">驅動程式必須在「寫入指令到記憶體」與「寫入 Doorbell」之間加入一個 Write Barrier，以確保當 Controller 收到通知準備抓取指令時，指令的內容已經在記憶體中準備就緒，能被 Controller 讀取到。</p><hr id="33aa15e2-9005-80b3-af0a-cf9f8c0fb57e" dir="auto"/><p id="33aa15e2-9005-8084-bbbd-f72f9292a06e" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8051-87c4-c847678ed14c" class="" dir="auto">因為 CPU 有時候會為了效能調換指令順序。如果 Doorbell 比 SQ 指令更早抵達控制器，控制器就會讀到舊的或錯誤的資料。所以必須加一個 Write Barrier 來擋住，確保指令是正確的，Doorbell 才更新。</p></div></p><hr id="33ca15e2-9005-80f9-993a-d68e9074c183" dir="auto"/><p id="33ca15e2-9005-80ae-bc24-ee19ce098fb0" class="" dir="auto">(1) 雖然 MMIO 寫入在某些架構下有順序性，但 CPU 對一般記憶體的寫入與對 MMIO 暫存器的寫入可能被處理器重新排序。如果 Doorbell 先被寫入，而 SQ 指令內容還在 CPU Cache 裡沒寫回 DRAM， Controller 透過 DMA 抓到的將會是舊的或錯誤的指令。</p><p id="33ca15e2-9005-8038-a5c4-cc0b051470ff" class="" dir="auto">(2) NVMe 的設計精髓就是多隊列，每個 CPU 核心可以各跑各的，互不干擾，所以不需要加 Global Lock 來限制效能。</p><p id="33ca15e2-9005-8051-8ba9-c19a44ffec51" class="" dir="auto">(4) Doorbell Register 很小，僅用於存放 Tail Pointer 的索引值，而非存放指令內容。Controller 收到 Doorbell 通知後，會自行透過 DMA 到 Host Memory 抓取 64-byte 的 SQE。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8056-b01a-dd881c5bc631" dir="auto"/><ol type="1" id="33aa15e2-9005-805e-876d-d6297327f197" class="numbered-list" start="4" dir="auto"><li>你正在優化一個部署在 32 核 CPU 伺服器上的向量資料庫。 為了處理大量 4KB 隨機寫入（極高 IOPS 需求），你將 NVMe 驅動程式設定為 Per-core Queue Pair 模式。 請問下列關於該系統為了達到最佳效能的運作敘述，哪一個是「正確」的？<blockquote id="33aa15e2-9005-8077-9bbb-c223fdc7ba48" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8034-adda-ce94cdfe4fc9" class="numbered-list" start="1" dir="auto"><li>當 Core 7 寫入指令到 SQ7 的下一個空位後，它必須更新 SQ7 的 Doorbell Register（一個 MMIO 寄存器），這動作相當於發信號告訴 SSD 控制器：「SQ 裡有新指令，請透過 DMA 讀取」。</li></ol><ol type="1" id="33aa15e2-9005-8026-9c2b-e6b84542c0c0" class="numbered-list" start="2" dir="auto"><li>雖然資料分散在不連續的物理分頁，但因為使用的是 4KB 小碎塊寫入，NVMe 控制器可以直接利用虛擬位址（Virtual Address）透過匯流排抓取資料，不需透過 PRP 或 SGL 進行位址轉換。</li></ol><ol type="1" id="33aa15e2-9005-8078-8fab-e595a673bbe2" class="numbered-list" start="3" dir="auto"><li>在完成階段，NVMe 控制器會將結果寫入 CQ，並由軟體自動更新 CQ 的 Tail 指標。只要軟體讀取了結果，控制器就會立刻知道該位置已空出，不需要額外的 Doorbell 更新。</li></ol><ol type="1" id="33aa15e2-9005-8045-812a-f26a56bf5bad" class="numbered-list" start="4" dir="auto"><li>由於有 32 個核心同時發送 4KB 指令，為了避免指令在 PCIe 匯流排上碰撞，軟體必須在 SQ 中加入 Spinlock，確保同一時間只有一個核心能更新 Doorbell Register。</li></ol></blockquote><details id="33aa15e2-9005-8021-97b9-e1a2d1197b46" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8074-b04c-cb036e6116e6" dir="ltr"><div style="width:100%"><p id="954eea42-a0ee-4a5d-9f61-48474f767e73" class="" dir="auto">當 Core 7 寫入指令到 SQ7 的下一個空位後，它必須更新 SQ7 的 Doorbell Register（一個 MMIO 寄存器），這動作相當於發信號告訴 SSD 控制器：「SQ 裡有新指令，請透過 DMA 讀取」。</p><hr id="33aa15e2-9005-80d8-98c6-eb206a33b227" dir="auto"/><p id="33aa15e2-9005-802a-80b9-d7783fc95369" class="" dir="auto">解析: <div class="indented"><p id="1b792517-c30c-4874-967c-0b3cbef79101" class="" dir="auto">軟體寫完 SQ（DRAM）後，必須按一下 Doorbell（MMIO），SSD 才會知道要去搬東西。這是觸發整個 I/O 流程的發令槍。</p></div></p><hr id="33ca15e2-9005-80be-8e51-ffce70cdddee" dir="auto"/><p id="33ca15e2-9005-80f3-b6a9-c8ddc49ab83b" class="" dir="auto">(2) DMA 永遠只認物理位址。即使只有 4KB，只要它在物理上與前一段資料不連續，就必須透過 PRP 或 SGL 這張「物理地圖」來導引 SSD 搬運工。</p><p id="33ca15e2-9005-80d2-8ee3-fbe36249e79e" class="" dir="auto">(3) 軟體處理完 CQ 的結果後，必須更新 CQ 的 Head Doorbell，告訴控制器：「我已經消費了這些完成結果，你可以覆蓋掉了」。如果沒有這個動作，控制器會以為 CQ 還是滿的，導致後續無法寫入新的完成報告。</p><p id="33ca15e2-9005-80e7-b017-fe955bf09b0d" class="" dir="auto">(4) Per-core Queue 的精髓就是消滅 Lock。因為 Core 7 擁有專屬的 SQ7，它不需要跟其他核心搶資源，所以 Lock-less。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8029-a06b-e98952a55aae" dir="auto"/><ol type="1" id="33aa15e2-9005-8068-ab91-d712684610b7" class="numbered-list" start="5" dir="auto"><li><mark class="highlight-red" data-notion-highlight="red">一位系統架構師正在排查高效能資料庫伺服器的效能問題。他觀察到儘管伺服器配備了 64 個 CPU ，但在處理高並行的工作負載時，若使用基於 AHCI 的 SSD，throughput 會停滯不前。 分析結果顯示，所有 I/O completion 都經由同一條中斷線送到同一個 CPU core，造成單核中斷處理瓶頸。下列哪一項 NVMe 協定的架構轉變，解決了上述的同步瓶頸，使 I/O 效能得以便隨 CPU 核心數量的增加而線性擴展？</mark><blockquote id="33aa15e2-9005-8076-999a-ce04f9864496" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8071-9a68-e033068fa7b4" class="numbered-list" start="1" dir="auto"><li>從傳統的 SATA 指令集轉向較精簡的 command set。</li></ol><ol type="1" id="33aa15e2-9005-801d-a91f-cfea52252582" class="numbered-list" start="2" dir="auto"><li>將 command queue depth 從 32 擴展至 65536 個。</li></ol><ol type="1" id="33aa15e2-9005-80c0-9d16-caae598ec770" class="numbered-list" start="3" dir="auto"><li>NVMe 允許我們將不同的 Completion Queues 映射至各自獨立的 Interrupt Vectors，並透過 Interrupt Affinity 機制將中斷處理負載分佈到特定的 CPU Cores 上處理。</li></ol><ol type="1" id="33aa15e2-9005-805d-909f-eed3b42f0fdb" class="numbered-list" start="4" dir="auto"><li>實作多組且彼此獨立的 Submission Queues 與 Completion Queues 配對。</li></ol></blockquote><details id="33aa15e2-9005-80d0-986b-dc1273e0f9e9" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-809b-8d74-eef7753e6a17" dir="ltr"><div style="width:100%"><p id="e43a72b3-a706-4bea-93dc-502b9ca17db4" class="" dir="auto">NVMe 允許我們將不同的 Completion Queues 映射至各自獨立的 Interrupt Vectors，並透過 Interrupt Affinity 機制將中斷處理負載分佈到特定的 CPU Cores 上處理。</p><hr id="33aa15e2-9005-80e5-afe5-c4f2f13d4bd5" dir="auto"/><p id="33aa15e2-9005-800f-a852-c01b7556a52a" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8001-a0ba-db1d68ad2b58" class="" dir="auto">NVMe 協定利用 MSI-X 支援大量的中斷訊號，允許每個 Completion Queue 擁有專屬的 Interrupt Vector。透過作業系統設定 Interrupt Affinity，可以確保 I/O interrupt handling 在多核心之間平衡分佈， 消除 AHCI 架構中單一中斷線造成的單核瓶頸，從而實現效能的線性擴展。</p></div></p><hr id="33ca15e2-9005-8066-9975-c4ca602bfe43" dir="auto"/><p id="33ca15e2-9005-8058-9e13-c9100d7c3139" class="" dir="auto">(1) 雖然這能減少每個 I/O 消耗的 CPU 週期，但與 lock contention 無直接關聯。</p><p id="33ca15e2-9005-807f-931a-fc79223d2f4b" class="" dir="auto">(2) 單一 Queue 仍然需要鎖來同步，無法解決多核心競爭的問題。</p><p id="33ca15e2-9005-8004-9232-e504995b189b" class="" dir="auto">(4) NVMe 支援多達 65,535 個隊列。在多核心系統中，每個核心可以分配到專屬的 Queue pair，這使得 I/O 的提交與完成不再需要跨核心的 lock contention，但與題目說的效能瓶頸為不同問題。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8055-8829-faf60efc5f01" dir="auto"/><ol type="1" id="33aa15e2-9005-804a-b40f-cce43a8c0e09" class="numbered-list" start="6" dir="auto"><li><mark class="highlight-red" data-notion-highlight="red">在 NVMe Multi-Queue 架構中，關於採用 </mark><mark class="highlight-red" data-notion-highlight="red"><strong>Interrupt-based</strong></mark><mark class="highlight-red" data-notion-highlight="red"> 的 I/O 請求 </mark><mark class="highlight-red" data-notion-highlight="red"><strong>完成階段 (Completion Phase)</strong></mark><mark class="highlight-red" data-notion-highlight="red">，CPU (Host) 與 NVMe Controller (Device) 之間的底層互動機制為何？</mark><blockquote id="33aa15e2-9005-8020-a1f5-fd49b4054cdf" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8084-817a-e094ff4bdf9f" class="numbered-list" start="1" dir="auto"><li>Controller 透過 DMA 將執行結果寫入位於 Host 記憶體中的 CQ，並發出 Interrupt。作業系統讀取 CQ 後，寫入 Controller 的 CQ Doorbell Register 來釋放該 CQ slot。</li></ol><ol type="1" id="33aa15e2-9005-809c-9093-e819142e0a16" class="numbered-list" start="2" dir="auto"><li>Controller 僅發出 Interrupt 通知 CPU，作業系統收到中斷後，需要主動去 Controller 端的暫存器拉取完成狀態，處理完後再更新 Doorbell。</li></ol><ol type="1" id="33aa15e2-9005-80d5-8b05-ec5c326a84c0" class="numbered-list" start="3" dir="auto"><li>Controller 直接將完成狀態覆寫回原先 Host 記憶體中 SQ 的指令位置，並發出 Interrupt，以節省記憶體開銷與頻寬。</li></ol><ol type="1" id="33aa15e2-9005-8036-b735-edb9be6b68ce" class="numbered-list" start="4" dir="auto"><li>Controller 完成 I/O 後，將狀態寫入 Host 記憶體的 CQ，接著主動寫入 Host 端的 CQ Doorbell Register 以觸發 Interrupt 通知 CPU。</li></ol></blockquote><details id="33aa15e2-9005-80c0-b833-ed4787cbd852" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80c4-ab65-fe9fb869b66b" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8067-9b8b-dadf7cf82ee9" class="" dir="auto">Controller 透過 DMA 將執行結果寫入位於 Host 記憶體中的 CQ，並發出 Interrupt。作業系統讀取 CQ 後，寫入 Controller 的 CQ Doorbell Register 來釋放該 CQ slot。</p><hr id="33aa15e2-9005-80d1-909c-f98c08eab30a" dir="auto"/><p id="33aa15e2-9005-8096-83ac-f2700bf9d373" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8009-b4ec-d3d81c2325c4" class="" dir="auto">NVMe 讀寫狀態的傳遞是由 <strong>Controller 發起 DMA</strong> 寫回 Host 端 DRAM 裡的 Completion Queue (CQ)。 接著發送 Interrupt 通知 CPU。Host 處理完後，必須透過 MMIO 寫入實作在 Controller 端的 <strong>CQ Doorbell Register</strong>，讓硬體知道這塊記憶體已經被軟體處理掉了，可以回收給下一個 I/O 結果使用。</p></div></p><hr id="33ca15e2-9005-8058-8d2e-c3276acfc844" dir="auto"/><p id="33ca15e2-9005-80bd-9116-f68920b83ea3" class="" dir="auto">(2) 在 NVMe 設計中，Host 是 <strong>直接讀 Host memory 的 CQ</strong>，而不是去 Controller 端拉取完成狀態。 因為去硬體端拉取資料會產生極高延遲的 PCIe MMIO Read，所以 NVMe 統一由 Controller 透過 DMA 將結果主動寫入 Host 記憶體中的 CQ，OS 收到中斷時只要讀取本機端記憶體即可。</p><p id="33ca15e2-9005-809e-aa75-c1fefea9c373" class="" dir="auto">(3) NVMe 架構在設計上本來就將 SQ 與 CQ 完全分開管理。這樣的設計允許更靈活的配置（例如多個獨立的 SQ 可以對應共享同一個 CQ），同時能明確劃分軟體與硬體在生產和消費請求時的界線，避免覆寫混淆。</p><p id="33ca15e2-9005-80e5-85ce-f1523e6575a7" class="" dir="auto">(4) Doorbell Registers 是位在 <strong>NVMe Controller 裝置端</strong> 的硬體暫存器（透過 PCIe MMIO 映射進記憶體空間）。 它們是由 <strong>Host 軟體來主動寫入</strong> 以通知硬體，Controller 不會去寫入 Host 端的 Doorbell。<br/><br/></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8064-9017-d4901555c24f" dir="auto"/><ol type="1" id="33aa15e2-9005-8049-8cbb-f61b092e23ff" class="numbered-list" start="7" dir="auto"><li><mark class="highlight-red" data-notion-highlight="red">在 NVMe 核心架構中，關於 Submission Queue (SQ)、Completion Queue (CQ) 與 Doorbell Register 的交互運作， 以及其相對於 AHCI 的優化，下列敘述何者最能精確反映其在高負載下的底層行為與硬體限制？</mark><blockquote id="33aa15e2-9005-8045-9349-c04f959e65a1" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8035-9335-f38b3d3c9dfc" class="numbered-list" start="1" dir="auto"><li>在 NVMe 執行過程中，控制器會主動更新 Host 端的 SQ Head 指標以釋放空間，Host 端則需頻繁讀取 Doorbell Register 來確認該 Queue 是否已滿，以防指令溢位。</li></ol><ol type="1" id="33aa15e2-9005-80d2-af47-e7810334318e" class="numbered-list" start="2" dir="auto"><li>當 Host 更新 SQ Tail Doorbell 後，NVMe 控制器會立即透過 PCIe 中斷機制回傳資料，這確保了 Queue Pair 在多個 Namespace 之間共享時，Command Set 的執行優先權能維持一致。</li></ol><ol type="1" id="33aa15e2-9005-80fd-8249-da1f0bf27aef" class="numbered-list" start="3" dir="auto"><li>NVMe 透過簡化 Command Set 並強制每個 Queue Pair 僅能處理特定類型的指令，使得多個 CPU 核心能獨立操作專屬 Queue 以提升並行度；這種「指令分類處理」機制是大幅提升 IOPS 的主因。</li></ol><ol type="1" id="33aa15e2-9005-807c-ae76-f033edd23391" class="numbered-list" start="4" dir="auto"><li>NVMe 支援多個 Queue，讓作業系統能為每個 CPU 核心分配專屬的 Queue Pair (Per-Core Queue)。這使得不同核心在提交 I/O 時無需競爭同一個核心鎖 (Kernel Lock)，徹底消除了 lock contention 導致的效能瓶頸。</li></ol></blockquote><details id="33aa15e2-9005-80c3-a942-f07a2cf25228" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-802d-915c-f52d41caef04" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-807d-8b11-de03c5244eaf" class="" dir="auto">NVMe 支援多個 Queue，讓作業系統能為每個 CPU 核心分配專屬的 Queue Pair (Per-Core Queue)。這使得不同核心在提交 I/O 時無需競爭同一個核心鎖 (Kernel Lock)，徹底消除了 lock contention 導致的效能瓶頸。</p><hr id="33aa15e2-9005-8024-b003-c78ce8b9c6f6" dir="auto"/><p id="33aa15e2-9005-8046-9a41-de562521ffcb" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8043-b6fa-cdbaad7ae21d" class="" dir="auto">這是 NVMe 效能優於 AHCI 的核心原因。傳統 AHCI 僅支援單一佇列 (Single Queue)，在多核環境下，所有 CPU 核心必須競爭同一個軟體鎖才能存取該佇列。NVMe 透過硬體層級的多佇列並行處理機制 (parallelism)，讓每個核心具備獨立的 submission 與 completion 路徑，從而大幅提升系統在高並發下的吞吐量。</p></div></p><hr id="33ca15e2-9005-80c8-87fd-d494aa3dcc10" dir="auto"/><p id="33ca15e2-9005-800a-acd4-c8dc04305765" class="" dir="auto">(1) Host 是透過檢查內存中的「CQ Entry」來得知 SQ Head 的更新進度，而非讀取 Doorbell Register。在高效能驅動設計中，頻繁「讀取」硬體暫存器是嚴重的效能殺手，應極力避免。</p><p id="33ca15e2-9005-8025-bedb-c53c70fc3de0" class="" dir="auto">(2) 更新 Doorbell 僅是通知控制器有新任務。控制器隨後透過 DMA 非同步抓取指令，而非透過中斷機制回傳資料。此外，Namespace 的優先權是由控制器內部的仲裁邏輯（Arbitration）決定，與 Doorbell 更新動作無直接關係。</p><p id="33ca15e2-9005-802c-9a66-d4b0e143f545" class="" dir="auto">(3) NVMe 的每個 I/O Queue 都是「通用型」的，可以處理讀、寫等各類 I/O 指令，並不需要對指令進行分類處理。效能提升來自於「佇列數量的增加」與「鎖競爭的消除」，而非限制每個 Queue 只能處理特定類型的指令。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-809a-8d90-e659f00fa0bc" dir="auto"/><ol type="1" id="33aa15e2-9005-80cb-af85-d4506b8cd85a" class="numbered-list" start="8" dir="auto"><li>你正在優化一個高 IOPS 的 NVMe 系統，採用 per-core queue pair 設計。為了降低 MMIO 開銷，你讓每個 core 累積 64 個 command 後才更新對應的 Doorbell Register。 分析結果顯示，雖然 CPU 負載因 MMIO 頻率降低而減少，但 SSD utilization 下降，且 I/O 延遲顯著上升。 請問造成此現象的最合理原因為何？<blockquote id="33aa15e2-9005-800e-b987-c7af5565e164" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80b5-a7f5-d3beaeb3dbd1" class="numbered-list" start="1" dir="auto"><li>CQ 滿導致 SSD 停止所有正在進行以及後續的 I/O 操作。</li></ol><ol type="1" id="33aa15e2-9005-807b-a301-ec7b9439821a" class="numbered-list" start="2" dir="auto"><li>當 Submission Queue 滿時，Host 會直接丟棄新的 I/O request，導致整體 throughput 下降。</li></ol><ol type="1" id="33aa15e2-9005-8073-965b-f4223af390da" class="numbered-list" start="3" dir="auto"><li>Doorbell Batching 導致 Controller Starvation，使 SSD 無法即時得知新的 command 而處於 idle 狀態。</li></ol><ol type="1" id="33aa15e2-9005-8045-8c20-e004682809e1" class="numbered-list" start="4" dir="auto"><li>PCIe bandwidth 成為瓶頸。</li></ol></blockquote><details id="33aa15e2-9005-804d-b87f-f3fbf99e8169" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8046-a9f6-c9a73b72c1c8" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-80b9-bb38-f1efe26515f5" class="" dir="auto">Doorbell Batching 導致 Controller Starvation，使 SSD 無法即時得知新的 command 而處於 idle 狀態。</p><hr id="33aa15e2-9005-80bd-a60f-c08759faddf4" dir="auto"/><p id="33aa15e2-9005-801b-870d-d0c6d0051dff" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-807e-8364-d6e723574eb2" class="" dir="auto">Doorbell Batching 會延遲通知 NVMe controller 有新的 command，導致 controller 在兩次 doorbell 更新之間無法取得新的工作，進而產生 Controller Starvation，使 SSD 長時間處於 idle 狀態，並造成 I/O latency 上升。</p></div></p><hr id="33ca15e2-9005-8077-a84a-ca057bf8a325" dir="auto"/><p id="33ca15e2-9005-80c7-ab67-d1164bf1c4f2" class="" dir="auto">(1) 當 CQ 滿時，SSD 無法再寫入新的 completion，因此會停止從 SQ 取得新的 command；但已經在執行中的 I/O 仍會完成，而不會被中途停止。</p><p id="33ca15e2-9005-80ab-9529-ccf27bef78f5" class="" dir="auto">(2) 實際上當 SQ 滿時，Host 會進入等待（backpressure），而非直接 drop request。</p><p id="33ca15e2-9005-80d7-994f-f98efed8c1d6" class="" dir="auto">(3) 若 PCIe 頻寬成為瓶頸，代表傳輸匯流排已接近飽和。在此情況下，SSD 應持續處於高利用率以輸出最大頻寬，而非如題幹所述出現 utilization 下降與 idle 的現象。  </p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-801b-ac2e-ca58319b6281" dir="auto"/><ol type="1" id="33aa15e2-9005-8021-8502-e8b72529396f" class="numbered-list" start="9" dir="auto"><li>某資料中心正在評估將舊有的企業級 SATA SSD（採用 AHCI 協定）全面升級為最新的 NVMe SSD。他們的伺服器搭載了 64 核心的頂級 CPU，並運行一個會產生海量 random reads 的高併發資料庫。在舊的 AHCI 架構下，工程師觀察到即使資料庫開啟了 64 個 thread 同時發出 I/O 請求，SSD 的總 IOPS 卻卡在一個極低的瓶頸，且 CPU 花費大量時間在 kernel space 的 lock waiting 與 cache line bouncing。<br/>請問 NVMe 協定主要是透過哪一種核心架構設計，來大幅降低這個多核心 CPU 發送 I/O 時的嚴重效能瓶頸？<blockquote id="33aa15e2-9005-800c-91c3-c7bcbf938716" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8010-ba1c-c3316dd86a08" class="numbered-list" start="1" dir="auto"><li>NVMe 強制廢除了 interrupt 機制，全面改用 <strong>doorbell register</strong> 進行 polling。這消除了傳統 AHCI 在處理 interrupt 時所需的 context switch，是降低 CPU lock contention 開銷的唯一解法。</li></ol><ol type="1" id="33aa15e2-9005-8096-9653-ce8186b53e22" class="numbered-list" start="2" dir="auto"><li>NVMe 實作了硬體層級的 <strong>namespace</strong> 隔離技術。透過將一顆實體 SSD 切割成 64 個獨立的 namespace 並分配給 64 個 core，每個 core 就能繞過作業系統，直接對自己的 namespace 進行無鎖的讀寫。</li></ol><ol type="1" id="33aa15e2-9005-80b2-a032-f8433dabf49c" class="numbered-list" start="3" dir="auto"><li>NVMe 捨棄了傳統的 SATA 排線，改為直接使用頻寬極大的 <strong>PCIe bus</strong>。只要 bus 的實體 bandwidth 足夠大，無論 CPU 有多少個 core，資料庫的 random read 指令都能瞬間傳輸完成，從而自然消除了軟體層面的 lock waiting 現象。</li></ol><ol type="1" id="33aa15e2-9005-80a2-b4e3-da792cc507d6" class="numbered-list" start="4" dir="auto"><li>NVMe 引入了 <strong>per-core queue pair</strong> 的設計概念。作業系統可做 per-core 的 queue mapping，為 CPU core 分配獨立的 submission queue（SQ）與 completion queue（CQ）。這使得每個 core 在發送 I/O 指令時，主要操作自己專屬的記憶體區塊，大幅降低了多個 core 搶奪單一 queue 時所產生的 lock contention 與同步開銷。</li></ol></blockquote><details id="33aa15e2-9005-8004-9f84-dfa2eadf44a0" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-803c-ae43-ffa9f7db0db0" dir="ltr"><div style="width:100%"><p id="0ac06c34-8cc6-4f87-b993-d2d2e11afc02" class="" dir="auto">NVMe 引入了 <strong>per-core queue pair</strong> 的設計概念。作業系統可做 per-core 的 queue mapping，為 CPU core 分配獨立的 submission queue（SQ）與 completion queue（CQ）。這使得每個 core 在發送 I/O 指令時，主要操作自己專屬的記憶體區塊，大幅降低了多個 core 搶奪單一 queue 時所產生的 lock contention 與同步開銷。</p><hr id="33aa15e2-9005-806f-ab92-ea5ef13d2ad0" dir="auto"/><p id="33aa15e2-9005-8057-856e-f3e265303c09" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8082-9fd6-d48a747439d4" class="" dir="auto">這是正確的。根據講義，AHCI 只有一個 queue，當多個 CPU core 同時要發送 I/O 時，作業系統必須使用 lock（如 spinlock）來保護這個共享資源。在 64 核心的高併發場景下，頻繁的搶鎖與 cache line bouncing 會造成災難性的效能損耗。NVMe 支援高達 65,535 個 queue，Linux NVMe driver 利用此特性，通常會做 per-core 的 queue mapping。由於資料結構減少了共享，大幅降低了 core 之間的同步開銷，從而使 IOPS 通常可達到接近 linear scaling 的擴展性。</p></div></p><hr id="33ca15e2-9005-8064-a756-f12a1be541fa" dir="auto"/><p id="33ca15e2-9005-80d1-a5a9-f7f2fe58748a" class="" dir="auto">(1) 這個選項將不同的概念強行拼湊。首先，NVMe 並沒有廢除 interrupt，它依然支援並廣泛使用 MSI-X 等 interrupt 機制來通知 I/O 完成。其次，doorbell register 雖然是每個 queue 必備的通知機制（用來通知控制器 queue 有新指令或已消費結果），但它本身並不是用來解決多核心 lock contention 的關鍵設計。解決 lock contention 常見的解法是資料結構的去中心化（如 per-core queue pair）。</p><p id="33ca15e2-9005-800d-b34f-d711ca46ca94" class="" dir="auto">(2) 這混淆了 namespace 的用途。Namespace 是一種邏輯儲存空間的分割機制（類似於更靈活的 partition），主要用於 multi-tenant 環境或 VM 的容量分配與隔離。解決 CPU 多核心並發送指令（I/O submission）瓶頸的技術是 multi-queue 架構，而不是儲存空間的 namespace 分割。</p><p id="33ca15e2-9005-8016-b5e7-cb35bbc021ae" class="" dir="auto">(3) 這是一個常見的迷思。雖然 NVMe 確實改用了高頻寬的 PCIe bus，但 bandwidth 解決的是「資料傳輸量」的問題，而非「指令發送的併發衝突」問題。如果軟體架構依然只有一個共享的 queue，多個 core 在「寫入指令到 queue」這個軟體階段就已經因為 lock contention 而卡住了，根本還沒進入實體的 PCIe 傳輸階段。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8083-975e-e66c42855919" dir="auto"/><ol type="1" id="33aa15e2-9005-807d-974e-fcf29188c35c" class="numbered-list numbered-list-digits-2" start="10" dir="auto"><li>在實作高效能 userspace NVMe driver 時，開發者通常會利用 doorbell batching 技術（累積多個指令後才更新一次暫存器）來減少 MMIO 寫入帶來的 CPU 負擔。若要正確實作此機制並確保指令被硬體正確執行，開發者必須精確理解 SQ 與 CQ 的指標同步邏輯。 關於 NVMe 的 doorbell 角色與指標維護機制，下列敘述何者最符合協定規範？<blockquote id="33aa15e2-9005-80d5-a98b-ceea23df9cf1" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8083-aadc-f32dcb806280" class="numbered-list" start="1" dir="auto"><li>在 doorbell batching 的情境下，即便 host 尚未更新 SQ tail doorbell，controller 仍可透過 DMA prefetch 位於 SQ 記憶體中已寫入但未敲響 doorbell 的指令。</li></ol><ol type="1" id="33aa15e2-9005-808d-b0b1-d83502ef0ef6" class="numbered-list" start="2" dir="auto"><li>當 host 更新 CQ head doorbell 後，會同步觸發 controller 發送一個 MSI-X 中斷給 CPU，以確認該次 completion 已成功被軟體處理完畢。</li></ol><ol type="1" id="33aa15e2-9005-806b-ae6d-ea57f90bae11" class="numbered-list" start="3" dir="auto"><li>Host 透過寫入 SQ tail doorbell 通知 controller 有新指令待處理；而更新 CQ head doorbell 則是告知 controller 哪些 completion 空間已被消費，可供回收使用。</li></ol><ol type="1" id="33aa15e2-9005-80cb-a464-df9d68f8254f" class="numbered-list" start="4" dir="auto"><li>由於 NVMe 採用非同步設計，controller 會定期主動 polling host memory 中的 SQ tail 指標，因此更新 doorbell 僅是為了加速硬體反應而非必要動作。</li></ol></blockquote><details id="33aa15e2-9005-8026-835d-c63ad6e4f395" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-802d-bd2d-c5b1aa7ef6ee" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-807a-82b2-e6d0dad52724" class="" dir="auto">Host 透過寫入 SQ tail doorbell 通知 controller 有新指令待處理；而更新 CQ head doorbell 則是告知 controller 哪些 completion 空間已被消費，可供回收使用。</p><hr id="33aa15e2-9005-8038-923b-c653c23b6df8" dir="auto"/><p id="33aa15e2-9005-8052-804d-d94bab86f6ac" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-80b8-9145-df1498e5f1d3" class="" dir="auto">這是 NVMe 的核心通訊邏輯。SQ tail 由 host 更新以觸發硬體的 DMA fetch 動作。而 CQ head 則是由 host 在處理完 completion entry 後更新，這對 controller 而言是一種 flow control 訊號，確保硬體不會覆蓋掉軟體尚未處理的完成結果。</p></div></p><hr id="33ca15e2-9005-80c6-92b4-f323e9ad19d0" dir="auto"/><p id="33ca15e2-9005-805f-a382-cd05690f8202" class="" dir="auto">(1) Controller 的 DMA engine 只會根據 doorbell 暫存器所指示的最新 tail 位置來抓取指令。如果 host 寫入了 10 個指令但尚未更新 doorbell，這些指令對硬體而言是「不可見」的。這是 batching 的必然權衡：雖然減少了 MMIO 開銷，但會增加該批次首個指令的初始延遲。</p><p id="33ca15e2-9005-8058-abae-ca92c40829e7" class="" dir="auto">(2) interrupt 的方向是由 controller 指向 host，目的是通知 CPU 有新的結果已寫入 CQ。而 CQ head doorbell 的方向是 host 指向 controller，用來回報處理進度，此動作本身並不會觸發 controller 再次發送中斷回 host。</p><p id="33ca15e2-9005-804d-8716-dc2ebad52f0a" class="" dir="auto">(4) 為了節省系統 bus 的頻寬與功耗，NVMe controller 並不會主動輪詢 host memory。硬體完全依賴 doorbell register 的寫入作為觸發訊號。若 host 僅更新記憶體指標而漏掉 doorbell 更新，即便 SQ 內已有新指令，硬體也會處於閒置狀態，不會發起 DMA 抓取指令。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80f9-b25a-dd8dc92e1416" dir="auto"/><ol type="1" id="33aa15e2-9005-8057-82d6-c8b61f8c4273" class="numbered-list numbered-list-digits-2" start="11" dir="auto"><li>某團隊把 OLTP 系統從 SATA AHCI SSD 遷移到 NVMe SSD。測試時採用 single thread、queue depth = 1 的 4KB random read， 結果發現 IOPS 沒有暴增，但平均 latency 仍明顯下降。工程師因此主張「NVMe 只有在高併發才有價值， 低併發下幾乎沒差」。下列哪個說法最能正確解釋這個現象？<blockquote id="33aa15e2-9005-8082-92eb-c2d0b1ec0dfc" class="" dir="auto"><ol type="1" id="33aa15e2-9005-804c-9a39-e8f1a1d93648" class="numbered-list" start="1" dir="auto"><li>若 IOPS 沒有暴增，就代表 NVMe 沒有任何實質效益；latency 下降多半是量測誤差。</li></ol><ol type="1" id="33aa15e2-9005-808c-9db7-e98b778f3e34" class="numbered-list" start="2" dir="auto"><li>即使 queue depth = 1，NVMe 仍可能比 AHCI 更低延遲，因為它把較重的傳統儲存協定換成更精簡的 command path，並直接在 PCIe 上運作；只是這種情況下 IOPS 不一定會大幅增加，因為裝置平行的部份沒有被完全利用。</li></ol><ol type="1" id="33aa15e2-9005-8053-ae19-fb7a63e5533f" class="numbered-list" start="3" dir="auto"><li>只要 queue depth = 1，NVMe 會自動把單一 I/O 複製到多個 SQ/CQ 平行執行，再由控制器做結果合併，所以 latency 必然等比縮短。</li></ol><ol type="1" id="33aa15e2-9005-8084-b198-dcdddfcf6177" class="numbered-list" start="4" dir="auto"><li>在 queue depth = 1 時，NVMe 幾乎不會比 AHCI 快，因為多 queue 的優勢完全無法發揮，所以 latency 通常不會有明顯差異。</li></ol></blockquote><details id="33aa15e2-9005-8073-b0d5-f3b9e7332b2f" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80a4-bce9-d3996376825f" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80dc-b4d9-f9df755226c9" class="" dir="auto">即使 queue depth = 1，NVMe 仍可能比 AHCI 更低延遲，因為它把較重的傳統儲存協定換成更精簡的 command path，並直接在 PCIe 上運作；只是這種情況下 IOPS 不一定會大幅增加，因為裝置平行的部份沒有被完全利用。</p><hr id="33aa15e2-9005-803d-9e39-f538b0772691" dir="auto"/><p id="33aa15e2-9005-805f-beff-f5cf8c88ce4b" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-80d2-9e80-e4c695de16e5" class="" dir="auto">NVMe 的優勢不只存在於高併發，也包括單筆 I/O 的固定開銷較低。 AHCI 是較舊、較重的協定，而 NVMe 在 PCIe 上運作，控制路徑更短；所以即使 queue depth = 1， 平均 latency 仍可能下降，但 IOPS 不會因為缺乏併發而暴增。</p></div></p><hr id="33ca15e2-9005-805d-bcf2-e7dcafb9c1e8" dir="auto"/><p id="33ca15e2-9005-803e-a734-e4bd55e09292" class="" dir="auto">(1) IOPS 與 latency 是不同指標。低併發負載下，系統常先受每筆 I/O 固定成本影響， 因此可能先看到 latency 改善，而不是吞吐量暴增。這不代表量測有誤。</p><p id="33ca15e2-9005-805a-820e-e078e3d17e13" class="" dir="auto">(3) NVMe 的多 queue 不是把同一筆 I/O 複製成多份計算。queue depth = 1 代表同時間在途請求很少， 無法憑空製造平行工作。latency 改善主要來自路徑開銷變小，而非同一筆請求被多隊列分身處理。</p><p id="33ca15e2-9005-8039-ae67-d38b353450d8" class="" dir="auto">(4) 這個說法太絕對了。即使 queue depth 很低，NVMe 仍能因為協定更簡化、路徑更短而降低單筆 I/O 的固定開銷， 因此 latency 仍可能比 AHCI 好。 </p></div></aside></div></details></li></ol></div></details></div></details></div></div><hr id="33aa15e2-9005-80dd-a3f5-c5f88a67e2cd" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80b5-8662-f191141907ca" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8012-b2e7-e6a0a5b9d39d" class="" dir="auto">
+</p></div></aside></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

@@ -1,0 +1,791 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>B+Tree</title><meta name="data-notion-page-icon" content="🔧"/><link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2290%22%3E%F0%9F%94%A7%3C%2Ftext%3E%3C%2Fsvg%3E"/><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+/* Override strong tags inside headings to maintain consistent weight */
+h1 strong,
+h2 strong,
+h3 strong {
+	font-weight: 600;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 10px;
+	padding: 1rem;
+}
+
+/* For default-background callouts, render the border outline. */
+.callout.block-color-default_background {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+figure,
+aside,
+details {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+
+	table.collection-content {
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	table.collection-content th,
+	table.collection-content td {
+		overflow-wrap: anywhere;
+	}
+
+	table.collection-content td > .user,
+	table.collection-content td > time {
+		white-space: pre-wrap;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content-wrapper {
+	overflow-x: auto;
+}
+
+@media only print {
+	.collection-content-wrapper {
+		overflow-x: visible;
+	}
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.collection-content td {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.column-list {
+	display: flex;
+	gap: 46px;
+}
+
+.column {
+	min-width: 0;
+	overflow: hidden;
+}
+
+.column > *:first-child {
+	margin-top: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding-inline: 0.125rem;
+	padding-block: 0.375rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+table {
+	border-collapse: collapse;
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol.numbered-list.numbered-list-digits-2 {
+	padding-inline-start: 2em;
+}
+
+ol.numbered-list.numbered-list-digits-3plus {
+	padding-inline-start: 2.4em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+/*
+ * Render emoji icons using a ::before pseudo-element to keep the glyph
+ * out of the DOM textContent traversal. This avoids double-rendering icons
+ * in callouts and page titles.
+ * NOTE(slim/html-export-pseudo-icons): I can't tagref this because it will
+ * flag as a duplicate tag after codegen.
+ */
+.icon[data-emoji]::before {
+	content: attr(data-emoji);
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.callout img.notion-static-icon {
+	width: 1em;
+	height: 1em;
+}
+
+.callout p {
+	margin: 0;
+}
+
+.callout h1,
+.callout h2,
+.callout h3 {
+	margin: 0 0 0.6rem;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	margin-right: 0.4em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+blockquote.quote-large {
+	font-size: 1.25em;
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.tab {
+	margin: 1.25em 0;
+	padding-inline: 1rem;
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.highlight-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.highlight-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.highlight-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.highlight-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.highlight-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.highlight-default_background {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray_background {
+	background: rgba(42, 28, 0, 0.07);
+}
+.highlight-brown_background {
+	background: rgba(139, 46, 0, 0.086);
+}
+.highlight-orange_background {
+	background: rgba(224, 101, 1, 0.129);
+}
+.highlight-yellow_background {
+	background: rgba(211, 168, 0, 0.137);
+}
+.highlight-teal_background {
+	background: rgba(0, 100, 45, 0.09);
+}
+.highlight-blue_background {
+	background: rgba(0, 124, 215, 0.094);
+}
+.highlight-purple_background {
+	background: rgba(102, 0, 178, 0.078);
+}
+.highlight-pink_background {
+	background: rgba(197, 0, 93, 0.086);
+}
+.highlight-red_background {
+	background: rgba(223, 22, 0, 0.094);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.block-color-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.block-color-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.block-color-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.block-color-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.block-color-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(240, 239, 237, 1);
+}
+.block-color-brown_background {
+	background: rgba(245, 237, 233, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 235, 222, 1);
+}
+.block-color-yellow_background {
+	background: rgba(249, 243, 220, 1);
+}
+.block-color-teal_background {
+	background: rgba(232, 241, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(229, 242, 252, 1);
+}
+.block-color-purple_background {
+	background: rgba(243, 235, 249, 1);
+}
+.block-color-pink_background {
+	background: rgba(250, 233, 241, 1);
+}
+.block-color-red_background {
+	background: rgba(252, 233, 231, 1);
+}
+.select-value-color-default { background-color: rgba(42, 28, 0, 0.07); }
+.select-value-color-gray { background-color: rgba(28, 19, 1, 0.11); }
+.select-value-color-brown { background-color: rgba(127, 51, 0, 0.156); }
+.select-value-color-orange { background-color: rgba(196, 88, 0, 0.203); }
+.select-value-color-yellow { background-color: rgba(209, 156, 0, 0.282); }
+.select-value-color-green { background-color: rgba(0, 96, 38, 0.156); }
+.select-value-color-blue { background-color: rgba(0, 118, 217, 0.203); }
+.select-value-color-purple { background-color: rgba(92, 0, 163, 0.141); }
+.select-value-color-pink { background-color: rgba(183, 0, 78, 0.152); }
+.select-value-color-red { background-color: rgba(206, 24, 0, 0.164); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style><style>@import url('https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex-swap.min.css')</style></head><body><article id="33aa15e2-9005-8083-b1eb-d7c4509a3d41" class="page serif" data-notion-page-icon="🔧"><header><img class="page-cover-image" src="https://app.notion.com/images/page-cover/met_william_morris_1877_willow.jpg" style="object-position:center 90%"/><div class="page-header-icon page-header-icon-with-cover"><span class="icon" data-emoji="🔧"></span></div><h1 class="page-title" dir="auto">B+Tree</h1><p class="page-description" dir="auto"></p><table class="properties"><tbody></tbody></table></header><div class="page-body"><div id="33aa15e2-9005-805e-a083-d1ca3940ded3" class="column-list" data-notion-column-list="" dir="auto"><div id="33aa15e2-9005-80ed-9a9f-da66b99c3965" style="width:18.75%" class="column" data-notion-column-ratio="0.1875" dir="auto"><hr id="33aa15e2-9005-802c-b01f-fe8ce411d083" dir="auto"/><figure id="33aa15e2-9005-8099-b1ed-d5af4c91f63d" class="image" data-notion-image="../../Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg" dir="ltr"><a href="../../Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg"><img style="width:548.375px" src="../../Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg"/></a></figure><p id="33aa15e2-9005-8031-9dac-fee5767af4f4" class="" dir="auto">
+</p></div><div id="33aa15e2-9005-8042-853d-c0083186ae73" style="width:81.25%" class="column" data-notion-column-ratio="0.8125" dir="auto"><h3 id="33aa15e2-9005-80d9-b6e0-ee106f7fd57e" class="" dir="auto">B+Tree</h3><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80e5-9464-ddf2eeb0dd08" dir="ltr"><div style="width:100%"><p id="d5169b1c-03d4-49c3-9080-599fbd3f3571" class="" dir="auto">你在 Momo 買了一個鍵盤，想查訂單進度。Momo 的訂單資料庫可能有上千萬筆訂單！？（我猜的） 但你按下「查看訂單」，頁面不到一秒就跳出你那筆訂單的物流狀態。 上千萬筆資料存在 SSD 上，Momo 怎麼可能在幾毫秒內找到你那一筆？</p><p id="5182abd1-efab-4d59-ad20-d36a46468a27" class="" dir="auto">如果用暴力法的話，從第一筆訂單開始，一筆一筆比對 order_id，直到找到為止。假設 Momo 有一千萬筆訂單，每筆 record 平均 100 bytes，一個 8 KB 的 disk page 放大約 80 筆，那就是大約 12.5 萬個 page。就算你的 SSD 一次 4KB random read 只要 100 us，掃完 12.5 萬個 page 也要超過 10 秒。</p><p id="6dac713f-d786-45d0-b9c2-11166c9f295e" class="" dir="auto">但如果你在 order_id 上建一棵 B+Tree 呢？ B+Tree 的 inner node fan-out 非常高（等等會解釋為什麼，大約 500）。Fan-out 500 代表每個 inner node 可以指向 500 個 child。所以樹的高度只有3 層。查一筆資料只需要 3 次 disk I/O。 而且 root node 和第二層的 inner node 因為太常被讀，幾乎一直快取在記憶體裡。所以大部分查詢實際上只需要 1 次真正的 disk I/O 就能命中目標 leaf node。</p></div></aside><blockquote id="33aa15e2-9005-80f6-8d05-f38980b85087" class="" dir="auto">Reference: </blockquote><hr id="33aa15e2-9005-807d-a396-cc487afb9d1b" dir="auto"/><details id="33aa15e2-9005-80cb-ac93-f71d1b0e351b" open="" class="toggle" dir="auto"><summary><strong>Classification</strong></summary><div class="indented"><p id="33aa15e2-9005-80d9-b2d7-e5294fb4c566" class="" dir="auto">
+</p><hr id="33aa15e2-9005-80b9-af29-e83fb17d4a4d" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80c9-9908-e2dcc3667ee6" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80e5-9c54-e7e138030f0a" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Extra Component</mark></p><hr id="33aa15e2-9005-80bd-81b3-cd0ce92fb69b" dir="auto"/><p id="33aa15e2-9005-8005-adcd-c4c1d8450fd2" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Reference:</mark></p></div></aside><hr id="33aa15e2-9005-80dc-a958-f0a0656dd19b" dir="auto"/></div></details><details id="33aa15e2-9005-80b1-ab3a-d84b49868e7f" open="" class="toggle" dir="auto"><summary><strong>Key Word Definition/ Discussion</strong></summary><div class="indented"><details id="33aa15e2-9005-8084-81b7-d9ff6143a4d0" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>B+Tree</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8036-902a-e6b08bb29e09" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8056-8823-cda91a04e7be" class="" dir="auto">B+Tree 是一種針對<strong>外部儲存裝置（External Storage）</strong>優化的多路平衡搜尋樹（Multi-way Search Tree）。它將節點分為僅存導向資訊（Routing Key）的 Inner Node，以及儲存實際資料的 Leaf Node。</p></div></aside><hr id="33aa15e2-9005-808d-aefd-eed7bbeef46a" dir="auto"/><p id="6226a8d7-f1ac-48d0-b024-c8fb061a139f" class="" dir="auto"><strong>樹高與效能：</strong><div class="indented"><p id="33da15e2-9005-800c-9b70-ec046f6b0990" class="" dir="auto">B+Tree 的設計目標是「矮而胖」，透過極高的 Fan-out 讓樹高維持在 3~4 層，即使索引上千萬筆資料，也僅需極少的磁碟 I/O。</p></div></p><p id="ccd8a654-07e9-43a7-a652-701f594c36bf" class="" dir="auto"><strong>B+Tree vs. B-Tree：</strong><div class="indented"><ul id="a348929f-3686-4c75-801d-1a701a8f3e9d" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>B-Tree：</strong>Inner Node 也存資料，導致每個節點能存的 Key 變少，樹變高。</li></ul><ul id="0249fb84-4f9d-486b-9c91-4fa2d6fd3c67" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>B+Tree：</strong>資料全在 Leaf Node，Inner Node 空間全給了 Pointer，因此分叉更多、樹更矮。</li></ul></div></p><p id="c1e70cb8-7dfc-48ad-9fc4-d72309b40bd1" class="" dir="auto"><strong>穩定地址：</strong><div class="indented"><p id="33da15e2-9005-8081-a7c2-fec44a4475f1" class="" dir="auto">Leaf Node 存的 pointer 通常指向資料表（如 Slotted Page）中的實體地址（CTID/TID）。</p></div></p><hr id="33da15e2-9005-8042-8939-cdd6f9a1df9b" dir="auto"/><figure id="33da15e2-9005-80f3-848e-f2573685f721" class="image" data-notion-image="B+Tree/image.png" dir="ltr"><a href="B+Tree/image.png"><img style="width:950.25px" src="B+Tree/image.png"/></a></figure><hr id="33aa15e2-9005-800c-bc20-f510e9e1532d" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8025-8bbe-ee137f30a157" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-803f-b541-c6e5d6bc2f57" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p><p id="33da15e2-9005-8044-9b3c-c1aadca53ae2" class="" dir="auto"><strong>誤解搜尋路徑</strong>：在 B+Tree 中，搜尋<strong>永遠</strong>會到達 Leaf Node（即使在 Inner Node 剛好看到該 Key），因為 Inner Node 只是導航，真正的資料指標只在底部。</p></div></aside><hr id="33aa15e2-9005-8099-a920-d65292aba8f3" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-806b-870c-e5df0145f89a" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8030-9acd-de9832eecbaa" class="" dir="auto">Reference: </p></div></aside><hr id="33aa15e2-9005-80ab-b76f-dfd4a84d1a3c" dir="auto"/></div></details><details id="33da15e2-9005-80d1-a8da-dc2eb9cc1aa6" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>fan-out</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8090-8a7c-ec0d41b3a02c" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-801b-b398-c7a65449d560" class="" dir="auto">Fan-out 是指一個 Inner Node 最多能擁有的子節點（Child Pointer）數量。</p></div></aside><hr id="33da15e2-9005-80d7-9faa-fc3f4fa80af1" dir="auto"/><p id="cb1b03f1-a688-4ba8-b948-f388a96f6069" class="" dir="auto">計算方式：<div class="indented"><p id="33da15e2-9005-80d0-8b38-df3ee7c8f763" class="" dir="auto">假設 Page 為 8 KB，Key 8 bytes，Pointer 6 bytes。</p><p id="33da15e2-9005-804c-abd7-c1f359fec6b7" class="" dir="auto"><span data-notion-inline-equation="\text{Fan-out} = \lfloor \frac{8192}{8 + 6} \rfloor \approx 585" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">Fan-out</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.2484em;vertical-align:-0.4033em;"></span><span class="mopen">⌊</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">8</span><span class="mbin mtight">+</span><span class="mord mtight">6</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">8192</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.4033em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose">⌋</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">585</span></span></span></span></span></p></div></p><p id="33da15e2-9005-80c2-9be1-d341d16db2f8" class="" dir="auto">呈幾何增長：<div class="indented"><p id="33da15e2-9005-80be-86a8-fe196255c110" class="" dir="auto">若 Fan-out 為 500，三層樹（Root + 1 層 Inner + Leaf）可索引 <span data-notion-inline-equation="500^2 \times 100 \text{ (records per leaf)} = 25,000,000" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8974em;vertical-align:-0.0833em;"></span><span class="mord">50</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">100</span><span class="mord text"><span class="mord"> (records per leaf)</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">25</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">000</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">000</span></span></span></span></span> 筆資料。</p></div></p><figure id="33da15e2-9005-808d-bed8-c6f0bea3b966" class="image" data-notion-image="B+Tree/Screenshot_2026-04-09_232906.png" dir="ltr"><a href="B+Tree/Screenshot_2026-04-09_232906.png"><img style="width:950.2250366210938px" src="B+Tree/Screenshot_2026-04-09_232906.png"/></a></figure><hr id="33da15e2-9005-8087-a50a-d7ee14f0c4f1" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-809b-9e82-e10a4578be68" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-80a6-89a3-ce3d6ab8e510" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p><p id="33da15e2-9005-8005-ae26-e653ecc8227f" class="" dir="auto"><strong>隨資料變動</strong>：實務上 Node 不會永遠全滿，通常維持在 50%~100% 的填充率（Fill Factor），計算預期效能時應考慮平均 Fan-out。</p></div></aside><hr id="33da15e2-9005-808d-9771-dc438fd82bdb" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8096-ace1-f95ccbda1dcc" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-809e-8b9d-cb4062814657" class="" dir="auto">Reference: </p></div></aside><hr id="33da15e2-9005-80f7-8a3d-faa26e16ff4d" dir="auto"/></div></details><details id="33da15e2-9005-80b3-a66a-f641c8180fb5" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Inner node</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8072-a111-c41a87670320" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8078-bdb5-c879f2462c0e" class="" dir="auto">不儲存實際 Record 資料，僅存取導向鍵（Routing Key）與子頁面指標（Child Page Pointer）的節點。</p></div></aside><hr id="33da15e2-9005-8056-8463-dd17f43d85d0" dir="auto"/><ul id="15be7557-9ee6-495d-853a-354446ade248" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>導航功能</strong>：它像地圖，告訴搜尋演算法「大於 A 且小於 B 的值請往 Page X 找」。</li></ul><ul id="eddf9f32-71d4-4fb7-bd6a-5cf7c91c2d27" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>高度快取</strong>：由於 Inner Node 數量相對極少且存取頻繁，資料庫通常會將其常駐在記憶體（Buffer Pool）中。</li></ul><hr id="33da15e2-9005-8094-a720-cf867bda3c35" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-800c-bbc8-d1622bb9ca7c" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-80c5-966c-e0b1c31d956e" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p><p id="33da15e2-9005-8059-b000-f81ab655d0cd" class="" dir="auto"><strong>不唯一性</strong>：同一個 Key 可能出現在多個 Inner Node 作為分界點，但它只代表範疇。</p></div></aside><hr id="33da15e2-9005-805a-b70d-ce3126f5ac78" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8062-b3ec-dc1627f88963" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-802f-8f95-fd78094f4d46" class="" dir="auto">Reference: </p></div></aside><hr id="33da15e2-9005-80ca-9e7b-f5d39dbfbec2" dir="auto"/></div></details><details id="33da15e2-9005-809e-a7df-fcc6695dcfb4" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Leaf node</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-800c-ae9b-d2fc5b384f4e" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-80d0-9b88-c0fe9a45d09b" class="" dir="auto">B+Tree 的最底層節點，包含完整的 Key 與對應的資料（或指向資料的指標），且彼此間以 Linked List 串接。</p></div></aside><hr id="33da15e2-9005-8038-a8df-ddb817b1efc1" dir="auto"/><ul id="df9ea831-17ac-4503-bae1-a213d9f67ae5" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>資料有序性</strong>：Leaf Node 內的資料是按 Key 排序的。</li></ul><ul id="8142f8d7-64f8-4900-8aa1-714625c3d165" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>節點關聯</strong>：每個 Leaf Node 通常存有指向「前一個」與「後一個」節點的指標（Doubly Linked List），這是支援 Range Query 的關鍵。</li></ul><hr id="33da15e2-9005-802f-a8f8-ec917307f23d" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-802a-b2f9-eb77b25c7bd8" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8088-8c6f-d6c8c5d5b833" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p><p id="33da15e2-9005-80cf-9262-d8ae2e5bed9e" class="" dir="auto"><strong>更新成本</strong>：當資料插入導致 Leaf Node 溢出時，會觸發 Split，這可能導致上層 Inner Node 的連鎖更新。</p></div></aside><hr id="33da15e2-9005-80d3-bd23-feca418a263e" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8041-b068-d6b029caa27c" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-80cb-a074-dafd4c19ea15" class="" dir="auto">Reference: </p></div></aside><hr id="33da15e2-9005-803e-960d-e0d63774c681" dir="auto"/></div></details><details id="33da15e2-9005-803c-a0ca-d3188c71ee96" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Linked list</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-808d-8b73-eb577355a52f" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8016-9045-e6b611a203a7" class="" dir="auto">B+Tree 所有的 Leaf Node 透過指標串接成一個雙向鏈結序列。</p></div></aside><hr id="33da15e2-9005-8079-b42e-cf611003fe7b" dir="auto"/><ul id="a6676466-c079-4e7f-8668-e9cd855756f5" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>水平遍歷</strong>：傳統 BST 需要回溯 Parent 才能找到下一個有序元素，B+Tree 只要沿著 Leaf 的指標往右走即可。</li></ul><ul id="c1c8697f-482a-4c41-91d6-3785251bd2ab" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>與磁碟匹配</strong>：雖然相鄰 Node 在磁碟上不一定連續，但邏輯上的 Linked List 讓 Scan 變得直觀。</li></ul><hr id="33da15e2-9005-8005-b3a5-c85525800bd8" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-803a-8a45-c0392e71aaa3" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-803b-9d6d-c7a322e676c8" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p><p id="33da15e2-9005-807d-940f-d80e2348e1ef" class="" dir="auto"><strong>Fragmentation (碎片化)</strong>：頻繁插入刪除後，邏輯上連續的 Leaf Node 在物理磁碟上可能散佈各處，導致「順序掃描」退化成「隨機 I/O」。</p></div></aside><hr id="33da15e2-9005-80dc-a60e-e7e3fbb94138" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8093-8f85-f52d68d26ed2" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-802f-9821-c166e3808012" class="" dir="auto">Reference: </p></div></aside><hr id="33da15e2-9005-80fe-bef1-faa1e953f552" dir="auto"/></div></details><details id="33da15e2-9005-807f-80cb-c54e9dd822f3" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Range query</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-801b-b60a-d9ed5823546c" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-80ec-a5c1-e44eff43c4f0" class="" dir="auto">尋找某個區間內（如 <code>WHERE id &gt; 10 AND id &lt; 100</code>）所有資料的操作。</p></div></aside><hr id="33da15e2-9005-8064-a725-ec4926853c07" dir="auto"/><p id="33da15e2-9005-80fb-ac5a-d3ed624dae04" class="" dir="auto"><strong>二步驟執行</strong>：<div class="indented"><p id="33da15e2-9005-80f1-a893-c9ff328c1934" class="" dir="auto">1. <strong>Seek</strong>：用 B+Tree 找到起始點（<span data-notion-inline-equation="id=10" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">i</span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">10</span></span></span></span></span>）所在的 Leaf Node。<br/>2. <strong>Scan</strong>：沿著 Linked List 往後讀取，直到遇見結束點（<span data-notion-inline-equation="id=100" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">i</span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">100</span></span></span></span></span>）。</p></div></p><p id="33da15e2-9005-80c5-9b5d-f5278e897074" class="" dir="auto"><strong>效能優勢</strong>：相較於 BST 需要多次  <span data-notion-inline-equation="O(\log N)" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="mclose">)</span></span></span></span></span>  搜尋，B+Tree 僅需 1 次搜尋 + 順序讀取。</p><hr id="33da15e2-9005-8041-a6b0-f5f38c6042d0" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-801d-92e3-c24dc9f28ade" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8033-b257-db79d4bc6284" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p></div></aside><hr id="33da15e2-9005-80c3-8308-debd9a07bbce" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8056-ba77-d05aee33a56a" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-806e-919a-cbab9e2602dd" class="" dir="auto">Reference: </p></div></aside><hr id="33da15e2-9005-8018-81f2-dfc533db1460" dir="auto"/></div></details><details id="33da15e2-9005-80d9-90a4-ed82ca4a12f7" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Split</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-806c-8d60-e2ec0f6a37ea" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8057-b6fa-d200240bd816" class="" dir="auto">當插入新 Key 導致 Node 超過容量時，將該 Node 一分為二並向上層更新 Routing Key 的過程。</p></div></aside><hr id="33da15e2-9005-80ee-ad55-ccfd506c83e4" dir="auto"/><ul id="ea8de82e-f9fd-4c08-89c0-020288fa4a76" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>由下而上</strong>：B+Tree 是從 Leaf 往 Root 方向「生長」的。</li></ul><ul id="6d4c1c72-1991-4e7a-8a12-2aca9ad24df5" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>中間值上提</strong>：分裂時，中間的 Key 會被推送到 Parent Node 作為新的分界點。</li></ul><hr id="33da15e2-9005-8034-a9f3-c8a27f12b03c" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-801a-bae6-c6464ed86da9" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-80b0-a985-e6d2ad0face6" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p><p id="33da15e2-9005-8040-be75-d5dba29fa36e" class="" dir="auto"><strong>連鎖反應</strong>：如果 Parent 也滿了，Split 會一路傳遞到 Root。若 Root 也 Split，樹的高度就會加 1（這是 B+Tree 變高的唯一方式）。</p></div></aside><hr id="33da15e2-9005-802a-9c4e-c3af4baa1653" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8066-8d5e-c5b5f1d84f83" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8032-9780-cbbab10fb5d7" class="" dir="auto">Reference: </p></div></aside><hr id="33da15e2-9005-8092-961a-d3f7dc4050cd" dir="auto"/></div></details><details id="33da15e2-9005-8088-a335-c912751b72b5" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Merge</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8041-b5db-c11bf19b68a3" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8083-a3a3-fab72a596ee7" class="" dir="auto">當刪除資料導致 Node 填充率低於門檻（通常為 50%）時，將節點與鄰居合併或重新分配資料的操作。</p></div></aside><hr id="33da15e2-9005-80b6-bf33-ca435d17e07c" dir="auto"/><ul id="51ea3534-1134-452a-b996-9b8c5b289e8c" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>反向操作</strong>：與 Split 相反，它會減少上層的 Routing Key。</li></ul><ul id="cb8e7ad6-4b97-4bde-9cfe-9f9ee6ee32b0" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Lazy Merge</strong>：許多實務系統（如 InnoDB）不急著執行 Merge，因為合併成本高且未來可能有新資料填補，僅在極低填充率時才處理。</li></ul><hr id="33da15e2-9005-80dd-9bf7-eb6e8d741421" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8070-a00a-ff9516d7d2de" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-80c1-91d6-eebb554ff4a3" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p></div></aside><hr id="33da15e2-9005-80e2-ba5c-dbdbb0901781" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-807f-af3d-c56780520ecd" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8004-9234-f508cb3f30ef" class="" dir="auto">Reference: </p></div></aside><hr id="33da15e2-9005-807e-a75c-fe9e6437e55c" dir="auto"/></div></details><details id="33da15e2-9005-8091-93c7-fca8a15305c0" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Prefix truncation</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8052-8d8e-ce61f366cafe" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-80e2-b42c-ed6b19a2570f" class="" dir="auto">在 Inner Node 中只儲存足以區分左右子樹的「最短前綴」，而非完整的 Key。</p></div></aside><hr id="33da15e2-9005-8058-8cd1-dac36cc4bfd5" dir="auto"/><p id="64b74fe7-8205-45dd-bee3-9fa1bd91b879" class="" dir="auto"><strong>Prefix Truncation</strong><br/>Inner node 裡的 routing key，其實不需要存完整的 key。它的功能只是「告訴你往左走還是往右走」，所以只要存到能區分左右 child 的最短前綴就夠了。這叫 prefix truncation。</p><p id="a13f63b7-f974-4d2b-959a-4dec01d8eda2" class="" dir="auto">假設一個 inner node 有三個 child（三個 leaf node），分別存 &quot;NCKU&quot;（成大）、&quot;NTHU&quot;（清大）、&quot;NYCU&quot;（交大）的資料。這個 inner node 需要兩個 routing key 來分隔三個 child：</p><figure id="33da15e2-9005-805a-a3ec-d13b7e4a4176" class="image" data-notion-image="B+Tree/Screenshot_2026-04-09_233055.png" dir="ltr"><a href="B+Tree/Screenshot_2026-04-09_233055.png"><img style="width:950.25px" src="B+Tree/Screenshot_2026-04-09_233055.png"/></a></figure><div id="33da15e2-9005-80c1-b695-c7af070a338e" class="column-list" data-notion-column-list="" dir="auto"><div id="33da15e2-9005-80b3-aeae-c93b9ebfbd54" style="width:95.83333333333333%" class="column" data-notion-column-ratio="0.9583333333333333" dir="auto"><figure id="33da15e2-9005-8048-b1d2-e32da7cd1b03" class="image" data-notion-image="B+Tree/Screenshot_2026-04-09_233122.png" dir="ltr"><a href="B+Tree/Screenshot_2026-04-09_233122.png"><img style="width:432px" src="B+Tree/Screenshot_2026-04-09_233122.png"/></a></figure></div><div id="33da15e2-9005-8069-82f1-c4dba8dc20e4" style="width:4.166666666666666%" class="column" data-notion-column-ratio="0.041666666666666664" dir="auto"><p id="33da15e2-9005-801d-93b8-d4ff0db0a266" class="" dir="auto">
+</p><p id="33da15e2-9005-80bf-a65a-da99acbbcde6" class="" dir="auto">→ </p></div><div id="33da15e2-9005-80b5-9dd5-f27f500391c2" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><figure id="33da15e2-9005-801d-9314-fbfc1e472184" class="image" data-notion-image="B+Tree/Screenshot_2026-04-09_233145.png" dir="ltr"><a href="B+Tree/Screenshot_2026-04-09_233145.png"><img style="width:432px" src="B+Tree/Screenshot_2026-04-09_233145.png"/></a></figure></div></div><p id="33da15e2-9005-8076-9d2f-de945555c141" class="" dir="auto">大學縮寫只有 4 個字元，效果就已經看得到。如果 key 是 email 地址，效果更驚人：&quot;<a href="mailto:A@gmail.com">A@gmail.com</a>&quot;、&quot;<a href="mailto:B@gmail.com">B@gmail.com</a>&quot;、&quot;<a href="mailto:C@gmail.com">C@gmail.com</a>&quot; 三個 key，routing key 不需要存完整的 &quot;<a href="mailto:B@gmail.com">B@gmail.com</a>&quot; 和 &quot;<a href="mailto:C@gmail.com">C@gmail.com</a>&quot;（共 22 bytes），只需要 &quot;B&quot; 和 &quot;C&quot; 各 1 byte 就夠了，省了 91%。key 越長，prefix truncation 省下的空間越多，一個 page 能塞進更多 routing key，fan-out 更高，樹更矮。</p><hr id="33da15e2-9005-8088-bd66-ce805c48ffd1" dir="auto"/><p id="33da15e2-9005-804b-bf20-d29e5454f0e4" class="" dir="auto"><strong>範例</strong>：若左子樹最大值為 <code>apple</code>，右子樹最小值為 <code>apply</code>，Routing Key 只要存 <code>appl</code>（或能區分兩者的最小字串）即可。</p><p id="33da15e2-9005-8044-b40d-f1f94dfb32c0" class="" dir="auto"><strong>效益</strong>：顯著節省 Inner Node 空間 → 增加 Fan-out → 降低樹高。</p><hr id="33da15e2-9005-8064-9dd6-df5d45170d13" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-80ff-905a-d0b8d3fe4276" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8015-94f7-cf14ba2c180b" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p><p id="33da15e2-9005-8000-96e8-fdeab0c27909" class="" dir="auto"><strong>變長 Key 的複雜度</strong>：使用前綴縮減後，Inner Node 內的 Key 長度不一，Page 內部的空間管理（如使用 Slotted Page 結構）會變複雜。</p></div></aside><hr id="33da15e2-9005-804c-80d6-f0c7e8bcad3c" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-80ca-a1a2-c84e75352972" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-802d-a61b-d4c4860bb95a" class="" dir="auto">Reference: </p></div></aside><hr id="33da15e2-9005-8000-8991-c4b05ffd49e3" dir="auto"/></div></details><details id="33da15e2-9005-8072-8603-caea745277fd" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Disk I/O</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-804e-b366-f534265b6f3b" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8080-9be2-f42bb81ef37d" class="" dir="auto">資料在硬碟（持久化層）與記憶體（Buffer Pool）之間的讀寫移動。</p></div></aside><hr id="33da15e2-9005-8082-a543-cd7a9b06715b" dir="auto"/><ul id="f5f705cd-74bf-48eb-a11b-2db3c806f1be" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Page-Aligned</strong>：B+Tree 節點大小通常等於磁碟 Page 大小（如 8 KB），確保一次 I/O 就能讀入一個完整的節點。</li></ul><ul id="08ef51d6-5fd4-40cf-94bd-cf204490003a" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>I/O 效率對比</strong>：<ul id="87051266-eaec-4502-a157-4e404340e9b6" class="bulleted-list" dir="auto"><li style="list-style-type:circle"><strong>BST</strong>：查一筆資料約 24 次隨機 I/O（假設一千萬筆）。</li></ul><ul id="469b3916-dfff-4612-919b-61ef2b2fee64" class="bulleted-list" dir="auto"><li style="list-style-type:circle"><strong>B+Tree</strong>：僅需約 3 次隨機 I/O。</li></ul></li></ul><hr id="33da15e2-9005-80c8-9594-f1ad9dabde70" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8046-9ec2-f575317d1910" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8026-864c-d4a19781c802" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p><p id="33da15e2-9005-80be-9d7c-ee1f80d4f660" class="" dir="auto"><strong>Random vs. Sequential</strong>：B+Tree 的 Seek 是隨機 I/O，而 Range Scan 雖然在邏輯上是連續的，但若磁碟碎片嚴重，仍會引發大量隨機讀取，影響效能。</p></div></aside><hr id="33da15e2-9005-8063-94b4-dce446ebcde1" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-80c2-a317-f9576d902195" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8081-a4d3-fe0f2a512076" class="" dir="auto">Reference: </p></div></aside><hr id="33da15e2-9005-803c-8739-cf00bacc6fee" dir="auto"/></div></details></div></details><details id="33aa15e2-9005-803b-8da4-f02a0030533a" open="" class="toggle" dir="auto"><summary><strong>Test</strong></summary><div class="indented"><details id="33aa15e2-9005-80b9-9b8f-d4148aeb9ffc" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Key Concepts</strong></mark></summary><div class="indented"><details id="33aa15e2-9005-8014-b570-ffe52562a147" open="" class="toggle" dir="auto"><summary>理解 B+Tree 的基本結構：inner node 只存放 routing key，所有實際資料都儲存在 leaf node 中</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8094-9ee5-cf0b3f27575e" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8013-9e45-db36d2153910" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-8009-a999-cda07b450809" class="" dir="auto">B+Tree 分為負責導航的內部節點 (Inner Node)與負責儲存實際資料的葉節點 (Leaf Node)，兩者職責完全分離。</p></div></p><hr id="33aa15e2-9005-80ac-82ae-f3b4db3e0092" dir="auto"/><p id="33aa15e2-9005-80a2-8db1-e7917482f134" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-800c-93d3-ed2ce81690ee" class="" dir="auto">Inner Node (Routing Node), Leaf Node (Data Node), Key Separation, Routing Key。</p></div></p><hr id="33aa15e2-9005-80f3-b894-e45399473a84" dir="auto"/><p id="33aa15e2-9005-8071-bee8-d982177ce1fd" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-806f-91ea-f65ba8e51035" class="" dir="auto">在 B+Tree 中，Inner Node 絕對不儲存 Row Data（實際資料或完整指標），它只存放用來指引方向的 Routing Key。就像圖書館的索引櫃抽屜外面的標籤（例如 &quot;A-C&quot;），告訴你該往哪個子節點找。所有的實際資料（或指向實體資料的指標）都整齊地排列在最底層的 Leaf Node 中。這種「職責分離」是 B+Tree 效能優越的基礎。</p></div></p></div></aside><hr id="33aa15e2-9005-80be-8e3f-fc249318ebe7" dir="auto"/></div></details><details id="33aa15e2-9005-809b-8299-da7666cdf0d1" open="" class="toggle" dir="auto"><summary>理解 leaf node 之間以 linked list 串接，使得 range query 可以循序掃描而不需回到上層 node</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80e1-92d9-dafec83fb7aa" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80be-af1f-e4287009423e" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-803d-9a34-fb5c00cb8487" class="" dir="auto">所有最底層的 Leaf Node 會透過指標（通常是雙向鏈結）互相串聯成一個 List，讓範圍查詢可以直接橫向讀取。</p></div></p><hr id="33aa15e2-9005-80ac-920a-cb574960c17d" dir="auto"/><p id="33aa15e2-9005-8096-9d92-c75d1c3263b8" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-8012-b0ca-da1956323b8b" class="" dir="auto">Sibling Pointers (兄弟指標), Linked List, Range Query, Sequential I/O (循序讀寫)。</p></div></p><hr id="33aa15e2-9005-80c1-ad1a-d46ffe4e80bc" dir="auto"/><p id="33aa15e2-9005-803f-b365-ee7392662c02" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-8039-be2e-d0de4370e6a5" class="" dir="auto">當你下達 <code>SELECT * FROM table WHERE age BETWEEN 20 AND 30</code> 時，B+Tree 只需要從 Root 往下找到第一個 <code>age=20</code> 的 Leaf Node。接著，它<strong>不需要</strong>再回到上層節點去尋找下一筆資料，而是直接沿著 Leaf Node 旁邊的 Sibling Pointer 往右邊橫向掃描，直到遇到大於 30 的值為止。這將原本複雜的樹狀遍歷，轉化為對磁碟極度友善的循序讀取。</p></div></p></div></aside><hr id="33aa15e2-9005-806a-a919-d4e7eee7c85a" dir="auto"/></div></details><details id="33aa15e2-9005-806b-8758-e838bf57a826" open="" class="toggle" dir="auto"><summary>計算 fan-out 並理解高 fan-out 如何讓 B+Tree 的高度極低，減少每次查詢所需的 disk I/O 次數</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8081-ae4f-ef60263e9bf3" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80ea-874e-da2436c41b8a" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-80d9-8df0-c2279e828258" class="" dir="auto">Fan-out（分支度）是指一個節點能擁有的最多子節點數。Fan-out 越高，樹就越扁平（矮），從而大幅減少尋找資料時所需的磁碟 I/O 次數。</p></div></p><hr id="33aa15e2-9005-80f9-8bcc-f2ff5928acc2" dir="auto"/><p id="33aa15e2-9005-8080-99b4-c49d89b5a7d9" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-8028-9501-c118a301ebc6" class="" dir="auto">Fan-out (分叉率/扇出), Tree Height (樹高), Logarithmic Time, Disk I/O Bottleneck。</p></div></p><hr id="33aa15e2-9005-8021-bbca-fc4da7419109" dir="auto"/><p id="33aa15e2-9005-80b1-9509-ee066ad2fbcb" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-80e4-9e66-ed9a396faae2" class="" dir="auto">資料庫效能的致命傷是 Disk I/O（從硬碟讀取一個 Page）。B+Tree 每往下走一層，就需要一次 I/O。因為 Inner Node 不存資料，它可以塞入非常多的 Routing Key，使得 Fan-out 經常高達數百甚至上千。這帶來了指數級的容量增長：即使有數十億筆紀錄，一棵高 Fan-out 的 B+Tree 高度通常也能維持在 3 到 4 層。這意味著「只要 3~4 次磁碟讀取」就能在十億筆資料中精準撈出你要的那一筆。</p></div></p></div></aside><hr id="33aa15e2-9005-8035-a7ac-e74a4b4e828f" dir="auto"/></div></details><details id="33aa15e2-9005-8050-8be1-c2242e3fcd9f" open="" class="toggle" dir="auto"><summary>理解 B+Tree leaf node 透過 CTID 指向 slotted page 中的 record，以及 slot indirection 為什麼讓這個設計能運作</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8052-8ccf-ed8a0a5dd863" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80b8-b310-e040db91f9bf" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-80b6-85c0-f732e5043c14" class="" dir="auto">Leaf Node 通常存放 CTID（Page ID + Slot Number）指向 Slotted Page。透過 Slot 作為中介層，即使實體資料在 Page 內移動，B+Tree 也不需要更新。</p></div></p><hr id="33aa15e2-9005-80a9-a98e-c41fe079cc35" dir="auto"/><p id="33aa15e2-9005-8081-b614-d27dd6baa8b6" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-804f-93ad-c6810ed6c252" class="" dir="auto">CTID (Item Pointer), Slot Indirection, Decoupling (解耦), Logical Address。</p></div></p><hr id="33aa15e2-9005-805a-b831-db8d3e99a16d" dir="auto"/><p id="33aa15e2-9005-80a4-9f01-fad1132dd1b8" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-8034-a3b1-c71f4a981720" class="" dir="auto">這結合了你之前學過的 Slotted Page 觀念。如果 B+Tree 直接記錄資料的實體記憶體位址（Offset），那麼每當 Slotted Page 進行 Compaction（碎片整理）移動資料時，整棵 B+Tree 的指標都要跟著重寫，這會造成災難性的效能問題。有了 Slot Indirection，B+Tree 只要記住穩定的邏輯地址（Slot Number）。資料在 Page 內隨便搬，只要把 Slot 內的 Offset 更新就好，B+Tree 完全不用動。</p></div></p></div></aside><hr id="33aa15e2-9005-8040-bd74-c94acb47e9bb" dir="auto"/></div></details><details id="33aa15e2-9005-801a-abfd-eaf1622dde06" open="" class="toggle" dir="auto"><summary>理解 prefix truncation 如何透過縮短 routing key 來提高 fan-out</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80b6-b2d5-f9dd15255d71" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80e3-a417-dd0ddb443167" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-805d-99d6-c463130965e7" class="" dir="auto">在 Inner Node 中，將 Routing Key 縮減到「足以分辨左右子節點」的最短長度，藉此節省空間並進一步提升 Fan-out。</p></div></p><hr id="33aa15e2-9005-80a5-b70b-fe03e585d635" dir="auto"/><p id="33aa15e2-9005-80fc-8087-c7a2d9e4b24e" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-8035-b74b-de3378feaa5f" class="" dir="auto">Prefix Truncation, Key Compression, Space Optimization。</p></div></p><hr id="33aa15e2-9005-80a9-a87e-eeddc4b6564a" dir="auto"/><p id="33aa15e2-9005-807b-93f8-d4598cbc3901" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-80db-a6d9-df31433f77e2" class="" dir="auto">假設某個 Inner Node 要區分左邊子樹（最大值是 &quot;Smith, John&quot;）和右邊子樹（最小值是 &quot;Smith, Kevin&quot;）。系統其實不需要在 Inner Node 存下完整的 &quot;Smith, Kevin&quot;，它只要存 &quot;Smith, K&quot; 甚至更短的字元就足以作為路標了。捨棄不必要的字尾（Truncation）能讓 Key 變得極短，同一個 Page 就能塞進更多 Key，直接拉高 Fan-out 並壓低樹高。</p></div></p></div></aside><hr id="33aa15e2-9005-8008-9fd9-f7b3ceab1e9c" dir="auto"/></div></details></div></details><details id="33aa15e2-9005-80a3-b585-e4186058a97f" open="" class="toggle" dir="auto"><summary><mark class="highlight-teal" data-notion-highlight="teal"><strong>Test your understanding</strong></mark></summary><div class="indented"><details id="33aa15e2-9005-8077-bdc6-dc304bb37f58" open="" class="toggle" dir="auto"><summary>為什麼 B+Tree 要把所有資料都放在 leaf node，而不是像 B-Tree 那樣讓 inner node 也存資料？這個設計決策對 fan-out 和 range query 分別有什麼影響？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80f8-a0ca-f59bcc0db0bb" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-800f-a517-e7a3d4be6eac" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-80ba-a095-cc6f0fd32d09" class="" dir="auto">不把資料放在 Inner Node 可以省下大量空間，極大地提升 Fan-out；資料集中在底層也讓 Range Query 變得單純高效。</p></div></p><hr id="33aa15e2-9005-8049-8485-ea4985c9430e" dir="auto"/><p id="33aa15e2-9005-80c8-ae8d-f4ff3b3365f3" class="" dir="auto">Key Concept<div class="indented"><p id="465d5a6f-1417-4e76-b876-dddb039ef4ee" class="" dir="auto">Payload Separation, Tree Flattening, Sequential Access</p></div></p><hr id="33aa15e2-9005-80ae-8b15-e9ae4c840668" dir="auto"/><p id="33aa15e2-9005-8011-a6ac-c82dab59746e" class="" dir="auto">Detail<div class="indented"><ul id="ea54af04-11c2-450d-b315-8cf4737ce707" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>對 Fan-out 的影響</strong>：這就是 B-Tree 與 B+Tree 最核心的差異。B-Tree 的每個節點除了存 Key 還存 Data Payload。如果一個 Page 是 8KB，Data 佔了 1KB，那一個節點頂多只能有 7~8 個分支。B+Tree 把 Data 趕到底層，Inner Node 全放幾 bytes 的 Key，Fan-out 瞬間飆升到上千，樹的高度從「高瘦」變成「矮胖」，大幅降低磁碟讀取次數。</li></ul><ul id="abaf3a96-dd07-49b2-855e-83f37a362584" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>對 Range Query 的影響</strong>：在 B-Tree 中，要撈出 10~50 的資料，你必須在樹的上層與下層之間不斷上上下下（In-order Traversal）。B+Tree 配合 Linked List，只要在 Leaf Node 找到 10，接著就像看陣列一樣一路往右讀到 50 就結束了。</li></ul></div></p></div></aside><hr id="33aa15e2-9005-804e-a8a6-f80c575df199" dir="auto"/></div></details><details id="33aa15e2-9005-802d-b936-c46f46fb83fa" open="" class="toggle" dir="auto"><summary>假設一棵 B+Tree 的 inner node 大小是 16 KB，每個 routing key 佔 8 bytes，每個 child pointer 佔 6 bytes。請計算 fan-out，以及這棵樹在 4 層的情況下最多能索引多少筆 record（假設每個 leaf node 存 200 筆）。</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8046-a9ce-ffdeeae614de" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80f2-a30c-e19d9bccd0ac" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-8015-9d54-d34a207ac74f" class="" dir="auto">Fan-out 約為 1170。在 4 層的情況下，最多可索引約 3,200 億筆 Record。</p></div></p><hr id="33aa15e2-9005-8003-bb4b-f3eacc70dae3" dir="auto"/><p id="33aa15e2-9005-8058-82f0-e082c801f29a" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-80ca-809a-e73fde2d8693" class="" dir="auto">Node Capacity Formula, Exponential Growth。</p></div></p><hr id="33aa15e2-9005-8066-8963-ff617028c1bf" dir="auto"/><p id="33aa15e2-9005-801a-9713-e66df1725fa1" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-80f0-908f-d8f90b8e8d7b" class="" dir="auto"><strong>計算 Fan-out (F)</strong>：<div class="indented"><p id="33da15e2-9005-80d1-924f-d246c5f0a53d" class="" dir="auto">一個有 F 個子節點的 Inner Node，會有 F 個 Pointer 與 F-1 個 Key。<br/><span data-notion-inline-equation="16 \text{ KB} = 16384 \text{ bytes}" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">16</span><span class="mord text"><span class="mord"> KB</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord">16384</span><span class="mord text"><span class="mord"> bytes</span></span></span></span></span></span>。<br/><span data-notion-inline-equation="(F \times 6) + ((F-1) \times 8) \le 16384" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.13889em;">F</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">6</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">((</span><span class="mord mathnormal" style="margin-right:0.13889em;">F</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">8</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">16384</span></span></span></span></span><br/><span data-notion-inline-equation="6F + 8F - 8 \le 16384 \Rightarrow 14F \le 16392 \Rightarrow F \approx 1170.85" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord">6</span><span class="mord mathnormal" style="margin-right:0.13889em;">F</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord">8</span><span class="mord mathnormal" style="margin-right:0.13889em;">F</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7804em;vertical-align:-0.136em;"></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">16384</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⇒</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8193em;vertical-align:-0.136em;"></span><span class="mord">14</span><span class="mord mathnormal" style="margin-right:0.13889em;">F</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">16392</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⇒</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">F</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1170.85</span></span></span></span></span>。<br/>因此最大 Fan-out 為 <strong>1170</strong>。</p></div></p><p id="33da15e2-9005-80a9-ab2e-c4dbc97ef87b" class="" dir="auto"><strong>計算 4 層的最大資料量</strong>：<div class="indented"><p id="33da15e2-9005-8041-a34b-d26e805b31a1" class="" dir="auto">第 1 層 (Root)：1 個 Node<br/>第 2 層：1170 個 Node<br/>第 3 層：<span data-notion-inline-equation="1170^2 = 1,368,900" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">117</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">368</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">900</span></span></span></span></span> 個 Node<br/>第 4 層 (Leaf)：<span data-notion-inline-equation="1170^3 \approx 1,601,613,000" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">117</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">601</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">613</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">000</span></span></span></span></span> 個 Node<br/>總容量 = 葉節點數量 * 每頁筆數 =<span data-notion-inline-equation="1,601,613,000 \times 200 \approx \textbf{320,322,600,000 筆}" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">601</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">613</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">000</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">200</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8805em;vertical-align:-0.1944em;"></span><span class="mord text"><span class="mord textbf">320,322,600,000 </span><span class="mord textbf cjk_fallback">筆</span></span></span></span></span></span>（約 3200 億筆）。</p></div></p><p id="33da15e2-9005-8039-99a4-d9a6acc1a106" class="" dir="auto">這展現了 B+Tree 驚人的擴展力。</p></div></p></div></aside><hr id="33aa15e2-9005-80f1-8aa9-eaf331eda389" dir="auto"/></div></details><details id="33aa15e2-9005-80fa-9aa3-d018e477b3e5" open="" class="toggle" dir="auto"><summary>假設有一張 table 的 primary key 是 <code>VARCHAR(100)</code> 的 email 地址，平均長度 25 bytes。如果沒有 prefix truncation，一個 8 KB inner node 的 fan-out 大約是多少？如果 prefix truncation 能把平均 routing key 長度壓到 5 bytes，fan-out 又會變多少？這對樹高有什麼影響？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-801c-836a-f850773b5798" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80d5-85b9-c408e6a9e570" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-8013-a02e-dc67e6413e31" class="" dir="auto">假設 Pointer 為 6 bytes，無截斷時 Fan-out 約 264；截斷到 5 bytes 時 Fan-out 躍升至 744。這能顯著降低樹高並減少 I/O。</p></div></p><hr id="33aa15e2-9005-8080-9436-e0402da7c5dd" dir="auto"/><p id="33aa15e2-9005-8087-b002-d55995f7f93e" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-805e-aedd-d12679b83be2" class="" dir="auto">Key Size Impact, I/O Cost Reduction</p></div></p><hr id="33aa15e2-9005-8016-bf6f-d73955e3d7f3" dir="auto"/><p id="33aa15e2-9005-8058-b847-ccce89961ec8" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-8035-9c07-ffc75bb1fa51" class="" dir="auto">我們假設 8 KB Page 的可用空間約為 8192 bytes，且 Pointer 為 6 bytes。</p><p id="33da15e2-9005-80ab-9e0b-eebcd8ae7eca" class="" dir="auto"><strong>無截斷 (平均 25 bytes)</strong>：<div class="indented"><p id="33da15e2-9005-80ca-8a8c-f1a2575cb697" class="" dir="auto">每組 (Key + Pointer) 約佔 31 bytes。<br/><span data-notion-inline-equation="8192 / 31 \approx \textbf{264}" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">8192/31</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord text"><span class="mord textbf">264</span></span></span></span></span></span></p></div></p><p id="33da15e2-9005-8052-af81-d0d98e206d33" class="" dir="auto"><strong>有截斷 (壓縮至 5 bytes)</strong>：<div class="indented"><p id="33da15e2-9005-80c3-942f-f64849664d82" class="" dir="auto">每組 (Key + Pointer) 約佔 11 bytes。<br/><span data-notion-inline-equation="8192 / 11 \approx \textbf{744}" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">8192/11</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord text"><span class="mord textbf">744</span></span></span></span></span></span>。</p></div></p><p id="33da15e2-9005-8056-9e04-c94146fb2caa" class="" dir="auto"><strong>對樹高的影響</strong>：<div class="indented"><p id="33da15e2-9005-800d-a14a-e7f0b2b3e02f" class="" dir="auto">假設有一張 1 億筆資料的表。<br/>Fan-out 264 時：<span data-notion-inline-equation="264^3 \approx 1800 萬" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">26</span><span class="mord"><span class="mord">4</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">1800</span><span class="mord cjk_fallback">萬</span></span></span></span></span>，三層裝不下，需要 <strong>4 層</strong>。<br/>Fan-out 744 時：<span data-notion-inline-equation="744^3 \approx 4.1 億" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">74</span><span class="mord"><span class="mord">4</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">4.1</span><span class="mord cjk_fallback">億</span></span></span></span></span>，只需要 <strong>3 層</strong>就綽綽有餘。<br/>從 4 層降為 3 層，代表每一次的資料查詢都<strong>硬生生省下了一次 Random Disk I/O</strong>，在極端高併發的資料庫環境中，這是巨大的效能躍升。</p></div></p></div></p></div></aside><hr id="33aa15e2-9005-80bb-91ad-d579287ba81f" dir="auto"/></div></details></div></details><details id="33aa15e2-9005-80cd-8185-e1634ce03168" open="" class="toggle" dir="auto"><summary><mark class="highlight-red" data-notion-highlight="red"><strong>Quiz Pool</strong></mark></summary><div class="indented"><ol type="1" id="33aa15e2-9005-806c-bb2d-cad9b14ae2da" class="numbered-list" start="1" dir="auto"><li>你正在設計一個以 B+Tree 作為索引結構的資料庫系統。雖然理想上希望樹的高度越低越好， 但實務上每個 node 的大小通常不會超過一個 page（例如 4 KB 或 8 KB）。<p id="33aa15e2-9005-80f7-be0b-f42712b0813e" class="" dir="auto">在以下四種解釋中，請判斷哪一個最合理說明為何 B+Tree 的 node 大小通常會限制在單一 page 內。</p><blockquote id="33aa15e2-9005-8091-8bef-d38da33bbd69" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80da-b954-cb01e9230335" class="numbered-list" start="1" dir="auto"><li>若一個 node 剛好對齊並完整放入單一 page，則每次存取 node 只需一次 page I/O，避免跨 page 存取帶來額外的 I/O 成本與複雜性。</li></ol><ol type="1" id="33aa15e2-9005-80c9-86e8-d2a5d15190d8" class="numbered-list" start="2" dir="auto"><li>node 大小限制在單一 page 是因為作業系統不允許一次 I/O 讀取超過一個 page 的資料。</li></ol><ol type="1" id="33aa15e2-9005-80ac-90d5-dcb3ca655174" class="numbered-list" start="3" dir="auto"><li>將 node 限制在單一 page 可確保每個 node 的 fan-out 固定，避免樹高隨資料量增加而不穩定。</li></ol><ol type="1" id="33aa15e2-9005-8009-8c5b-fda71720b375" class="numbered-list" start="4" dir="auto"><li>node 應該盡量大（例如 1 MB），因為子節點數量越多樹越矮，disk I/O 次數越少，整體查詢一定更快。</li></ol></blockquote><details id="33aa15e2-9005-809d-b9c3-f838c2dd169b" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-801a-8f4f-f06528f1a2a1" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8062-9a98-ce8c2bd3c5ba" class="" dir="auto">若一個 node 剛好對齊並完整放入單一 page，則每次存取 node 只需一次 page I/O，避免跨 page 存取帶來額外的 I/O 成本與複雜性。</p><hr id="33aa15e2-9005-8042-abe2-d8988932b1ea" dir="auto"/><p id="33aa15e2-9005-808c-b1f8-faa98e6c5980" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8002-9633-fac8cf97ae86" class="" dir="auto">將 node 限制在單一 page 內，可以確保一次 I/O 就能完整讀取該 node。 若 node 跨越多個 page，則每次存取可能需要多次 I/O，反而增加延遲， 抵銷降低樹高所帶來的效益，因此實務上會將 node size 控制在一個 page 內。</p></div></p><hr id="33da15e2-9005-8012-971f-f53e9ec0c012" dir="auto"/><p id="33da15e2-9005-80cf-b533-d5ecc94bdfa3" class="" dir="auto">(2) 作業系統並未限制單次 I/O 必須小於一個 page，實務上可以一次讀取多個 page。 node size 限制主要是為了降低 I/O 次數與跨 page 存取的複雜性，而不是作業系統限制。</p><p id="33da15e2-9005-809d-bdcc-df590ac25fb5" class="" dir="auto">(3) 每個 node 的 fan-out 會隨 node size 改變，但限制 node 在 page 內並不能固定樹高。 樹高會隨資料量增加而自然增加，此說法誤將 I/O 考量誤解為樹高控制原因，因此不正確。</p><p id="33da15e2-9005-80eb-b61e-c0f536cde827" class="" dir="auto">(4) 雖然增大 node 可以提高子節點數量、降低樹高，但若 node 超過 page，存取單個 node 時會涉及多次 I/O， disk I/O 次數可能反而變多，因此過大的 node 反而可能降低查詢效能。 另外，資料庫寫入通常以 page 為單位，node 越大代表即使只修改少量資料，也可能需要重寫整個 node， 增加寫入成本。因此實務上會將 node size 限制在一個 page 內，以平衡查詢效能與寫入成本。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80e7-8a08-e2b5c76f7a00" dir="auto"/><ol type="1" id="33aa15e2-9005-80d7-8ab6-e888ad5f0859" class="numbered-list" start="2" dir="auto"><li>一個電商平台的訂單資料庫有 1000 萬筆資料，在 <code>order_id</code>（依訂單時間遞增的整數）上建了一棵 B+Tree（fan-out 500，樹高 3 層，上層 inner node 常駐 cache。<p id="33aa15e2-9005-805d-88d7-e8cdca008931" class="" dir="auto">以下四種查詢操作同時存在於這個系統中，選出它們在此 B+Tree 架構下能<strong>發揮的效益</strong>最高與最低的選項。</p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8012-9364-f6827cb572fa" dir="ltr"><div style="width:100%"><ul id="33aa15e2-9005-8069-aae9-e88d7b53ab19" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><em>P</em>：將某一筆被取消的訂單的 <code>order_id</code> 從 B+Tree 中刪除。</li></ul><ul id="33aa15e2-9005-803a-b060-c3c5abfaa432" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Q：客服系統查詢過去一小時的所有訂單，範圍約 100 筆。</li></ul><ul id="33aa15e2-9005-8011-86f8-d8c44d61fa09" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><em>R</em>：財務部門每月底跑一次全表報表，掃描所有 1000 萬筆訂單計算營收。</li></ul><ul id="33aa15e2-9005-8072-b33c-ceed8032502e" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><em>S</em>：反詐騙系統每秒隨機抽查數千筆分散在全域的訂單，每筆 <code>order_id</code> 都不同。</li></ul></div></aside><blockquote id="33aa15e2-9005-8020-af05-dcf0cd481523" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8079-b4e6-e4a028b1db3a" class="numbered-list" start="1" dir="auto"><li><em>P</em> 最高、<em>S</em> 最低</li></ol><ol type="1" id="33aa15e2-9005-800c-8d2f-c8c3b6af064e" class="numbered-list" start="2" dir="auto"><li><em>Q</em> 最高、<em>P</em> 最低</li></ol><ol type="1" id="33aa15e2-9005-8042-8ba9-f74e39fd75b7" class="numbered-list" start="3" dir="auto"><li><em>Q</em> 最高、R 最低</li></ol><ol type="1" id="33aa15e2-9005-80af-9c03-e53003fbd21d" class="numbered-list" start="4" dir="auto"><li><em>R</em> 最高、<em>S</em> 最低</li></ol></blockquote><details id="33aa15e2-9005-8016-9ffa-d47c851bf49f" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80a3-ac20-c6df0c1ac654" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8075-aaaf-ea4075a9e6de" class="" dir="auto">Q 最高、R 最低</p><hr id="33aa15e2-9005-808d-8207-ecc97b9ac1ba" dir="auto"/><p id="33aa15e2-9005-8058-95cf-dfc4e5545f26" class="" dir="auto">解析: <div class="indented"><ul id="0119b041-3e5a-4a10-95ea-9b8abaa63ac6" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Q：小範圍連續 range query 剛好是 B+Tree 的強項，B+Tree 先定位到起點 leaf node（上層在 cache，只需 1 次 disk I/O），再沿 linked list 掃幾個 leaf node 就結束，disk I/O 極少，效益很高。</li></ul><ul id="33da15e2-9005-8077-b572-c3563ebc54ea" class="bulleted-list" dir="auto"><li style="list-style-type:disc">R：幾乎掃過全部 1000 萬筆資料，B+Tree 定位起點的優勢完全被稀釋，和 full table scan 成本相當，index 的存在幾乎沒有幫助，反而多了 inner node traversal 的 overhead。</li></ul></div></p><hr id="33da15e2-9005-80d1-8e4d-dd086643ddcd" dir="auto"/><p id="33da15e2-9005-8095-84b8-e04cae9da48d" class="" dir="auto">(1) <div class="indented"><p id="33da15e2-9005-800b-b320-dec5642a919f" class="" dir="auto">P：B+Tree 本身有支援刪除功能，但並非其強項，效益普通。</p><p id="33da15e2-9005-8011-9468-c1b908a23b30" class="" dir="auto">S：每次 <code>order_id</code> 都不同且分散，上層 inner node 在 cache，但目標 leaf node 每次都不同，cache hit rate 極低，幾乎每次都需要 1 次 disk I/O。B+Tree 相比 BST 等結構仍然有效，但幫助不顯著（仍優於 R）。</p></div></p><p id="33da15e2-9005-80fc-bc10-ebb0e493f694" class="" dir="auto">(2) <div class="indented"><p id="33da15e2-9005-801c-ad20-fae3709020ec" class="" dir="auto">Q：小範圍連續 range query 剛好是 B+Tree 的強項，B+Tree 先定位到起點 leaf node（上層在 cache，只需 1 次 disk I/O），再沿 linked list 掃幾個 leaf node 就結束，disk I/O 極少，效益很高。</p><p id="33da15e2-9005-804b-8808-cff1b5897b23" class="" dir="auto">P：B+Tree 本身有支援刪除功能，但並非其強項，效益普通。</p></div></p><p id="33da15e2-9005-80ff-8b95-dc876ede72bd" class="" dir="auto">(4) <div class="indented"><p id="33da15e2-9005-8072-ba8e-c5e4c80ef289" class="" dir="auto">R：幾乎掃過全部 1000 萬筆資料，B+Tree 定位起點的優勢完全被稀釋，和 full table scan 成本相當，index 的存在幾乎沒有幫助，反而多了 inner node traversal 的 overhead。</p><p id="33da15e2-9005-80ca-a078-eaba06505b78" class="" dir="auto">S：每次 <code>order_id</code> 都不同且分散，上層 inner node 在 cache，但目標 leaf node 每次都不同，cache hit rate 極低，幾乎每次都需要 1 次 disk I/O。B+Tree 相比 BST 等結構仍然有效，但幫助不顯著（仍優於 R）。</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-806b-bde2-d5cdc7be59cb" dir="auto"/><ol type="1" id="33aa15e2-9005-80e9-a8bf-e498d9388b91" class="numbered-list" start="3" dir="auto"><li>在資料庫系統中， B+ tree 被廣泛用於實作索引。假設我們有一個 Fan-out 為 f、高度為 h 的 B+ tree ，關於其處理查詢時的操作邏輯與效能特點，下列哪一個敘述最準確？<blockquote id="33aa15e2-9005-800f-acc4-f619669f733c" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80c7-bebe-ccfc2fc9ffed" class="numbered-list" start="1" dir="auto"><li>如果希望優化對連續範圍資料的查詢效率，可以在 B+ tree 的各個層級（包括 internal node 與 leaf node ）都建立了水平的 doubly linked list。</li></ol><ol type="1" id="33aa15e2-9005-80e0-ba3c-fe4d1bcc7a91" class="numbered-list" start="2" dir="auto"><li>在執行 point query 時，若 internal node 已包含目標 key ，搜尋可立即在該層停止並回傳資料。</li></ol><ol type="1" id="33aa15e2-9005-8077-84f8-d13fcf942bda" class="numbered-list" start="3" dir="auto"><li>透過減少每個節點能容納的 key 的數量（即降低 f ），可以有效降低樹的高度 h ，從而減少磁碟 I/O 次數。</li></ol><ol type="1" id="33aa15e2-9005-805d-a753-f017de03c899" class="numbered-list" start="4" dir="auto"><li>所有的資料記錄僅儲存在 leaf nodes ，這使得每次查詢的路徑長度固定為 h ，提供穩定的 I/O 表現。</li></ol></blockquote><details id="33aa15e2-9005-8067-bb45-cc7840561b53" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-809c-ab0b-f625ef9600ce" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-807e-987d-ec0360a82da5" class="" dir="auto">
+</p><hr id="33aa15e2-9005-8088-b3ac-ea599eedad50" dir="auto"/><p id="33aa15e2-9005-80be-a33f-fde63c35eaa3" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-805f-ab5a-f9f5f4b7bc83" class="" dir="auto">
+</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80c4-8cb1-e00f05acd37d" dir="auto"/><ol type="1" id="33aa15e2-9005-80d0-9e26-d179dfa2651d" class="numbered-list" start="4" dir="auto"><li>已知一個資料庫共有 10 億筆資料，其系統底層採用 B+ Tree ，規格如下所示：<aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8074-8091-d2e905d4b955" dir="ltr"><div style="width:100%"><ul id="33aa15e2-9005-8007-b140-c9ed70b7ebe3" class="bulleted-list" dir="auto"><li style="list-style-type:disc">每個 inner node 大小為 8 KB</li></ul><ul id="33aa15e2-9005-808d-b59a-cc6a8917a454" class="bulleted-list" dir="auto"><li style="list-style-type:disc">每個 routing key 平均長度為 40 bytes</li></ul><ul id="33aa15e2-9005-803d-990c-f02f8fd9e744" class="bulleted-list" dir="auto"><li style="list-style-type:disc">每個 child pointer 佔 6 bytes</li></ul><ul id="33aa15e2-9005-80f4-9458-cb6e8cf81a0f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">每個 leaf node 可存 100 筆資料</li></ul></div></aside><p id="33aa15e2-9005-80c4-9789-d646e5c8b742" class="" dir="auto">若改用 prefix truncation 後，平均 routing key 長度從 40 bytes 壓縮到 5 bytes，fan-out 和樹高會如何變化？</p><blockquote id="33aa15e2-9005-8051-aa5e-ff4d2f09da0a" class="" dir="auto"><ol type="1" id="33aa15e2-9005-808b-b22a-c21f8ca31b95" class="numbered-list" start="1" dir="auto"><li>Fan-out 從 178 變成 744，樹高則從 5 層降至 4 層。</li></ol><ol type="1" id="33da15e2-9005-8099-acf3-d563a84cc8fc" class="numbered-list" start="2" dir="auto"><li>Fan-out 從 178 變成 744，但樹高不會改變。</li></ol><ol type="1" id="33da15e2-9005-8076-94ca-c532ee38e6cd" class="numbered-list" start="3" dir="auto"><li>Fan-out 從 204 變成 744，樹高則從 5 層降至 4 層。</li></ol><ol type="1" id="33da15e2-9005-800d-b783-fcdfdd148afe" class="numbered-list" start="4" dir="auto"><li>Prefix truncation 只對查詢一段連續範圍的資料 (range query) 有幫助，對 fan-out 沒有影響。</li></ol></blockquote><details id="33aa15e2-9005-800a-9124-d2f6dc6ad0cf" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-806f-83bc-e98b7673530a" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8051-8223-c5f66171905c" class="" dir="auto">
+</p><hr id="33aa15e2-9005-80e3-817d-e5012d03b0a3" dir="auto"/><p id="33aa15e2-9005-803a-91d1-d86ae2c95cc1" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-80ab-99b4-c7123c3d24ea" class="" dir="auto">
+</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8081-8348-fcd18f26238d" dir="auto"/><ol type="1" id="33aa15e2-9005-80a2-a11d-df0e91fc948f" class="numbered-list" start="5" dir="auto"><li>在分析 B+Tree 的搜尋效能時，我們通常會將焦點放在節點存取的 disk I/O 次數（亦即樹的高度），<br/>而大多會忽略在 inner node 中對數百個 routing key 執行 binary search 所帶來的 CPU 運算成本。<br/>導致這個現象最主要的架構與硬體原因是什麼？<blockquote id="33aa15e2-9005-806b-b611-e4abdba52ade" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8035-8f78-d71445b12abb" class="numbered-list" start="1" dir="auto"><li>內部節點中的 routing key 會透過資料庫引擎內建的 hash table 進行 O(1) 的直接定址，實際上引擎在 inner node 根本不需要執行 binary search。</li></ol><ol type="1" id="33da15e2-9005-8080-8514-f2a2554c7916" class="numbered-list" start="2" dir="auto"><li>prefix truncation 技術將 key 壓縮得極小，使得單一 inner node 的資料量可以直接載入 CPU 的 L1 快取，將 binary search 的 time complexity 降為零。</li></ol><ol type="1" id="33da15e2-9005-8038-84da-e9a8fac1f6c7" class="numbered-list" start="3" dir="auto"><li>CPU 在記憶體內執行運算的速度遠快於存取 disk 的延遲，兩者的時間成本差距高達數個數量級，因此減少 disk I/O 次數的效益遠大於節省記憶體內的搜尋計算。</li></ol><ol type="1" id="33da15e2-9005-8086-a2d0-cd3c3b5e2387" class="numbered-list" start="4" dir="auto"><li>資料庫引擎在遍歷 B+Tree 時，會以 asynchronous 的背景執行緒處理 inner node 的 binary search，藉此將 CPU 的延遲完全隱藏在前景的網路傳輸中。</li></ol></blockquote><details id="33aa15e2-9005-8086-9747-ee18eef382ff" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-802a-b310-db3344cc4878" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-806e-830e-c39dfa8e41b6" class="" dir="auto">
+</p><hr id="33aa15e2-9005-80d8-ac38-e2b27558ceaf" dir="auto"/><p id="33aa15e2-9005-8071-9826-e4ff31086ace" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-80ad-aeb7-fce6a2171245" class="" dir="auto">
+</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80c9-8c5d-c06e39bc5f58" dir="auto"/><ol type="1" id="33aa15e2-9005-8047-9435-c32eb3eb14b5" class="numbered-list" start="6" dir="auto"><li>某資料庫使用 B+Tree 作為 secondary index。leaf node 的 entry 儲存 <code>(key, CTID)</code>，<br/>其中 CTID 指向 heap file 中某個 slotted page 的 tuple 位置。<p id="33da15e2-9005-800d-9780-c8bd9b7ccf8d" class="" dir="auto">系統在同一個 page 內做 compaction，將 record 的實體 byte 位置重新排列，<br/>但沒有改變 slot array 的順序。完成後，查詢結果仍正確，且不需要回寫整棵 B+Tree。</p><p id="33da15e2-9005-80b5-ae2d-e106cd9af311" class="" dir="auto">下列哪個解釋最正確？</p><blockquote id="33aa15e2-9005-8054-aeaa-ef7d421bc5aa" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8023-8d91-e4db81dc9d70" class="numbered-list" start="1" dir="auto"><li>因為 CTID 直接記錄 record 的 byte offset，compaction 後 offset 會自動被 CPU cache 修正，所以索引不需更新。</li></ol><ol type="1" id="33da15e2-9005-80fe-b344-d73a0c1e9ca5" class="numbered-list" start="2" dir="auto"><li>因為 B+Tree leaf node 彼此有 linked list，compaction 後只要沿 linked list 重新掃描一次，就能修正所有 CTID。</li></ol><ol type="1" id="33da15e2-9005-8038-86ff-c3e381f877f4" class="numbered-list" start="3" dir="auto"><li>因為 prefix truncation 會在 inner node 壓縮 routing key，所以 page 內 tuple 搬移不會影響 leaf entry。</li></ol><ol type="1" id="33da15e2-9005-8048-9f2b-c7ccb0eba26d" class="numbered-list" start="4" dir="auto"><li>因為 CTID 可視為 <code>(page_id, slot_id)</code> 的穩定位址，compaction 時只需更新 slot array 中 slot 對應的 byte offset；只要 slot identity 不變，leaf 裡的 CTID 仍有效。</li></ol></blockquote><details id="33aa15e2-9005-8019-a3e4-e2e6bcaca66b" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8092-b672-e1ab42968057" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8056-bcdd-dcd0252db491" class="" dir="auto">
+</p><hr id="33aa15e2-9005-80a7-8f19-da7c908dc5c8" dir="auto"/><p id="33aa15e2-9005-80b4-be33-f74295be69b3" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-806f-8565-f63f4983477d" class="" dir="auto">
+</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80ec-a2e2-c17f99a545d1" dir="auto"/><ol type="1" id="33aa15e2-9005-806e-8afc-ee5909247e59" class="numbered-list" start="7" dir="auto"><li>BST、B-Tree、B+Tree 三種樹狀結構都可以作為 external data structure。<br/>請問 B+Tree 在處理 range query（如 WHERE order_id BETWEEN 100 AND 500）時，相較於 BST 與 B-Tree 能展現更高效率的主要原因為何？<blockquote id="33aa15e2-9005-80e9-827f-cf6031be59bb" class="" dir="auto"><ol type="1" id="33aa15e2-9005-800f-b7fb-fe15942a310f" class="numbered-list" start="1" dir="auto"><li>B+Tree 的葉節點儲存的是資料在 page 內的直接 byte offset，這使得資料在 page 內部搬移後不需更新索引，提升了更新效能。</li></ol><ol type="1" id="33da15e2-9005-8082-967c-de232f28e16a" class="numbered-list" start="2" dir="auto"><li>B+Tree 的內部節點（inner node）不存放實際資料，僅存放 routing key，這能極大化 fan-out 並降低樹高，且葉節點間的 doubly linked list 支援高效的連續掃描。</li></ol><ol type="1" id="33da15e2-9005-8031-8087-fa1ca772e16c" class="numbered-list" start="3" dir="auto"><li>B+Tree 採用了與 B-Tree 相同的設計，讓內部節點也能儲存部分實際資料，以此減少查詢特定資料時必須走到葉節點的延遲。</li></ol><ol type="1" id="33da15e2-9005-80d3-b84b-c5b2c2e47b5d" class="numbered-list" start="4" dir="auto"><li>B+Tree 引入了 Prefix Truncation 技術，雖然會導致內部節點能塞入的路由鍵數量減少，但能確保查詢路徑始終保持在 1 次真正的 disk I/O。</li></ol></blockquote><details id="33aa15e2-9005-800b-a44d-dc9bba961fac" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80c8-bc94-f39f45ab0af9" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80e6-ad05-dc8899fe55d5" class="" dir="auto">
+</p><hr id="33aa15e2-9005-8051-9e03-f77567af7a80" dir="auto"/><p id="33aa15e2-9005-8006-833f-ef7d33fb9e74" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-808a-88f8-cbb493d4f6e5" class="" dir="auto">
+</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80ab-8427-dae2dd766d4a" dir="auto"/><ol type="1" id="33aa15e2-9005-8003-af7f-f5c74d50e5e8" class="numbered-list" start="8" dir="auto"><li>假設你正在為一家擁有 10 億（<span data-notion-inline-equation="10^9" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">9</span></span></span></span></span></span></span></span></span></span></span></span>）名用戶的社交平台設計資料庫索引。所有資料都儲存在硬碟中，且磁碟每讀取一個 Page 需要 10 ms。<br/>請問在這種極端情境下，應該選擇 B+ Tree 還是 BST？以及較快者跟較慢者的時間差異大約是多少？<aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8044-bf1e-fb80d56b294c" dir="ltr"><div style="width:100%"><ul id="33da15e2-9005-8090-b02f-e286a6197460" class="bulleted-list" dir="auto"><li style="list-style-type:disc">每個 page 大小為 8 KB</li></ul><ul id="33da15e2-9005-80fe-b664-dabb44276a5e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">每個 inner node 大小為 8 KB</li></ul><ul id="33da15e2-9005-80a5-a379-ef2c56d5bad5" class="bulleted-list" dir="auto"><li style="list-style-type:disc">每個 routing key 平均長度為 40 bytes</li></ul><ul id="33da15e2-9005-8062-80e4-e518a46b8acc" class="bulleted-list" dir="auto"><li style="list-style-type:disc">每個 child pointer 佔 6 bytes</li></ul><ul id="33da15e2-9005-807c-9520-e54c3ee4b6cc" class="bulleted-list" dir="auto"><li style="list-style-type:disc">每個 leaf node 可存 100 筆資料</li></ul></div></aside><p id="33da15e2-9005-80b6-88e0-cc7a9310d6de" class="" dir="auto">註 : 每個 inner node 的 fan-out 是 <span data-notion-inline-equation="\lfloor {8192 \over (40 + 6)} \rfloor = 178" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.3651em;vertical-align:-0.52em;"></span><span class="mopen">⌊</span><span class="mord"><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mord mtight">40</span><span class="mbin mtight">+</span><span class="mord mtight">6</span><span class="mclose mtight">)</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">8192</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.52em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span><span class="mclose">⌋</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">178</span></span></span></span></span>。</p><blockquote id="33aa15e2-9005-80d1-9a1f-f7876f9f9b1d" class="" dir="auto"><ol type="1" id="33aa15e2-9005-800b-9a50-d897a90f5048" class="numbered-list" start="1" dir="auto"><li>BST 的搜尋次數為 30 次 I/O，而 B+ Tree 的搜尋次數為 5 次 I/O，因此 B+ Tree 較快，時間差異約為 250 ms。</li></ol><ol type="1" id="33da15e2-9005-80d5-a823-cc3d4f78dc99" class="numbered-list" start="2" dir="auto"><li>BST 的搜尋次數為 30 次 I/O，而 B+ Tree 的搜尋次數為 4 次 I/O，因此 B+ Tree 較快，時間差異約為 260 ms。</li></ol><ol type="1" id="33da15e2-9005-800c-86c3-efedc7228794" class="numbered-list" start="3" dir="auto"><li>BST 的搜尋次數為 24 次 I/O，而 B+ Tree 的搜尋次數為 5 次 I/O，因此 B+ Tree 較快，時間差異約為 190 ms</li></ol><ol type="1" id="33da15e2-9005-802e-8203-c90e97f0d673" class="numbered-list" start="4" dir="auto"><li>BST 的搜尋次數為 30 次 I/O，而 B+ Tree 的搜尋次數為 25 次 I/O，因此 B+ Tree 較快，時間差異約為 50 ms。</li></ol></blockquote><details id="33aa15e2-9005-803e-aeae-caabbcd11ec8" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80b9-80d5-d35069b82d2a" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80bb-8d5f-dab2902096ef" class="" dir="auto">
+</p><hr id="33aa15e2-9005-8021-abda-e24c7f588343" dir="auto"/><p id="33aa15e2-9005-8064-b189-e6aabe6b66eb" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8098-9dd9-f5c7c8da5819" class="" dir="auto">
+</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8074-9d42-f1c85ed0589f" dir="auto"/><ol type="1" id="33aa15e2-9005-8051-b457-e1b8a14739a9" class="numbered-list" start="9" dir="auto"><li>假設我們要從一億 (<span data-notion-inline-equation="10^8" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">8</span></span></span></span></span></span></span></span></span></span></span></span>) 筆資料中搜尋特定資料。現有兩個 B+Tree 方案：<br/>已知條件:<aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-80c3-8d42-eaf3fbc104b3" dir="ltr"><div style="width:100%"><ul id="33da15e2-9005-80db-9b43-cef87d53ac4f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">每個 leaf node 可存 100 筆資料</li></ul><ul id="33da15e2-9005-80e4-8c4b-c00ac411c148" class="bulleted-list" dir="auto"><li style="list-style-type:disc">每次 I/O 需 10 ms</li></ul><ul id="33da15e2-9005-807b-8716-dfe131170bf5" class="bulleted-list" dir="auto"><li style="list-style-type:disc">節點內部二元搜尋每步需 1 us</li></ul></div></aside><p id="33da15e2-9005-8018-821f-f98fe8f01bb4" class="" dir="auto">現有兩種不同的方案:</p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-801d-a99c-c8b53a12c941" dir="ltr"><div style="width:100%"><ul id="33da15e2-9005-8037-b739-cdbcc441ca45" class="bulleted-list" dir="auto"><li style="list-style-type:disc">方案甲：Fan-out  M=10</li></ul><ul id="33da15e2-9005-8062-8788-c0bc76b5c41a" class="bulleted-list" dir="auto"><li style="list-style-type:disc">方案乙：Fan-out  M=1000</li></ul></div></aside><p id="33da15e2-9005-8053-b166-e36d66d82ecc" class="" dir="auto">請問哪一個方案的「總搜尋時間」較短，其主要原因為何？</p><blockquote id="33aa15e2-9005-809e-b5cb-fa1be1b33973" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8055-a0fd-dc427a59d735" class="numbered-list" start="1" dir="auto"><li>方案乙較短，主導原因是 I/O 次數大幅下降。</li></ol><ol type="1" id="33da15e2-9005-80da-8b97-c83c8eb45366" class="numbered-list" start="2" dir="auto"><li>方案甲較短，主因是二元搜尋所需要的時間較短</li></ol><ol type="1" id="33da15e2-9005-8060-91b6-c0fc8368659b" class="numbered-list" start="3" dir="auto"><li>兩者所需要的時間相近，因為 I/O 次數與二元搜尋時間的變化剛好抵銷。</li></ol><ol type="1" id="33da15e2-9005-80c9-b283-e62d61e477fc" class="numbered-list" start="4" dir="auto"><li>兩者所需要的時間相近，因為資料量相同，對搜尋時間的影響相同。</li></ol></blockquote><details id="33aa15e2-9005-809f-95ea-da8e93d7df62" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80e6-925b-dc5e95a51df2" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-800f-8c23-c1b51913f070" class="" dir="auto">
+</p><hr id="33aa15e2-9005-8036-b2aa-d037b2a0a50c" dir="auto"/><p id="33aa15e2-9005-8088-b819-d237c91c84e2" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-801f-b089-f1d0e26eb0e9" class="" dir="auto">
+</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80cb-bc4d-cfed25cdff8b" dir="auto"/><ol type="1" id="33aa15e2-9005-8024-84e9-f12183049d7b" class="numbered-list numbered-list-digits-2" start="10" dir="auto"><li>在某大型購物資料庫中，為了讓使用者按下「查看訂單」時能立即獲得結果，系統採用了 B+Tree 索引。<br/>對於 B+Tree 物理結構與磁碟 I/O 的分析，下列哪一個敘述最正確？<blockquote id="33aa15e2-9005-8083-a7e7-d08f4d59ffe3" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80f7-b532-f39062333380" class="numbered-list" start="1" dir="auto"><li>在 inner node 執行 prefix truncation，主因是為了讓單個 page 塞入更多 entry，進而降低樹的高度並減少磁碟讀取次數。</li></ol><ol type="1" id="33da15e2-9005-8038-9e26-f437a4e8514e" class="numbered-list" start="2" dir="auto"><li>B+Tree 的 leaf node 之間使用 doubly linked list 串接，其主要目的是為了加快點查詢（point lookup）的速度，避免每次都必須從 root 節點開始搜尋。</li></ol><ol type="1" id="33da15e2-9005-8004-88b5-dcd793094853" class="numbered-list" start="3" dir="auto"><li>為了提升讀取效能，B+Tree 刻意讓 inner node 也儲存部分 data record，這樣在搜尋時就有機會在中間層直接命中，而不必一路走到 leaf node。</li></ol><ol type="1" id="33da15e2-9005-80e6-b6c5-dbcaee67574b" class="numbered-list" start="4" dir="auto"><li>對於 write-heavy 的 workload，增加 B+Tree 的 leaf node 的大小可以顯著地提升系統效能，降低延遲。</li></ol></blockquote><details id="33aa15e2-9005-80fc-ae16-f060d15f520c" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-803d-8465-d109e78dcb9e" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8092-988c-d185a1835e8e" class="" dir="auto">
+</p><hr id="33aa15e2-9005-8035-bedb-e49216944181" dir="auto"/><p id="33aa15e2-9005-80dd-aad1-c65909160ba8" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8075-a5a3-da732d6e0705" class="" dir="auto">
+</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80c7-897d-e33aa768cb3d" dir="auto"/><ol type="1" id="33aa15e2-9005-80f8-871d-faf92925d167" class="numbered-list numbered-list-digits-2" start="11" dir="auto"><li>B+Tree 的每個 Node 大小通常設計成等於一個 disk page（常見 4 KB 或 8 KB），為什麼不將 Node Size 預設為 1 MB 或更大以換取極大的 Fan-out？<blockquote id="33aa15e2-9005-8045-9e4d-c1e763cc75c7" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80dc-93a5-de6d1adb9107" class="numbered-list" start="1" dir="auto"><li>因為要避免寫入放大和提高快取命中率</li></ol><ol type="1" id="33da15e2-9005-80c6-9f19-c14936b45cbd" class="numbered-list" start="2" dir="auto"><li>因為 Node 越大， disk I/O 次數也會越多</li></ol><ol type="1" id="33da15e2-9005-806a-852f-fc27b29d1003" class="numbered-list" start="3" dir="auto"><li>因為 B+Tree 的 leaf node 以 linked list 串接，node 越大會增加跨節點讀取的次數</li></ol><ol type="1" id="33da15e2-9005-805c-a8d4-cdc80d41fe56" class="numbered-list" start="4" dir="auto"><li>因為更大的 node 會增加樹高</li></ol></blockquote><details id="33aa15e2-9005-805d-a25f-e188a741157b" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8049-a490-e9335bf87445" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80dc-9c32-e7fc4027ad72" class="" dir="auto">
+</p><hr id="33aa15e2-9005-800d-a923-fc6b19ad83bf" dir="auto"/><p id="33aa15e2-9005-80c6-bbb7-fab843be7c1c" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8015-9241-cc2492fcbfd6" class="" dir="auto">
+</p></div></p></div></aside></div></details></li></ol><hr id="33da15e2-9005-8049-9619-f2327532cbee" dir="auto"/><ol type="1" id="33da15e2-9005-8069-ac20-ecb4ed4dc8d6" class="numbered-list numbered-list-digits-2" start="12" dir="auto"><li>當你要執行一個範圍查詢，例如 WHERE order_id BETWEEN 100 AND 500 時，<br/>如果 B+Tree 共三層且 leaf node 之間沒有用 doubly linked list 串接，查詢過程會如何？<br/>相較之下，有 linked list 的設計帶來什麼最明顯的優勢？<blockquote id="33da15e2-9005-802f-8590-fce097736062" class="" dir="auto"><ol type="1" id="33da15e2-9005-8062-b667-c496e27c037c" class="numbered-list" start="1" dir="auto"><li>沒有 linked list 時仍可快速完成，因為 B+Tree 樹高只有 3 層</li></ol><ol type="1" id="33da15e2-9005-80dd-ab6b-d0dd31b1d6c4" class="numbered-list" start="2" dir="auto"><li>沒有 linked list 時必須反覆回到上層 inner node 判斷該走哪個 child，導致大量額外 disk I/O；有 linked list 則可從起始 leaf node 開始進行簡單的 sequential scan</li></ol><ol type="1" id="33da15e2-9005-8060-af10-e151ebcb1ccf" class="numbered-list" start="3" dir="auto"><li>沒有 linked list 時範圍查詢會自動使用 prefix truncation 來提高 fan-out</li></ol><ol type="1" id="33da15e2-9005-8049-9de3-cc1db9643e07" class="numbered-list" start="4" dir="auto"><li>沒有 linked list 時查詢只需 1 次 disk I/O，因為 root node 永遠在記憶體中</li></ol></blockquote><details id="33da15e2-9005-80a4-b60a-cea570d0a421" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8032-948d-f5df273a95c8" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-804b-9f78-f41f4fcf4e7b" class="" dir="auto">
+</p><hr id="33da15e2-9005-80eb-9b92-c7f2d120ba16" dir="auto"/><p id="33da15e2-9005-80af-a8da-c9fe652595d0" class="" dir="auto">解析: <div class="indented"><p id="33da15e2-9005-8005-843f-e49c5e1cd216" class="" dir="auto">
+</p></div></p></div></aside></div></details></li></ol></div></details></div></details></div></div><hr id="33aa15e2-9005-8024-9ffe-cea6202c0bf1" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8089-8ad9-fec159463ad4" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8099-a3c8-df328e9f1305" class="" dir="auto">
+</p></div></aside></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

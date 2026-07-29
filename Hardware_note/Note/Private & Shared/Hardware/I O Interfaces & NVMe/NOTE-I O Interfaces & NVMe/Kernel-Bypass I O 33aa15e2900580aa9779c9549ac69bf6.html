@@ -1,0 +1,770 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Kernel-Bypass I/O</title><meta name="data-notion-page-icon" content="🔧"/><link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2290%22%3E%F0%9F%94%A7%3C%2Ftext%3E%3C%2Fsvg%3E"/><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+/* Override strong tags inside headings to maintain consistent weight */
+h1 strong,
+h2 strong,
+h3 strong {
+	font-weight: 600;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 10px;
+	padding: 1rem;
+}
+
+/* For default-background callouts, render the border outline. */
+.callout.block-color-default_background {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+figure,
+aside,
+details {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+
+	table.collection-content {
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	table.collection-content th,
+	table.collection-content td {
+		overflow-wrap: anywhere;
+	}
+
+	table.collection-content td > .user,
+	table.collection-content td > time {
+		white-space: pre-wrap;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content-wrapper {
+	overflow-x: auto;
+}
+
+@media only print {
+	.collection-content-wrapper {
+		overflow-x: visible;
+	}
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.collection-content td {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.column-list {
+	display: flex;
+	gap: 46px;
+}
+
+.column {
+	min-width: 0;
+	overflow: hidden;
+}
+
+.column > *:first-child {
+	margin-top: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding-inline: 0.125rem;
+	padding-block: 0.375rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+table {
+	border-collapse: collapse;
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol.numbered-list.numbered-list-digits-2 {
+	padding-inline-start: 2em;
+}
+
+ol.numbered-list.numbered-list-digits-3plus {
+	padding-inline-start: 2.4em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+/*
+ * Render emoji icons using a ::before pseudo-element to keep the glyph
+ * out of the DOM textContent traversal. This avoids double-rendering icons
+ * in callouts and page titles.
+ * NOTE(slim/html-export-pseudo-icons): I can't tagref this because it will
+ * flag as a duplicate tag after codegen.
+ */
+.icon[data-emoji]::before {
+	content: attr(data-emoji);
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.callout img.notion-static-icon {
+	width: 1em;
+	height: 1em;
+}
+
+.callout p {
+	margin: 0;
+}
+
+.callout h1,
+.callout h2,
+.callout h3 {
+	margin: 0 0 0.6rem;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	margin-right: 0.4em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+blockquote.quote-large {
+	font-size: 1.25em;
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.tab {
+	margin: 1.25em 0;
+	padding-inline: 1rem;
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.highlight-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.highlight-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.highlight-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.highlight-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.highlight-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.highlight-default_background {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray_background {
+	background: rgba(42, 28, 0, 0.07);
+}
+.highlight-brown_background {
+	background: rgba(139, 46, 0, 0.086);
+}
+.highlight-orange_background {
+	background: rgba(224, 101, 1, 0.129);
+}
+.highlight-yellow_background {
+	background: rgba(211, 168, 0, 0.137);
+}
+.highlight-teal_background {
+	background: rgba(0, 100, 45, 0.09);
+}
+.highlight-blue_background {
+	background: rgba(0, 124, 215, 0.094);
+}
+.highlight-purple_background {
+	background: rgba(102, 0, 178, 0.078);
+}
+.highlight-pink_background {
+	background: rgba(197, 0, 93, 0.086);
+}
+.highlight-red_background {
+	background: rgba(223, 22, 0, 0.094);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.block-color-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.block-color-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.block-color-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.block-color-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.block-color-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(240, 239, 237, 1);
+}
+.block-color-brown_background {
+	background: rgba(245, 237, 233, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 235, 222, 1);
+}
+.block-color-yellow_background {
+	background: rgba(249, 243, 220, 1);
+}
+.block-color-teal_background {
+	background: rgba(232, 241, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(229, 242, 252, 1);
+}
+.block-color-purple_background {
+	background: rgba(243, 235, 249, 1);
+}
+.block-color-pink_background {
+	background: rgba(250, 233, 241, 1);
+}
+.block-color-red_background {
+	background: rgba(252, 233, 231, 1);
+}
+.select-value-color-default { background-color: rgba(42, 28, 0, 0.07); }
+.select-value-color-gray { background-color: rgba(28, 19, 1, 0.11); }
+.select-value-color-brown { background-color: rgba(127, 51, 0, 0.156); }
+.select-value-color-orange { background-color: rgba(196, 88, 0, 0.203); }
+.select-value-color-yellow { background-color: rgba(209, 156, 0, 0.282); }
+.select-value-color-green { background-color: rgba(0, 96, 38, 0.156); }
+.select-value-color-blue { background-color: rgba(0, 118, 217, 0.203); }
+.select-value-color-purple { background-color: rgba(92, 0, 163, 0.141); }
+.select-value-color-pink { background-color: rgba(183, 0, 78, 0.152); }
+.select-value-color-red { background-color: rgba(206, 24, 0, 0.164); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style><style>@import url('https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex-swap.min.css')</style></head><body><article id="33aa15e2-9005-80aa-9779-c9549ac69bf6" class="page serif" data-notion-page-icon="🔧"><header><img class="page-cover-image" src="https://app.notion.com/images/page-cover/met_william_morris_1877_willow.jpg" style="object-position:center 90%"/><div class="page-header-icon page-header-icon-with-cover"><span class="icon" data-emoji="🔧"></span></div><h1 class="page-title" dir="auto">Kernel-Bypass I/O</h1><p class="page-description" dir="auto"></p><table class="properties"><tbody></tbody></table></header><div class="page-body"><div id="33aa15e2-9005-8051-845c-d3e2a77b82de" class="column-list" data-notion-column-list="" dir="auto"><div id="33aa15e2-9005-80bd-9b0e-e282583abc26" style="width:18.75%" class="column" data-notion-column-ratio="0.1875" dir="auto"><hr id="33aa15e2-9005-805d-a7e9-d1a1dbafa8c8" dir="auto"/><figure id="33aa15e2-9005-803b-bba8-c201937f5469" class="image" data-notion-image="../../Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg" dir="ltr"><a href="../../Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg"><img style="width:548.375px" src="../../Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg"/></a></figure><p id="33aa15e2-9005-80dc-a30d-f95926e1a47d" class="" dir="auto">
+</p></div><div id="33aa15e2-9005-8076-a560-d0006c2c40b7" style="width:81.25%" class="column" data-notion-column-ratio="0.8125" dir="auto"><h3 id="33aa15e2-9005-8077-9649-cbbac9bac02e" class="" dir="auto">Kernel-Bypass I/O</h3><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8035-a5b0-ccf1ce81164e" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8035-83fe-f73a48044acd" class="" dir="auto">在現代高速存儲系統中，NVMe SSD 的延遲已演進至微秒 (μs) 等級。這使得傳統 Linux Kernel 的 I/O 棧（Stack）從原本的「加速器」變成了效能「瓶頸」。身為系統架構師，我們必須重新審視底層 I/O 路徑，理解從 Kernel-space 轉向 User-space 的技術動機與架構演變。</p></div></aside><blockquote id="33aa15e2-9005-8052-9559-da3af9f84a2d" class="" dir="auto">Reference: <a href="https://www.youtube.com/watch?v=Iod4ffMExWU">https://www.youtube.com/watch?v=Iod4ffMExWU</a></blockquote><hr id="33aa15e2-9005-8037-a100-ef7bca4b9760" dir="auto"/><details id="33aa15e2-9005-80ae-90a2-cf022d1b5bee" open="" class="toggle" dir="auto"><summary><strong>Classification</strong></summary><div class="indented"><p id="33aa15e2-9005-804a-b18c-e137f2d23115" class="" dir="auto">
+</p><hr id="33aa15e2-9005-808b-89cd-e32654400156" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80ea-aae5-e8c6932d6d8a" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80e6-8d4e-e3bac57412d5" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Extra Component</mark></p><hr id="33aa15e2-9005-8028-b3b9-d10533e58463" dir="auto"/><p id="33aa15e2-9005-802b-a169-c6436cd1e6f3" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Reference:</mark></p></div></aside><hr id="33aa15e2-9005-809d-a5ab-fa0bbbb29ce1" dir="auto"/></div></details><details id="33aa15e2-9005-803d-85ed-c314c1b4a20c" open="" class="toggle" dir="auto"><summary><strong>Key Word Definition/ Discussion</strong></summary><div class="indented"><details id="33aa15e2-9005-80ea-a3a9-dff8b90b5d2d" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Kernel bypass</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-806c-aa54-c86f5f3fe5ea" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8001-9b8c-fec3e014977f" class="" dir="auto">當 NVMe SSD 硬體延遲降到微秒等級時，傳統針對 HDD 設計的作業系統軟體層（Block Layer、File System 等 Kernel I/O Stack）開銷變得極度顯著，成為拖垮整體系統效能的瓶頸。</p></div></aside><hr id="33aa15e2-9005-806b-888c-ef66922bc1f3" dir="auto"/><p id="1b9fdde8-f36b-4572-9efd-aa847d617c0d" class="" dir="auto"><strong>Kernel I/O 的轉型背景與效能瓶頸</strong></p><ul id="0faa8d34-5183-429d-8746-216a8b8463fe" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>I/O Scheduling (I/O 排程) 的失效</strong> 原本為 HDD 設計的「電梯演算法」（Elevator Algorithm）旨在減少物理磁頭的移動路徑。然而，NVMe SSD 具備極高的並行處理能力與無機械運作特性，複雜的排程演算法反而增加 CPU 計算延遲，現在的重點已轉向如何極大化減少處理路徑。</li></ul><ul id="f79b2be1-bd21-4d4c-aa7d-9789d0aad9d3" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>I/O Merging (I/O 合併) 的效能折損</strong> 合併請求是為了補償 HDD 隨機讀寫效能差的弱點。但在 SSD 高隨機存取能力面前，判斷並執行請求合併的 CPU 運算成本，往往高於直接發送多個小 I/O 所產生的收益，導致其成為效能拖油瓶。</li></ul><ul id="4cf60979-2814-4225-bb93-a0781eb93f87" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Interrupts (中斷機制) 導致的上下文切換</strong> 中斷會強迫 CPU 停止目前任務進行 Context Switch（上下文切換）。在每秒數百萬次 I/O (IOPS) 的場景下，頻繁的中斷會使 CPU 浪費大量週期在處理核心狀態切換，而非實際搬運數據。</li></ul><hr id="33ca15e2-9005-80cf-a558-e653ca27e6af" dir="auto"/><p id="33ca15e2-9005-8053-a7b0-c2769158f9b5" class="" dir="auto">極致效能並非沒有代價，繞過 Kernel 意味著必須自行處理原本由作業系統託管的複雜服務。</p><table id="b92715e3-dba6-40fa-ac6f-fec621a0d1ab" class="simple-table" dir="ltr"><thead class="simple-table-header"><tr id="94ef3075-3ca5-4bd6-aa1b-7994bb010985" dir="ltr"><th id="j{qs" class="simple-table-header-color simple-table-header" style="width:271px"><strong>服務類別</strong></th><th id="Feh]" class="simple-table-header-color simple-table-header" style="width:301px"><strong>傳統 Kernel I/O</strong></th><th id="g[hF" class="simple-table-header-color simple-table-header" style="width:339px"><strong>SPDK Kernel-Bypass</strong></th></tr></thead><tbody><tr id="a99ec24e-a0d6-4193-8327-8b7b3211acda" dir="ltr"><td id="j{qs" class="" style="width:271px"><strong>Security/Isolation (安全性與隔離)</strong></td><td id="Feh]" class="" style="width:301px">由 Kernel 統一管理，程序間隔離嚴密。</td><td id="g[hF" class="" style="width:339px">應用程式直接操作硬體，安全性防線後退至應用層。</td></tr><tr id="24f67c20-b121-4154-9e05-58d939ff6805" dir="ltr"><td id="j{qs" class="" style="width:271px"><strong>Fairness/Sharing (公平性與共享)</strong></td><td id="Feh]" class="" style="width:301px">核心排程器確保多個程序公平分配資源。</td><td id="g[hF" class="" style="width:339px">通常由單一程序獨佔資源，難以在多個程序間彈性共享。</td></tr><tr id="557f6f8d-0470-4638-be52-5b16b034821e" dir="ltr"><td id="j{qs" class="" style="width:271px"><strong>POSIX Ecosystem (標準生態系)</strong></td><td id="Feh]" class="" style="width:301px">支援 <code><strong>open/read/write</strong></code>，開發成本低。</td><td id="g[hF" class="" style="width:339px">須使用特定 API，與現有 POSIX 程式不相容，重寫成本高。</td></tr></tbody></table><hr id="33ca15e2-9005-806c-8bb3-f60cad9d7bfd" dir="auto"/><p id="33ca15e2-9005-8051-b1d2-d44b608c4149" class="" dir="auto">解釋為什麼傳統針對 HDD 設計的 I/O 機制（排程、合併、中斷）在高速 NVMe SSD 時代反而會成為效能「拖油瓶」。</p><hr id="33ca15e2-9005-8007-a656-fab7d957ecdf" dir="auto"/><p id="33ca15e2-9005-8035-b503-f367796d8cd5" class="" dir="auto"><strong>中間路線：eBPF/XRP 與 xNVMe</strong></p><ul id="ea851c54-8a39-4049-a807-5fbd4b205d26" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>簡介</strong>：極致的 Kernel Bypass 需要付出極大代價（失去 OS 管理與 POSIX 相容性）。對於成熟的系統（如 PostgreSQL），全面推翻 Kernel 路徑並不切實際，因此出現了不需完全繞過 Kernel 的中間方案。</li></ul><ul id="26df2834-4e73-4e44-9a16-ef8d37fd2cef" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>重點</strong>：<ul id="cdb2da04-7e18-47a4-9a36-f845c57af600" class="bulleted-list" dir="auto"><li style="list-style-type:circle"><strong>eBPF / XRP</strong>：允許將自定義的處理邏輯「下放」到 Kernel 的驅動層執行。這能大幅縮短 I/O 路徑，跳過 Block Layer 或 File System 的開銷，同時確保程式仍留在 Kernel 環境的保護中。</li></ul><ul id="f31152f8-8dec-48a0-b542-74ad44a01a6e" class="bulleted-list" dir="auto"><li style="list-style-type:circle"><strong>xNVMe</strong>：提供一層統一的抽象介面。開發者只需寫一次程式，就能在不大幅修改架構的前提下，靈活切換底層要使用 <code>io_uring</code>、SPDK 還是標準 Syscall。</li></ul></li></ul><ul id="7db1aa7c-fddc-40b5-9b56-624e500ddaea" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>考試</strong>：<ul id="f38fcad2-847c-4d76-9447-fed73f3fc322" class="bulleted-list" dir="auto"><li style="list-style-type:circle">為什麼需要中間路線？（關鍵字：<strong>相容性</strong>、<strong>重寫成本</strong>、<strong>POSIX 生態系</strong>）。</li></ul><ul id="10c05acb-522b-4faa-9ff1-668dc0f61f33" class="bulleted-list" dir="auto"><li style="list-style-type:circle">比較 eBPF/XRP 與徹底 Kernel Bypass 的適用場景差異。</li></ul></li></ul><ul id="2ad0f919-f942-46ed-bdca-12daa2a1ec54" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>補充</strong>：<ul id="9d73e0e5-4ab3-4dba-8596-f6da7041eb6a" class="bulleted-list" dir="auto"><li style="list-style-type:circle"><strong>Pitfall</strong>: 評估存儲架構時，不可僅看極限效能。成熟資料庫若強行引入 SPDK，可能因失去 File System 支援或重寫核心模組而導致專案失敗。</li></ul></li></ul><hr id="33aa15e2-9005-80ae-a802-c47e0109e0cf" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-800b-b562-d276300709b2" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80a8-be90-edcf9eecb433" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark><br/>有些系統在升級 SSD 後效能不如預期，往往是因為沒有調整 OS 層級的 I/O Scheduler（例如應將其設為 <code>none</code> 或 <code>kyber</code>），導致軟體層吃掉硬體紅利。</p></div></aside><hr id="33aa15e2-9005-804f-87f6-eee148d5f39e" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-801d-8237-e5530d2cb4bf" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8069-9dc9-cc46ba21c050" class="" dir="auto">Reference: </p></div></aside><hr id="33aa15e2-9005-8019-89c6-d50e146e354b" dir="auto"/></div></details><details id="33ca15e2-9005-80bb-a355-d5865ce7184b" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>SPDK</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-804b-833d-c777be95ae51" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-804d-8873-d5a0012722db" class="" dir="auto">SPDK (Storage Performance Development Kit) 是一套建立在 <strong>DPDK</strong> (Data Plane Development Kit) 之上的框架，旨在透過 User-space 驅動程式徹底榨乾硬體效能。</p></div></aside><hr id="33ca15e2-9005-801e-bed6-ffbf6ba2c677" dir="auto"/><ul id="be81c1bc-eea1-44e6-84c0-e8643064043a" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>User-space Driver &amp; Hugepages</strong>：將驅動移至用戶空間。利用大頁記憶體 (Hugepages, 如 2MB/1GB) 減少 CPU 的 TLB Miss，並確保實體連續的 DMA buffer，讓硬體能繞過 Kernel 直接存取記憶體。同時透過 MMIO 直接操作硬體佇列。</li></ul><ul id="81745dbc-cb18-47f8-a2a2-1d89ed9abee6" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Polling Mode (輪詢模式)</strong>：完全捨棄硬體中斷。改派專屬 Thread 持續輪詢 (Polling) 檢查 Completion Queue (CQ)。雖然 CPU 使用率較高，但完全消除了中斷造成的 Context Switch 開銷。</li></ul><ul id="a7ed2587-5551-4bad-9bdb-a3649a87f32e" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Lockless Design &amp; Thread-to-queue affinity</strong>：採用 Share-nothing 架構，每個 Thread 綁定專屬的 I/O 佇列。處理過程中不需要爭搶全域鎖 (Global Lock)，徹底消除多核心間的鎖競爭 (Lock contention)。</li></ul><hr id="33ca15e2-9005-801a-9cd1-d972162dc4d1" dir="auto"/><p id="48ddd9aa-07ff-4636-9cfa-f2d404ce7c8e" class="" dir="auto"><strong>SPDK I/O 流程追蹤 (全程無 Syscall、無 Interrupt、無 Context Switch)</strong></p><ol type="1" id="c0c81484-8c4b-4893-b91f-b3c828f1193b" class="numbered-list" start="1" dir="auto"><li><strong>請求初始化</strong>：應用程式在 User-space 準備好數據，存放在 Hugepage DMA buffer。</li></ol><ol type="1" id="5204d2d8-3394-436e-9faa-974018a41716" class="numbered-list" start="2" dir="auto"><li><strong>提交指令</strong>：SPDK 直接將指令寫入 NVMe 的 Submission Queue (SQ)。</li></ol><ol type="1" id="b01caec2-2ec4-4e37-85a8-19d2016ba8a1" class="numbered-list" start="3" dir="auto"><li><strong>觸發硬體</strong>：透過 MMIO 更新 Doorbell Register，通知 SSD 執行任務。</li></ol><ol type="1" id="1daee305-6731-4540-8ab0-90f138e67aef" class="numbered-list" start="4" dir="auto"><li><strong>數據傳輸</strong>：SSD 透過 DMA 直接從 User-space 緩衝區進行數據搬運。</li></ol><ol type="1" id="4f874d71-ec9d-46d7-8f66-d0556c80a762" class="numbered-list" start="5" dir="auto"><li><strong>完成偵測</strong>：Polling Thread 持續監測 Completion Queue (CQ)，一旦發現 I/O 完成即刻回報。</li></ol><hr id="33ca15e2-9005-80f2-b881-ebcb96ca5877" dir="auto"/><ul id="b917bc74-d83e-445f-856c-85a6b8557d74" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>SPDK I/O 的完整流程</strong>：User-space 準備 DMA buffer -&gt; 指令寫入 SQ -&gt; MMIO 敲擊 Doorbell 觸發硬體 -&gt; SSD DMA 搬運數據 -&gt; Polling 監測 CQ 完成狀態。</li></ul><ul id="9db3dc2a-b151-4227-b525-5fce56134889" class="bulleted-list" dir="auto"><li style="list-style-type:disc">解釋 SPDK 的「三個沒有」：<strong>無 Syscall</strong>、<strong>無 Interrupt</strong>、<strong>無 Context Switch</strong>。</li></ul><ul id="b19143fd-7dbd-4a04-b271-9cefb92d7058" class="bulleted-list" dir="auto"><li style="list-style-type:disc">比較傳統 Kernel I/O 與 SPDK Bypass 在 Security、Fairness 與 POSIX 支援上的取捨（Trade-off）。</li></ul><hr id="33ca15e2-9005-8015-b273-f9d3089ecf0f" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-80a1-a07e-eba848f9af5b" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-80fe-97ef-daf14a34b2c1" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p><p id="33ca15e2-9005-805c-aa10-fc9ccd64d0d0" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>極致效能的代價是「責任轉嫁」。使用 SPDK 意味著應用程式必須自行管理資源隔離與安全性，且無法與其他一般 Process 公平共享該 SSD 資源。</strong></mark></p></div></aside><hr id="33ca15e2-9005-808e-8d6c-f3c3b0ac046b" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-808e-802b-ec289a991005" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-80bd-bc00-cc4cb15fcb50" class="" dir="auto">Reference: </p></div></aside><hr id="33ca15e2-9005-8022-bd12-dac89e286b0b" dir="auto"/></div></details><details id="33ca15e2-9005-8072-b903-dff7567e9565" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>user-space driver</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-8032-8f70-fed9e138870b" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-80ec-8167-d189e1c8d53b" class="" dir="auto">將硬體驅動程式從核心空間（Kernel-space）搬到用戶空間（User-space）。應用程式不再透過系統呼叫（Syscall）請求 Kernel 存取硬體，而是直接操作硬體寄存器。</p></div></aside><hr id="33ca15e2-9005-8033-b36f-eec3646c8827" dir="auto"/><ul id="f3ebd5a4-69e3-4153-8063-6c13496b0acf" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>DMA &amp; Hugepages</strong>: 透過 UIO (Userspace I/O) 或 VFIO 框架，應用程式能直接存取硬體的 MMIO 空間。使用 Hugepages 確保記憶體在物理上是連續的，方便硬體透過 DMA 直接搬運數據，且減少 TLB Miss。</li></ul><ul id="731ff8dd-a657-418d-8930-af2136f701db" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Zero-copy</strong>: 數據直接從硬體傳輸到應用程式的 Buffer，無需在 Kernel Buffer 與 User Buffer 之間進行二次拷貝。</li></ul><hr id="33ca15e2-9005-80ce-ab8a-e435add00673" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-808f-959d-f2dd1e0e8175" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-8090-b458-fed2d7ed5cec" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p><ul id="caf8a000-1a35-49a0-8547-28c5210d8662" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>安全性降低</strong>: Kernel 失去了對硬體的保護與監控，若應用程式崩潰，可能導致硬體狀態異常。</li></ul><ul id="6d7cd079-e814-4960-aa34-bd0c87a49e11" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>開發難度</strong>: 必須自行實作原本 Kernel 處理的錯誤恢復（Error Recovery）與資源回收</li></ul></div></aside><hr id="33ca15e2-9005-8051-9d10-cc298eb808b0" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-803f-b542-f8d156b81600" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-808f-b515-d85f027b2af7" class="" dir="auto">Reference: </p></div></aside><hr id="33ca15e2-9005-8070-b68d-dc644a51b777" dir="auto"/></div></details><details id="33ca15e2-9005-801e-8639-cf5b403abc86" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Polling mode</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-8015-b176-f25331e1d359" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-8080-b512-e7a8a7e30491" class="" dir="auto">捨棄中斷機制（Interrupt-driven），讓 CPU 核心不斷地檢查（Poll）硬體的完成佇列（Completion Queue），確認任務是否完成。</p></div></aside><hr id="33ca15e2-9005-8070-a455-d8091ed09ae1" dir="auto"/><ul id="5202277c-71ae-452c-943d-a2bce1a8550a" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>消除 Context Switch</strong>: 傳統中斷會強迫 CPU 暫停當前工作並切換到中斷處理程序；Polling 讓 CPU 始終處於工作狀態，省去切換開銷。</li></ul><ul id="97759b04-a355-402e-9fab-9793cccd3647" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>確定性延遲</strong>: 減少了處理中斷的抖動（Jitter），讓 I/O 延遲極度穩定。</li></ul><hr id="33ca15e2-9005-807f-be47-ee92d019d13f" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-8064-8064-e79ea4afa9b5" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-80d6-85c2-c1d493550310" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p><ul id="90547213-525f-4f6e-97b2-84e6420875ad" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>CPU 佔用率 100%</strong>: 即使沒有 I/O，負責 Polling 的核心也會顯示滿載，造成電力浪費。</li></ul><ul id="41173599-75dd-4c75-b553-88d6defbc3e5" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>飢餓問題</strong>: 如果 Polling Thread 權限過高，可能會導致同核心的其他 Task 無法執行。</li></ul></div></aside><hr id="33ca15e2-9005-806e-b2ab-c458de83bf48" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-80fa-bf30-e5fdc940f5bb" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-80ed-be6e-f67a352afc01" class="" dir="auto">Reference: </p></div></aside><hr id="33ca15e2-9005-8018-9f1c-caa027973f82" dir="auto"/></div></details><details id="33ca15e2-9005-8060-93dd-e84dfaf4f88f" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>thread-to-queue affinity</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-8098-9866-f25be8a48f0c" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-80ef-96cc-fc9f6d93d497" class="" dir="auto">每個 CPU 執行緒擁有自己專屬的硬體 I/O 佇列對（Queue Pair, SQ/CQ），並固定綁定處理。</p></div></aside><hr id="33ca15e2-9005-80f2-b75d-d0b5be01d6f3" dir="auto"/><ul id="9d1d815c-3f3d-4fea-9acc-3eec95149600" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>並行化</strong>: NVMe 硬體支援多佇列（Multi-queue），這項技術讓多核心能真正並行發送指令，而不會在硬體入口發生擠碰。</li></ul><ul id="7709fabf-9446-4a11-b6c4-0d48e9997174" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Cache Locality</strong>: 數據處理始終在同一個核心上完成，極大化 L1/L2 Cache 的命中率。</li></ul><hr id="33ca15e2-9005-801f-bf45-eb4d11ab3e15" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-8093-9693-d0f8b38af699" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-80a6-98a3-db076d7eeeb6" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p><p id="33ca15e2-9005-805f-9867-ea4a9768a347" class="" dir="auto"><strong>負載不均</strong>: 若特定佇列負載過重而其他空閒，系統無法自動平衡（需在應用層手動設計 Load Balancing）。</p></div></aside><hr id="33ca15e2-9005-8001-bafb-ce6043693650" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-80b8-a543-ea75d3ad2aed" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-80fe-b814-e7e5f3263034" class="" dir="auto">Reference: </p></div></aside><hr id="33ca15e2-9005-8052-9d29-cf6820e084db" dir="auto"/></div></details><details id="33ca15e2-9005-8008-b92b-f2167804af93" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>DPDK</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-8065-837f-f4413907f560" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-809b-8c55-c50b3e431835" class="" dir="auto">一組由 Intel 發起的函式庫，最初用於高速網路封包處理，SPDK 借鑑了其記憶體管理與環境抽象層（EAL）。</p></div></aside><hr id="33ca15e2-9005-801b-bbb6-faeac6a75752" dir="auto"/><ul id="e7680cfd-b642-4f13-9f38-8a3386351ef2" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>基礎組件</strong>: SPDK 使用 DPDK 的 Hugepage 管理、環形佇列（Ring Buffer）以及 CPU 核心綁定（Lcore）機制。</li></ul><ul id="4dd10f53-e79b-49f9-9471-dc8f6d294a9b" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>環境抽象</strong>: 讓存儲應用能像網路應用一樣，以極高的吞吐量處理數據報文（Data Plane）。</li></ul><hr id="33ca15e2-9005-809d-9dd5-c34d74ee51f6" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-80f1-b391-e28e4abef333" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-80ae-a509-d23719bc4cbe" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p><ul id="161fe5a0-3ed4-4b9a-8075-08cdd20b12a3" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>環境配置複雜</strong>: 需要調整系統 Boot loader（如 Grub）來預留 Hugepages。</li></ul><ul id="0619faa8-c8d5-47d7-831a-21f4b59e5f36" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>硬體限制</strong>: 對網卡/存儲設備的型號與驅動支援有較嚴格的要求。</li></ul></div></aside><hr id="33ca15e2-9005-8084-9af7-c81ebcb88e85" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-8060-bdec-c491c48ecba8" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-80d3-ae43-ffde4ae42069" class="" dir="auto">Reference: </p></div></aside><hr id="33ca15e2-9005-80dc-8c85-fffbf4bd66e1" dir="auto"/></div></details><details id="33ca15e2-9005-8035-adc4-e3a36fb1cb02" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Lockless design</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-80b7-9b63-da7acb0e77c4" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-808e-9d8d-e9f9054426cc" class="" dir="auto">一種軟體架構模式，各個執行緒之間互不共享數據，因此不需要使用互斥鎖（Mutex）或原子鎖。</p></div></aside><hr id="33ca15e2-9005-8084-9570-f2ae2d216144" dir="auto"/><ul id="2ee89e45-ecbf-44e5-9b7b-63b9a9573b1b" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>消除 Contention</strong>: 在多核心系統中，傳統鎖機制會造成 CPU 核心互相等待（Lock Contention），效能無法隨核心數線性增長。</li></ul><ul id="9c344957-4423-46cf-8409-09be69ff07db" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Message Passing</strong>: 若執行緒間需通訊，改用非同步訊息傳遞（Async Messaging）而非修改共享變數。</li></ul><hr id="33ca15e2-9005-8036-9137-f5e4494e79d0" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-8099-9b86-f1985ae509f7" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-80d5-b2cc-dc9a21f606e7" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p><p id="33ca15e2-9005-802f-a514-d18d847dd382" class="" dir="auto"><strong>邏輯複雜化</strong>: 開發者必須改變「共用記憶體」的思維，改用 Event-driven 或 Reactor 模式，增加程式碼維護門檻。</p></div></aside><hr id="33ca15e2-9005-804e-ba96-d42b496bbf48" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-8049-9ff8-c259d9147706" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-808f-b086-dcede3350a50" class="" dir="auto">Reference: </p></div></aside><hr id="33ca15e2-9005-80df-87e8-ebe51ae441ef" dir="auto"/></div></details></div></details><details id="33aa15e2-9005-80f5-9f9a-e32bc02cbee7" open="" class="toggle" dir="auto"><summary><strong>Test</strong></summary><div class="indented"><details id="33aa15e2-9005-8044-946c-e3e073510562" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Key Concepts</strong></mark></summary><div class="indented"><details id="33aa15e2-9005-80a9-98bb-e6d8af04ea6b" open="" class="toggle" dir="auto"><summary>理解 kernel 為 HDD 時代設計的三項優化在 SSD 時代的取捨：I/O scheduling, I/O merging, interrupt vs. polling</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80cd-99a5-e9c5c0eda796" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8050-87ed-e5c25283e7ba" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-8081-96da-f0e2cb94f6ad" class="" dir="auto">在 HDD 時代，Kernel 為了彌補機械延遲，著重於重排與合併 I/O 以減少磁頭移動；<br/>但在 SSD 時代，隨機存取極快且具備高度並行性，這些複雜的 Scheduling 反而成為 CPU 瓶頸，因此轉向簡單化並改用 Polling 以追求低延遲。</p></div></p><hr id="33aa15e2-9005-8035-8416-c9dcda72b090" dir="auto"/><p id="33aa15e2-9005-80d4-92fb-c5fd95b97a3a" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-80ef-ad73-f644ad961403" class="" dir="auto">I/O Scheduler (Elevator), I/O Merging (Coalescing), CPU Overhead, Parallelism, Interrupt Latency vs. Polling.</p></div></p><hr id="33aa15e2-9005-809e-a005-cd34ea692154" dir="auto"/><p id="33aa15e2-9005-80ac-9013-fd3b508da3ab" class="" dir="auto">Detail<div class="indented"><ul id="a6e0ed3b-790f-49c3-ab6b-6e597a77b5c2" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>I/O Scheduling/Merging：</strong> HDD 時代為了避免磁頭來回跳動（Seek time），Kernel 會像電梯一樣對請求進行排序與合併。但 SSD 沒有機械結構，其內部具備多通道並行處理能力，傳統的 Scheduling 演算法會消耗過多 CPU 資源，現代系統多半改用 <code>none</code> 或 <code>mq-deadline</code>。</li></ul><ul id="a7e711f6-4b90-48fa-b917-d8ced954e588" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Interrupt vs. Polling：</strong> 過去 I/O 很慢，CPU 發出請求後去切換做別的事，等「中斷」通知是高效的。但 NVMe SSD 完成一次 I/O 可能只需幾微秒，處理中斷與 Context switch 的時間（數微秒）已經跟 I/O 本身差不多，因此改由 CPU 不斷輪詢（Polling）結果，雖然耗電但延遲更低。</li></ul></div></p></div></aside><hr id="33aa15e2-9005-807d-bb34-ec1d8c988eae" dir="auto"/></div></details><details id="33aa15e2-9005-8085-bb4f-f61636518a12" open="" class="toggle" dir="auto"><summary>理解 SPDK 的完整 I/O 流程：透過 hugepage DMA buffer 與 MMIO doorbell register，在 user space 直接操作 NVMe 的 submission/completion queue，由 polling thread 偵測 completion，全程無 syscall、interrupt 或 context switch</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8055-b56f-cb4f9911a77e" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80fa-93f0-fb73f4a107de" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-806c-9889-ee62ab63d176" class="" dir="auto">SPDK 透過將 NVMe 驅動移至 User space，利用 Hugepage 進行零拷貝 DMA，並由專屬線程直接操作硬體暫存器（Doorbell）與輪詢 Queue，達成完全避開核心開銷的極速 I/O。</p></div></p><hr id="33aa15e2-9005-80a0-844a-e5004e259e6e" dir="auto"/><p id="33aa15e2-9005-801e-b49f-f30d4114e133" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-8010-b805-eefb94642cf0" class="" dir="auto">User-space Driver, Hugepages (Zero-copy), MMIO (Doorbell), Polling Mode Driver (PMD), No Syscall/No Context Switch.</p></div></p><hr id="33aa15e2-9005-80ea-8f37-fa9478f48fab" dir="auto"/><p id="33aa15e2-9005-80ce-9bf2-d1733f38549c" class="" dir="auto">Detail<div class="indented"><p id="24616743-f19d-4def-9515-591c712e7302" class="" dir="auto">SPDK (Storage Performance Development Kit) 的核心在於「完全掌控」。它透過 UIO/VFIO 框架將硬體控制權拉到 User space。</p><ul id="3995b1a1-73e8-4e4a-9c09-5357e31c044b" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>提交：</strong> 應用程式在 Hugepage 分配緩存（減少 TLB miss），將請求填入 Submission Queue，直接對硬體 MMIO 地址寫入 Doorbell 告知 SSD。</li></ul><ul id="ef884249-be75-4c57-9027-1f2775373a42" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>收割：</strong> 一個專屬的 Polling Thread 持續檢查 Completion Queue。<br/>整個過程不進出 Kernel（無 Syscall），不產生硬體中斷（無 Interrupt），更沒有進程切換（No Context Switch），效能幾乎等同硬體極限。</li></ul></div></p></div></aside><hr id="33aa15e2-9005-8014-bc2a-c61153d6a08c" dir="auto"/></div></details><details id="33aa15e2-9005-801c-a0e1-f39b3a207c5b" open="" class="toggle" dir="auto"><summary>了解 kernel bypass 犧牲的三大類服務：security/isolation、fairness/sharing、POSIX ecosystem</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-807d-b0cf-f245963965f3" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80d0-bc8d-f56d021defd2" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-80af-a37d-c3950b89fd98" class="" dir="auto">Kernel Bypass 雖然快，但犧牲了核心提供的安全隔離（Security）、公平資源分配（Fairness）以及成熟的作業系統標準生態（POSIX）。</p></div></p><hr id="33aa15e2-9005-8034-9eaf-c53cb31956f0" dir="auto"/><p id="33aa15e2-9005-80bd-9266-cea4a2850d71" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-80a9-9ed8-ee07d270795b" class="" dir="auto">Isolation, Resource Sharing, POSIX standard, Management Overhead.</p></div></p><hr id="33aa15e2-9005-80a2-a0dd-d052153d44e1" dir="auto"/><p id="33aa15e2-9005-8045-bae2-e6042a2bbbee" class="" dir="auto">Detail<div class="indented"><ul id="8fb45311-2c93-4b4f-90cc-41559a5f91d4" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Security/Isolation：</strong> Kernel 是資源的守門員，Bypass 後硬體通常被單一進程獨佔，難以防止惡意程式或錯誤程式碼破壞硬體或其他進程的資料。</li></ul><ul id="05d15b39-b8e9-45ae-994b-c6892f95f682" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Fairness/Sharing：</strong> Kernel 內建複雜的調度機制確保各應用公平使用磁碟。在 Bypass 模式下，誰搶到硬體誰就是老大，多應用併發時的資源管理變得極其困難。</li></ul><ul id="c7dbf05f-c6c4-4d79-8be4-976021ddc6ab" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>POSIX Ecosystem：</strong> 所有的標準工具（如 <code>ls</code>, <code>cat</code>, <code>grep</code>）與 API（<code>open</code>, <code>read</code>）都無法直接作用在 Bypass 的裝置上，開發者必須針對特定 SDK（如 SPDK）重寫整套應用。</li></ul></div></p></div></aside><hr id="33aa15e2-9005-80ca-b4b9-ea22f3973706" dir="auto"/></div></details><details id="33aa15e2-9005-804c-9f73-c797b409297b" open="" class="toggle" dir="auto"><summary>理解 eBPF/XRP 的中間路線</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80a8-9bf5-f8bebb754196" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8095-881c-ec38ca5bad8e" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-8014-9365-edc9e7a4688a" class="" dir="auto">eBPF/XRP 是在不離開 Kernel 的前提下，允許應用程式將自訂邏輯（如 B+Tree 查找）下推至 Kernel 的驅動層執行，兼顧了安全、標準與效能。</p></div></p><hr id="33aa15e2-9005-8097-9121-f92c5ff92365" dir="auto"/><p id="33aa15e2-9005-80fc-beaf-c5be31492336" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-809a-9cd4-e27f6c817111" class="" dir="auto">XRP (eXpress Resubmission Path), eBPF In-kernel Execution, Function Offloading, Safety Sandbox.</p></div></p><hr id="33aa15e2-9005-80aa-aa2b-e4ef59571334" dir="auto"/><p id="33aa15e2-9005-80d8-b1dc-ea22840495c5" class="" dir="auto">Detail<div class="indented"><p id="199e4354-14ba-405c-9aaf-3cf3766d5264" class="" dir="auto">Kernel Bypass 太激進，傳統 Kernel 太慢。XRP 提出一種折衷方案：利用 eBPF 這個在 Kernel 內的安全沙箱，讓應用程式把「查找邏輯」寫成 eBPF 程式。<br/>當資料從磁碟讀取完成時，直接在驅動層執行該 eBPF 程式，決定下一個要讀取的地址（如追蹤 B+Tree 指標），而不需要回到 User space。這省下了大量的 User/Kernel 切換，卻保留了檔案系統的安全邊界。</p></div></p></div></aside><hr id="33aa15e2-9005-809f-ad18-cea970f1d3fd" dir="auto"/></div></details><details id="33aa15e2-9005-804d-81a4-d4f3e2cfe5ce" open="" class="toggle" dir="auto"><summary>理解 kernel bypass 不只為效能，更為 controllability：application 可控制 data placement、降低 write amplification</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80d2-90c7-c1208c7d3898" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-802e-ab08-d2f2b245d9ec" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-8042-bbfb-ff01e3859060" class="" dir="auto">Bypass 讓應用程式能精準控制資料存放位置與寫入時機，藉此優化固態硬碟的「寫入放大」問題並提升存取一致性。</p></div></p><hr id="33aa15e2-9005-801b-a101-ff6a7876976c" dir="auto"/><p id="33aa15e2-9005-802a-b334-da2da3b19f31" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-800b-a8cd-d554985b290a" class="" dir="auto">Deterministic Latency, Data Placement, Write Amplification (WAF), Log-structured Storage.</p></div></p><hr id="33aa15e2-9005-806f-a38b-cbb94fdda73f" dir="auto"/><p id="33aa15e2-9005-805b-91a6-f41881880919" class="" dir="auto">Detail<div class="indented"><p id="bd6439d3-ae15-48d2-b973-451d01a64fdf" class="" dir="auto">效能只是其一，更重要的是「可預測性」。Kernel 的快取管理與調度往往是黑盒子。<br/>對於高效能資料庫而言，能直接控制資料在 SSD Flash 上的分佈（Data Placement）可以避免 SSD 內部頻繁的垃圾回收（GC），進而降低寫入放大（Write Amplification）。應用程式可以根據自身的負載特性（如只做 Append-only 寫入）來優化存取，達到比核心通用演算法更高的效率與更穩定的延遲。</p></div></p></div></aside><hr id="33aa15e2-9005-80cb-a1dd-c448e5a5465d" dir="auto"/></div></details><details id="33aa15e2-9005-8073-8615-dd7d2a125f61" open="" class="toggle" dir="auto"><summary>能描述 CSAL 雙層架構：高速 SSD 以 log-structured 方式吸收 random write，經 compaction 以 sequential I/O 寫入 QLC SSD</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80c9-825a-d975dbdfd352" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8033-8020-de3fae346621" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-80f6-a1e5-d34bde2d3595" class="" dir="auto">CSAL 將高效能 SSD（如 Optane/SLC）作為寫入快取，以 Log-structured 方式接收隨機寫入，再透過背景壓縮轉換為大塊順序 I/O 寫入低成本、壽命短的 QLC SSD。</p></div></p><hr id="33aa15e2-9005-80e1-b0d2-f65230be1297" dir="auto"/><p id="33aa15e2-9005-80f2-b634-f297c2716315" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-8085-8e5c-f0c1e8474982" class="" dir="auto">Cloud Storage Acceleration Layer (CSAL), Tiered Storage, Log-structured, QLC SSD, Random-to-Sequential.</p></div></p><hr id="33aa15e2-9005-80a8-b517-c4f88a4b8603" dir="auto"/><p id="33aa15e2-9005-808c-8b2f-f577bf82cd04" class="" dir="auto">Detail<div class="indented"><p id="b8e4aa7b-b5cd-4c47-b983-7843d6f2c507" class="" dir="auto">QLC SSD 儲存密度高、價格低，但隨機寫入極慢且容易損壞。CSAL 架構建立了兩層系統：</p><ul id="837f5447-ff01-40de-b8eb-f0dc215100ed" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>上層（Performance Layer）：</strong> 用高速 SSD 吸收頻繁且破碎的隨機寫入（Random Writes），並以日誌形式（Log-structured）紀錄。</li></ul><ul id="300ce5d9-dfa1-4394-a08e-bc97d4fb4f53" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>下層（Capacity Layer）：</strong> 待數據累積到一定量後，CSAL 在 Host 端進行 Compaction，將其轉化為對 QLC 最友善的「大塊順序寫入」，從而保護 QLC 壽命並大幅提升系統整體的寫入吞吐量。</li></ul></div></p></div></aside><hr id="33aa15e2-9005-8093-b60d-cc296b05c538" dir="auto"/></div></details><details id="33aa15e2-9005-803b-8fa9-f8918bbb3388" open="" class="toggle" dir="auto"><summary>理解 CSAL 的兩階層 host-side FTL</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8074-baf9-e6f04a2863a3" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8042-842d-efda423e6807" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-803c-9353-c9b9273041dc" class="" dir="auto">CSAL 在主機端管理兩套映射關係：第一階層將邏輯地址映射到快取 SSD，第二階層則在冷數據搬移時將其映射到大容量 QLC。</p></div></p><hr id="33aa15e2-9005-80b5-8a15-f9a874c5f833" dir="auto"/><p id="33aa15e2-9005-800a-9f13-edc98d4403f9" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-80ba-b4ed-e1df6d53f3b9" class="" dir="auto">Host-side Flash Translation Layer (FTL), Indirect Mapping, Cache Management, Background Data Migration.</p></div></p><hr id="33aa15e2-9005-807a-9258-d10e0419b111" dir="auto"/><p id="33aa15e2-9005-80bb-b018-f294b7f63a41" class="" dir="auto">Detail<div class="indented"><p id="a72e831e-9f95-4dfe-9c5a-6c12dbad1ac4" class="" dir="auto">傳統 SSD 的 FTL（Flash Translation Layer）位於硬體內部。CSAL 將 FTL 的管理邏輯拉到主機端（Host-side）：</p><ul id="4e394be1-b333-49d0-a942-2beeabec7461" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>第一階 (L1)：</strong> 當數據寫入高速層時，主機維護一個 LBA 到高速 SSD 的 Mapping Table。</li></ul><ul id="64a2419e-4df6-4fe0-bb47-0d953b7cdf0e" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>第二階 (L2)：</strong> 當數據從高速層移到 QLC 層（Eviction/Migration）時，主機更新 Mapping Table 到 QLC 的實體位置。<br/>這樣做的好處是主機能「全局俯瞰」所有 SSD 的狀態，並根據應用需求（而不是硬體黑盒邏輯）來決定何時搬移數據與清理空間。</li></ul></div></p></div></aside><hr id="33aa15e2-9005-8014-b46a-e36461eb1bc4" dir="auto"/></div></details></div></details><details id="33aa15e2-9005-806b-af96-d2971d86a1db" open="" class="toggle" dir="auto"><summary><mark class="highlight-red" data-notion-highlight="red"><strong>Quiz Pool</strong></mark></summary><div class="indented"><ol type="1" id="33aa15e2-9005-8014-b88a-ff5cda871858" class="numbered-list" start="1" dir="auto"><li><mark class="highlight-default" data-notion-highlight="default">某企業架設了一台高效能 AI 伺服器，底層配置了 10 個由不同廠商供應的 NVMe SSD （包含不同型號與顆粒類型）。技術團隊為了壓榨出 SSD 的極致效能，打算採用 SPDK (Kernel Bypass) 框架來取代傳統的 Linux I/O Stack。 關於此場景下採用 SPDK 的評估，下列敘述何者最為合理？</mark><blockquote id="33aa15e2-9005-8088-a8d0-c66d9dda0709" class="" dir="auto"><ol type="1" id="33aa15e2-9005-807a-9db6-ee54c5a4206f" class="numbered-list" start="1" dir="auto"><li>SPDK 雖然能提供極致效能，但在此異質硬體環境下，企業必須自行承擔原本由 Linux Kernel 處理的硬體「抽象化」與「相容性」維護，開發成本將大幅增加。因此，此伺服器不建議使用 SPDK。</li></ol><ol type="1" id="33aa15e2-9005-80f9-90a2-c9574c80e2a5" class="numbered-list" start="2" dir="auto"><li>相較於 SPDK，<code>io_uring</code> 是更適合此場景的技術選項，因為它在提升效能的同時，還能自動處理異質硬體帶來的相容性問題。</li></ol><ol type="1" id="33aa15e2-9005-8038-ad12-ede6601147b8" class="numbered-list" start="3" dir="auto"><li>在 SPDK 架構下，IOMMU 無法有效隔離異質 SSD 設備，將導致安全性風險。</li></ol><ol type="1" id="33aa15e2-9005-80a1-b33d-e6e98911decc" class="numbered-list" start="4" dir="auto"><li>由於 SPDK 能支援多家廠商的 NVMe SSD，異質環境帶來的軟體複雜度不會顯著增加，因此使用 SPDK 不會提高維護成本。</li></ol></blockquote><details id="33aa15e2-9005-80cd-a5f4-dd97fa6716ba" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80c4-92de-f946255b8ba6" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80c7-99c7-cbc774607ad5" class="" dir="auto">SPDK 雖然能提供極致效能，但在此異質硬體環境下，企業必須自行承擔原本由 Linux Kernel 處理的硬體「抽象化」與「相容性」維護，開發成本將大幅增加。因此，此伺服器不建議使用 SPDK。</p><hr id="33aa15e2-9005-800c-83e5-cad6334a4b91" dir="auto"/><p id="33aa15e2-9005-8024-82e9-f3ab81585b91" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-80ee-abcc-f1112bcd3611" class="" dir="auto">Linux Kernel 的 I/O Stack （如 VFS 和 Block Layer） 隱藏了不同廠牌 SSD 的實作差異。一旦 Bypass Kernel，應用程式就必須直接面對 10 種不同特性的 SSD，對於企業來說，維護成本往往會抵消 SPDK 帶來的效能收益。權衡之下，在這種多廠商混合的異質環境中，使用 SPDK 的綜合價值可能有限。</p></div></p><hr id="33ca15e2-9005-80cd-92e2-ddda9c0233b2" dir="auto"/><p id="33ca15e2-9005-8091-817f-f8e60e16782b" class="" dir="auto">(2) <code>io_uring</code> 雖然能改善 Linux 的 I/O 效能，但它的原理是透過非同步的 SQ/CQ 來減少 System call 開銷，而非自動解決異質硬體的相容性。事實上，<code>io_uring</code> 仍運行在 Kernel 之中，完全依賴原有的 VFS 和 Block Layer 來提供硬體抽象化。相較之下，SPDK 才是真正繞過 Kernel，需要在 User space 處理硬體差異的方案。因此，儘管 <code>io_uring</code> 無法在效能上與 SPDK 相提並論，但對於許多實際場景而言，它仍然是一種更平衡的選擇。</p><p id="33ca15e2-9005-8083-8f5d-fd7384a6a12c" class="" dir="auto">(3) 只要處理器和主機板支援 IOMMU，SPDK 就能確保異質 SSD 之間的安全隔離，這與廠牌種類無關。IOMMU 是硬體層級的 DMA 隔離技術，與 SPDK 和諧共處。</p><p id="33ca15e2-9005-80db-8365-e302d229014f" class="" dir="auto">(4) 雖然 SPDK 可以技術上支援眾多廠商的 NVMe SSD，但異質環境仍然會大幅增加軟體複雜度和維護工作量。各種不同型號 SSD 在細節上的實作差異，使得相容性調校和持續維運的難度遠高於單一廠商環境。若輕忽這方面的開銷，很可能會抵銷 SPDK 的效能優勢。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-803f-ab1e-f5ea7aabcf11" dir="auto"/><ol type="1" id="33aa15e2-9005-802d-b546-c7f57255a254" class="numbered-list" start="2" dir="auto"><li>某團隊在資料中心導入 QLC SSD 作為主要容量層，並在主機上部署 CSAL（Cloud Storage Acceleration Layer）。<p id="33aa15e2-9005-8010-a8b0-c5ff6192add0" class="" dir="auto">其 workload 特性如下：</p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8053-b8fe-c385c1b02e2b" dir="ltr"><div style="width:100%"><ul id="33aa15e2-9005-8027-981f-ef95aa7f4f76" class="bulleted-list" dir="auto"><li style="list-style-type:disc">80% 為 4 KB random write</li></ul><ul id="33aa15e2-9005-80d2-b26b-cf81e03f83ef" class="bulleted-list" dir="auto"><li style="list-style-type:disc">latency 要求嚴格 （ P99 要穩定）</li></ul></div></aside><p id="33aa15e2-9005-8030-897a-e7d76dd6f3ae" class="" dir="auto">部署 CSAL 後，團隊觀察到：</p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8093-8c52-d2f0525885cb" dir="ltr"><div style="width:100%"><ul id="33aa15e2-9005-8076-aa59-ee9e06b26361" class="bulleted-list" dir="auto"><li style="list-style-type:disc">QLC SSD 的 write amplification 顯著下降</li></ul><ul id="33aa15e2-9005-80d1-8092-d37ab9046e2c" class="bulleted-list" dir="auto"><li style="list-style-type:disc">tail latency （ P99）改善</li></ul></div></aside><p id="33aa15e2-9005-80c8-9fd0-ca3417418949" class="" dir="auto">以下哪一個解釋最合理地同時說明上述兩個現象？</p><blockquote id="33aa15e2-9005-8020-8890-fedaae4a2de2" class="" dir="auto"><ol type="1" id="33aa15e2-9005-802a-8307-fb5b5d0e9821" class="numbered-list" start="1" dir="auto"><li>CSAL 將所有 write 轉為 synchronous write，確保資料一致性，這降低了 write amplification 並改善 tail latency</li></ol><ol type="1" id="33aa15e2-9005-8099-8159-d68a69669610" class="numbered-list" start="2" dir="auto"><li>CSAL 將 FTL 從 SSD 移到 host，使 SSD controller 負載下降，因此 write amplification 與 tail latency 同時改善</li></ol><ol type="1" id="33aa15e2-9005-80b4-8e4e-e99a4e84ebdb" class="numbered-list" start="3" dir="auto"><li>CSAL 將 random write 轉為 sequential write，減少 QLC 的內部 garbage collection，因此同時降低 write amplification 並改善 tail latency</li></ol><ol type="1" id="33aa15e2-9005-80f7-bef0-db7604a25fb3" class="numbered-list" start="4" dir="auto"><li>CSAL 使用 RAID-like striping 將寫入分散到多顆 QLC SSD，降低單顆 SSD 壓力，因此 write amplification 與 tail latency 改善</li></ol></blockquote><details id="33aa15e2-9005-8012-874c-e20023b5a247" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-806e-be85-e03d46ad2283" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8010-8348-cd6b77933cb4" class="" dir="auto">CSAL 將 random write 轉為 sequential write，減少 QLC 的內部 garbage collection，因此同時降低 write amplification 並改善 tail latency</p><hr id="33aa15e2-9005-80a5-8c9f-eb0f5eb93be6" dir="auto"/><p id="33aa15e2-9005-80ae-9325-d7629b8cd5ab" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-80d4-b93a-e60aa371094e" class="" dir="auto">這是 CSAL 的核心機制 <strong>&quot;Write Shaping&quot;</strong>。QLC 最忌諱小碎片隨機寫入，因為這會觸發頻繁的 SSD 內部 GC，進而導致 WAF 飆升與 P99 延遲不穩。CSAL 在 Host 端將隨機寫入整合成大塊的 Sequential 寫入（Batching），從根本上降低了 QLC 的 GC 壓力，穩定了 P99 延遲。</p></div></p><hr id="33ca15e2-9005-80b0-beda-cfd78ba5fae2" dir="auto"/><p id="33ca15e2-9005-802f-9ff6-dcce43e6f8df" class="" dir="auto">(1) 同步寫入通常會顯著「惡化」P99 延遲（因為必須等待確認），且同步機制與降低 WAF（寫入放大）並無直接物理因果關係。</p><p id="33ca15e2-9005-8006-b857-f062aef66d32" class="" dir="auto">(2) CSAL 雖然確實將部分邏輯移至 Host 端處理，但其主要目的是改變「寫入行為」而非單純減少控制器負載。「把 FTL 從 SSD 移到 host」不是這題最自然的 CSAL 解釋。</p><p id="33ca15e2-9005-805b-aaa6-cbc3627b9591" class="" dir="auto">(4) RAID-like striping 是為了提升吞吐量或容錯，但「分散寫入」若維持隨機性質，依然無法解決 QLC 的 WAF 問題。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-805c-923b-ea74a86b0087" dir="auto"/><ol type="1" id="33aa15e2-9005-80e3-865e-ec82d7531570" class="numbered-list" start="3" dir="auto"><li>某團隊在資料庫系統中處理大量 <strong>B+ tree lookup</strong>。<p id="33aa15e2-9005-8070-9f0e-fdc392cefddf" class="" dir="auto">其 workload 特性如下：</p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-805c-9fe1-e8f89b6eceb3" dir="ltr"><div style="width:100%"><ul id="33aa15e2-9005-8005-a057-e8709e9058ed" class="bulleted-list" dir="auto"><li style="list-style-type:disc">每次查詢都需要沿著 tree 做多層 pointer chasing</li></ul><ul id="33aa15e2-9005-8090-8abd-f118e435557d" class="bulleted-list" dir="auto"><li style="list-style-type:disc">每讀完一層 node，才能知道下一層 block address</li></ul><ul id="33aa15e2-9005-8070-a1e4-e15e187c5955" class="bulleted-list" dir="auto"><li style="list-style-type:disc">底層儲存裝置是高速 NVMe SSD</li></ul><ul id="33aa15e2-9005-8081-bcbc-e72d6583d190" class="bulleted-list" dir="auto"><li style="list-style-type:disc">profiling 顯示 media latency 並不是主要瓶頸，反而是大量 <strong>user-kernel round trip</strong> 與 system call overhead</li></ul></div></aside><p id="33aa15e2-9005-806c-bcd2-fab37cc439cd" class="" dir="auto">團隊後來導入一種方案：<strong>保留 kernel storage stack，不採用完全 SPDK 式 kernel bypass，但把「解析 node 並決定下一個 block address」的小段邏輯放進 kernel I/O path 中執行。</strong></p><p id="33aa15e2-9005-806d-806c-d24b76663934" class="" dir="auto">部署後，團隊觀察到：</p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-804c-853e-e4eca119dd99" dir="ltr"><div style="width:100%"><ul id="33aa15e2-9005-80b2-8b5d-dbd48c6cab7c" class="bulleted-list" dir="auto"><li style="list-style-type:disc">system call 次數顯著下降</li></ul><ul id="33aa15e2-9005-8057-a988-c7f30d3eccab" class="bulleted-list" dir="auto"><li style="list-style-type:disc">tail latency（P99）改善</li></ul></div></aside><p id="33aa15e2-9005-8031-91a8-ff7da3ecf641" class="" dir="auto">以下哪一個解釋最合理地同時說明上述兩個現象？</p><blockquote id="33aa15e2-9005-80d7-b1b6-f46fedd4c698" class="" dir="auto"><ol type="1" id="33aa15e2-9005-805b-b98b-c860fecb9e35" class="numbered-list" start="1" dir="auto"><li>此方案透過 FDP 對每筆 lookup 提供 placement hint，讓 SSD 在內部重新分類資料，因此減少 system call 並改善 pointer-chasing 的 tail latency</li></ol><ol type="1" id="33aa15e2-9005-8004-a968-f11b83a3f0c1" class="numbered-list" start="2" dir="auto"><li>此方案主要依賴 page cache 吸收 B+ tree lookup，因此 NVMe 幾乎不需要處理 I/O，故 system call 與 tail latency 同時下降</li></ol><ol type="1" id="33aa15e2-9005-805e-a287-f09fbc4345dc" class="numbered-list" start="3" dir="auto"><li>此方案的主要效果來自 io_uring 的 submission/completion batching，因此多層 B+ tree traversal 可以在 user space 一次提交完成，不必每層等前一層結果</li></ol><ol type="1" id="33aa15e2-9005-80e1-b3e0-c7c31400044c" class="numbered-list" start="4" dir="auto"><li>此方案利用 eBPF/XRP 類型機制，將 pointer-chasing 中「下一步去哪」的關鍵決策下沉到 kernel path，減少每層 traversal 都要回 user space 的往返，因此 system call 數下降，tail latency 也改善</li></ol></blockquote><details id="33aa15e2-9005-802e-8d3e-c0f036d6edcb" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-804b-a2d7-e8fb874bb412" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80c9-8903-f9b129059abc" class="" dir="auto">此方案利用 eBPF/XRP 類型機制，將 pointer-chasing 中「下一步去哪」的關鍵決策下沉到 kernel path，減少每層 traversal 都要回 user space 的往返，因此 system call 數下降，tail latency 也改善</p><hr id="33aa15e2-9005-80ae-9956-e7ee0e9c7f53" dir="auto"/><p id="33aa15e2-9005-802d-8414-fafcbe8d9a69" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8058-9389-e6244a2af2f2" class="" dir="auto">這是正解。題目強調「保留 kernel」但把小決策下沉到 kernel path， 正是 eBPF/XRP 這類方法的核心思路。少了每層 traversal 的來回往返， system call 數和 P99 都可能改善。</p></div></p><hr id="33ca15e2-9005-80a7-bb43-c623fc2de87a" dir="auto"/><p id="33ca15e2-9005-80c7-9ee4-f4517b9a45a4" class="" dir="auto">(1) FDP 解的是寫入放置與垃圾回收干擾，不是 lookup 過程中「下一步去哪」的 decision path overhead。它和 pointer chasing 的 user-kernel 往返成本 沒有直接對應關係。</p><p id="33ca15e2-9005-80fc-acd3-c9bf69522a00" class="" dir="auto">(2) 題目的重點是 pointer chasing 過程中的 decision path overhead， 不是 cache hit。即使 page cache 有時能降低裝置 I/O，這也不能直接解釋 為何把小段邏輯放進 kernel path 後，system call 次數會明顯下降。</p><p id="33ca15e2-9005-8026-b47b-fc772f8675ee" class="" dir="auto">(3) 這個說法忽略了 pointer chasing 的相依性。題幹已明示每讀完一層 node， 才能知道下一層 block address，因此不能單靠 batching 就把整條 traversal 預先一次提交完成。真正改善來自把「決定下一步去哪」的邏輯下沉到 kernel path， 減少每層都往返 user-kernel。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8065-b4c4-cc97827aa20f" dir="auto"/><ol type="1" id="33aa15e2-9005-805e-8656-ee32f7b913f4" class="numbered-list" start="4" dir="auto"><li>儘管 Kernel-Bypass I/O 很強大，但並非所有情況下都適用，以下關於 Kernel-Bypass I/O 限制 或缺點的描述，何者錯誤?<blockquote id="33aa15e2-9005-80f6-bc3c-d14fe321b419" class="" dir="auto"><ol type="1" id="33aa15e2-9005-803a-8b7b-d0b49a126dec" class="numbered-list" start="1" dir="auto"><li>Kernel-Bypass I/O 無法使用 Kernel 提供的各種功能。</li></ol><ol type="1" id="33aa15e2-9005-80a8-ae9c-f4e1595b90bd" class="numbered-list" start="2" dir="auto"><li>交給 Kernel-Bypass I/O 所管理的記憶體，只有一個 process 可以使用。</li></ol><ol type="1" id="33aa15e2-9005-807f-9dd3-facdcd08002e" class="numbered-list" start="3" dir="auto"><li>Kernel-Bypass I/O 由於繞過 Kernel，因此無法使用 DMA 機制進行資料傳輸。</li></ol><ol type="1" id="33aa15e2-9005-80b2-a98e-dc17dc6e3a04" class="numbered-list" start="4" dir="auto"><li>原則上 Kernel-Bypass I/O 會占用 CPU 執行 Polling 模式。</li></ol></blockquote><details id="33aa15e2-9005-80e2-a352-e725aa4b01d9" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-807b-b55e-f2f40b451126" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-804a-8c25-ec7022b15da2" class="" dir="auto">Kernel-Bypass I/O 由於繞過 Kernel，因此無法使用 DMA 機制進行資料傳輸。</p><hr id="33aa15e2-9005-80d9-88e1-d1e351ee07d2" dir="auto"/><p id="33aa15e2-9005-801e-937a-efd5ff94100e" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-807d-948a-f06f5fcb97c2" class="" dir="auto">Kernel-Bypass 不但沒有避免 DMA，反而高度依賴 DMA。正是透過 DMA 直接將資料搬運 至 user space，繞過 kernel space，才達成極高效能</p></div></p><hr id="33ca15e2-9005-807c-b1a5-fee4c39f6352" dir="auto"/><p id="33ca15e2-9005-80e7-807f-ec9eb15c5064" class="" dir="auto">(1) Kernel-Bypass I/O 犧牲了 Kernel 提供的安全檢查、硬體抽象化等大量功能，開發者必須自行 實作或管理這些邏輯，技術門檻與開發成本大幅增加。</p><p id="33ca15e2-9005-809d-90e2-dc430e6f775f" class="" dir="auto">(2) Kernel-Bypass 通常會讓應用程式直接接管硬體與特定記憶體區域，這種「獨佔」機制使得硬 體資源難以在多個不相關的 Process 之間輕鬆地進行切換與共享。</p><p id="33ca15e2-9005-8090-9aa3-f58ff7052486" class="" dir="auto">(4) Kernel-Bypass I/O 為了低延遲所以採用 Polling，這意味著即便在沒有資料傳輸時， 該 CPU 也會維持高負載，在非頻繁 I/O 的情境下會造成電力與運算資源浪費。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80fb-9d35-c2b1ac54ec77" dir="auto"/><ol type="1" id="33aa15e2-9005-80f2-82cc-db17fa2e66f0" class="numbered-list" start="5" dir="auto"><li>在 HDD 時代，Linux kernel 的 block layer 提供三項關鍵優化：I/O scheduling（重新排序 request 以最小化 seek）、I/O merging（合併 相鄰 request）以及 interrupt-driven completion。當儲存裝置換成延遲 只有微秒等級的高速 NVMe SSD 後，以下哪個選項最能說明這三項機制 為何反而成為效能瓶頸？<blockquote id="33aa15e2-9005-80bb-8152-c87cc87e797a" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80f2-a5e3-cac38ec0a961" class="numbered-list" start="1" dir="auto"><li>這些機制成為瓶頸主要是因為它們的內部資料結構消耗太多 DRAM，壓縮了 page cache 的可用空間</li></ol><ol type="1" id="33aa15e2-9005-80bd-ba4f-d6bf017b9ec9" class="numbered-list" start="2" dir="auto"><li>這些機制只有在使用 SPDK 時才是瓶頸；使用 io_uring 時 kernel 會自動停用它們</li></ol><ol type="1" id="33aa15e2-9005-8065-b1db-d45f7917c96c" class="numbered-list" start="3" dir="auto"><li>I/O scheduling 在 NVMe 上是多餘的 CPU 開銷，因為 SSD 沒有 seek penalty；I/O merging 為了湊批而延遲送出 request；interrupt 的 context switch 開銷在裝置延遲只有微秒時占比顯著</li></ol><ol type="1" id="33aa15e2-9005-80b4-b621-ffef22db4a89" class="numbered-list" start="4" dir="auto"><li>I/O scheduling 仍然有用，因為 NVMe SSD 也能從 sequential access 中獲益；I/O merging 仍然有效；只有 interrupt 的開銷才是問題</li></ol></blockquote><details id="33aa15e2-9005-8045-87b9-dd9a38df1660" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80f5-9c7a-f682c2e55699" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80e2-8708-eade88e8aa6b" class="" dir="auto">I/O scheduling 在 NVMe 上是多餘的 CPU 開銷，因為 SSD 沒有 seek penalty；I/O merging 為了湊批而延遲送出 request；interrupt 的 context switch 開銷在裝置延遲只有微秒時占比顯著</p><hr id="33aa15e2-9005-8031-bdef-f1691b89b9a6" dir="auto"/><p id="33aa15e2-9005-80a3-a850-fe7b5d269208" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8053-a616-c2497076f38c" class="" dir="auto">三項優化都假設儲存裝置是慢速機械式硬碟。SSD 沒有 seek，所以 scheduling 是白做工。Merging 增加延遲但收益極小。而 interrupt 的 context switch 開銷（約 5-10 us）在 NVMe 總延遲只有 10-20 us 的情況下已不可忽視，因此 polling 成為更好的選擇。</p></div></p><hr id="33ca15e2-9005-8073-912c-cfe31c7e8b89" dir="auto"/><p id="33ca15e2-9005-8059-b56a-ec8d5865e79c" class="" dir="auto">(1) 瓶頸在於 CPU 與延遲的開銷，而非記憶體消耗。這些資料結構很小， 真正的問題是花在這些軟體層的時間。</p><p id="33ca15e2-9005-80f4-bd7b-dd87e095642e" class="" dir="auto">(2) io_uring 減少的是 syscall 開銷，但 I/O 路徑仍然經過 kernel 的 block layer，包含 scheduling 和 merging。這些軟體層並不會因為 使用 io_uring 就自動被繞過。</p><p id="33ca15e2-9005-80b9-8001-de6159ab869d" class="" dir="auto">(4) 雖然 sequential access 對 SSD 有些微好處（內部 parallelism 與 prefetch），但 scheduling 本身的 CPU 開銷遠大於這個收益。Merging 同理，在裝置已經很快的情況下，延遲送出換來的合併效果微乎其微。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8048-933e-f0dc156f5114" dir="auto"/><ol type="1" id="33aa15e2-9005-80ba-b3eb-e975f246b8d5" class="numbered-list" start="6" dir="auto"><li>某系統工程師比較兩種 I/O 設計：<aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8077-8dfc-c63a3563e0f3" dir="ltr"><div style="width:100%"><ul id="33aa15e2-9005-8091-9f19-d0e80da58826" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>設計 A：</strong> 完全 kernel bypass（例如 SPDK）</li></ul><ul id="33aa15e2-9005-80d8-abbf-ee009e0baf1c" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>設計 B：</strong> 使用 <code>io_uring</code>（仍經 kernel，但透過 shared ring buffer 減少 syscall）</li></ul></div></aside><p id="33aa15e2-9005-8033-82ab-fef923d4c758" class="" dir="auto">實驗發現，在某些 workload 下，設計 B 的效能接近甚至超過設計 A。 請分析最合理的原因：</p><blockquote id="33aa15e2-9005-8035-8f79-da3051e2e61b" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8027-92ef-f63164eb3f54" class="numbered-list" start="1" dir="auto"><li>io_uring 強制使用 page cache，因此在所有 workload 都比 kernel bypass 快</li></ol><ol type="1" id="33aa15e2-9005-8010-834d-c14ebabed509" class="numbered-list" start="2" dir="auto"><li>io_uring 透過 shared memory queue 減少 syscall 與 context switch，同時保留 kernel 的資源管理與最佳化</li></ol><ol type="1" id="33aa15e2-9005-8013-a39d-e3e1532e436e" class="numbered-list" start="3" dir="auto"><li>io_uring 並未繞過 kernel，因此在所有情況下都會比 kernel bypass 慢</li></ol><ol type="1" id="33aa15e2-9005-80a7-8ba6-f6eb4d836f3c" class="numbered-list" start="4" dir="auto"><li>io_uring 主要使用 interrupt，而 kernel bypass 主要使用 polling，因此 latency 較高</li></ol></blockquote><details id="33aa15e2-9005-8057-a6ad-f2fddf05932e" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80b6-b619-ccc234dee433" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80fb-b430-de77396bc3ec" class="" dir="auto">io_uring 透過 shared memory queue 減少 syscall 與 context switch，同時保留 kernel 的資源管理與最佳化</p><hr id="33aa15e2-9005-8022-bb96-d546e853c049" dir="auto"/><p id="33aa15e2-9005-808c-b803-f8a86caaed66" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-80d2-b4f6-ff80a9c44ccd" class="" dir="auto">io_uring 使用 shared ring buffer（SQ / CQ）讓 user space 與 kernel 之間以低成本溝通，顯著降低 syscall 與 context switch overhead。 同時仍保留 kernel 的 I/O scheduling、資源管理與快取機制，使其在非極端低延遲或 mixed workload 下，可能比 kernel bypass 更有效率。</p></div></p><hr id="33ca15e2-9005-80cf-b1ea-ecad1bc884ce" dir="auto"/><p id="33ca15e2-9005-80e7-bf62-c4db94d31f5d" class="" dir="auto">(1) io_uring 並不強制使用 page cache，可搭配 buffered I/O 或 direct I/O。 效能取決於 workload 特性，例如是否有 temporal locality，而不是必然優於 kernel bypass。</p><p id="33ca15e2-9005-80ad-b8e8-e83d63dc2b1d" class="" dir="auto">(3) io_uring 雖然仍經過 kernel，但透過 shared ring buffer 大幅降低 syscall 與 context switch 成本。 在某些 workload 下，kernel 的 I/O scheduling、cache 與資源管理反而能提升整體效能，因此不一定比 kernel bypass 慢。</p><p id="33ca15e2-9005-800b-9ba9-e7b42175c0cd" class="" dir="auto">(4) io_uring 並不限於 interrupt，也支援 polling（例如 IORING_SETUP_SQPOLL）。 同樣地，kernel bypass 常見使用 polling，但這並非唯一模式。 latency 表現取決於實際設定與 workload，而非由 interrupt 或 polling 單一因素決定。 </p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80bb-99c3-fe4b95204400" dir="auto"/><ol type="1" id="33aa15e2-9005-80a5-b0a5-c5e737593dc1" class="numbered-list" start="7" dir="auto"><li><mark class="highlight-red" data-notion-highlight="red">某系統使用 kernel bypass I/O（user space queue + polling）直接操作 NVMe SSD，並觀察到 throughput 對 batch size 非常敏感。 該系統的設計是累積一批 command 寫入 submission queue（SQ）後，才統一寫一次 doorbell register 通知 controller，這個累積的數量稱為 batch size。 當 batch size 過小時，整體效能顯著下降。</mark><p id="33aa15e2-9005-8074-b91c-d6618df2e569" class="" dir="auto"><mark class="highlight-red" data-notion-highlight="red">假設系統同時有大量 in-flight I/O 請求，裝置內部的平行性已被充分利用，且裝置本身沒有成為 bottleneck，請分析最合理的原因：</mark></p><blockquote id="33aa15e2-9005-8047-a10c-cf7ea1e3f4ef" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80c1-b06f-c2a3bc352632" class="numbered-list" start="1" dir="auto"><li>batch size 過小會限制 NVMe controller 的內部平行性，使 DMA 無法同時處理多個 I/O</li></ol><ol type="1" id="33aa15e2-9005-80d6-b083-f657b66cad3f" class="numbered-list" start="2" dir="auto"><li>batch size 過小會增加 user space 與 kernel 之間的 context switch 次數，導致效能下降</li></ol><ol type="1" id="33aa15e2-9005-8095-b6ac-c6f0957f1d13" class="numbered-list" start="3" dir="auto"><li>batch size 過小會使 page cache 無法有效運作，導致 cache miss rate 上升</li></ol><ol type="1" id="33aa15e2-9005-8051-8057-c7d57ed276e7" class="numbered-list" start="4" dir="auto"><li>batch size 過小會降低 doorbell write 與 queue submission 的 amortization，導致每個 I/O 的固定成本過高</li></ol></blockquote><details id="33aa15e2-9005-8072-aebf-f20341d5f0d0" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-808f-91ba-fa98cde4814b" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80e9-921c-c0992c06f509" class="" dir="auto">batch size 過小會降低 doorbell write 與 queue submission 的 amortization，導致每個 I/O 的固定成本過高</p><hr id="33aa15e2-9005-80b0-98c1-e9648efee395" dir="auto"/><p id="33aa15e2-9005-80f9-9c70-c6515b327ec7" class="" dir="auto">解析: <div class="indented"><p id="0df34fc4-16f3-4ba7-bb9e-f363a7e262a4" class="" dir="auto">在 NVMe 架構中，每次提交 I/O 都需要進行 queue 操作與 doorbell write，這些都有固定成本。 當 batch size 太小時，這些成本無法被多個 I/O 攤平（amortization），導致 per I/O 開銷上升，進而降低整體 throughput。</p></div></p><hr id="33ca15e2-9005-8080-a06b-f5746fb92454" dir="auto"/><p id="33ca15e2-9005-80ba-ba5f-fa4871ff2eda" class="" dir="auto">(2) kernel bypass 的設計目標之一就是避免 user space 與 kernel 之間的 context switch。 在此架構下，I/O 操作主要在 user space 完成，因此 context switch 並不是主要開銷來源。</p><p id="33ca15e2-9005-8038-9fd9-dc5874e43dc5" class="" dir="auto">(3) kernel bypass I/O 通常繞過 OS page cache，因此效能不依賴 page cache 的命中率。 因此 cache miss 並不是此情境下的主要因素。</p><p id="33ca15e2-9005-80ac-a5af-e15a22a8468c" class="" dir="auto">(4) NVMe 的平行性主要來自 in-flight I/O 數量與裝置內部設計，題目已假設有大量 in-flight I/O，表示裝置平行性已被充分利用。 batch size 影響的是 submission 效率，而非裝置端的平行處理能力。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-804f-8593-dfbc92666818" dir="auto"/><ol type="1" id="33aa15e2-9005-808d-a117-d0ba895a2229" class="numbered-list" start="8" dir="auto"><li>在設計基於 8-lane PCIe Gen5 NVMe SSD 的極致效能儲存系統時，開發者發現傳統 Linux kernel I/O stack 難以達到硬體標稱的 IOPS。若考慮導入 SPDK，關於其透過核心設計提升 I/O 處理效率的敘述，下列何者最符合其邏輯？<blockquote id="33aa15e2-9005-80ca-a94a-c7966eabbf7b" class="" dir="auto"><ol type="1" id="33aa15e2-9005-803f-90c2-fda10bc92f80" class="numbered-list" start="1" dir="auto"><li>當 NVMe SSD 的 I/O latency 降至 10-20 微妙時，傳統 interrupt 的固定 overhead 佔比顯著提升，SPDK 透過 polling 消除 context switch 與 IRQ 處理負擔。</li></ol><ol type="1" id="33aa15e2-9005-80d9-ae9c-e292b4efa1f1" class="numbered-list" start="2" dir="auto"><li>SPDK 在 userspace 重新實作了完整的 POSIX 檔案系統抽象層，並透過進階的 block merging 演算法大幅減少發往硬體的指令總數。</li></ol><ol type="1" id="33aa15e2-9005-80b0-b9cf-c2fd6d659f16" class="numbered-list" start="3" dir="auto"><li>SPDK 採用 share-nothing 架構，為每個 worker thread 分配專屬的 NVMe queue pair 並結合 io_uring 機制，達成 lockless 設計。</li></ol><ol type="1" id="33aa15e2-9005-808e-a10e-c0fca6873d91" class="numbered-list" start="4" dir="auto"><li>SPDK 透過 IOMMU 將硬體存取權限移轉至 userspace，藉此繞過硬體層的 DMA 延遲，從實體層縮短 data path。</li></ol></blockquote><details id="33aa15e2-9005-809b-8537-d0a14ba108f8" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80be-a90a-f5e3ae9ee86e" dir="ltr"><div style="width:100%"><p id="bc34228c-bde7-499b-ab1f-8e9cc8812038" class="" dir="auto">當 NVMe SSD 的 I/O latency 降至 10-20 微妙時，傳統 interrupt 的固定 overhead 佔比顯著提升，SPDK 透過 polling 消除 context switch 與 IRQ 處理負擔。</p><hr id="33aa15e2-9005-8087-b2ae-f47f4175026d" dir="auto"/><p id="33aa15e2-9005-804b-b83e-fd8ac7ad9e3d" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-806c-b0f0-d5b5ec3404d8" class="" dir="auto">在高速 NVMe 環境下，interrupt 產生的開銷（如 context switch 與 kernel mode switching）可能佔用高達 15-30% 的處理時間。雖然 polling 會導致 CPU 持續處於 busy-wait 狀態，但它消除了非必要的非同步中斷開銷，顯著提升處理單一 I/O 的效率。</p></div></p><hr id="33ca15e2-9005-8038-82f4-f8cfad51675d" dir="auto"/><p id="33ca15e2-9005-80d6-ba4a-c1e4250c9d32" class="" dir="auto">(2) SPDK 為了效能通常會捨棄 POSIX 的兼容性與多層抽象。此外，對於具備 multi-queue 能力的 NVMe SSD 而言，減少指令總數的 block merging 雖然有益，但不再像傳統 HDD 需要優化磁頭移動那般具有決定性的效能影響。</p><p id="33ca15e2-9005-8007-95ac-c666b3b79e03" class="" dir="auto">(3) 雖然 SPDK 強調 share-nothing 與 lockless，但它屬於 kernel bypass 技術，設計目標是完全繞過 kernel；而 <code>io_uring</code> 仍然是基於 kernel space 的非同步優化機制，兩者在架構路徑上是互斥的。</p><p id="33ca15e2-9005-8001-996a-f7c182b387a6" class="" dir="auto">(4) IOMMU 的角色在於確保 security 與 isolation，並處理 address translation，它並不能繞過硬體本身的實體延遲。SPDK 的效能優勢主要來自於軟體層架構對 CPU 開銷的優化。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80fa-98d3-db1c0a0fcc4a" dir="auto"/><ol type="1" id="33aa15e2-9005-80bc-8d62-e0eebe38837c" class="numbered-list" start="9" dir="auto"><li>在 CSAL 雙層架構中，一個 VM 發出大量 <strong>4KiB 隨機寫入</strong> 請求。SPDK polling thread 在處理這批請求時，Upstream FTL 的 write buffer 已滿，觸發了一次 <strong>compaction</strong>，需將 Upstream 的 chunk 搬移至 Downstream QLC Tier。 請問在 compaction 進行期間，下列哪一項描述 <strong>最精確</strong> 反映了此架構的行為與設計取捨？<blockquote id="33aa15e2-9005-8005-aaa7-dd7626a2b0c3" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8039-8d16-ed2c5d274861" class="numbered-list" start="1" dir="auto"><li>Compaction 期間，新進的 4KiB 隨機寫入會被暫停，直到 Upstream write buffer 清出空間為止。 由於 SPDK 採用 polling 而非 interrupt，此暫停不會讓 CPU 閒置，polling thread 仍會持續空轉偵測 CQ，因此對整體 CPU 使用率沒有影響。</li></ol><ol type="1" id="33aa15e2-9005-8007-81cb-c5bc7a5e2ce5" class="numbered-list" start="2" dir="auto"><li>透過 write shaping，compaction 會將 Upstream 的資料聚合成 sequential 大區塊寫入 QLC 裝置，使得 QLC 裝置內部的 FTL 幾乎不需要執行 GC。 同時，將同一個 VM (壽命相近) 的資料集中寫入相同的 host-managed block 中，能讓該區塊的資料接近同時失效，大幅降低 host-side FTL 未來的 GC 負擔與 WAF。</li></ol><ol type="1" id="33aa15e2-9005-8021-af35-f7edc5529d2c" class="numbered-list" start="3" dir="auto"><li>Compaction 完成後必須更新 host FTL 的 L2P mapping。由於此映射表主體放在較慢的儲存層且不在 DRAM 中，compaction 結束後的第一批前端讀取勢必會發生大量 cache miss，嚴重惡化讀取延遲，且 SPDK 的高並發 (high queue depth) 模型無法掩蓋這種延遲，成為該架構固有的瓶頸。</li></ol><ol type="1" id="33aa15e2-9005-808f-a3db-e072bce6454a" class="numbered-list" start="4" dir="auto"><li>受惠於 SPDK 的 shared-nothing 架構，因為每個 SSD 裝置都被分配到專屬獨立的 worker thread，所以這兩層的 I/O 路徑完全隔離。 Upstream 到 Downstream 的 compaction 會由專屬的背景執行緒處理，不會影響到服務新進寫入的 Upstream thread，前端延遲的影響為零。</li></ol></blockquote><details id="33aa15e2-9005-8070-b1b8-d76eb264ad25" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8072-8fd5-faff16ac36f3" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8057-a51d-ed2d0a445a1d" class="" dir="auto">透過 write shaping，compaction 會將 Upstream 的資料聚合成 sequential 大區塊寫入 QLC 裝置，使得 QLC 裝置內部的 FTL 幾乎不需要執行 GC。 同時，將同一個 VM (壽命相近) 的資料集中寫入相同的 host-managed block 中，能讓該區塊的資料接近同時失效，大幅降低 host-side FTL 未來的 GC 負擔與 WAF。</p><hr id="33aa15e2-9005-80a4-af93-c2f42270feb5" dir="auto"/><p id="33aa15e2-9005-8099-ba2d-fea562f76a24" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-807c-9e27-c9279ceefe65" class="" dir="auto">完全正確。CSAL 中有兩層 GC 概念，分別為 1. write shaping 的循序大檔寫入能避免 QLC 裝置端硬體內部的 GC；2. 同 VM 短壽命資料分群在一起，則是為了當 Host 端軟體層的 FTL 需要做 GC 時，該區段多數資料已經 invalid，可以直接整塊回收，從而降低 host-side FTL 層的 WAF。</p></div></p><hr id="33ca15e2-9005-80a7-8a85-c0765dafb1cc" dir="auto"/><p id="33ca15e2-9005-805f-b3c5-d85d933bc3fe" class="" dir="auto">(1) CSAL 的 Upstream 採用 log-structured storage，compaction 是在背景非同步進行，除非 buffer 達到 hard limit，否則不會直接封鎖前端寫入路徑。 此外，對 CPU 沒影響是錯誤的推論：雖然 polling 本來就佔用 100% core，但 compaction 相關的 I/O 處理會消耗 polling thread 實際的處理週期 (cycles)，會與同一 thread 下服務的其他 I/O 產生排擠效應。</p><p id="33ca15e2-9005-80cd-be69-d33a218028eb" class="" dir="auto">(3) 選項有兩個明顯錯誤。第一，新寫入或 compaction 中更新的 L2P 通常會駐留在 DRAM cache 中（被標記為 dirty），並非後續的讀取就必然發生 cache miss。 第二，SPDK 異步非阻塞的設計，正是要讓系統在等待某個 I/O 的 metadata 載入時，CPU 能夠繼續推進處理其他 I/O，這確保了整體的總吞吐量 (throughput) 能維持飽和，不會因為單一 IO 延遲而成為吞吐量瓶頸。</p><p id="33ca15e2-9005-8051-9d6a-e043684d07de" class="" dir="auto">(4) SPDK 的 shared-nothing 是以 CPU core 為單位，一個 polling thread 往往負責輪詢多個 SSD 的 queue pairs，因此它們極可能在同一個執行緒下被處理。 即便刻意隔開執行緒，compaction 的資料依然需要從 Upstream SSD 讀出，勢必佔用 Upstream 的 I/O 頻寬，不管在軟體還是硬體層面上，都不可能完全隔離且影響為零。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8051-ac57-c4bd01fa2398" dir="auto"/><ol type="1" id="33aa15e2-9005-80c0-875b-c09d83565e47" class="numbered-list numbered-list-digits-2" start="10" dir="auto"><li>你正在設計一個基於 CSAL 的儲存系統， 目標是透過暫存層將上層應用產生的 random write 重新組織為對 QLC SSD 較友善的 sequential write。<p id="33aa15e2-9005-80f7-b7e4-e8643485adb0" class="" dir="auto">若要選擇作為 CSAL 暫存層的 SSD，其應優先具備哪一種特質？</p><blockquote id="33aa15e2-9005-806b-9c70-c3efd87d9703" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8050-917a-f9715015bcd2" class="numbered-list" start="1" dir="auto"><li>高 read IOPS 與低 read latency</li></ol><ol type="1" id="33aa15e2-9005-804c-88ce-cdac637e9231" class="numbered-list" start="2" dir="auto"><li>提供大容量 SSD（例如數 TB）以容納更多暫存資料</li></ol><ol type="1" id="33aa15e2-9005-807f-9972-c2c14ac592ec" class="numbered-list" start="3" dir="auto"><li>採用高 over-provisioning 與多通道 NAND 設計，支援低延遲、高 IOPS small random write 並具高耐久度</li></ol><ol type="1" id="33aa15e2-9005-809e-a3a2-fd68db93b8b0" class="numbered-list" start="4" dir="auto"><li>專為 large sequential write 最佳化，追求高吞吐量</li></ol></blockquote><details id="33aa15e2-9005-80db-a483-f2c2648c8397" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80ca-8937-dae0d63c490e" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-809b-9e1a-d8a311b09025" class="" dir="auto">採用高 over-provisioning 與多通道 NAND 設計，支援低延遲、高 IOPS small random write 並具高耐久度</p><hr id="33aa15e2-9005-8058-bbc5-c6beb79dc79a" dir="auto"/><p id="33aa15e2-9005-805b-85a8-dc3190ea1610" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-805e-8916-e6619b221c12" class="" dir="auto">暫存層的任務是即時吸收 small random write 並重組成 sequential write，因此 SSD 需要在 small I/O 下提供低延遲和高 IOPS， 並具備足夠耐久度支撐長時間高頻寫入。高 over-provisioning 可降低 GC 阻塞，多通道 NAND 增加並行度提高 IOPS，高耐久度則支撐長期負載。</p></div></p><hr id="33ca15e2-9005-8092-895a-f4c747ff93e9" dir="auto"/><p id="33ca15e2-9005-8013-83b6-f56c2fe37975" class="" dir="auto">(1) 暫存層主要處理 write，讀取效能對這類負載幫助有限，無法解決 write path 的瓶頸。</p><p id="33ca15e2-9005-80c7-959f-cd213028afcd" class="" dir="auto">(2) 大容量可以存放更多資料，但對暫存層吸收 small random write 的效能幫助有限，無法改善延遲或 IOPS，不是首要考量。</p><p id="33ca15e2-9005-8089-87d2-f531b8aec63a" class="" dir="auto">(4) 暫存層瓶頸在於吸收 random write，而不是 flush 時的 sequential write 吞吐量。若 random write 延遲高或 IOPS 低，仍會造成暫存層阻塞。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80cc-b56c-dd0c14f26fce" dir="auto"/><ol type="1" id="33aa15e2-9005-805f-afc8-e17e89a411d7" class="numbered-list numbered-list-digits-2" start="11" dir="auto"><li>某資料庫團隊考慮將 storage layer 從 <code>io_uring_cmd</code> 改為 SPDK，以進一步降低 latency。 下列哪個敘述最能描述兩者本質差異？<blockquote id="33aa15e2-9005-8057-9ced-ca330372be7d" class="" dir="auto"><ol type="1" id="33aa15e2-9005-804a-ad3a-d22cd96f9810" class="numbered-list" start="1" dir="auto"><li><code>io_uring_cmd</code> 比 SPDK 更接近硬體，因為使用 NVMe passthrough</li></ol><ol type="1" id="33aa15e2-9005-80aa-be90-fe6c9b55af18" class="numbered-list" start="2" dir="auto"><li>SPDK 與 <code>io_uring_cmd</code> 都完全繞過 kernel，差別為 API 不同</li></ol><ol type="1" id="33aa15e2-9005-80ae-9c94-e06419151610" class="numbered-list" start="3" dir="auto"><li>SPDK 透過 polling 與 user-space driver 完全消除 syscall 與 interrupt</li></ol><ol type="1" id="33aa15e2-9005-8012-92c8-cead26c031c8" class="numbered-list" start="4" dir="auto"><li>SPDK 與 <code>io_uring_cmd</code> 均可避免資料複製（memcpy），因此 latency 差異主要來自 queue depth 與 batching 能力</li></ol></blockquote><details id="33aa15e2-9005-808f-9916-f4ff3269ad0d" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80d4-9a92-c803803286c8" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8071-94eb-e03f745baba1" class="" dir="auto">SPDK 透過 polling 與 user-space driver 完全消除 syscall 與 interrupt</p><hr id="33aa15e2-9005-803e-840c-f93bf3706cc3" dir="auto"/><p id="33aa15e2-9005-801d-b21f-ca9de0996223" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-806c-997d-d46b4fa07276" class="" dir="auto">正確。SPDK 直接控制 NVMe queue， 透過 polling thread 避免 syscall、interrupt 與 context switch。</p></div></p><hr id="33ca15e2-9005-8060-aee3-da2716d0a045" dir="auto"/><p id="33ca15e2-9005-808f-a728-c0a24b7851ed" class="" dir="auto">(1) passthrough 實際仍經 kernel driver，SPDK 才是真正直接控制裝置。</p><p id="33ca15e2-9005-8074-b493-fada5b3370a2" class="" dir="auto">(2) <code>io_uring_cmd</code> 仍依賴 kernel driver， SPDK 則完全在 user space 操作裝置。</p><p id="33ca15e2-9005-80a0-ad9c-c09530572fef" class="" dir="auto">(4) 錯誤，兩者皆可支援高 queue depth 與 batching，亦可能避免 memcpy，但主要差異在於 control path。 io_uring_cmd 仍經 kernel，而 SPDK 完全繞過 kernel，因此效能差異不在 batching。</p></div></aside></div></details></li></ol></div></details></div></details></div></div><hr id="33aa15e2-9005-803b-8d83-f6957492ca1e" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8016-8e4d-cd2c325c1523" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8053-8699-d366ffe1d85d" class="" dir="auto">
+</p></div></aside></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

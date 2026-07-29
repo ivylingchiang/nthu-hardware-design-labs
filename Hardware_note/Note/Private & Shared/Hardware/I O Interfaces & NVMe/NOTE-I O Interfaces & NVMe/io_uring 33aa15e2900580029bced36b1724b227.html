@@ -1,0 +1,770 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>io_uring</title><meta name="data-notion-page-icon" content="🔧"/><link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2290%22%3E%F0%9F%94%A7%3C%2Ftext%3E%3C%2Fsvg%3E"/><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+/* Override strong tags inside headings to maintain consistent weight */
+h1 strong,
+h2 strong,
+h3 strong {
+	font-weight: 600;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 10px;
+	padding: 1rem;
+}
+
+/* For default-background callouts, render the border outline. */
+.callout.block-color-default_background {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+figure,
+aside,
+details {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+
+	table.collection-content {
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	table.collection-content th,
+	table.collection-content td {
+		overflow-wrap: anywhere;
+	}
+
+	table.collection-content td > .user,
+	table.collection-content td > time {
+		white-space: pre-wrap;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content-wrapper {
+	overflow-x: auto;
+}
+
+@media only print {
+	.collection-content-wrapper {
+		overflow-x: visible;
+	}
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.collection-content td {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.column-list {
+	display: flex;
+	gap: 46px;
+}
+
+.column {
+	min-width: 0;
+	overflow: hidden;
+}
+
+.column > *:first-child {
+	margin-top: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding-inline: 0.125rem;
+	padding-block: 0.375rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+table {
+	border-collapse: collapse;
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol.numbered-list.numbered-list-digits-2 {
+	padding-inline-start: 2em;
+}
+
+ol.numbered-list.numbered-list-digits-3plus {
+	padding-inline-start: 2.4em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+/*
+ * Render emoji icons using a ::before pseudo-element to keep the glyph
+ * out of the DOM textContent traversal. This avoids double-rendering icons
+ * in callouts and page titles.
+ * NOTE(slim/html-export-pseudo-icons): I can't tagref this because it will
+ * flag as a duplicate tag after codegen.
+ */
+.icon[data-emoji]::before {
+	content: attr(data-emoji);
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.callout img.notion-static-icon {
+	width: 1em;
+	height: 1em;
+}
+
+.callout p {
+	margin: 0;
+}
+
+.callout h1,
+.callout h2,
+.callout h3 {
+	margin: 0 0 0.6rem;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	margin-right: 0.4em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+blockquote.quote-large {
+	font-size: 1.25em;
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.tab {
+	margin: 1.25em 0;
+	padding-inline: 1rem;
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.highlight-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.highlight-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.highlight-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.highlight-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.highlight-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.highlight-default_background {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray_background {
+	background: rgba(42, 28, 0, 0.07);
+}
+.highlight-brown_background {
+	background: rgba(139, 46, 0, 0.086);
+}
+.highlight-orange_background {
+	background: rgba(224, 101, 1, 0.129);
+}
+.highlight-yellow_background {
+	background: rgba(211, 168, 0, 0.137);
+}
+.highlight-teal_background {
+	background: rgba(0, 100, 45, 0.09);
+}
+.highlight-blue_background {
+	background: rgba(0, 124, 215, 0.094);
+}
+.highlight-purple_background {
+	background: rgba(102, 0, 178, 0.078);
+}
+.highlight-pink_background {
+	background: rgba(197, 0, 93, 0.086);
+}
+.highlight-red_background {
+	background: rgba(223, 22, 0, 0.094);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.block-color-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.block-color-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.block-color-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.block-color-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.block-color-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(240, 239, 237, 1);
+}
+.block-color-brown_background {
+	background: rgba(245, 237, 233, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 235, 222, 1);
+}
+.block-color-yellow_background {
+	background: rgba(249, 243, 220, 1);
+}
+.block-color-teal_background {
+	background: rgba(232, 241, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(229, 242, 252, 1);
+}
+.block-color-purple_background {
+	background: rgba(243, 235, 249, 1);
+}
+.block-color-pink_background {
+	background: rgba(250, 233, 241, 1);
+}
+.block-color-red_background {
+	background: rgba(252, 233, 231, 1);
+}
+.select-value-color-default { background-color: rgba(42, 28, 0, 0.07); }
+.select-value-color-gray { background-color: rgba(28, 19, 1, 0.11); }
+.select-value-color-brown { background-color: rgba(127, 51, 0, 0.156); }
+.select-value-color-orange { background-color: rgba(196, 88, 0, 0.203); }
+.select-value-color-yellow { background-color: rgba(209, 156, 0, 0.282); }
+.select-value-color-green { background-color: rgba(0, 96, 38, 0.156); }
+.select-value-color-blue { background-color: rgba(0, 118, 217, 0.203); }
+.select-value-color-purple { background-color: rgba(92, 0, 163, 0.141); }
+.select-value-color-pink { background-color: rgba(183, 0, 78, 0.152); }
+.select-value-color-red { background-color: rgba(206, 24, 0, 0.164); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style><style>@import url('https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex-swap.min.css')</style></head><body><article id="33aa15e2-9005-8002-9bce-d36b1724b227" class="page serif" data-notion-page-icon="🔧"><header><img class="page-cover-image" src="https://app.notion.com/images/page-cover/met_william_morris_1877_willow.jpg" style="object-position:center 90%"/><div class="page-header-icon page-header-icon-with-cover"><span class="icon" data-emoji="🔧"></span></div><h1 class="page-title" dir="auto">io_uring</h1><p class="page-description" dir="auto"></p><table class="properties"><tbody></tbody></table></header><div class="page-body"><div id="33aa15e2-9005-801a-ac4c-e983bb06e326" class="column-list" data-notion-column-list="" dir="auto"><div id="33aa15e2-9005-80c1-af83-cb6084a3c92d" style="width:18.75%" class="column" data-notion-column-ratio="0.1875" dir="auto"><hr id="33aa15e2-9005-8069-80d6-e35c540775d4" dir="auto"/><figure id="33aa15e2-9005-8078-aa5b-db6a086f2e59" class="image" data-notion-image="../../Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg" dir="ltr"><a href="../../Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg"><img style="width:548.375px" src="../../Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg"/></a></figure><p id="33aa15e2-9005-80f4-a86f-e1b80aa0ba03" class="" dir="auto">
+</p></div><div id="33aa15e2-9005-80cb-a558-ca4cc24630ce" style="width:81.25%" class="column" data-notion-column-ratio="0.8125" dir="auto"><h3 id="33aa15e2-9005-80b1-8192-dd37f9835551" class="" dir="auto">io_uring</h3><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80bd-acda-f97e97cb1aab" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-802f-8591-c826e0a79e96" class="" dir="auto">在前面我們學過 synchronous 與 asynchronous I/O 的差異，而 Linux 早期的 async I/O 機制（如 libaio）有諸多限制，例如只支援 direct I/O 且 syscall 開銷仍然顯著。io_uring 是 Linux 從 5.1 開始引入的高效能 async I/O 框架，我們將深入探討它如何透過 kernel 與 user space 之間共享的 submission queue 和 completion queue ring buffer，讓應用程式不需要頻繁呼叫 syscall 就能提交與收割 I/O 請求。課程中我們也會介紹 batched submission 如何攤平 syscall 成本、SQPOLL 模式如何讓 kernel thread 持續 polling submission queue 以完全省去 submit 端的 syscall，以及 IOPOLL 模式如何用 polling 取代 interrupt 來降低 completion 延遲。此外，io_uring_cmd 機制允許我們直接下達 NVMe passthrough command，繞過傳統 block layer 的抽象。這些技術結合了我們先前學到的 block I/O 與 NVMe 知識，是目前 Linux 上最重要的高效能 I/O 介面。</p></div></aside><blockquote id="33aa15e2-9005-80b5-ba73-cffd4fed1dc3" class="" dir="auto">Reference: </blockquote><hr id="33aa15e2-9005-8001-aea7-c6ca7efd8357" dir="auto"/><details id="33aa15e2-9005-801d-b93c-ffb7007725d5" open="" class="toggle" dir="auto"><summary><strong>Classification</strong></summary><div class="indented"><p id="33aa15e2-9005-8076-bc59-d023963120fc" class="" dir="auto">
+</p><hr id="33aa15e2-9005-802d-9d2b-ea96ba16248e" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-806d-b4ac-cb1dd8cf86fe" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80c9-8863-d5efe9a13494" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Extra Component</mark></p><hr id="33aa15e2-9005-8042-85f2-ef78e068c697" dir="auto"/><p id="33aa15e2-9005-807a-b2cf-c8549ef471aa" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Reference:</mark></p></div></aside><hr id="33aa15e2-9005-8063-a83c-cc321740bae3" dir="auto"/></div></details><details id="33aa15e2-9005-80ef-9c35-de42b330d3c4" open="" class="toggle" dir="auto"><summary><strong>Key Word Definition/ Discussion</strong></summary><div class="indented"><details id="33aa15e2-9005-80b5-86a4-fc915f875a41" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>io_uring</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8022-aa5c-ea42908c581c" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8097-a20e-f692b24dffcd" class="" dir="auto"><code>io_uring</code> 是由 Jens Axboe 於 2019 年（Linux Kernel 5.1）引入的非同步 I/O 框架。它旨在解決傳統 <code>system call</code> 在高 IOPS 場景下的 <strong>Context Switch Overhead</strong>（模式切換開銷），透過 User Space 與 Kernel Space <strong>共享記憶體（Ring Buffer）</strong> 的方式，實現極致的 I/O 吞吐量。</p></div></aside><hr id="33aa15e2-9005-803c-912b-e7d15715bcaa" dir="auto"/><p id="aa00b10c-0ad9-4ffc-b319-ee8c2bc23283" class="" dir="auto">一個繁忙的資料庫 server 每秒要處理數十萬筆查詢，每筆查詢可能都需要從 SSD 讀取資料。傳統的做法是每次 I/O 都呼叫一次 system call，但 system call 本身不是免費的：<div class="indented"><p id="33ca15e2-9005-8058-ac40-d3e21a7b2824" class="" dir="auto">CPU 要從 user mode 切換到 kernel mode、儲存 register、做安全檢查，然後再切回來。</p></div></p><p id="33ca15e2-9005-8083-917f-d8f524bd5020" class="" dir="auto">當你每秒要做幾十萬次這種切換，CPU 花在「進出 kernel 的門」上的時間比花在「實際搬資料」上的時間還多。<code>io_uring</code> 就是為了解決這個問題而被創造出來的。</p><p id="628e7666-66ff-4b96-bc7e-f01b4f5a9093" class="" dir="auto">Linux 很早就有 asynchronous I/O 的機制（<code>POSIX AIO</code> 和 <code>libaio</code>），但它們都有明顯的限制。<div class="indented"><blockquote id="33ca15e2-9005-8088-acd6-de13cee29914" class="" dir="auto"><code>POSIX AIO</code> 在 glibc 裡是用 thread pool 模擬的，本質上還是 synchronous。<p id="33ca15e2-9005-8027-8a70-c3d1261e6f95" class="" dir="auto"><code>libaio</code> 只支援 <code>O_DIRECT</code>（不能用 page cache），而且每次提交都要呼叫 <code>io_submit()</code> system call，每次收割完成結果都要呼叫 <code>io_getevents()</code> system call。</p></blockquote></div></p><p id="aba47c58-1765-4735-9524-2baa9c7ce329" class="" dir="auto">在高 IOPS 場景下，system call 本身的成本就很可觀。一次 system call 涉及 user-to-kernel mode switch，大約需要幾百個 nanoseconds（包括 register save/restore、security checks 等等）。如果你每秒要做 100 萬次 I/O，那就是每秒 100 萬次 submit syscall 加上數十萬次 reap syscall，光是 syscall overhead 就會吃掉大量 CPU 時間。</p><hr id="33ca15e2-9005-80e6-aeb9-d515cee28faa" dir="auto"/><ul id="33ca15e2-9005-8044-a6cd-e07ea1f93d10" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>對比 libaio</strong>：<code>libaio</code> 僅支援 <code>O_DIRECT</code>（繞過 Page Cache），且每次提交與收割仍需 <code>io_submit</code> 和 <code>io_getevents</code> 兩個 syscall。</li></ul><ul id="33ca15e2-9005-8085-9c69-f59739ceeb0f" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>對比 POSIX AIO</strong>：在 glibc 中是用 User-level thread pool 模擬，效率低下，並非真正的核心非同步。</li></ul><ul id="33ca15e2-9005-803c-8ac1-caf15dad9555" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>零拷貝 (Zero Copy)</strong>：因為使用了 <code>mmap</code> 共享記憶體，核心不需要在提交請求時從 User space 複製資料結構。</li></ul><hr id="33aa15e2-9005-80a5-94e8-e15b1cf1997a" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8007-bc92-f228532364a1" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80f9-85d6-e2bfa21fced8" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p><ul id="33ca15e2-9005-80a2-b538-ca64e68d4a3e" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>核心版本依賴</strong>：雖然 5.1 引入，但 5.10 (LTS) 之後的功能才趨於穩定與完整。開發時須檢查 <code>IORING_FEAT_</code> 系列標誌。</li></ul><ul id="33ca15e2-9005-8040-bcb6-efe487225767" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>安全限制</strong>：由於繞過了許多傳統 syscall 路徑，早期版本在安全審查（如 <code>seccomp</code>）上存在挑戰。</li></ul></div></aside><hr id="33aa15e2-9005-807a-a138-e910cd09dbc4" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8066-b502-cd60296c3f7b" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80c6-827a-df6e9df8674c" class="" dir="auto">Reference: </p></div></aside><hr id="33aa15e2-9005-8003-b012-fa30b4cc94c6" dir="auto"/></div></details><details id="33ca15e2-9005-80f5-8012-d2d5e581d4f1" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>SQE vs CQE</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-8007-8ac2-fe41f86cb585" dir="ltr"><div style="width:100%"><p id="c2dee836-04ee-40e5-861b-1cf3c4ff51ca" class="" dir="auto"><code>io_uring</code> 的核心是兩個環形緩衝區（Ring Buffer）：</p><ol type="1" id="e65a77bb-02e9-401f-9037-8bd835be6429" class="numbered-list" start="1" dir="auto"><li><strong>SQ (Submission Queue)</strong>：應用程式寫入 <strong>SQE (Entry)</strong>，描述「要做的任務」。</li></ol><ol type="1" id="bc90bec8-1b90-4c43-954e-8c38ff2afc47" class="numbered-list" start="2" dir="auto"><li><strong>CQ (Completion Queue)</strong>：核心寫入 <strong>CQE (Entry)</strong>，回報「任務結果」。</li></ol></div></aside><hr id="33ca15e2-9005-8059-929b-fb3f90f261ae" dir="auto"/><ul id="68e4645b-e1f4-42fd-a7ed-28b15c62d066" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>SQE 關鍵欄位</strong>：<code>opcode</code> (讀/寫/fsync)、<code>addr</code> (Buffer 位址)、<code>user_data</code> (識別標籤)。</li></ul><ul id="a4fbd01b-b021-40bb-aa11-98b06ffd402b" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>CQE 關鍵欄位</strong>：<code>res</code> (回傳值，如讀取的 bytes 或錯誤代碼)、<code>user_data</code> (與 SQE 對應)。</li></ul><ul id="9767cc70-fdaa-47ec-8fc4-0f480c057b0c" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Head/Tail 機制</strong>：<ul id="a5f3032f-b7f6-43de-b3e8-ece209d39016" class="bulleted-list" dir="auto"><li style="list-style-type:circle">Application 更新 SQ Tail，Kernel 消耗 SQ Head。</li></ul><ul id="f6eb5a31-6124-44c7-aaa7-f29b219fc3ff" class="bulleted-list" dir="auto"><li style="list-style-type:circle">Kernel 更新 CQ Tail，Application 消耗 CQ Head。</li></ul></li></ul><hr id="33ca15e2-9005-80cd-bcc7-e55950b09a59" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-8077-8283-c2b5ef017d07" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-80a3-b967-cf05f62efeab" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p><ul id="eb581d84-bfdd-4f4f-ae8c-dd41ea87e867" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Memory Ordering</strong>：在直接操作記憶體而非使用 <code>liburing</code> 時，必須手動處理 <strong>Memory Barrier</strong>，確保寫入 <code>SQE</code> 的動作在更新 <code>tail pointer</code> 之前完成。</li></ul><ul id="4e45fed9-b23d-4e6c-8228-0500af02de08" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>CQ Overflow</strong>：預設 CQ 是 SQ 的兩倍大。如果 CQ 滿了，新的 completion 可能會被暫時擋住甚至丟失。</li></ul></div></aside><hr id="33ca15e2-9005-80fd-9f0f-ff78f579cc50" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-80ac-8eea-deab3e0f10d1" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-807c-94db-fe8089e083ea" class="" dir="auto">Reference: </p></div></aside><hr id="33ca15e2-9005-809e-9140-d3368b12c7dd" dir="auto"/></div></details><details id="33ca15e2-9005-8087-9d0e-e2069eea1dcf" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Ring buffer</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-806f-9372-e973f3dac274" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-8071-9b6f-c819cfe74fa2" class="" dir="auto"><code>io_uring</code> 的通訊基礎是建立在 User Space 與 Kernel Space 共享的兩組 <strong>Ring Buffer（環形緩衝區）</strong>：<strong>Submission Queue (SQ)</strong> 與 <strong>Completion Queue (CQ)</strong>。這是一種典型的生產者-消費者模型（Producer-Consumer），透過 <code>mmap</code> 技術，雙方都能直接存取這塊記憶體，徹底告別傳統 I/O 繁瑣的資料拷貝。</p></div></aside><hr id="33ca15e2-9005-80fa-8661-e7e08959c676" dir="auto"/><p id="33ca15e2-9005-80dc-9e5d-f70a9f7a4d48" class="" dir="auto"><code>io_uring</code> 的核心機制是 kernel 和 user space 共享兩個 ring buffer：<div class="indented"><p id="33ca15e2-9005-80ba-8a9e-ed2b4656b222" class="" dir="auto"><strong>Submission Queue（</strong><code><strong>SQ</strong></code><strong>）</strong> 和 <strong>Completion Queue（</strong><code><strong>CQ</strong></code><strong>）</strong>。</p></div></p><p id="33ca15e2-9005-8042-92c0-c3b14ab4f5c3" class="" dir="auto">初始化的時候，application 呼叫 <code>io_uring_setup()</code> 建立一個 <code>io_uring</code> instance。Kernel 會分配 <code>SQ</code> 和 <code>CQ</code> 的記憶體，然後把它們 <code>mmap</code> 到 user space。從此之後，kernel 和 application 直接透過 shared memory 溝通，不需要經過 syscall 來傳遞 I/O request 的內容。<div class="indented"><p id="33ca15e2-9005-804a-b9c9-de8d82bceb93" class="" dir="auto"><strong>提交 I/O</strong>：<div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-80b4-b31a-c9f6898e284b" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-80e5-99c1-c10f94fa9698" class="" dir="auto">Application 把一個 <code><strong>SQE</strong></code>（Submission Queue Entry）寫入 <code>SQ</code> ring buffer 的下一個空位。<code>SQE</code> 包含操作類型（read、write、fsync 等）、file descriptor、buffer address、offset、length 等所有必要資訊。寫完之後，application 更新 <code>SQ</code> 的 <strong>tail pointer</strong>。</p></div></aside></div></p><p id="33ca15e2-9005-8024-8f95-e96f8b5ddc82" class="" dir="auto"><strong>收割結果</strong>：<div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-800b-8b00-e1d78c52e671" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-803b-87e3-c50345924e45" class="" dir="auto">Kernel 完成 I/O 之後，把結果寫成一個 <code><strong>CQE</strong></code>（Completion Queue Entry）放入 <code>CQ</code> ring buffer。<code>CQE</code> 包含結果狀態碼和一個 <code>user_data</code> field（application 在 <code>SQE</code> 裡面設的，用來辨別是哪個 request 完成了）。Application 讀取 <code>CQ</code> 的 head 到 tail 之間的所有 <code>CQE</code> 來收割結果，然後更新 <code>CQ</code> 的 head pointer。</p></div></aside></div></p></div></p><p id="33ca15e2-9005-803d-843f-f31995f0fb42" class="" dir="auto"><code>SQ</code> 和 <code>CQ</code> 都是 ring buffer，所以 head/tail pointer 到尾端之後會自動 wrap around。整個機制跟 NVMe 的 <code>SQ</code>/<code>CQ</code> 非常像，這不是巧合。<code>io_uring</code> 的設計明確受到 NVMe 的 command queue 模型啟發。</p><hr id="33ca15e2-9005-809b-8d3b-e7f584eb5af9" dir="auto"/><ul id="09804004-2105-4e7f-a794-5d0b46b1b5ac" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>同步機制</strong>：整個過程中，同步是透過更新兩個索引（Head 和 Tail）來完成的。<ul id="2d26dbbe-e5ec-45f9-a791-73f133538d68" class="bulleted-list" dir="auto"><li style="list-style-type:circle"><strong>SQ (Submission)</strong>：Application 是生產者（更新 Tail），Kernel 是消費者（更新 Head）。</li></ul><ul id="5edd96da-1123-4c93-a43e-a19fb0e49366" class="bulleted-list" dir="auto"><li style="list-style-type:circle"><strong>CQ (Completion)</strong>：Kernel 是生產者（更新 Tail），Application 是消費者（更新 Head）。</li></ul></li></ul><ul id="a88e3de4-39c2-4ffd-8efe-fe6a22c7d619" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Indirection Table</strong>：為了靈活性，SQ 其實還有一層「索引表」。Application 寫入 SQE 後，在 <code>sq_array</code> 裡填入該 SQE 的位置。這樣的好處是允許 Application 以任意順序重複使用 SQE 陣列空間。</li></ul><ul id="8eb17528-e87e-4f78-9802-9530bc8885f0" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>致敬 NVMe</strong>：這套設計幾乎 1:1 模擬了 NVMe 的硬體通訊協議，這讓核心在轉發指令到 SSD 時的邏輯極簡化，路徑極短。</li></ul><hr id="33ca15e2-9005-8073-98d6-f3656c272b01" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-807f-bbc4-e1941919ec73" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-80e8-9515-fa95e2c4830a" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p><ul id="31df38f4-2af3-4a0f-97c7-6e33490ea7ed" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Memory Ordering（記憶體屏障）</strong>：這是考試最愛考的細節。因為是共享記憶體且無鎖，你必須確保「SQE 的內容寫入」發生在「Tail 指標更新」之前。在 C 語言中需要手動呼叫 <code>smp_store_release()</code> 或 <code>io_uring_smp_store_release()</code>，否則核心可能讀到一個還沒寫完的殘缺指令。</li></ul><ul id="6504d30c-6542-443c-88af-b8baa2eccd7f" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>CQ 溢出</strong>：如果你的 I/O 完成太快而你收割太慢，CQ 可能會溢出。雖然 <code>io_uring</code> 有內部的 backpressure 機制，但開發者仍需根據工作負載謹慎配置 <code>entries</code> 大小。</li></ul></div></aside><hr id="33ca15e2-9005-8088-98e3-d78fd6720d67" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-80a1-945d-dd61771e897a" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-80c4-bb82-c655a6a7f51d" class="" dir="auto">Reference: </p></div></aside><hr id="33ca15e2-9005-804b-a1ca-e7f45d6ef9d0" dir="auto"/></div></details><details id="33ca15e2-9005-8087-8924-e94d9c4d012c" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Batched submission</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-808d-b852-c2ae9e16191d" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-800a-8680-ee9c11dd33f6" class="" dir="auto">允許應用程式在一次 <code>io_uring_enter()</code> 系統呼叫中提交多個 <code>SQE</code>。</p></div></aside><hr id="33ca15e2-9005-805e-b48b-f4d517ec3618" dir="auto"/><p id="eb4a9e51-9fac-408d-8060-23ade59b9ec0" class="" dir="auto">即使有了 shared ring buffer，application 還是需要呼叫 <code>io_uring_enter()</code> system call 來通知 kernel「我放了新的 <code>SQE</code> 進去，請處理」。</p><p id="58636603-97eb-49fa-a49c-33c748fc2e38" class="" dir="auto">但 <code>io_uring</code> 的巧妙之處在於：你可以一次寫入多個 <code>SQE</code>，然後只呼叫<strong>一次</strong> <code>io_uring_enter()</code>。假設你有 32 個 I/O request 要發，你先把 32 個 <code>SQE</code> 依序寫入 <code>SQ</code>，然後呼叫一次 <code>io_uring_enter(submit=32)</code>，kernel 就會一口氣處理這 32 個 request。</p><p id="9a6abbd0-6520-424f-8a9f-a954f98bbeb4" class="" dir="auto">跟 <code>libaio</code> 的 <code>io_submit()</code> 比較：<code>libaio</code> 每次呼叫也可以提交多個 request，但 <code>io_uring</code> 的 batching 更高效，因為 <code>SQE</code> 已經在 shared memory 裡了，kernel 不需要從 user space 複製 request 的內容。</p><p id="44eed183-5a31-4832-88a8-22fa7760759b" class="" dir="auto">Batched submission 在高 IOPS 場景下效果非常明顯。假設你每秒要做 50 萬次 I/O，如果每次只 submit 1 個就 enter 一次，那就是每秒 50 萬次 syscall。如果你每次攢 32 個再 enter，syscall 降到每秒約 1.5 萬次，減少了 97%。</p><hr id="33ca15e2-9005-8082-888c-e6e712166de8" dir="auto"/><p id="33ca15e2-9005-8088-bee2-eb230d4f3ad3" class="" dir="auto"><strong>效率公式</strong>：假設每秒 N 個 I/O。傳統方式需要 N 次 syscall；Batch 方式（每次 batch M 個）只需 N/M 次 syscall。<br/><strong>Amortized Cost</strong>：在高負載下，單次 I/O 分攤到的 syscall 成本趨近於零。</p><hr id="33ca15e2-9005-80c2-867a-d90b4d675e46" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-80e7-98af-f6820c200b6c" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-8065-8070-d16a76c5c654" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p><p id="33ca15e2-9005-8004-bc5b-df716ab7ebee" class="" dir="auto"><strong>Latency vs. Throughput</strong>：過大的 Batch 會導致第一個請求被「壓」在 SQ 中等待後面的請求湊齊，進而增加 <strong>Tail Latency</strong> (長尾延遲)。</p></div></aside><hr id="33ca15e2-9005-80c1-bc7d-cf29fdf0be7e" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-8006-be0e-ea18a923ef96" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-80e1-8929-e595917a0b6f" class="" dir="auto">Reference: </p></div></aside><hr id="33ca15e2-9005-8063-adcd-f85915114f2c" dir="auto"/></div></details><details id="33ca15e2-9005-80d6-85ef-e12fc03ab55c" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>SQPOLL vs IOPOLL</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-80e9-b05d-d90d3461f0da" dir="ltr"><div style="width:100%"><ul id="d6d80a51-7c46-48a3-94ce-d1ea5c34e256" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>SQPOLL</strong>：解決 <strong>Submit 端</strong> 成本。核心啟動 Kernel Thread 輪詢 SQ，實現「零 syscall 提交」。</li></ul><ul id="b5bd4823-de0c-4df2-a4e1-143eaa5a79dd" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>IOPOLL</strong>：解決 <strong>Completion 端</strong> 成本。核心主動輪詢硬體完成狀態，實現「零 interrupt 完工」。</li></ul></div></aside><hr id="33ca15e2-9005-80d6-96ad-dacf7382c58a" dir="auto"/><p id="7525e1ee-45f6-4b13-9dcd-4e8312002b76" class="" dir="auto"><code><strong>SQPOLL</strong></code><strong> 模式：零 Syscall 提交</strong><div class="indented"><p id="9d7acd2b-0440-48f7-9b19-968ce0a482fc" class="" dir="auto">Batched submission 把 syscall 次數降了很多，但還是有 syscall。對於那些需要榨乾每一分效能的場景，例如高頻交易系統的 storage layer、或是每秒處理百萬筆請求的 key-value store，即使是少量的 syscall overhead 也嫌太多。<code>io_uring</code> 提供了更激進的 <code><strong>SQPOLL</strong></code> 模式，可以<strong>完全消除 submit 端的 syscall</strong>。</p><p id="50412776-8f98-4c29-9a4e-d1f197630e91" class="" dir="auto">開啟 <code>SQPOLL</code> 之後，kernel 會啟動一個專屬的 <strong>kernel polling thread</strong>。這個 thread 不斷地去看 <code>SQ</code> ring buffer 有沒有新的 <code>SQE</code>（透過檢查 <code>SQ</code> 的 tail pointer 是否被 application 更新了）。只要發現新的 <code>SQE</code>，kernel thread 就自動取出來處理。</p><p id="b8e09e7d-c8bb-40c3-a10b-4cb234e0213a" class="" dir="auto">Application 的角度完全變了：你只需要把 <code>SQE</code> 寫進 <code>SQ</code> ring buffer、更新 tail pointer，然後什麼都不用做。不需要呼叫任何 syscall。Kernel thread 會自己來取。</p><p id="f9e8e08c-7115-4488-a2de-a3ddefd56a91" class="" dir="auto">代價是什麼？那個 kernel polling thread 會持續佔用一個 CPU core（或至少佔用它的很大比例），即使沒有任何 I/O 要處理，它也在空轉 poll。所以 <code>SQPOLL</code> 適合的場景是 I/O 非常密集、需要最低延遲的 workload。如果你的 I/O 是偶爾才來一個，<code>SQPOLL</code> 就是在浪費 CPU。</p><p id="1ff044ad-bf53-409a-b8d7-66fae8bd25b3" class="" dir="auto">為了緩解這個問題，<code>SQPOLL</code> 有一個 idle timeout 機制：如果 polling thread 發現超過一段時間都沒有新的 <code>SQE</code>，它會自動進入 sleep 狀態。下次 application 寫了新的 <code>SQE</code> 之後如果發現 polling thread 已經 sleep，就需要呼叫一次 <code>io_uring_enter()</code> 把它叫醒。所以 <code>SQPOLL</code> 不是「永遠零 syscall」，而是「在 I/O 持續密集的時候零 syscall」。</p></div></p><hr id="33ca15e2-9005-80d1-b21e-d90cc0b3f0e5" dir="auto"/><p id="fdd2937b-42a2-46de-9ef5-89fb989bef21" class="" dir="auto"><code><strong>IOPOLL</strong></code><strong> 模式：Polling 取代 Interrupt</strong><div class="indented"><p id="18c347e5-05cf-4b33-8308-ad3b48b5c2bd" class="" dir="auto">前面的 <code>SQPOLL</code> 解決的是 <strong>submit 端</strong> 的 syscall 問題。<code>IOPOLL</code> 解決的則是 <strong>completion 端</strong> 的 interrupt 問題。</p><p id="f91a42bc-386a-4d4b-8557-69ed6d37107e" class="" dir="auto">在正常模式下，I/O 完成的時候裝置送 interrupt 通知 kernel，kernel 把結果填入 <code>CQ</code>，然後透過某種機制（<code>eventfd</code>、signal、或 application 下次呼叫 <code>io_uring_enter</code> 順便 reap）通知 application。每次 interrupt 都有幾個 microseconds 的 overhead。</p><p id="d47da5c9-5a5a-45fd-b08d-f69e29e9ff02" class="" dir="auto"><code>IOPOLL</code> 模式開啟之後，kernel 不等 interrupt。Application 呼叫 <code>io_uring_enter(flags=IORING_ENTER_GETEVENTS)</code> 的時候，kernel 直接去 <strong>poll 裝置的 completion queue</strong>（對 NVMe 來說就是去檢查 NVMe <code>CQ</code> 有沒有新的 completion entry）。如果有，立刻處理並填入 <code>io_uring</code> 的 <code>CQ</code>。如果沒有，繼續 poll，直到有結果或超時。</p><p id="806056e9-9baf-49cd-ac6c-34e5110a4b2d" class="" dir="auto"><code>IOPOLL</code> 的好處是延遲更低：I/O 完成之後不需要等 interrupt delivery 和 handler 的開銷，下一次 poll 就能拿到結果。在 NVMe SSD 的 read latency 只有幾十個 microseconds 的情況下，省掉 interrupt 的幾個 microseconds 是有意義的改善。</p><p id="6f26c3de-1d86-4efe-9709-def91daa5134" class="" dir="auto"><code>IOPOLL</code> 必須搭配 <code>O_DIRECT</code> 使用（因為 buffered I/O 的 completion path 不支援 polling）。而且 <code>IOPOLL</code> 會讓呼叫 <code>io_uring_enter</code> 的 thread 在 kernel space busy-wait，所以它會佔用 CPU。跟 <code>SQPOLL</code> 類似，適合 I/O 密集且對延遲極度敏感的場景。</p><p id="2fd88680-b95d-480b-a6cf-9a6d84dbba7f" class="" dir="auto">把 <code>SQPOLL</code> 和 <code>IOPOLL</code> 同時開啟，就能得到一個「submit 不需要 syscall、completion 不需要 interrupt」的極致 I/O 路徑。在這個模式下，application 只需要操作 shared memory 的 <code>SQ</code> 和 <code>CQ</code>，kernel polling thread 處理 submit，completion 也走 polling。整條路徑上幾乎沒有任何 mode switch。</p></div></p><hr id="33ca15e2-9005-80ba-ac56-d7db4e869120" dir="auto"/><ul id="45d12cc9-e0d6-4022-ae09-6bc39ee2ba76" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>SQPOLL Idle Timeout</strong>：核心執行緒若一段時間沒事做會睡覺，需呼叫 <code>io_uring_enter</code> 喚醒。</li></ul><ul id="88ccf5b1-1da0-4479-9e30-7ae6b0cb37c7" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>最強組合</strong>：同時開啟 <code>SQPOLL</code> + <code>IOPOLL</code>，資料搬運過程完全沒有 User/Kernel Mode 的切換與中斷開銷。</li></ul><hr id="33ca15e2-9005-80a4-beaf-f6f248fc06c6" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-80d2-b3fd-dba3c5fb294c" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-8059-b16d-e125386af3af" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p><ul id="22835c71-2b3d-4511-9f6c-a1bd182b68f5" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>CPU 飢餓 (Starvation)</strong>：<code>SQPOLL</code> 會無條件占用一個 CPU 核心進行輪詢，即便沒資料也會空轉（Busy-wait），適合 I/O 密度極高的服務。</li></ul><ul id="d738e09b-0365-47b8-a9ac-0f70efb9df42" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>IOPOLL 限制</strong>：必須搭配 <code>O_DIRECT</code> 使用。</li></ul></div></aside><hr id="33ca15e2-9005-8017-82b4-d61da2944ce1" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-804d-9a23-dc3703d5db00" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-8091-8696-d0e122be70ed" class="" dir="auto">Reference: </p></div></aside><hr id="33ca15e2-9005-80ec-9cef-c0e88806c47d" dir="auto"/></div></details><details id="33ca15e2-9005-808f-b02f-fc403e01e535" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>io_uring_cmd</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-8074-b234-f8cb5a801226" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-800c-a548-f9f695036d35" class="" dir="auto">繞過 Linux <strong>Block Layer</strong>（I/O 調度器、檔案系統層），讓 <code>io_uring</code> 直接發送原生 NVMe 指令給驅動程式。</p></div></aside><hr id="33ca15e2-9005-80a9-81a9-e6c20c18eb42" dir="auto"/><p id="b568d9d9-7bd4-4c2f-8631-2e9828677182" class="" dir="auto"><code><strong>io_uring_cmd</strong></code><strong>：NVMe Passthrough</strong><div class="indented"><p id="6a71719d-371a-4ad6-a033-2e7da902b3c2" class="" dir="auto"><code>io_uring</code> 預設的 I/O 路徑還是要經過 Linux 的 block layer。Block layer 提供了很多有用的功能（I/O scheduler、I/O accounting、encryption 等等），但在極端效能場景下，它也是一層 overhead。</p><p id="ef15d270-e57a-461c-8479-88e5ebd4745e" class="" dir="auto"><code><strong>io_uring_cmd</strong></code> 機制允許 application 透過 <code>io_uring</code> 直接向 NVMe driver 發送 <strong>passthrough command</strong>，完全繞過 block layer。Application 可以自己組裝 NVMe command（包括 opcode、LBA、PRP 等），然後用 <code>io_uring_cmd</code> 直接把這個 raw NVMe command 丟給 driver。</p><p id="75fcdf50-87c4-4d7b-a975-9bf44d41b9af" class="" dir="auto">這有什麼用？一般的 <code>read()</code> / <code>write()</code> 經過 block layer 之後，中間有 I/O scheduler 的 reordering、merging、plugging 等處理，這些東西在 HDD 時代很有價值（可以減少 disk seek），但在 NVMe SSD 上反而是多餘的 overhead。透過 <code>io_uring_cmd</code> passthrough，application 可以跳過這些中間層，直接操作 NVMe 的 command queue。</p><p id="5b06e615-06bc-4183-b65a-54a5646b2d92" class="" dir="auto"><code>io_uring_cmd</code> 也支援 NVMe 的特殊 command，比如 zone management command（for Zoned Namespace SSD）或 vendor-specific command，這些是一般 block layer 不支援的。</p><p id="17ff9516-9752-4d6f-baa8-658da200e0e3" class="" dir="auto">不過 <code>io_uring_cmd</code> 的使用門檻比較高：application 必須自己理解 NVMe command format，自己管理 DMA buffer，而且失去了 block layer 提供的所有便利功能（file system、encryption、I/O priority）。它的定位是給高效能 storage application（例如 database engine、storage target）使用的進階功能，不是給一般 application 用的。</p></div></p><hr id="33ca15e2-9005-80dc-a89c-e3ac07142262" dir="auto"/><ul id="9e74b168-434c-4120-93c4-f89fb7ee63ac" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>繞過 Overhead</strong>：Block Layer 的隊列管理在 HDD 時代有用，但在萬分之一秒等級的 NVMe SSD 上卻是多餘的 CPU 負擔。</li></ul><ul id="6964b38b-cdb8-40a6-a35d-42d751ed0d35" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>特殊指令</strong>：支援 Zoned Namespace (ZNS) 或廠商自定義指令。</li></ul><hr id="33ca15e2-9005-8014-aaaf-eec6a1427875" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-80d0-bd31-d849b3c60f41" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-8086-b7db-e7920f39cd18" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p><ul id="5b402cf6-7b61-4256-b085-4e1c4509cec4" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>資料損壞風險</strong>：失去檔案系統保護，應用程式若寫錯地址會直接破壞硬體數據。</li></ul><ul id="0010e7b9-96fe-449b-a421-996241a11b75" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>複雜性</strong>：應用程式需自己處理 DMA Buffer 對齊與 NVMe 指令封裝。</li></ul></div></aside><hr id="33ca15e2-9005-80a2-88f2-d44f8e614be2" dir="auto"/><table id="4a3fdfcd-a861-470a-8ae1-5ea68e0b2235" class="simple-table" dir="ltr"><tbody><tr id="8c5e27f3-004a-4a72-9bd3-37096b7f8784" dir="ltr"><td id="s}Qh" class="" style="width:169px"><strong>特性</strong></td><td id="C&lt;U}" class="" style="width:239.4250030517578px"><strong>傳統 Synchronous</strong></td><td id="n{yS" class="" style="width:222.3000030517578px"><strong>libaio</strong></td><td id="jner" class="" style="width:292.1000061035156px"><strong>io_uring</strong></td></tr><tr id="16500251-b20a-42f3-8ca2-542f89cd9647" dir="ltr"><td id="s}Qh" class="" style="width:169px"><strong>Syscall 頻率</strong></td><td id="C&lt;U}" class="" style="width:239.4250030517578px">高 (1:1)</td><td id="n{yS" class="" style="width:222.3000030517578px">中 (需 submit/getevents)</td><td id="jner" class="" style="width:292.1000061035156px">極低 (支援 Batch/SQPOLL)</td></tr><tr id="e0c028ed-1378-41cf-a7c4-31f44b8ba007" dir="ltr"><td id="s}Qh" class="" style="width:169px"><strong>資料複製</strong></td><td id="C&lt;U}" class="" style="width:239.4250030517578px">有 (Buffer Copy)</td><td id="n{yS" class="" style="width:222.3000030517578px">低 (O_DIRECT)</td><td id="jner" class="" style="width:292.1000061035156px">極低 (Shared Memory)</td></tr><tr id="ef7391b9-d3d5-4779-80d3-e917f8ebc1bd" dir="ltr"><td id="s}Qh" class="" style="width:169px"><strong>Page Cache</strong></td><td id="C&lt;U}" class="" style="width:239.4250030517578px">支援</td><td id="n{yS" class="" style="width:222.3000030517578px">不支援</td><td id="jner" class="" style="width:292.1000061035156px">支援</td></tr><tr id="0d16c3ae-e298-445f-acd5-82eb55fbb10b" dir="ltr"><td id="s}Qh" class="" style="width:169px"><strong>複雜度</strong></td><td id="C&lt;U}" class="" style="width:239.4250030517578px">低</td><td id="n{yS" class="" style="width:222.3000030517578px">中</td><td id="jner" class="" style="width:292.1000061035156px">高</td></tr></tbody></table><p id="33ca15e2-9005-805f-92e4-e163a86ed334" class="" dir="auto"><strong>核心總結：</strong> <code>io_uring</code> 的核心哲學是 <strong>「讓軟體架構與 NVMe 硬體架構對稱」</strong>。NVMe 透過 SQ/CQ 實現硬體並行，<code>io_uring</code> 則在核心軟體層實作了這套 Ring Buffer 機制。</p><hr id="33ca15e2-9005-8084-b469-f0234cb7287f" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-80a1-a3bb-e35e20ec993e" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-804e-a2c9-dd1467d47be5" class="" dir="auto">Reference: </p></div></aside><hr id="33ca15e2-9005-8075-a7af-f7183367ac2a" dir="auto"/></div></details><details id="33ca15e2-9005-8027-9555-e7f0ca49575c" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>NVMe passthrough</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-804a-b06b-cfe2728e7b0a" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-8001-9cc2-ebb2edf2eebc" class="" dir="auto">這是 <code>io_uring</code> 在核心 5.19 引入的重磅功能（透過 <code>IORING_OP_URING_CMD</code> 指令）。它允許應用程式<strong>直接對 NVMe 驅動程式發送原生指令</strong>，完全跳過 Linux 傳統的 <strong>Block Layer（塊設備層）</strong>。</p></div></aside><hr id="33ca15e2-9005-8084-998a-f25e4613e770" dir="auto"/><ul id="002acba4-850c-4048-9299-1dd5ba7601ab" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>消滅中間商</strong>：傳統 Block Layer 會做 I/O 合併、排序與排隊計費。但在現代超高速 NVMe SSD 上，這些軟體邏輯往往比硬體還慢。Passthrough 就像是給 I/O 辦了「快速通關」，直接從應用程式通往硬體。</li></ul><ul id="97a6de10-4a91-4744-8a4b-ba9fe8af3cc6" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>解鎖隱藏功能</strong>：許多 NVMe 的進階功能（如 <strong>ZNS 區塊管理</strong>、<strong>KV 指令集</strong>、或是特定廠商的 <strong>Health Debugging</strong>）無法透過標準 <code>read/write</code> 實現。Passthrough 讓開發者能直接撰寫 <code>nvme_passthru_cmd</code> 結構並丟給核心。</li></ul><ul id="53084ec3-8ece-43a2-b0ea-b1b4804c88cd" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>效能數據</strong>：在極限測試中，使用 Passthrough 往往能比標準 io_uring 再降低 5%~10% 的延遲，並減少 CPU 在 Block Layer 的耗能。</li></ul><hr id="33ca15e2-9005-80b6-8e1b-c095e304b00d" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-803f-9881-f107c6a54c75" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-8056-88c1-ccde03e2dcf3" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p><ul id="95490738-7df6-425f-b899-4fca6698be04" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>失去安全墊</strong>：Block Layer 提供了一層保護，防止你誤寫核心區域或檔案系統元數據。用 Passthrough 時，如果你 LBA (Logical Block Address) 算錯，核心不會擋你，資料會直接毀損。</li></ul><ul id="b712a070-55e2-4f96-9987-c9c8c39e5ea7" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>不可移植性</strong>：你的代碼會與「NVMe」這個硬體規範綁死。如果客戶換成 SATA SSD 或雲端虛擬硬碟，代碼會直接失效。</li></ul><ul id="00d10d57-c453-4ac2-bd92-a046774a7970" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>權限問題</strong>：這種操作通常需要 <code>CAP_SYS_ADMIN</code> 權限，這在容器化環境（如 Kubernetes）中需要特別配置 Security Context。</li></ul></div></aside><hr id="33ca15e2-9005-80aa-ad89-f1c63750ae07" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ca15e2-9005-80bd-9a04-fc466c96cb7c" dir="ltr"><div style="width:100%"><p id="33ca15e2-9005-80a9-b657-ea795e3c8f87" class="" dir="auto">Reference: </p></div></aside><hr id="33ca15e2-9005-809c-9559-e91175691446" dir="auto"/></div></details></div></details><details id="33aa15e2-9005-80c8-a0d7-e2b9a6a6d2a7" open="" class="toggle" dir="auto"><summary><strong>Test</strong></summary><div class="indented"><details id="33aa15e2-9005-80ac-a24d-ec83a506c5b3" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Key Concepts</strong></mark></summary><div class="indented"><details id="33aa15e2-9005-80e3-9c70-e9bf4fb2e516" open="" class="toggle" dir="auto"><summary>理解 io_uring 的 shared ring buffer 設計，知道 kernel 與 user space 共享 submission queue 和 completion queue，應用程式透過寫入 SQE 提交請求、讀取 CQE 收割結果，大幅減少 syscall 次數</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80d7-90d7-ccd680bbcb66" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80c7-a205-caf021fe3f9b" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-8023-80bb-e840e0a74255" class="" dir="auto">透過將 Submission Queue (SQ) 與 Completion Queue (CQ) 映射為 User Space 與 Kernel Space 共享的記憶體，應用程式可直接讀寫 Queue，免去資料複製並大幅減少 System Call 的頻率。</p></div></p><hr id="33aa15e2-9005-801b-be9a-da7c976367d9" dir="auto"/><p id="33aa15e2-9005-8041-b9c5-ca79e62ddf3b" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-80a5-8f88-f7a2a8da2522" class="" dir="auto">Shared Memory (mmap), Submission Queue Entry (SQE), Completion Queue Entry (CQE), Zero-copy, Context Switch 降低</p></div></p><hr id="33aa15e2-9005-8070-9ae5-e06774962bc7" dir="auto"/><p id="33aa15e2-9005-80a5-9f54-dcd050200381" class="" dir="auto">Detail<div class="indented"><p id="263d4ffe-26cb-4aae-8b53-f85144a40718" class="" dir="auto">在傳統的 I/O 模型中，每次提交或收割請求，都需要透過系統呼叫（Syscall）跨越 User/Kernel 邊界，並將資料結構進行複製。io_uring 運用了 Ring Buffer 加上 mmap 技術，讓作業系統與應用程式看見同一塊記憶體。<br/>當應用程式要提交 I/O 時，只需在 User Space 將 SQE 填入並推進 SQ 的 Tail 指標；收割時則是檢查 CQ 的 Head 指標並讀取 CQE。這種設計使得 Kernel 能直接存取請求，完全消除了 memcpy 的額外開銷，同時也為後續的 Batched 與 Polling 最佳化打下基礎。</p></div></p></div></aside><hr id="33aa15e2-9005-809e-82e8-f70c1c422b3d" dir="auto"/></div></details><details id="33aa15e2-9005-80df-803c-c72654f4a9f6" open="" class="toggle" dir="auto"><summary>理解 batched submission 如何將多筆 I/O 請求一次提交，攤平 syscall 的成本，提升高 IOPS 場景下的效率</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80a3-aa04-db0d24fa0f61" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80e6-981d-ca1f5f01b39e" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-8092-8411-f8ce10a9293e" class="" dir="auto">允許應用程式在 shared ring buffer 中一次填寫多個 I/O 請求後，僅呼叫一次系統呼叫來通知 Kernel 處理，藉此將單次 syscall 的成本平均分攤。</p></div></p><hr id="33aa15e2-9005-8086-a383-e109dab833a4" dir="auto"/><p id="33aa15e2-9005-8006-8baa-dc808ab80fb2" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-802b-9c3a-c348d301e6fd" class="" dir="auto">Batching, <code>io_uring_enter</code>, Syscall Amortization (成本攤平), High IOPS</p></div></p><hr id="33aa15e2-9005-80f6-b4dd-f72df0455fd9" dir="auto"/><p id="33aa15e2-9005-80a2-9e9c-e2e1c4368cb3" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-80ec-bbad-ce480f5ebd47" class="" dir="auto">在高 IOPS（每秒輸入/輸出次數）的場景下，如果每一個 4KB 的請求都觸發一次 Syscall，CPU 大量的時間會被浪費在 Context Switch（上下文切換）上。透過 Batched Submission，應用程式可以連續在 SQ 中寫入幾十或幾百個 SQE，然後只呼叫一次 <code>io_uring_enter</code> 系統呼叫來喚醒 Kernel。這樣一來，單次 Context Switch 的 CPU 週期成本被多個 I/O 請求共同承擔，大幅提升了整體的吞吐量 (Throughput)。</p></div></p></div></aside><hr id="33aa15e2-9005-807e-b8e8-e96401df8015" dir="auto"/></div></details><details id="33aa15e2-9005-8085-87e4-d8f1e2ca4f8c" open="" class="toggle" dir="auto"><summary>理解 SQPOLL 模式的運作方式，知道它讓一個專屬的 kernel thread 持續 polling submission queue，使應用程式完全不需要呼叫 syscall 就能提交 I/O</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8090-aa24-d4d91aaad2ce" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8030-baba-db05411c2958" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-808b-98b6-c33ed2ee50dc" class="" dir="auto">啟動一個專屬的 Kernel Thread 於背景持續輪詢 (Polling) Submission Queue。應用程式只需放入請求，完全不需要呼叫 syscall 就能觸發 I/O。</p></div></p><hr id="33aa15e2-9005-8068-92e0-e0e00550f4d1" dir="auto"/><p id="33aa15e2-9005-800c-91d4-ef132836abac" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-800a-813b-de6c80610535" class="" dir="auto">SQPOLL (<code>IORING_SETUP_SQPOLL</code>), Kernel Thread, Zero-syscall, 主動輪詢</p></div></p><hr id="33aa15e2-9005-80c7-ac01-ea54a33867a5" dir="auto"/><p id="33aa15e2-9005-803a-9e74-d22fc00232fa" class="" dir="auto">Detail<div class="indented"><p id="e71a2135-3d05-4246-9baf-f1a3c6fd1eb5" class="" dir="auto">這是 io_uring 追求極致效能的進階模式。當開啟 IORING_SETUP_SQPOLL 標記後，Kernel 會建立一個專屬的執行緒 (通常名為 io_uring-sq)。這個 Thread 會持續監控共用的 Submission Queue；一旦應用程式在 User Space 更新了 SQ 的 Tail 指標，Kernel Thread 會立刻偵測到並抓取 SQE 進行處理。<br/>這意味著應用程式提交 I/O 的過程變成了純粹的 User Space 記憶體操作，達成了真正的「Zero-syscall (零系統呼叫)」，極大地壓榨出硬體極限。</p></div></p></div></aside><hr id="33aa15e2-9005-806b-98be-e9cd891aa9aa" dir="auto"/></div></details><details id="33aa15e2-9005-8062-8731-ee4eca10a2cf" open="" class="toggle" dir="auto"><summary>理解 IOPOLL 模式如何用 polling 取代 interrupt 來通知 I/O 完成，降低 completion 端的延遲</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-801c-bae0-d443841044a1" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80d7-b024-ce7beee52df4" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-802d-9151-c225dc61467e" class="" dir="auto">放棄傳統的硬體中斷 (Interrupt) 通知機制，改由 CPU 主動向底層 NVMe 裝置輪詢 I/O 是否完成，用 CPU 資源換取極低的 I/O 延遲。</p></div></p><hr id="33aa15e2-9005-8050-9387-f43d820b60e7" dir="auto"/><p id="33aa15e2-9005-8090-ac33-ed0c8dfe1c57" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-80b7-a580-c0a6d5ac7022" class="" dir="auto">IOPOLL (<code>IORING_SETUP_IOPOLL</code>), Interrupt vs. Polling, Low/Tail Latency, NVMe completion queue。</p></div></p><hr id="33aa15e2-9005-800b-99ce-d8057e38532a" dir="auto"/><p id="33aa15e2-9005-8028-aee1-ea4c03b765de" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-80ae-aaef-d907ba1892d0" class="" dir="auto">傳統硬體在 I/O 完成時，會向 CPU 發送硬體中斷，OS 接著觸發中斷處理程序來收割結果。對於現代超高速的 NVMe SSD 而言，這種「中斷延遲」已經成為效能瓶頸。啟用 IOPOLL 後，Kernel 不再被動等待中斷，而是在提交 I/O 後主動去查閱裝置硬體層的 Completion Queue。雖然這會造成 CPU 占用率升高 (100% busy-wait)，但在需要極端低延遲 (Low Tail Latency) 的資料庫或儲存引擎場景中，這是非常划算的交易。</p></div></p></div></aside><hr id="33aa15e2-9005-8084-add1-c9e043971752" dir="auto"/></div></details><details id="33aa15e2-9005-8067-8af2-f6640cc3fad4" open="" class="toggle" dir="auto"><summary>了解 io_uring_cmd 機制如何讓應用程式直接下達 NVMe passthrough command，繞過傳統 block layer 的抽象來操作 NVMe 裝置</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80a6-9135-c844164ea8a2" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8000-ab0c-e32ffd87b91a" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-809c-aab1-d8973d18bbf2" class="" dir="auto">允許應用程式繞過 Linux 核心龐大的 Block Layer 與 VFS，將原生的 NVMe 指令透過 <code>io_uring</code> 直接傳送給底層裝置驅動。</p></div></p><hr id="33aa15e2-9005-80dd-94e2-f394cd6877e1" dir="auto"/><p id="33aa15e2-9005-803a-b768-dd9cffcec11f" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-80a4-b961-e3e430620870" class="" dir="auto"><code>io_uring_cmd</code>, NVMe Passthrough, Block Layer Bypass, Character Device (<code>/dev/ngXnY</code>)。</p></div></p><hr id="33aa15e2-9005-8020-96c9-da2a858e91e2" dir="auto"/><p id="33aa15e2-9005-80fa-8102-f793d79826f9" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-80f0-8791-dc9b8c9a7110" class="" dir="auto">傳統 Linux I/O 會經過虛擬檔案系統 (VFS)、Block Layer 抽象層，最後才轉譯為硬體指令，這段軟體堆疊開銷不小。<code>io_uring_cmd</code> 是後來引入的強大機制，它允許應用程式對 NVMe 的 Character Device (<code>/dev/ng*</code>) 開啟檔案，並將特製的 NVMe command (例如特定的 Admin command 或自訂的 I/O command) 包裝進 SQE 中直接發送給驅動層。這為需要深度控制硬體的應用 (如 SPDK 等級的應用程式) 提供了一個原生的、極高效的 Kernel 替代方案。</p></div></p></div></aside><hr id="33aa15e2-9005-8080-8174-de2e9876233a" dir="auto"/></div></details></div></details><details id="33aa15e2-9005-807b-af9d-cb673fba5ac5" open="" class="toggle" dir="auto"><summary><mark class="highlight-teal" data-notion-highlight="teal"><strong>Test your understanding</strong></mark></summary><div class="indented"><details id="33aa15e2-9005-807a-a47d-c1af8227cad0" open="" class="toggle" dir="auto"><summary><code>io_uring</code> 的 shared ring buffer 設計和傳統 <code>libaio</code> 比起來，在 submit 和 reap 的流程上各省掉了什麼開銷？為什麼光是「不需要 copy request 內容」就能帶來明顯的效能差異？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80fb-a145-f4e683b08da4" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-802d-9e69-fd965b67750b" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-8083-b083-fd5a6d58771d" class="" dir="auto">比起 libaio，<code>io_uring</code> 省下了 submit 時複製請求 (<code>iocb</code>) 和 reap 時複製結果 (<code>io_event</code>) 的開銷。免除記憶體拷貝不僅省下 CPU 週期，更避免了 CPU Cache 污染與指標驗證的負擔，從而帶來效能提升。</p></div></p><hr id="33aa15e2-9005-80ec-b42f-d623b7530eb4" dir="auto"/><p id="33aa15e2-9005-8041-a174-fb425ba07311" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-80c8-97aa-e56319a1253d" class="" dir="auto"><code>io_submit</code> / <code>io_getevents</code>, Memory Copy Overhead (User-to-Kernel), CPU Cache Eviction (快取污染)</p></div></p><hr id="33aa15e2-9005-8017-b6d2-c134ffc12ec7" dir="auto"/><p id="33aa15e2-9005-8063-954e-e4d7b68ee729" class="" dir="auto">Detail<div class="indented"><ul id="c2fcf596-6594-45e9-a974-4cd6f5cfce37" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>流程上的省卻：</strong> <p id="33ca15e2-9005-80d0-ad08-d0cfa9cbba6b" class="" dir="auto">傳統的 <code>libaio</code> 在呼叫 <code>io_submit</code> 時，Kernel 必須將 User space 的 <code>iocb</code> 結構陣列 <strong>複製 (copy_from_user)</strong> 到 Kernel space；在呼叫 <code>io_getevents</code> 收割時，又必須將結果的 <code>io_event</code> 結構 <strong>複製 (copy_to_user)</strong> 回 User space。<code>io_uring</code> 憑藉 Shared ring buffer 的設計，徹底移除了這兩段資料複製流程。</p></li></ul><ul id="4a5229d8-72ba-4dad-a448-02675c42c37f" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>效能差異原因：</strong> <p id="33ca15e2-9005-80b0-8c32-eaac1e8d4c19" class="" dir="auto">光是「不需要 copy」就能帶來顯著效能差異的原因在於：這不僅省去了 <code>memcpy</code> 指令本身的 CPU 時間，更重要的是它避免了高並發下的 <strong>CPU 快取失效 (Cache Misses)</strong>。當大量無謂的資料在 user/kernel 間複製時，會把有用的資料擠出 L1/L2 Cache。Zero-copy 讓 CPU 能專注於業務邏輯與 I/O 處理，且免去了 Kernel 每次都要檢查 user space 記憶體指標合法性的安全驗證開銷。</p></li></ul></div></p></div></aside><hr id="33aa15e2-9005-800d-b361-e8ba60c06f01" dir="auto"/></div></details><details id="33aa15e2-9005-801e-87f7-ce11eeb826bd" open="" class="toggle" dir="auto"><summary>假設你的 application 每秒需要做 50 萬次 4KB random read。在不使用 batching 的情況下需要多少次 syscall？使用 batch size 64 的 batched submission 之後需要多少次？<code>SQPOLL</code> 模式下需要多少次？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80cc-b60f-cabe0931ae38" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8086-a69f-d4a6f57cb61c" class="" dir="auto">Answer<div class="indented"><ul id="a4b2c798-42d7-464b-9882-54d4c96ef403" class="bulleted-list" dir="auto"><li style="list-style-type:disc">不使用 batching：<strong>50 萬次</strong> syscall。</li></ul><ul id="33f650a1-665c-4179-bc88-3347d64cb70d" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Batch size 64：<strong>7,813 次</strong> syscall。</li></ul><ul id="d7310cce-c4c6-4032-88c2-fd70209bbaad" class="bulleted-list" dir="auto"><li style="list-style-type:disc">SQPOLL 模式：<strong>0 次</strong> syscall（理想狀態下）。</li></ul></div></p><hr id="33aa15e2-9005-809c-a119-c8344410d423" dir="auto"/><p id="33aa15e2-9005-8053-8638-f020c7f31e7b" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-8054-aebe-eb6e28901e35" class="" dir="auto">Syscall Math, Batching efficiency, SQPOLL zero-syscall, 效能攤平</p></div></p><hr id="33aa15e2-9005-8079-a0bf-c4000a462d76" dir="auto"/><p id="33aa15e2-9005-80c5-b9fc-fe8cd54e7d51" class="" dir="auto">Detail<div class="indented"><ul id="7718870b-103e-4ca9-9b4e-c7735ca85105" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>不使用 Batching：</strong> 每個請求獨立發送，1 次 I/O 請求對應 1 次 <code>io_uring_enter</code>，因此 500,000 次 random read 就會產生 <strong>500,000 次</strong> System Call。</li></ul><ul id="56a38945-f110-45ca-b964-79a5d1b0aa22" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>使用 Batch size 64：</strong> 應用程式每累積 64 個 SQE 才呼叫一次 <code>io_uring_enter</code> 來通知 Kernel。計算方式為 500,000 / 64 = 7812.5。因此只需要約 <strong>7,813 次</strong> System Call。Syscall 次數直接下降了超過 98%。</li></ul><ul id="4c9673ec-5def-440f-88df-ece6f4354e4f" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>SQPOLL 模式：</strong> 由於背景有一個專屬的 Kernel Thread 在不停輪詢 (Polling) 共用的 Submission Queue，應用程式只需在 User Space 填寫 SQE 並更新 tail pointer，Kernel Thread 就會自動將其取走。在沒有因閒置導致 Kernel Thread 休眠的理想狀況下，應用程式提交這 50 萬次 I/O 完全不需要呼叫任何 syscall，即 <strong>0 次</strong>。</li></ul></div></p></div></aside><hr id="33aa15e2-9005-806f-957d-f1915218d301" dir="auto"/></div></details></div></details><details id="33aa15e2-9005-801f-bd94-e43d9a1b1070" open="" class="toggle" dir="auto"><summary><mark class="highlight-red" data-notion-highlight="red"><strong>Quiz Pool</strong></mark></summary><div class="indented"><ol type="1" id="33aa15e2-9005-80fb-b9e2-c3e800e6b630" class="numbered-list" start="1" dir="auto"><li><mark class="highlight-red" data-notion-highlight="red">在高效能伺服器的 I/O 子系統設計中，工程師常需在 </mark><mark class="highlight-red" data-notion-highlight="red"><code>epoll</code></mark><mark class="highlight-red" data-notion-highlight="red"> 與 </mark><mark class="highlight-red" data-notion-highlight="red"><code>io_uring</code></mark><mark class="highlight-red" data-notion-highlight="red"> 之間做出取捨。考慮以下場景：一套類 PostgreSQL 的資料庫系統需同時應對大量並發網路連線與頻繁的隨機磁碟讀寫。系統面臨的瓶頸不只是吞吐量，還包括 Spectre/Meltdown 修補後 syscall 成本上升、以及 Direct I/O 與 Buffered I/O 難以統一管理的問題。<br/>關於 </mark><mark class="highlight-red" data-notion-highlight="red"><code>epoll</code></mark><mark class="highlight-red" data-notion-highlight="red"> 與 </mark><mark class="highlight-red" data-notion-highlight="red"><code>io_uring</code></mark><mark class="highlight-red" data-notion-highlight="red"> 在此情境下的差異與適用性，下列哪一項描述最為準確？</mark><blockquote id="33aa15e2-9005-80dd-91f2-c8086cb915ea" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80bb-ad57-e93c7b37dc78" class="numbered-list" start="1" dir="auto"><li>將 PostgreSQL 的同步 I/O 改為 <code>io_uring</code> 介面後，即使不調整系統架構，也能因消除中斷延遲而獲得數倍的效能提升。</li></ol><ol type="1" id="33aa15e2-9005-805c-9b2a-e1864e4b0a96" class="numbered-list" start="2" dir="auto"><li><code>io_uring</code> 雖然效能強大，但其設計初衷是為了取代 <code>libaio</code> 處理 Direct I/O，在處理 Buffered I/O 或網路 Socket 時，其表現仍遜於傳統的 <code>epoll</code> 介面。</li></ol><ol type="1" id="33aa15e2-9005-8081-89a1-e344c469bcba" class="numbered-list" start="3" dir="auto"><li><code>epoll</code> 採用 Event-Driven 架構，能同時監控大量網路連線，因此資料庫系統只需使用 <code>epoll</code>，便能統一處理網路請求與磁碟讀寫。</li></ol><ol type="1" id="33aa15e2-9005-8067-acc5-ffec075791d7" class="numbered-list" start="4" dir="auto"><li><code>epoll</code> 在處理檔案 I/O 時存在侷限，因為它無法有效區分資料是存在硬碟還是已快取在 Page Cache；而 <code>io_uring</code> 統一了網路與儲存介面，並透過 Shared Ring Buffer 減少了 mode switch 的開銷。</li></ol></blockquote><details id="33aa15e2-9005-805f-bbfe-c4a9e61d9dad" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8099-bf50-c6f5dcbc0662" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-807a-b05d-e45c7d297bab" class="" dir="auto"><code>poll</code> 在處理檔案 I/O 時存在侷限，因為它無法有效區分資料是存在硬碟還是已快取在 Page Cache；而 <code>io_uring</code> 統一了網路與儲存介面，並透過 Shared Ring Buffer 減少了 mode switch 的開銷。</p><hr id="33aa15e2-9005-807f-8301-c5dcaac435c1" dir="auto"/><p id="33aa15e2-9005-80d2-b7d9-fcb7f1692c24" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-80b4-ba3e-c571541e8dbc" class="" dir="auto">Linux 的一般檔案幾乎永遠對 <code>epoll</code> 回報「就緒」，導致 <code>epoll</code> 無法感知實際磁碟延遲，資料庫系統因此不得不另行依賴 <code>libaio</code> 處理 Direct I/O。<code>io_uring</code> 透過 SQ/CQ 共享記憶體環形緩衝區，讓使用者空間與核心免於反覆切換，且同時覆蓋網 路、Buffered 與 Direct I/O。</p></div></p><hr id="33ca15e2-9005-80c2-9f91-e2dbe25751d7" dir="auto"/><p id="33ca15e2-9005-8067-a879-f9905d712135" class="" dir="auto">(1) <code>io_uring</code> 的效益來自 queue depth 的提高。若系統邏輯仍為同步 (送出請求後即原地等待)，queue depth 始終為 1，因此 必須配合 Fiber 或 Coroutine 等非同步設計，才能真正釋放 <code>io_uring</code> 的潛能。</p><p id="33ca15e2-9005-8084-b01e-d8e487fe687c" class="" dir="auto">(2) <code>io_uring</code> 的核心優勢之一是透過 <strong>單一介面同時支援 Buffered I/O、Direct I/O 與網路 Socket</strong> ，打破了過去必須 混用 <code>epoll</code> + <code>libaio</code> 的局面。在網路場景中，<code>io_uring</code> 同樣可減少 syscall 次數，效能不遜於 <code>epoll</code>。<br/><br/>(3) <code>epoll</code> 在網路連線上確實是成功的 Event-Driven 解法，但它對檔案 I/O 幾乎完全無效。Linux 的檔案永遠被視為「就緒」狀 態，<code>epoll</code> 無法分辨資料是已快取在 Page Cache 還是仍在硬碟上。因此資料庫系統不得不同時維護兩套機制：<code>epoll</code> 處理網 路、<code>libaio</code> 處理硬碟，這正是 <code>io_uring</code> 出現並統一兩者的動機。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8099-ae39-f1820080f6cc" dir="auto"/><ol type="1" id="33aa15e2-9005-80ee-8fc0-f462f9ded461" class="numbered-list" start="2" dir="auto"><li><mark class="highlight-red" data-notion-highlight="red">在高效能儲存系統（如使用 io_uring 與 NVMe SSD）的架構設計中，關於 I/O 處理與優化機制，下列何者敘述最為精確？</mark><blockquote id="33aa15e2-9005-8081-b7c1-fdd75565f22e" class="" dir="auto"><ol type="1" id="33aa15e2-9005-800d-8db2-e790b0ac39a2" class="numbered-list" start="1" dir="auto"><li>Fibers 能在單一執行緒內實現 parallelism（平行運算），藉此降低 context switch 開銷。</li></ol><ol type="1" id="33aa15e2-9005-8054-86fc-cef84d616dbe" class="numbered-list" start="2" dir="auto"><li>在 io_uring 使用 Direct I/O 模式時，數據會由 Kernel 強制執行一次 Double Buffering 拷貝，以確保 User-space 記憶體分頁的安全。</li></ol><ol type="1" id="33aa15e2-9005-80e9-b86a-c7710a27f853" class="numbered-list" start="3" dir="auto"><li>io_uring 透過 mmap 建立 User 與 Kernel 共享的 Ring Buffers，應用程式可實現 SQE 的 Batch submission，顯著減少 syscall 次數。</li></ol><ol type="1" id="33aa15e2-9005-8030-b7de-f0545917b3e9" class="numbered-list" start="4" dir="auto"><li>為了確保 I/O 完成後的數據完整性，CQE (Completion Queue Entry) 的資料結構設計必須比 SQE (Submission Queue Entry) 更大，以承載回傳的 Data Payload。</li></ol></blockquote><details id="33aa15e2-9005-80b8-8d8b-c4d210f560b6" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80eb-b6f2-d7b4781a6863" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80a5-b866-cfbe4faa5352" class="" dir="auto">io_uring 透過 mmap 建立 User 與 Kernel 共享的 Ring Buffers，應用程式可實現 SQE 的 Batch submission，顯著減少 syscall 次數。</p><hr id="33aa15e2-9005-8019-b894-f5851cff05e1" dir="auto"/><p id="33aa15e2-9005-8095-b700-c1951f3df65e" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-80c5-8b34-db378c1ee614" class="" dir="auto">這是 io_uring 的核心設計。透過 memory-mapped 將 Submission Queue (SQ) 與 Completion Queue (CQ) 映射至用戶空間，應用程式可以直接寫入多個 SQE，再透過一次 io_uring_enter 系統呼叫批量提交，大幅降低 Overhead。</p></div></p><hr id="33ca15e2-9005-80b3-926f-dd176944e7ee" dir="auto"/><p id="33ca15e2-9005-80a5-aab8-e3ff224d8c51" class="" dir="auto">(1) Fibers 屬於 User-space 的協作式排程，在單一執行緒內僅能達成 Concurrency（並行）而非 parallelism。Parallelism 必須依賴多個實體 CPU 核心同時執行任務。</p><p id="33ca15e2-9005-803f-9d67-f1bafc6f2b50" class="" dir="auto">(2) Direct I/O 的核心在於繞過 Kernel Page Cache（文件快取），使數據直接在儲存裝置與 User Buffer 之間傳輸。這消除了從 Kernel Buffer 到 User Buffer 的軟體拷貝開銷，而非增加雙重緩衝。</p><p id="33ca15e2-9005-8033-be8b-cc9719536207" class="" dir="auto">(4) SQE 通常為 64 bytes（含指令、位址、偏移量等），而 CQE 通常僅為 16 bytes。CQE 並不攜帶大量的數據 Payload，僅回傳 <code>res</code>（結果狀態）與使用者定義的標記（user_data），實際數據是透過 DMA 直接傳輸至 User Buffer。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8060-b150-d3635e8c771f" dir="auto"/><ol type="1" id="33aa15e2-9005-80ad-8b21-e79e4ffacaa7" class="numbered-list" start="3" dir="auto"><li>一位開發者正在構建高效能儲存引擎，利用 io_uring 介面來最小化與 NVMe SSD 互動時的 system call 開銷。他觀察到雖然 io_uring 透過批次處理請求減少了 context switches，但 CPU 仍花費不少時間執行 io_uring_enter 系統呼叫，以通知 kernel 在 Submission Queue 中有新 command。 下列哪一項配置選項可讓 io_uring 以無系統呼叫（system call-less）模式進行 I/O 提交？在此模式下，核心能自動發現並處理寫入共享提交隊列記憶體的新請求，而應用程式端完全無需使用系統呼叫。<blockquote id="33aa15e2-9005-807d-ab13-ca7c4acb43e5" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8093-a6c6-c1c7aa2c0124" class="numbered-list" start="1" dir="auto"><li>設定 IORING_SETUP_IOPOLL 旗標，啟用儲存裝置 poll driver completion queue 的核心端輪詢。</li></ol><ol type="1" id="33aa15e2-9005-8056-a8f8-c33c370df858" class="numbered-list" start="2" dir="auto"><li>使用 IORING_SETUP_SINGLE_ISSUER 旗標，允許核心在單一執行緒管理環（ring）時跳過內部鎖定機制。</li></ol><ol type="1" id="33aa15e2-9005-8087-9137-dd6e3148b297" class="numbered-list" start="3" dir="auto"><li>利用用戶空間與核心空間共享 ring buffer 特性，僅透過更新記憶體中的指標即可自動觸發核心處理，無需任何通知機制。</li></ol><ol type="1" id="33aa15e2-9005-8017-8f04-e505d2fd407f" class="numbered-list" start="4" dir="auto"><li>設定 IORING_SETUP_SQPOLL 旗標，建立一個 SQPOLL thread 持續 polling。</li></ol></blockquote><details id="33aa15e2-9005-80cf-9157-c6ceb74136a3" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80f8-bf99-ca61413f2668" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8037-abfa-e442ef5a5e5b" class="" dir="auto">設定 IORING_SETUP_SQPOLL 旗標，建立一個 SQPOLL thread 持續 polling。</p><hr id="33aa15e2-9005-80d5-88f5-c83fefd76a7c" dir="auto"/><p id="33aa15e2-9005-8059-8cd2-daa4f118a6ce" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8057-80b7-ccd761a34638" class="" dir="auto">SQPOLL（Submission Queue Polling）功能會產生一個核心執行緒來輪詢提交隊列。這使得應用程式只需將資料寫入 SQ 並更新 userspace 中的 tail pointer，核心執行緒就會自動接手工作，未睡眠時可避免 system call。</p></div></p><hr id="33ca15e2-9005-806c-ae4a-e149cebecbb8" dir="auto"/><p id="33ca15e2-9005-80d5-8840-e762f8d0f353" class="" dir="auto">(1) IOPOLL 是用於完成階段（透過 busy waiting 來檢查硬體是否完成），雖然能降低延遲，但並不能消除「提交階段」的系統呼叫。</p><p id="33ca15e2-9005-8088-b2ae-e349ff733e37" class="" dir="auto">(2) 這是針對核心內部鎖定安全性的效能優化，但並不會改變應用程式仍需透過系統呼叫通知核心有新 command 的基本需求。</p><p id="33ca15e2-9005-804a-ab2d-cd11ede0d5ce" class="" dir="auto">(3) 雖然 io_uring 使用共享記憶體，但如果沒有 SQPOLL 執行緒，核心仍然需要一個 doorbell 通知（即系統呼叫）才知道何時該去讀取這些共享記憶體。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80f4-8260-e8652d0f2251" dir="auto"/><ol type="1" id="33aa15e2-9005-80e2-a2c3-f8d7714d5552" class="numbered-list" start="4" dir="auto"><li><mark class="highlight-red" data-notion-highlight="red">某間公司的 HTTP 檔案伺服器運行於配備 NVMe SSD 的機器上， 尖峰時段需同時處理約 10,000 筆並行隨機讀取請求（每筆 4KB）。 工程師評估導入 io_uring 來降低 I/O 開銷，但伺服器的 CPU 核心數有限， 且 HTTP 流量具備明顯的 bursty。 在這個情境下，哪一種 io_uring 配置組合最能在吞吐量與 CPU 效率之間取得平衡？</mark><blockquote id="33aa15e2-9005-8085-b808-c932bf8200a3" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8084-acd8-ce79ec807de6" class="numbered-list" start="1" dir="auto"><li>啟用 SQPOLL 搭配 Registered Buffers，讓核心執行緒主動輪詢 SQ，以徹底消除 Syscall 與中斷的所有開銷。</li></ol><ol type="1" id="33aa15e2-9005-80a7-8783-ee3787d58ee9" class="numbered-list" start="2" dir="auto"><li>使用 Registered Buffers 搭配 Registered Files，並以 Batching 方式批次提交 SQE；不啟用 SQPOLL 或 IOPOLL。</li></ol><ol type="1" id="33aa15e2-9005-8042-889b-da5edb1e2c0f" class="numbered-list" start="3" dir="auto"><li>啟用 SQPOLL + IOPOLL 雙輪詢模式，並對每筆請求獨立提交一個 SQE（不使用 Batching）。</li></ol><ol type="1" id="33aa15e2-9005-80cf-8f5b-ca6380bd89c3" class="numbered-list" start="4" dir="auto"><li>使用 IOPOLL 模式並對每次請求各自動態分配一個 4KB Buffer，以精確消除 interrupt storm 並最小化記憶體佔用。</li></ol></blockquote><details id="33aa15e2-9005-8033-8126-df41495dff04" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8024-8b53-ce1c85fa8e54" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8099-9c44-f28c0a36b72e" class="" dir="auto">使用 Registered Buffers 搭配 Registered Files，並以 Batching 方式批次提交 SQE；不啟用 SQPOLL 或 IOPOLL。</p><hr id="33aa15e2-9005-802a-a370-e2c2a6069c90" dir="auto"/><p id="33aa15e2-9005-805f-add4-ee765f8d2b31" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8031-bd98-d110aa9d46d1" class="" dir="auto">這是最符合此情境的組合： Registered Buffers 讓核心在 <code>io_uring_register()</code> 時一次性完成 DMA Mapping 與記憶體頁面固定（Pin）， 省去每筆 I/O 重複的 Setup 開銷； Registered Files 同理，省去每次操作的 File Descriptor 查找成本； Batching 則將多筆 SQE 於一次 <code>io_uring_enter()</code> 中一起提交， 大幅攤提 Syscall 開銷。 不啟用 SQPOLL/IOPOLL 的原因是：HTTP 流量具有突發性， 輪詢模式在低峰期會持續消耗 CPU，與 CPU 核心數有限的前提相衝突。</p></div></p><hr id="33ca15e2-9005-80d0-9a57-f95f279f4c59" dir="auto"/><p id="33ca15e2-9005-80cb-be36-f299a6b70855" class="" dir="auto">(1) 此配置有兩個問題： 第一，SQPOLL 消除的是「提交端」的 Syscall 開銷，而非中斷開銷（那是 IOPOLL 的功能）， 描述混淆了兩者的職責； 第二，SQPOLL 的核心執行緒會 Burn 一顆 CPU 核心進行輪詢， 在 HTTP 這類具有突發性的場景中，流量低峰時這顆核心依然空轉， 對 CPU 核心數有限的伺服器是嚴重的資源浪費。</p><p id="33ca15e2-9005-800a-9f8a-f1a6b42d221f" class="" dir="auto">(3) 此配置有兩個致命缺陷： SQPOLL 與 IOPOLL 各自佔用一個 CPU 核心進行 busy-poll， 在 HTTP 流量具有突發性的情境下，低峰期會大量浪費 CPU； 加上缺乏 Batching，每筆請求各自觸發一次 <code>io_uring_enter()</code>， Syscall 開銷完全無法攤提，整體 CPU 使用率反而更高。</p><p id="33ca15e2-9005-8060-9b98-d2e1abda0d35" class="" dir="auto">(4) 此配置有兩個矛盾： IOPOLL 確實能消除硬體中斷，但代價是 CPU 必須持續 busy-waitNVMe 控制器， 在高並行場景下反而會顯著拉高 CPU 使用率，與「CPU 效率」目標背道而馳； 同時，每次請求動態分配獨立 Buffer 意味著放棄了 Registered Buffers 的核心優勢—— 每筆 I/O 仍需重新進行 DMA Mapping 與頁面固定， 讓 io_uring 對記憶體管理的最佳化形同虛設。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80da-9244-ce80de9f3568" dir="auto"/><ol type="1" id="33aa15e2-9005-807e-84c6-c1a5ae4325fd" class="numbered-list" start="5" dir="auto"><li>某量化交易公司的一名工程師正在設計高頻交易系統（HFT storage layer），系統每秒需要處理數十萬次 4KB 隨機讀取。 他觀察到 CPU 使用率很高，但 SSD 使用率卻不高。進一步分析後發現，CPU 大量時間消耗在 system call 上。 因此他將系統從傳統 read() 改為 io_uring，並使用 batched submission，每次提交 32 個 I/O requests。<br/>請問這個優化「主要降低」的是哪一段成本？<blockquote id="33aa15e2-9005-8019-a04f-cc8f049ca40f" class="" dir="auto"><ol type="1" id="33aa15e2-9005-808a-93c5-f4c022bdbb45" class="numbered-list" start="1" dir="auto"><li>攤平 user 與 kernel mode 切換成本，使每個 I/O 平均 syscall 成本下降</li></ol><ol type="1" id="33aa15e2-9005-8041-bbbf-e737eea29fce" class="numbered-list" start="2" dir="auto"><li>將多個 I/O request 合併為單一實體 I/O，減少裝置操作次數</li></ol><ol type="1" id="33aa15e2-9005-80a0-b5d8-c1c719c8829f" class="numbered-list" start="3" dir="auto"><li>降低 DMA 傳輸成本，使資料搬運更快</li></ol><ol type="1" id="33aa15e2-9005-8021-95b9-c32643bf4349" class="numbered-list" start="4" dir="auto"><li>降低 SSD 的 device latency</li></ol></blockquote><details id="33aa15e2-9005-80cc-8a8e-d8b07dccae5d" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80ed-9248-c30ae4b8cfde" dir="ltr"><div style="width:100%"><p id="db16482b-b76e-4f7d-a8d5-2729ea225f7a" class="" dir="auto">攤平 user 與 kernel mode 切換成本，使每個 I/O 平均 syscall 成本下降</p><hr id="33aa15e2-9005-802c-9cea-f7e3d314bb50" dir="auto"/><p id="33aa15e2-9005-8081-a569-ef2e8f4b11f4" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8085-8067-ee0f71465970" class="" dir="auto">正確。io_uring 的 batching 讓多個 request 共用一次 syscall， 原本每個 I/O 都需要 mode switch，現在變成 amortized cost。 CPU 時間從「進出 kernel」轉回「實際工作」。</p></div></p><hr id="33ca15e2-9005-8083-b7db-e5e69b5a4e11" dir="auto"/><p id="33ca15e2-9005-8058-afc4-d87712ac4453" class="" dir="auto">(2) 混淆 batching 與 request merging。 本題是合併 syscall，不是合併 I/O。request merging 通常由 block layer scheduler 或裝置控制器完成。</p><p id="33ca15e2-9005-80dc-9a59-ef2a20c70b86" class="" dir="auto">(3) DMA 行為完全不變，仍由裝置負責資料搬運。實際 DMA 由硬體處理，io_uring 不改變傳輸機制。</p><p id="33ca15e2-9005-8044-94f1-e1ebe50f8769" class="" dir="auto">(4) 實際上 SSD latency（數十微秒）不變， io_uring 只減少 CPU 端開銷。這種說法較接近升級硬體或快取命中率提升的情境。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80aa-9886-ca5024a633a8" dir="auto"/><ol type="1" id="33aa15e2-9005-80bb-8e3a-f2651e1a0b99" class="numbered-list" start="6" dir="auto"><li>某個高 IOPS 的資料庫系統每秒需要執行 640,000 次 4KB random read， 工程師使用 <code>io_uring</code> 並採用 batched submission，每次將 64 個 SQE 一起提交。<p id="33aa15e2-9005-809f-afd0-ff8f0e7c1902" class="" dir="auto">假設系統未啟用 SQPOLL，且每次 batch 都需要呼叫一次 <code>io_uring_enter()</code>， 下列哪一項最能<strong>合理解釋此優化對 syscall overhead 的影響本質</strong>？</p><blockquote id="33aa15e2-9005-8094-aeb0-c0404b811f23" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80c7-807e-ddc4f81953eb" class="numbered-list" start="1" dir="auto"><li>將 640,000 次 I/O 合併為 10,000 次 syscall，主要節省的是 kernel 與 user space 之間的 mode switch 與 request copy 成本。</li></ol><ol type="1" id="33aa15e2-9005-80eb-a866-e839ace06ec1" class="numbered-list" start="2" dir="auto"><li>雖然 syscall 次數下降，但每次 <code>io_uring_enter()</code> 需要處理更多 SQE，因此總 syscall overhead 不變，只是延遲被集中。</li></ol><ol type="1" id="33aa15e2-9005-80b2-85d6-d19e1221b6a2" class="numbered-list" start="3" dir="auto"><li>batched submission 的主要效益來自降低 NVMe 裝置的 interrupt 次數，而非 syscall 次數。</li></ol><ol type="1" id="33aa15e2-9005-8069-a7f6-c41abca24a84" class="numbered-list" start="4" dir="auto"><li>由於 <code>io_uring</code> 使用 shared ring buffer，因此即使不使用 batching，每個 I/O 也不需要 syscall。</li></ol></blockquote><details id="33aa15e2-9005-80ab-9697-eeecf2c9524a" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80c5-a9a8-d9bf97de74de" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80ce-87a1-c04c6e6f30dc" class="" dir="auto">將 640,000 次 I/O 合併為 10,000 次 syscall，主要節省的是 kernel 與 user space 之間的 mode switch 與 request copy 成本。</p><hr id="33aa15e2-9005-802f-b48d-f9f6318fca39" dir="auto"/><p id="33aa15e2-9005-8090-9a9f-d214e867b688" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8031-91b2-d317cfd40ab4" class="" dir="auto">每 64 個 I/O 合併為一次提交，因此 syscall 次數從 640,000 次降為 10,000 次。 關鍵節省來自兩點： 第一， batched submission 減少 user mode 與 kernel mode 的 mode switch 次數； 第二， <code>io_uring</code> 將 SQE 直接放在 shared memory 中，kernel 不需要逐筆 copy request。</p></div></p><hr id="33ca15e2-9005-8003-8506-c3e34d4c3306" dir="auto"/><p id="33ca15e2-9005-80c3-8685-f6dff888da4b" class="" dir="auto">(2) 雖然單次 syscall 處理的 SQE 變多，但 syscall 的固定成本（mode switch、register save/restore 等）只發生一次， 而不是隨 SQE 數量線性增加。因此總體 syscall overhead 會顯著下降，而不是只是把原本分散的延遲集中到少數幾次 syscall 中。</p><p id="33ca15e2-9005-802b-8f49-e0674404d0f9" class="" dir="auto">(3) interrupt 次數主要與 completion path（例如 IOPOLL）相關，而非 submission batching。 batched submission 的核心目標是減少 syscall 次數與資料傳遞成本，並不直接影響裝置 interrupt 行為。</p><p id="33ca15e2-9005-8041-b41c-f6de1d4de419" class="" dir="auto">(4) shared ring buffer 確實減少資料傳遞成本，但在未啟用 SQPOLL 的情況下， application 仍需要透過 <code>io_uring_enter()</code> 通知 kernel 有新的 SQE 進來請處理。 因此若不做 batching，每個 I/O 仍可能對應一次 syscall，無法消除 syscall overhead。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80c2-9e52-f69c3ac8fd73" dir="auto"/><ol type="1" id="33aa15e2-9005-8031-beed-cdabed7d951f" class="numbered-list" start="7" dir="auto"><li>某系統工程師將系統從 io_uring（經 block layer）改為 io_uring_cmd（NVMe passthrough）， 發現 latency 降低約 10%，但系統變得更難維護。 下列哪個原因最能解釋這個 trade-off？<blockquote id="33aa15e2-9005-80b5-a595-d02fe6aee13e" class="" dir="auto"><ol type="1" id="33aa15e2-9005-807a-bcae-c60edf759318" class="numbered-list" start="1" dir="auto"><li>因為 application 必須自己處理 NVMe command 與 memory 管理，失去 kernel abstraction</li></ol><ol type="1" id="33aa15e2-9005-8091-ad8e-c9a555f3984b" class="numbered-list" start="2" dir="auto"><li>因為 NVMe SSD 在 passthrough 模式下關閉了 queue 機制</li></ol><ol type="1" id="33aa15e2-9005-808f-adff-d002fdcaa7e4" class="numbered-list" start="3" dir="auto"><li>因為 filesystem 被完全移除，資料直接寫入 DRAM</li></ol><ol type="1" id="33aa15e2-9005-8002-83a1-ef9fee504024" class="numbered-list" start="4" dir="auto"><li>因為 DMA 不再使用 physical address，因此需要額外轉換成本</li></ol></blockquote><details id="33aa15e2-9005-80cf-9051-c0437b77d35c" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8026-9483-c16e02a9b9b5" dir="ltr"><div style="width:100%"><p id="62489e1e-0d2b-43de-85d8-4e428ae59419" class="" dir="auto">因為 application 必須自己處理 NVMe command 與 memory 管理，失去 kernel abstraction</p><hr id="33aa15e2-9005-80af-be8b-c863310dcf15" dir="auto"/><p id="33aa15e2-9005-8054-b447-e7a736af9626" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-80ba-a38e-d4d413a250c8" class="" dir="auto">正確。繞過 block layer 後需自行處理 NVMe command 與 DMA buffer， 失去 kernel abstraction，複雜度提升換取較低 latency。</p></div></p><hr id="33ca15e2-9005-800a-a6d6-cd74803ce296" dir="auto"/><p id="33ca15e2-9005-809c-a744-f63bfd78d40b" class="" dir="auto">(2) NVMe queue 仍存在，passthrough 僅繞過 block layer，不影響裝置機制。</p><p id="33ca15e2-9005-8027-ad07-fe0a79d40201" class="" dir="auto">(3) 混淆 filesystem 與資料來源。filesystem 只負責 mapping， 資料仍需從 SSD 經 DMA 搬到記憶體，並非直接產生於 DRAM。</p><p id="33ca15e2-9005-8034-a600-e9327039c85e" class="" dir="auto">(4) 實際 DMA 仍使用 physical address，passthrough 不改變此機制，此說法不成立。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8003-903f-ff6cf2525119" dir="auto"/><ol type="1" id="33aa15e2-9005-8062-861b-d1dee9c1c36a" class="numbered-list" start="8" dir="auto"><li>某超低延遲的交易系統正在將其儲存引擎從傳統的 <code>libaio</code> 遷移至 <code>io_uring</code>。工程師在 profiling 時發現，在每秒提交百萬次 I/O 請求的高負載情境下，<code>io_uring</code> 不僅消除了大量的 context switch，還大幅減少了 CPU 在 memory copy 上的開銷。<p id="33aa15e2-9005-8040-a158-f4fb8a1335fc" class="" dir="auto">請問 <code>io_uring</code> 是透過何種軟體架構設計，來徹底消除傳統 I/O 介面在「提交與接收指令」階段的資料搬運開銷？</p><blockquote id="33aa15e2-9005-80c5-8195-d912eefb1852" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80d9-8a75-f19fc6aa3d91" class="numbered-list" start="1" dir="auto"><li><code>io_uring</code> 會強制關閉 NVMe SSD 的 DMA 控制器，改為由 kernel 啟動一個專屬的 SQPOLL 執行緒，使用 CPU 親自將資料從 user space 搬運至 SSD 的快取中，藉此換取極低的延遲。</li></ol><ol type="1" id="33aa15e2-9005-80ae-b3fd-e0391b554bd5" class="numbered-list" start="2" dir="auto"><li><code>io_uring</code> 透過 <code>mmap</code> 機制，讓 user space 與 kernel space 直接共享 submission queue（SQ）與 completion queue（CQ）的記憶體區塊。應用程式只需將 I/O 指令寫入共享的 ring buffer，kernel 即可直接讀取，完全免除了傳統 system call 必須在兩個空間之間拷貝指令陣列的 CPU 開銷。</li></ol><ol type="1" id="33aa15e2-9005-80ad-99e9-fbd44dd4d549" class="numbered-list" start="3" dir="auto"><li><code>io_uring</code> 會在 user space 動態分配一塊記憶體，並要求應用程式每次提交 I/O 時，都必須主動呼叫 <code>mmap()</code> 來與 kernel 重新建立映射，藉此確保每個 I/O 請求的安全性與獨立性。</li></ol><ol type="1" id="33aa15e2-9005-8031-89e5-ca3eae77ebb8" class="numbered-list" start="4" dir="auto"><li><code>io_uring</code> 直接將 NVMe SSD 硬體上的 SQ 與 CQ 實體位址暴露給 user space，讓應用程式能完全繞過 Linux kernel 與檔案系統，直接對底層的 SSD 控制器發送指令。</li></ol></blockquote><details id="33aa15e2-9005-807a-ac5c-efe1ed0bd4f9" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8023-bd00-f08ef72b1d74" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80c9-80da-e199bcd0d10f" class="" dir="auto"><code>io_uring</code> 透過 <code>mmap</code> 機制，讓 user space 與 kernel space 直接共享 submission queue（SQ）與 completion queue（CQ）的記憶體區塊。應用程式只需將 I/O 指令寫入共享的 ring buffer，kernel 即可直接讀取，完全免除了傳統 system call 必須在兩個空間之間拷貝指令陣列的 CPU 開銷。</p><hr id="33aa15e2-9005-8088-9229-edf3a069a863" dir="auto"/><p id="33aa15e2-9005-806b-ab87-cb04cc30ee53" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-80c6-b4b5-d0ffe28e1969" class="" dir="auto">這是正確的。傳統的 <code>libaio</code> 在呼叫 <code>io_submit()</code> 時，kernel 必須將 user space 的 <code>iocb</code> 結構陣列逐一拷貝到 kernel space 才能處理。而 <code>io_uring</code> 巧妙地借鑑了 NVMe 的硬體設計，在軟體層面上實作了基於 <code>mmap</code> 共享的 SQ 與 CQ。應用程式在 user space 寫入指令、讀取結果，kernel 直接在同一個實體記憶體位址處理，達成了真正的 Zero-copy for commands。</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-807b-ba14-ec82e6c48bb0" dir="auto"/><ol type="1" id="33aa15e2-9005-80e3-9a30-fbabe3965b83" class="numbered-list" start="9" dir="auto"><li>工程師在一個對延遲極度敏感的 key-value store 中同時啟用了 SQPOLL 和 IOPOLL 模式，並搭配 O_DIRECT。系統上線後觀察到以下現象：<p id="33aa15e2-9005-8047-ab7e-f33f296f7307" class="" dir="auto">在 I/O 持續密集的時間段（每秒超過 80 萬次 I/O），延遲表現非常好。 但在每天凌晨 3~4 點的低峰期（請求稀疏，常出現數秒的空窗期），偶爾會出現單筆請求延遲突然飆升到數十 ms 的情況，而且這種高延遲的發生是週期性的、而不是持續性的。請問最可能造成凌晨低峰期 <strong>週期性延遲飆升</strong> 的原因是什麼？</p><blockquote id="33aa15e2-9005-8019-a56d-f6acd9d2f4ef" class="" dir="auto"><ol type="1" id="33aa15e2-9005-808c-9b88-f3bce108c207" class="numbered-list" start="1" dir="auto"><li>IOPOLL 模式要求呼叫 io_uring_enter() 時 kernel 在 kernel space busy-wait。在低峰期，因為同時執行的 I/O 請求少，busy-wait 的競爭降低，反而讓 kernel 把更多 CPU 時間花在其他系統任務上，造成 I/O completion 的處理被延後。</li></ol><ol type="1" id="33aa15e2-9005-80cc-8cf5-e4ef077a91a9" class="numbered-list" start="2" dir="auto"><li>同時啟用 SQPOLL 和 IOPOLL 在低負載下會造成兩個 polling thread 之間的 CPU 資源競爭。在高負載時兩者都有足夠的工作要做，分工明確；在低負載時兩者都在 idle spinning，競爭同一個 CPU core 的使用權，造成 context switch overhead 上升，間接拖慢 I/O 延遲。</li></ol><ol type="1" id="33aa15e2-9005-80ef-ad00-f4ab1057122b" class="numbered-list" start="3" dir="auto"><li>IOPOLL 在低 I/O 負載下會造成 kernel busy-wait 的時間拉長。因為 NVMe 裝置在 I/O 少的時候進入省電模式，response time 變慢，kernel polling thread 需要 busy-wait 更長時間才能等到 completion，導致單筆 I/O 的延遲上升。</li></ol><ol type="1" id="33aa15e2-9005-80db-a0a5-e7e79e00bd65" class="numbered-list" start="4" dir="auto"><li>SQPOLL 的 kernel polling thread 在低 I/O 負載下會因為長時間沒有新的 SQE 而進入睡眠狀態。下一個 I/O 請求到來時，則必須把它叫醒，但這個 wake-up 本身有一定的延遲。因此在低峰期 I/O 稀疏的情況下，每次 idle sleep 過後的第一批請求需要等待喚醒，造成週期性的延遲飆升。</li></ol></blockquote><details id="33aa15e2-9005-80c7-90b1-e2bb4d3ff3af" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8018-b9b7-d06f8e75387a" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8032-9d68-ee02c8fed2ce" class="" dir="auto">SQPOLL 的 kernel polling thread 在低 I/O 負載下會因為長時間沒有新的 SQE 而進入睡眠狀態。下一個 I/O 請求到來時，則必須把它叫醒，但這個 wake-up 本身有一定的延遲。因此在低峰期 I/O 稀疏的情況下，每次 idle sleep 過後的第一批請求需要等待喚醒，造成週期性的延遲飆升。</p><hr id="33aa15e2-9005-8079-b700-fe0125c6cfb8" dir="auto"/><p id="33aa15e2-9005-80c9-aa30-fb01e74e8d18" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-80ed-be80-c2d46527bd09" class="" dir="auto">週期性這個關鍵詞是核心線索：不是每個請求都慢，而是 polling thread 睡著之後的第一個請求才慢，之後 polling thread 醒著的這段時間請求都正常，直到下一次 idle timeout 觸發。這個模式完全符合 SQPOLL idle timeout 機制的行為。 且 SQPOLL 適合的場景是 I/O 非常密集、需要最低延遲的 workload。如果你的 I/O 是偶爾才來一個，SQPOLL 就是在浪費 CPU。</p></div></p><hr id="33ca15e2-9005-806f-9ef9-f154a08dd616" dir="auto"/><p id="33ca15e2-9005-80a1-91b5-cf228d6335ae" class="" dir="auto">(1) 這個邏輯是自相矛盾的。IOPOLL 的 busy-wait 是主動輪詢 NVMe CQ，它不會因為競爭降低就把 CPU 讓給其他任務。低峰期 I/O 少反而讓每次 busy-wait 更快結束（因為等待的 I/O 少），不會造成延遲飆升，更不會是週期性的現象。</p><p id="33ca15e2-9005-8033-91c6-c15f2539034a" class="" dir="auto">(2) SQPOLL 是 kernel polling thread 監控 SQ，IOPOLL 是呼叫 io_uring_enter() 的 thread 在 kernel space busy-wait，這兩者的運作機制不同，不會形成兩個 polling thread 競爭同一 core 的情況。 且這個解釋無法說明為何延遲飆升是 <strong>週期性</strong> 的，而不是持續性的。競爭導致的延遲應該在低負載時持續存在，而不是像脈衝一樣週期性出現。</p><p id="33ca15e2-9005-80de-b0d1-ca572e22e150" class="" dir="auto">(3) 這個解釋混淆了因果關係。IOPOLL 的 busy-wait 確實佔用 CPU，但它讓延遲 <strong>更低</strong> 而非更高，因為省掉了 interrupt 的 delivery overhead。 NVMe 省電模式確實存在，但這會讓所有 I/O 都變慢，不會造成週期性飆升，更不符合低峰期才出現的模式。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8026-9b31-dfdca04cb860" dir="auto"/><ol type="1" id="33aa15e2-9005-80c0-abb5-d224a5f0a86e" class="numbered-list numbered-list-digits-2" start="10" dir="auto"><li>某高效能資料庫團隊在使用 <code>io_uring</code> 時發現，雖然已經將 <code>SQ</code> 與 <code>CQ</code> 的機制發揮到極致，但 Linux <code>block layer</code> 內部的 <code>I/O scheduler</code>（如 <code>merging</code> 或 <code>reordering</code>）在高速 <code>NVMe SSD</code> 環境下反而成為了多餘的 <code>overhead</code>。若團隊希望應用程式能直接掌控硬體，甚至發送裝置專屬的 <code>vendor-specific command</code>，最合適的架構選擇及其伴隨的代價為何？<blockquote id="33aa15e2-9005-80ba-9624-dbfea7485fe6" class="" dir="auto"><ol type="1" id="33aa15e2-9005-804d-b232-fa4f906e5059" class="numbered-list" start="1" dir="auto"><li>透過調整 <code>io_uring_setup()</code> 的參數來增加 <code>entries</code> 數量並配合 <code>batched submission</code>。這能顯著提升單次 <code>io_uring_enter</code> 處理的指令總數。代價是記憶體開銷增加，且無法改變指令在 <code>kernel</code> 內部的傳遞路徑。</li></ol><ol type="1" id="33aa15e2-9005-806b-90ff-f2549b9f68e8" class="numbered-list" start="2" dir="auto"><li>在開啟檔案時強制使用 <code>O_DIRECT</code> 旗標。這能確保資料不經過 <code>page cache</code> 而直接寫入硬體。代價是必須滿足特定的記憶體對齊要求，但底層路徑仍受 <code>block layer</code> 的規範限制。</li></ol><ol type="1" id="33aa15e2-9005-8076-8b81-e8d36fdc4405" class="numbered-list" start="3" dir="auto"><li>同時啟用 <code>SQPOLL</code> 與 <code>IOPOLL</code> 模式。這能實現無 <code>system call</code> 提交與無 <code>interrupt</code> 完成的極致路徑。代價是會持續佔用 <code>CPU</code> 核心進行輪詢，且依然無法發送 <code>block layer</code> 不支援的硬體指令。</li></ol><ol type="1" id="33aa15e2-9005-80c9-8952-c74dd5385ba9" class="numbered-list" start="4" dir="auto"><li>使用 <code>io_uring_cmd</code> 進行 <code>NVMe passthrough</code>。這允許應用程式直接繞過 <code>block layer</code> 並發送 <code>raw command</code> 給驅動程式。代價是開發者必須自行管理 <code>DMA buffer</code>，且會失去 <code>file system</code> 與 <code>encryption</code> 等核心功能。</li></ol></blockquote><details id="33aa15e2-9005-8038-895f-c7157462c6ed" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8081-accc-f9ed9ac854ab" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80f7-90b0-c6a94513545d" class="" dir="auto">使用 <code>io_uring_cmd</code> 進行 <code>NVMe passthrough</code>。這允許應用程式直接繞過 <code>block layer</code> 並發送 <code>raw command</code> 給驅動程式。代價是開發者必須自行管理 <code>DMA buffer</code>，且會失去 <code>file system</code> 與 <code>encryption</code> 等核心功能。</p><hr id="33aa15e2-9005-8004-85fc-d47a713545df" dir="auto"/><p id="33aa15e2-9005-8034-8f0e-c54fe62ebc60" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8010-860e-c2736bc24a62" class="" dir="auto"><code>io_uring</code> 的預設路徑仍需經過 <code>block layer</code> 的處理邏輯，而 <code>io_uring_cmd</code> 提供了 <code>passthrough</code> 機制直接對接 <code>driver</code>。這能跳過針對傳統磁碟設計的優化開銷，但也意味著應用程式必須承擔原本由 <code>kernel</code> 處理的資源管理責任，且無法享用基於 <code>block device</code> 構建的檔案系統功能。</p></div></p><hr id="33ca15e2-9005-8022-a0a0-fd9c391a6d65" dir="auto"/><p id="33ca15e2-9005-8005-82ae-f7f802de577f" class="" dir="auto">(1) <code>batching</code> 技術的核心在於減少頻繁進出 <code>kernel</code> 門檻（<code>system call</code>）的時間成本。它優化的是指令的提交密度而非處理路徑，指令內容本身仍受限於 <code>io_uring</code> 預設的結構定義，無法夾帶不符合規範的硬體指令。<br/><br/>(2) <code>O_DIRECT</code> 的設計目標是消除 <code>page cache</code> 的複製與同步開銷。雖然減少了記憶體層級的負擔，但請求進入 <code>kernel</code> 後仍會被封裝成標準的 <code>I/O</code> 請求並遵循 <code>block layer</code> 的排程與處理機制，無法達成對硬體的直接指令控制。<br/><br/>(3) 這兩項技術分別針對 <code>submission</code> 端的 <code>system call</code> 與 <code>completion</code> 端的 <code>interrupt</code> 進行優化。即便兩者並行，請求在 <code>kernel</code> 內部依然是透過標準的 <code>block layer</code> 路徑傳遞，因此無法解決 <code>I/O scheduler</code> 帶來的延遲，也無法發送非標準的硬體指令。 </p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80eb-b28b-f33ea81c8b12" dir="auto"/><ol type="1" id="33aa15e2-9005-80b9-aac3-ed021a8c9828" class="numbered-list numbered-list-digits-2" start="11" dir="auto"><li>假設你正在開發一個類似 RocksDB 的儲存引擎，並打算將原本基於多執行緒的 synchronous I/O 遷移至 <code>io_uring</code> 搭配 asynchronous I/O。 下列關於這項技術轉換的敘述，下列哪項正確？<blockquote id="33aa15e2-9005-8055-8014-f2a472735034" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80b9-a186-eae019afd998" class="numbered-list" start="1" dir="auto"><li><code>io_uring</code> 僅能支援帶有 <code>O_DIRECT</code> 標籤的檔案存取，若檔案位於 page cache 中，行為會退化成同步阻塞模式。</li></ol><ol type="1" id="33aa15e2-9005-807c-875c-e58fa4880c4f" class="numbered-list" start="2" dir="auto"><li>改用 <code>io_uring</code> 的非同步模式後，由於 CPU 不再需要等待 I/O 完成，因此單一 I/O 請求從發出到完成的 latency 會比同步 I/O 有明顯縮短。</li></ol><ol type="1" id="33aa15e2-9005-8001-8b89-c9e1081f9fca" class="numbered-list" start="3" dir="auto"><li><code>io_uring</code> 透過 SQ 與 CQ 實現 user 與 kernel 空間的記憶體共享，能有效減少頻繁 syscall 帶來的 context switch 開銷。</li></ol><ol type="1" id="33aa15e2-9005-80b8-a6de-dcf360972d7d" class="numbered-list" start="4" dir="auto"><li>在 <code>io_uring</code> 架構下，系統必須強制使用 interrupt 來得知 I/O 完成，不能使用 polling，避免浪費 CPU 資源。</li></ol></blockquote><details id="33aa15e2-9005-80d1-8593-eebbb187bd8c" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8035-bec7-cdfb74a5414e" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-800b-8211-dac7df041d7f" class="" dir="auto"><code>io_uring</code> 透過 SQ 與 CQ 實現 user 與 kernel 空間的記憶體共享，能有效減少頻繁 syscall 帶來的 context switch 開銷。</p><hr id="33aa15e2-9005-80c0-ac6d-d5bf099db0ce" dir="auto"/><p id="33aa15e2-9005-80d3-8b64-fef313833fb4" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-803f-8e70-f70e6db20dd3" class="" dir="auto">這是 <code>io_uring</code> 的核心設計。透過與 kernel 共享 ring buffer，應用程式可以批次提交請求，在開啟 SQPOLL 模式下，不需要執行 syscall 就能讓 kernel 處理 I/O</p></div></p><hr id="33ca15e2-9005-8080-974d-e155e1056713" dir="auto"/><p id="33ca15e2-9005-80fb-a551-fa3a2a1c2546" class="" dir="auto">(1) 這是舊版 Linux AIO 的主要限制。<code>io_uring</code> 的一大突破就是它能處理包括 buffered I/O 在內的大部分 syscall，且能真正實現非同步執行。<br/><br/>(2) Async I/O 的優勢在於提高 throughput 與 CPU 利用率，而非縮短單次硬體存取的時間，由於增加了隊列管理和任務調度的開銷，單次的 latency 通常與同步 I/O 持平。</p><p id="33ca15e2-9005-8068-8897-e8a942a59280" class="" dir="auto">(4) <code>io_uring</code> 支持 I/O polling 模式（如 <code>IORING_SETUP_IOPOLL</code>），對於 NVMe SSD，使用 polling 繞過 interrupt 的開銷可以獲得更低的 latency 與更高的效能。</p></div></aside></div></details></li></ol></div></details></div></details></div></div><hr id="33aa15e2-9005-80a5-a005-f2d144adb725" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-801c-92f6-edc1c7b8832a" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80c0-8110-c00d4d89b218" class="" dir="auto">
+</p></div></aside></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>
