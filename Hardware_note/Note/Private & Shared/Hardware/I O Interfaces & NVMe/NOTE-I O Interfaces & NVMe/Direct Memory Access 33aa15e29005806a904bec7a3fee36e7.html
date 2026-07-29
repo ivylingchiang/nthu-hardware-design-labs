@@ -1,0 +1,792 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Direct Memory Access</title><meta name="data-notion-page-icon" content="🧱"/><link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2290%22%3E%F0%9F%A7%B1%3C%2Ftext%3E%3C%2Fsvg%3E"/><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+/* Override strong tags inside headings to maintain consistent weight */
+h1 strong,
+h2 strong,
+h3 strong {
+	font-weight: 600;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 10px;
+	padding: 1rem;
+}
+
+/* For default-background callouts, render the border outline. */
+.callout.block-color-default_background {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+figure,
+aside,
+details {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+
+	table.collection-content {
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	table.collection-content th,
+	table.collection-content td {
+		overflow-wrap: anywhere;
+	}
+
+	table.collection-content td > .user,
+	table.collection-content td > time {
+		white-space: pre-wrap;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content-wrapper {
+	overflow-x: auto;
+}
+
+@media only print {
+	.collection-content-wrapper {
+		overflow-x: visible;
+	}
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.collection-content td {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.column-list {
+	display: flex;
+	gap: 46px;
+}
+
+.column {
+	min-width: 0;
+	overflow: hidden;
+}
+
+.column > *:first-child {
+	margin-top: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding-inline: 0.125rem;
+	padding-block: 0.375rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+table {
+	border-collapse: collapse;
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol.numbered-list.numbered-list-digits-2 {
+	padding-inline-start: 2em;
+}
+
+ol.numbered-list.numbered-list-digits-3plus {
+	padding-inline-start: 2.4em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+/*
+ * Render emoji icons using a ::before pseudo-element to keep the glyph
+ * out of the DOM textContent traversal. This avoids double-rendering icons
+ * in callouts and page titles.
+ * NOTE(slim/html-export-pseudo-icons): I can't tagref this because it will
+ * flag as a duplicate tag after codegen.
+ */
+.icon[data-emoji]::before {
+	content: attr(data-emoji);
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.callout img.notion-static-icon {
+	width: 1em;
+	height: 1em;
+}
+
+.callout p {
+	margin: 0;
+}
+
+.callout h1,
+.callout h2,
+.callout h3 {
+	margin: 0 0 0.6rem;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	margin-right: 0.4em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+blockquote.quote-large {
+	font-size: 1.25em;
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.tab {
+	margin: 1.25em 0;
+	padding-inline: 1rem;
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.highlight-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.highlight-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.highlight-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.highlight-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.highlight-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.highlight-default_background {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray_background {
+	background: rgba(42, 28, 0, 0.07);
+}
+.highlight-brown_background {
+	background: rgba(139, 46, 0, 0.086);
+}
+.highlight-orange_background {
+	background: rgba(224, 101, 1, 0.129);
+}
+.highlight-yellow_background {
+	background: rgba(211, 168, 0, 0.137);
+}
+.highlight-teal_background {
+	background: rgba(0, 100, 45, 0.09);
+}
+.highlight-blue_background {
+	background: rgba(0, 124, 215, 0.094);
+}
+.highlight-purple_background {
+	background: rgba(102, 0, 178, 0.078);
+}
+.highlight-pink_background {
+	background: rgba(197, 0, 93, 0.086);
+}
+.highlight-red_background {
+	background: rgba(223, 22, 0, 0.094);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.block-color-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.block-color-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.block-color-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.block-color-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.block-color-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(240, 239, 237, 1);
+}
+.block-color-brown_background {
+	background: rgba(245, 237, 233, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 235, 222, 1);
+}
+.block-color-yellow_background {
+	background: rgba(249, 243, 220, 1);
+}
+.block-color-teal_background {
+	background: rgba(232, 241, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(229, 242, 252, 1);
+}
+.block-color-purple_background {
+	background: rgba(243, 235, 249, 1);
+}
+.block-color-pink_background {
+	background: rgba(250, 233, 241, 1);
+}
+.block-color-red_background {
+	background: rgba(252, 233, 231, 1);
+}
+.select-value-color-default { background-color: rgba(42, 28, 0, 0.07); }
+.select-value-color-gray { background-color: rgba(28, 19, 1, 0.11); }
+.select-value-color-brown { background-color: rgba(127, 51, 0, 0.156); }
+.select-value-color-orange { background-color: rgba(196, 88, 0, 0.203); }
+.select-value-color-yellow { background-color: rgba(209, 156, 0, 0.282); }
+.select-value-color-green { background-color: rgba(0, 96, 38, 0.156); }
+.select-value-color-blue { background-color: rgba(0, 118, 217, 0.203); }
+.select-value-color-purple { background-color: rgba(92, 0, 163, 0.141); }
+.select-value-color-pink { background-color: rgba(183, 0, 78, 0.152); }
+.select-value-color-red { background-color: rgba(206, 24, 0, 0.164); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style><style>@import url('https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex-swap.min.css')</style></head><body><article id="33aa15e2-9005-806a-904b-ec7a3fee36e7" class="page serif" data-notion-page-icon="🧱"><header><img class="page-cover-image" src="https://app.notion.com/images/page-cover/met_william_morris_1877_willow.jpg" style="object-position:center 90%"/><div class="page-header-icon page-header-icon-with-cover"><span class="icon" data-emoji="🧱"></span></div><h1 class="page-title" dir="auto"><strong>Direct Memory Access</strong></h1><p class="page-description" dir="auto"></p><table class="properties"><tbody></tbody></table></header><div class="page-body"><details id="33ba15e2-9005-8016-9f09-ee8bc47955ba" open="" class="toggle" dir="auto"><summary></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-8018-b5c1-e849e9bd77b1" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-8085-9c3d-d16eb0399add" class="" dir="auto">define</p></div></aside><hr id="33ba15e2-9005-8083-badf-cf3cd83c9d78" dir="auto"/><p id="33ba15e2-9005-80cb-9fa2-d5082f82fa7f" class="" dir="auto">more detail<div class="indented"><p id="33ba15e2-9005-8022-a380-f6789f947872" class="" dir="auto">
+</p></div></p><hr id="33ba15e2-9005-80b8-aa13-cb8af66a3e51" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-8050-af47-f57f82170cac" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-80b3-b937-caf5e97d5682" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p></div></aside><hr id="33ba15e2-9005-803c-83f6-c026c1e246d6" dir="auto"/><p id="33ba15e2-9005-800d-b7bb-ce6b7c302930" class="" dir="auto">
+</p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-800f-8492-f7b2a8675631" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-80aa-8501-f6829806da0b" class="" dir="auto">Reference: </p></div></aside><hr id="33ba15e2-9005-8024-b01e-df1394713640" dir="auto"/></div></details><details id="33ba15e2-9005-8075-8f5e-d546a3ac575a" open="" class="toggle" dir="auto"><summary></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-803b-aa6b-e8b758262a7f" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-80d7-98d4-f40e0dc529fa" class="" dir="auto">define</p></div></aside><hr id="33ba15e2-9005-8030-9180-fa0c96e0754d" dir="auto"/><p id="33ba15e2-9005-8008-9f44-c377f0605bd3" class="" dir="auto">more detail<div class="indented"><p id="33ba15e2-9005-8099-b5d6-e313341bcc44" class="" dir="auto">
+</p></div></p><hr id="33ba15e2-9005-80d4-9108-d45da29dcdfc" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-8031-babd-dec4e03cdbb7" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-8054-890c-eb38137f071c" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p></div></aside><hr id="33ba15e2-9005-808d-93ec-c4f849c913a4" dir="auto"/><p id="33ba15e2-9005-8077-adc5-d728b81d9d81" class="" dir="auto">
+</p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-8097-b5cf-e4444a606b72" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-80f1-bcbd-ccd43c1a6a52" class="" dir="auto">Reference: </p></div></aside><hr id="33ba15e2-9005-8033-b782-decf67014407" dir="auto"/></div></details><div id="33aa15e2-9005-802e-bcc9-db398f1349a5" class="column-list" data-notion-column-list="" dir="auto"><div id="33aa15e2-9005-800b-a021-f25287d753f2" style="width:18.75%" class="column" data-notion-column-ratio="0.1875" dir="auto"><hr id="33aa15e2-9005-80e8-a912-ee97e7936db5" dir="auto"/><figure id="33aa15e2-9005-8025-9376-d410c4a4b47f" class="image" data-notion-image="../../Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg" dir="ltr"><a href="../../Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg"><img style="width:548.375px" src="../../Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg"/></a></figure><p id="33aa15e2-9005-80db-b72f-edca27c46978" class="" dir="auto">
+</p></div><div id="33aa15e2-9005-8002-9683-ef4603df060e" style="width:81.25%" class="column" data-notion-column-ratio="0.8125" dir="auto"><h3 id="33aa15e2-9005-8067-9d1b-d7dbb328c996" class="" dir="auto">Direct Memory Access</h3><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8034-b3e1-c33af8cb6a1a" dir="ltr"><div style="width:100%"><p id="0867ae2e-160b-4a3a-a3e8-bbc705edb1b8" class="" dir="auto">你正在看一部 4K 影片（串流大約 25 Mbps），同時在背景編譯大 code，瀏覽器還開了十幾個分頁。影片每秒鐘需要把大量的畫面資料從 SSD 搬到記憶體、再送到 GPU 去解碼 render，累死。如果這些資料都要 CPU 親自一個 byte 一個 byte 搬運，你的 CPU 大概就什麼事都別做了，光搬資料就忙不過來。但實際上你的電腦可以邊播影片邊 compile 邊跑瀏覽器，就是因為有 DMA 在背後幫忙。</p><p id="a17bb316-354e-4b19-874a-ce0ebddb46f6" class="" dir="auto">沒有 DMA 的世界是什麼樣子？假設你要從 SSD 讀 4KB 的資料到記憶體。CPU 對裝置下一個 read 指令，裝置準備好資料之後，CPU 要親自跑一個迴圈，一次搬幾個 byte，把資料從裝置的 data register 搬到記憶體。這叫 programmed I/O（PIO）。</p><p id="d554755e-5843-49ec-87a2-cfed56b05f4a" class="" dir="auto">PIO 的問題很明顯：CPU 在搬資料的時候什麼其他事都不能做。搬 4KB 要幾千次 register read/write 操作。在慢速裝置的年代（例如軟碟），資料量小、速度慢，PIO 還可以接受。但現在一顆 NVMe SSD 的 bandwidth 可以到 7 GB/s，你不可能讓 CPU 用迴圈搬 7 GB 的資料，CPU 的運算能力會被完全浪費掉。</p></div></aside><blockquote id="33aa15e2-9005-8062-88d1-f3e789e0c16b" class="" dir="auto">Reference: </blockquote><hr id="33aa15e2-9005-80f7-92ad-d9ad14dc16a8" dir="auto"/><details id="33aa15e2-9005-80dd-8cdf-d06caabaddaa" open="" class="toggle" dir="auto"><summary><strong>Classification</strong></summary><div class="indented"><p id="33aa15e2-9005-8055-a1e1-c13d9482b837" class="" dir="auto">
+</p><hr id="33aa15e2-9005-8075-a22e-f7197686a508" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8031-a76e-dd934d711427" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-803b-95cf-dc5430e48d4c" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Extra Component</mark></p><hr id="33aa15e2-9005-8050-bc6a-cce4d8cbd9ab" dir="auto"/><p id="33aa15e2-9005-8097-8d9d-d4370e864db6" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Reference:</mark></p></div></aside><hr id="33aa15e2-9005-801e-9afa-e987d66882b9" dir="auto"/></div></details><details id="33aa15e2-9005-8025-a4c3-f3820f5b07fa" open="" class="toggle" dir="auto"><summary><strong>Key Word Definition/ Discussion</strong></summary><div class="indented"><details id="33aa15e2-9005-805e-ad7a-d1cf1a679cc7" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>DMA</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-804b-b27d-f683828aa967" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80cd-b68b-dfaa6d113b97" class="" dir="auto">一種硬體機制，允許外圍設備（如磁碟控制器、網卡）直接存取系統記憶體（RAM），而無需 CPU 全程介入搬運資料。</p></div></aside><hr id="33aa15e2-9005-8045-92bc-f963cd9af93c" dir="auto"/><ol type="1" id="94af07b3-9a02-4b51-b0ee-04aad11ff832" class="numbered-list" start="1" dir="auto"><li>CPU 初始化：告訴 DMA Controller「資料來源/目的地」、「記憶體位址 X」、「長度 N」。</li></ol><ol type="1" id="33ba15e2-9005-8078-a810-eb75e9d7a516" class="numbered-list" start="2" dir="auto"><li>搬運階段：DMA Controller 接管匯流排，自主完成裝置與記憶體間的資料傳輸。</li></ol><ol type="1" id="33ba15e2-9005-808e-afd0-ca3f2ef05f3c" class="numbered-list" start="3" dir="auto"><li>完成通知：傳輸結束後，DMA 發出一個 Interrupt 通知 CPU 處理後續邏輯。</li></ol><figure id="33ba15e2-9005-80b9-9c20-dd45d84ce257" class="image" data-notion-image="Direct%20Memory%20Access/image.png" dir="ltr"><a href="Direct%20Memory%20Access/image.png"><img style="width:950.2625122070312px" src="Direct%20Memory%20Access/image.png"/></a></figure><hr id="33aa15e2-9005-8034-b9d6-e94d6de7ddf4" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-801c-bd99-df1c91cb8a7e" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8058-bebb-ce596be57d49" class="" dir="auto">Reference: </p></div></aside><hr id="33aa15e2-9005-8021-a38b-f05a5a7fa89f" dir="auto"/></div></details><details id="33ba15e2-9005-8030-9de0-d3f098ec1cee" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Physical address</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-8066-ade3-c8b71b0b8ea6" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-808a-8c54-cf2a324615c2" class="" dir="auto">記憶體硬體上的真實物理位址。與 CPU 使用的虛擬位址（Virtual Address）相對。</p></div></aside><hr id="33ba15e2-9005-80fe-b0f1-d6783c76c7a1" dir="auto"/><p id="f71db636-84ad-4057-874e-85f2ea35454f" class="" dir="auto"><strong>DMA 對記憶體的三大硬性要求：</strong></p><ol type="1" id="ea95bb3e-e4f1-4102-84c7-4dc74e119d4a" class="numbered-list" start="1" dir="auto"><li><strong>Physical Address:</strong> <aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-80e2-9476-e096b2fd93b0" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-80ee-a63f-e285ec206f37" class="" dir="auto">傳統 DMA Controller 不懂虛擬記憶體，必須給它真實的物理位址。<br/>CPU 在執行程式的時候用的是 virtual address，經過 page table 轉換才對應到 physical address。但 DMA controller 和裝置通常不認識 virtual address，它們直接看 physical address（或者透過 IOMMU 轉換，但先不管這個）。所以設定 DMA 的時候，driver 必須把 buffer 的 virtual address 轉換成 physical address 告訴裝置。</p></div></aside></li></ol><ol type="1" id="24a739ad-bd63-4238-ba56-0363779c5582" class="numbered-list" start="2" dir="auto"><li><strong>Physically Contiguous:</strong> <aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-8036-aa10-ebbcdf56118f" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-80c8-892c-fc92d10b6397" class="" dir="auto">最簡單的 DMA 要求記憶體在物理上必須是連續的。因為它只會從起始點一直往後數 N 個 bytes。<br/>OS 的 virtual memory 系統會把連續的 virtual address 映射到不連續的 physical page。你 malloc 一塊 64KB 的 buffer，在 virtual space 是連續的，但底層可能散佈在 16 個不相鄰的 physical page。最簡單的 DMA controller 需要一塊 physically contiguous 的記憶體，因為它要從一個起始 physical address 開始，連續搬 N bytes。如果記憶體不連續，DMA controller 搬到一半就會搬到錯誤的位置。</p></div></aside></li></ol><ol type="1" id="772bffc9-1a59-492b-a9d0-2709c344deba" class="numbered-list" start="3" dir="auto"><li><strong>Pinned (Locked):</strong> <aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-8069-a958-ecb363fec222" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-804c-9a8a-fa8c5f8338df" class="" dir="auto">DMA 傳輸時，該記憶體分頁絕對不能被 OS 換出（Swap out）或搬移（Migration），否則 DMA 會寫入錯誤的物理位置，造成 <strong>Memory Corruption</strong>。<br/>OS 的 virtual memory 系統會把不常用的 memory page swap 到 disk 上。但 DMA 傳輸可能在任何時候發生（裝置準備好就開始搬），如果 DMA 目標的那個 page 剛好被 swap out，裝置就會寫到錯誤的 physical address，直接破壞其他 process 的資料，甚至導致 kernel panic。所以 DMA buffer 必須被 pin 住（也叫 lock），確保在 DMA 進行期間不會被 OS 搬走。</p></div></aside></li></ol><hr id="33ba15e2-9005-801a-ab4d-ee37a7f5bff8" dir="auto"/><p id="029dbb05-bb87-4343-a269-64b5abac287f" class="" dir="auto">在 Linux kernel 裡，分配 DMA buffer 通常不用 kmalloc（它不保證 physically contiguous 大區塊），而是用專門的 dma_alloc_coherent() 或 dma_pool API，這些 API 會同時處理 physical contiguity、alignment 和 pinning 的問題。</p><figure id="33ba15e2-9005-8050-b4a1-ececf71f03d7" class="image" data-notion-image="Direct%20Memory%20Access/image%201.png" dir="ltr"><a href="Direct%20Memory%20Access/image%201.png"><img style="width:950.2625122070312px" src="Direct%20Memory%20Access/image%201.png"/></a></figure><hr id="33ba15e2-9005-8058-8b87-d88d11501bae" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-807a-b556-ed03e32fd2ee" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-8026-8a05-e7b2980371b0" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: Cache Coherency（快取一致性）問題</strong></mark></p><p id="44132505-f633-4fa5-8eef-85e3db0148af" class="" dir="auto">當 DMA 直接改寫了記憶體，但 CPU 的 Cache 裡還留著舊資料時，CPU 讀到的會是錯誤的數據。現代系統通常靠硬體（Bus Snooping）或軟體（DMA Cache Flush/Invalidate）來解決。</p></div></aside><hr id="33ba15e2-9005-8049-96ad-c1aea448d8c4" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-80bd-b5e1-dc9bd234b88d" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-8038-bc8a-c3e127ec3b56" class="" dir="auto">Reference: </p></div></aside><hr id="33ba15e2-9005-80b5-b85d-c09ab4e42c01" dir="auto"/></div></details><details id="33ba15e2-9005-809b-b844-d1cf2e4086fd" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Scatter-gather list</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-8012-b221-eb0f46c5cefe" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-80b9-bf84-ed113908c864" class="" dir="auto">一種 DMA 技術，允許在單次 I/O 操作中，將資料傳輸到多段「物理上不連續」的記憶體空間。</p></div></aside><hr id="33ba15e2-9005-8009-a147-e22fc754ab3a" dir="auto"/><p id="b931ef5c-ec25-495e-815d-5178bd44e929" class="" dir="auto"><strong>Scatter-Gather List</strong><br/>前面說最簡單的 DMA 需要 physically contiguous buffer，但在實際系統中，分配大塊 physically contiguous 記憶體既困難又浪費（尤其系統跑久了之後，physical memory 已經碎片化了）。</p><p id="7fa6628b-eec6-4320-917d-e67f816f74dc" class="" dir="auto"><strong>Scatter-gather list（SGL）</strong>解決了這個問題。它讓你在一次 DMA 操作中指定多段不連續的記憶體區間。具體來說，SGL 是一個陣列，每個 entry 包含一個 (physical_address, length) pair。DMA controller 會依序處理每個 entry，把資料搬到（或從）對應的記憶體區段。</p><p id="d2192efb-84c3-4991-ac1e-b2ac031e02af" class="" dir="auto">舉個例子：你要從 SSD 讀 16KB 的資料，但你的 buffer 散佈在 4 個不連續的 physical page 上。沒有 scatter-gather 的話，你要先分配一塊 16KB 的 contiguous buffer 讓 DMA 搬進去，搬完之後再 memcpy 到你真正要用的 buffer。有了 scatter-gather，你直接建一個 4 個 entry 的 SGL，每個 entry 指向一個 4KB page 的 physical address，DMA controller 自己搞定。省掉了分配 contiguous buffer 和額外 memcpy 的成本。</p><p id="c80f9b06-c6f5-4a4e-ba70-0433e30fdbd3" class="" dir="auto">NVMe 支援 scatter-gather（NVMe 的術語叫 PRP，Physical Region Page，或更新的 SGL），所以 NVMe driver 在設定 I/O command 的時候可以直接把 scatter-gather list 放進 command 裡面。</p><hr id="33ba15e2-9005-80c2-aed6-e4114102a8ab" dir="auto"/><p id="33ba15e2-9005-809f-9df7-f1f9561c610e" class="" dir="auto">解決物理記憶體碎片化問題。它透過一個描述符陣列（包含多組 <code>[Address, Length]</code>），讓 DMA Controller 像玩接力賽一樣，自動搬完一段再搬下一段。這避免了為了湊出「大塊連續記憶體」而進行昂貴的 <code>memcpy</code>。</p><figure id="33ba15e2-9005-80e3-9222-c84d68465adf" class="image" data-notion-image="Direct%20Memory%20Access/image%202.png" dir="ltr"><a href="Direct%20Memory%20Access/image%202.png"><img style="width:950.25px" src="Direct%20Memory%20Access/image%202.png"/></a></figure><hr id="33ba15e2-9005-80b5-ae3f-e3860b85aff7" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-8006-b0ae-e5dccd0caaec" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-80f4-a68c-c49990a7ed00" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: SGL Entry 數量限制</strong></mark></p><p id="4eb8561d-d680-4efe-af64-9a9409f95e1a" class="" dir="auto">每個硬體（如特定的 NVMe 控制器）能處理的 SGL entry 數量是有上限的。如果你的記憶體太過破碎，超出了硬體支援的 Max SGL segments，驅動程式仍須回退到複製模式或拆分請求。</p></div></aside><hr id="33ba15e2-9005-802e-b43d-d2e9f3cd4cd7" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-80f7-9c5c-d3e3570ebb0a" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-8049-961a-e33c7abaa5cf" class="" dir="auto">Reference: </p></div></aside><hr id="33ba15e2-9005-80d3-adca-f4bdc54b14e9" dir="auto"/></div></details><details id="33ba15e2-9005-808b-8be5-ff0b630adcaa" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Zero-copy</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-803d-ba8d-f596c22b44c4" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-80e3-ad30-cc70629ace41" class="" dir="auto">消除資料在「核心空間快取 (Kernel Space)」與「使用者空間緩衝 (User Space)」之間不必要複製的技術。</p></div></aside><hr id="33ba15e2-9005-80a5-88a4-c0f0726eeb4a" dir="auto"/><p id="33ba15e2-9005-800f-baa6-e31a575ce3a1" class="" dir="auto"><strong>傳統路徑 (Traditional Path)</strong><div class="indented"><ul id="33ba15e2-9005-80f6-ac7c-c24a2b129249" class="bulleted-list" dir="auto"><li style="list-style-type:disc">流程： 裝置 <span data-notion-inline-equation="\xrightarrow{DMA}" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1113em;vertical-align:-0.011em;"></span><span class="mrel x-arrow"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1003em;"><span style="top:-3.322em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight x-arrow-pad"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.02778em;">D</span><span class="mord mathnormal mtight" style="margin-right:0.10903em;">M</span><span class="mord mathnormal mtight">A</span></span></span></span><span class="svg-align" style="top:-2.689em;"><span class="pstrut" style="height:2.7em;"></span><span class="hide-tail" style="height:0.522em;min-width:1.469em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="0.522em" viewBox="0 0 400000 522" preserveAspectRatio="xMaxYMin slice"><path d="M0 241v40h399891c-47.3 35.3-84 78-110 128
+-16.7 32-27.7 63.7-33 95 0 1.3-.2 2.7-.5 4-.3 1.3-.5 2.3-.5 3 0 7.3 6.7 11 20
+ 11 8 0 13.2-.8 15.5-2.5 2.3-1.7 4.2-5.5 5.5-11.5 2-13.3 5.7-27 11-41 14.7-44.7
+ 39-84.5 73-119.5s73.7-60.2 119-75.5c6-2 9-5.7 9-11s-3-9-9-11c-45.3-15.3-85
+-40.5-119-75.5s-58.3-74.8-73-119.5c-4.7-14-8.3-27.3-11-40-1.3-6.7-3.2-10.8-5.5
+-12.5-2.3-1.7-7.5-2.5-15.5-2.5-14 0-21 3.7-21 11 0 2 2 10.3 6 25 20.7 83.3 67
+ 151.7 139 205zm0 0v40h399900v-40z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.011em;"><span></span></span></span></span></span></span></span></span></span> Kernel Buffer <span data-notion-inline-equation="\xrightarrow{CPU\ memcpy}" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1113em;vertical-align:-0.011em;"></span><span class="mrel x-arrow"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1003em;"><span style="top:-3.322em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight x-arrow-pad"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">CP</span><span class="mord mathnormal mtight" style="margin-right:0.10903em;">U</span><span class="mspace mtight"><span class="mtight"> </span></span><span class="mord mathnormal mtight">m</span><span class="mord mathnormal mtight">e</span><span class="mord mathnormal mtight">m</span><span class="mord mathnormal mtight">c</span><span class="mord mathnormal mtight">p</span><span class="mord mathnormal mtight" style="margin-right:0.03588em;">y</span></span></span></span><span class="svg-align" style="top:-2.689em;"><span class="pstrut" style="height:2.7em;"></span><span class="hide-tail" style="height:0.522em;min-width:1.469em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="0.522em" viewBox="0 0 400000 522" preserveAspectRatio="xMaxYMin slice"><path d="M0 241v40h399891c-47.3 35.3-84 78-110 128
+-16.7 32-27.7 63.7-33 95 0 1.3-.2 2.7-.5 4-.3 1.3-.5 2.3-.5 3 0 7.3 6.7 11 20
+ 11 8 0 13.2-.8 15.5-2.5 2.3-1.7 4.2-5.5 5.5-11.5 2-13.3 5.7-27 11-41 14.7-44.7
+ 39-84.5 73-119.5s73.7-60.2 119-75.5c6-2 9-5.7 9-11s-3-9-9-11c-45.3-15.3-85
+-40.5-119-75.5s-58.3-74.8-73-119.5c-4.7-14-8.3-27.3-11-40-1.3-6.7-3.2-10.8-5.5
+-12.5-2.3-1.7-7.5-2.5-15.5-2.5-14 0-21 3.7-21 11 0 2 2 10.3 6 25 20.7 83.3 67
+ 151.7 139 205zm0 0v40h399900v-40z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.011em;"><span></span></span></span></span></span></span></span></span></span> User Buffer</li></ul><ul id="33ba15e2-9005-8093-9c51-cb67bcc0598a" class="bulleted-list" dir="auto"><li style="list-style-type:disc">特性： 經歷 2 次 搬運。</li></ul><ul id="33ba15e2-9005-80df-8e0d-e93f8616541c" class="bulleted-list" dir="auto"><li style="list-style-type:disc">缺點： 需要 CPU 介入執行 <code>memcpy</code>，造成計算資源浪費與額外延遲。</li></ul></div></p><p id="33ba15e2-9005-8004-8ec4-efe5aaffd130" class="" dir="auto"><strong>零拷貝 (Zero-copy)</strong><div class="indented"><ul id="33ba15e2-9005-8093-bf2d-c54c6808b2cc" class="bulleted-list" dir="auto"><li style="list-style-type:disc">流程： 裝置 <span data-notion-inline-equation="\xrightarrow{DMA}" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1113em;vertical-align:-0.011em;"></span><span class="mrel x-arrow"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1003em;"><span style="top:-3.322em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight x-arrow-pad"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.02778em;">D</span><span class="mord mathnormal mtight" style="margin-right:0.10903em;">M</span><span class="mord mathnormal mtight">A</span></span></span></span><span class="svg-align" style="top:-2.689em;"><span class="pstrut" style="height:2.7em;"></span><span class="hide-tail" style="height:0.522em;min-width:1.469em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="0.522em" viewBox="0 0 400000 522" preserveAspectRatio="xMaxYMin slice"><path d="M0 241v40h399891c-47.3 35.3-84 78-110 128
+-16.7 32-27.7 63.7-33 95 0 1.3-.2 2.7-.5 4-.3 1.3-.5 2.3-.5 3 0 7.3 6.7 11 20
+ 11 8 0 13.2-.8 15.5-2.5 2.3-1.7 4.2-5.5 5.5-11.5 2-13.3 5.7-27 11-41 14.7-44.7
+ 39-84.5 73-119.5s73.7-60.2 119-75.5c6-2 9-5.7 9-11s-3-9-9-11c-45.3-15.3-85
+-40.5-119-75.5s-58.3-74.8-73-119.5c-4.7-14-8.3-27.3-11-40-1.3-6.7-3.2-10.8-5.5
+-12.5-2.3-1.7-7.5-2.5-15.5-2.5-14 0-21 3.7-21 11 0 2 2 10.3 6 25 20.7 83.3 67
+ 151.7 139 205zm0 0v40h399900v-40z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.011em;"><span></span></span></span></span></span></span></span></span></span> User Buffer</li></ul><ul id="33ba15e2-9005-8078-9d0d-c6ba8a0fdb84" class="bulleted-list" dir="auto"><li style="list-style-type:disc">特性： 僅需 1 次 搬運。</li></ul><ul id="33ba15e2-9005-8086-9d20-c0f01f3250a6" class="bulleted-list" dir="auto"><li style="list-style-type:disc">優點： CPU 零參與搬運過程，顯著降低負載。</li></ul></div></p><hr id="33ba15e2-9005-8012-8479-c5909ee1442c" dir="auto"/><p id="963f4b3d-6904-48f6-b236-efb7bc9519f7" class="" dir="auto"><strong>Zero-Copy I/O</strong></p><p id="33ba15e2-9005-8066-baa6-c6f8442325a4" class="" dir="auto">理解了 DMA 和 scatter-gather 之後，你可能會問：既然 DMA 已經把資料搬到記憶體了，為什麼有時候 I/O 還是很慢？因為「搬到記憶體」不代表「搬到你程式的 buffer」。傳統的 I/O 路徑有很多次不必要的資料複製。以 read() system call 為例，典型的流程是：<div class="indented"><ul id="a4c1caab-5b70-443a-aaeb-a18cbc14b780" class="bulleted-list" dir="auto"><li style="list-style-type:disc">裝置透過 DMA 把資料搬到 kernel 的 buffer（kernel space）</li></ul><ul id="33ba15e2-9005-80b3-aca1-d520f101b66a" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Kernel 再用 memcpy 把資料從 kernel buffer 複製到你的 user space buffer</li></ul></div></p><p id="33ba15e2-9005-8043-ba63-c2587f54614b" class="" dir="auto">這個 kernel buffer 到 user buffer 的複製看起來好像沒什麼大不了，但 memcpy 的成本其實不低。複製 4KB 大約需要幾百個 nanoseconds，如果你每秒做幾十萬次 I/O，光是 memcpy 就會吃掉可觀的 CPU 時間和 memory bandwidth。而且同一份資料在記憶體裡佔了兩份空間（kernel buffer 和 user buffer），也浪費 DRAM。</p><hr id="33ba15e2-9005-8075-848b-f4e156fd0fd1" dir="auto"/><p id="8f633c79-493b-405e-af28-91793c41875d" class="" dir="auto"><strong>Zero-copy I/O 的核心想法</strong></p><p id="33ba15e2-9005-80b2-9550-eaa589932199" class="" dir="auto">讓裝置的 DMA 直接搬到應用程式的 buffer，完全跳過 kernel buffer 這一層。資料從裝置出發，經過 DMA 直接到達 user space，不需要任何 CPU 介入的 memcpy。</p><p id="723ed4ac-fc05-4897-8ffd-44da76447187" class="" dir="auto">要做到 zero-copy，application 的 buffer 必須滿足 DMA 的所有要求：<code>physical address 已知、pinned、alignment 正確</code></p><p id="33ba15e2-9005-802a-bba9-f27f3a6a87fc" class="" dir="auto">在 Linux 上，O_DIRECT flag 就是走這條路，它繞過 kernel 的 page cache，讓裝置直接 DMA 到 application buffer（但 application buffer 必須是 page-aligned 的）。</p><p id="cae2c6d1-bc9b-41e5-bd17-171af79da237" class="" dir="auto">更極端的做法是 kernel-bypass I/O（像 SPDK），不只省掉 kernel buffer copy，連 kernel 本身都繞過去了。我們後面會專門討論。</p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-80f4-99e8-c24b140644d8" dir="ltr"><div style="width:100%"><p id="68fa8c10-a278-45ef-9622-963e8a10d26d" class="" dir="auto">這裡要注意一個 trade-off：zero-copy 省掉了複製的成本，但同時也放棄了 kernel 的 page cache。如果你的 workload 有大量重複讀取相同資料的 pattern，page cache 的命中率可能非常高，走 zero-copy 反而更慢，因為每次都要真的去讀裝置。Zero-copy 最適合的場景是<strong>大量 sequential I/O</strong> 或者<strong>資料只讀一次的 workload</strong>，在這種情況下 page cache 幫不上忙，省掉 copy 的好處才會真正體現出來。</p></div></aside><hr id="33ba15e2-9005-8096-b23b-f4a00a15e274" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-80e5-bd1f-fee08449c949" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-80f7-93b4-cb5b715a16fd" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: 失去 Page Cache 的保護。</strong></mark></p><p id="eda47a74-f2ec-4d97-a885-3bfe7238abe6" class="" dir="auto">使用 O_DIRECT 達成 Zero-copy 後，OS 不再幫你快取這份資料。如果你的應用程式沒有自己實作 Buffer Pool，重複讀取同一份資料會導致頻繁的實體磁碟 I/O，效能反而下降。</p></div></aside><hr id="33ba15e2-9005-805f-8649-caae6b7a367e" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-80f2-9b5e-e154eff37257" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-8002-bc76-e1455587b513" class="" dir="auto">Reference: </p></div></aside><hr id="33ba15e2-9005-80c8-8e1a-c4ed6fc8fad9" dir="auto"/></div></details><details id="33ba15e2-9005-8047-af43-dfa8dc1ef3cb" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Bounce buffer</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-807f-9523-e4187eb0fc2c" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-804a-9be2-c8882f9eb7f6" class="" dir="auto">當裝置無法直接存取目標記憶體（例如：舊硬體只能存取 32-bit 位址，但 Buffer 在 64-bit 區域）時，作為中轉站的一塊「保證可達」的記憶體。</p></div></aside><hr id="33ba15e2-9005-80dd-aa78-f233e4a4572c" dir="auto"/><p id="33ba15e2-9005-807c-95ac-db9faac22634" class="" dir="auto">當發生「位址不可達」或「對齊不合法」時，核心會分配一塊符合硬體要求的 Bounce Buffer。資料先 DMA 到這裡，再由 CPU 搬到真正的目標。這雖然不是 Zero-copy，但能保證硬體相容性。</p><hr id="33ba15e2-9005-808f-8c4c-f1e35a012359" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-808a-832f-c435e2e97ba0" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-8081-8ab6-f788578f7a23" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: 顯著的效能損耗</strong></mark></p><p id="95135620-ecc0-451e-a5ee-494ab332e3b8" class="" dir="auto">Bounce Buffer 隱含了額外的 CPU 複製與記憶體分配開銷。在高吞吐系統中，出現大量 Bounce Buffer 通常意味著驅動程式配置錯誤或記憶體對齊（Alignment）不當。</p></div></aside><hr id="33ba15e2-9005-8082-a798-fef3134f3e96" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-8005-b306-e6d1a3e4aab6" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-8009-8a7c-de9fa6601858" class="" dir="auto">Reference: </p></div></aside><hr id="33ba15e2-9005-8091-b7dc-c7223ba8010f" dir="auto"/></div></details><details id="33ba15e2-9005-8008-8fa1-d2366189d59e" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>IOMMU</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-802c-b51f-fcae283ffa60" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-80c7-9d38-d43d6f870551" class="" dir="auto">位於設備與記憶體之間的硬體單元，功能類似於 CPU 的 MMU，負責將設備發出的「裝置虛擬位址」轉換為「物理位址」。</p></div></aside><hr id="33ba15e2-9005-80e6-97a2-ecd542204fee" dir="auto"/><ul id="3cc9ec3c-28fb-4b84-a394-883319163e46" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>解決連續性問題:</strong> 透過 IOMMU 映射，物理上散亂的分頁可以在裝置眼中看起來是「連續」的。</li></ul><ul id="3bb9bdd9-bb4f-4514-83f7-07967f921945" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>安全性 (Isolation):</strong> 防止惡意或出錯的設備存取它不該存取的記憶體區域（如 Kernel Data）。</li></ul><hr id="33ba15e2-9005-802c-9269-d384b67852be" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-800d-81da-d2ddc0f0f4bb" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-80b3-9774-e5a7adea2da2" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: TLB Miss Latency</strong></mark></p><p id="72acc675-4e80-4855-a85f-4b00e01daa12" class="" dir="auto">就像 CPU 有 TLB，IOMMU 也有。頻繁的位址轉換可能帶來輕微的延遲增加。</p></div></aside><hr id="33ba15e2-9005-8015-b452-da3572058de3" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-80b9-b618-cf953c273ff6" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-8050-9e5b-c3c152eb79e7" class="" dir="auto">Reference: </p></div></aside><hr id="33ba15e2-9005-807b-aced-c2d51617b86a" dir="auto"/></div></details><details id="33ba15e2-9005-80c3-89b0-e63eec57d5d9" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Pinned memory</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-80db-b9e2-ef0721cfa1a7" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-800b-9734-d37709782716" class="" dir="auto">被標記為「不可移動且不可換出」的實體記憶體頁面。</p></div></aside><hr id="33ba15e2-9005-80f4-acf8-dc5392e7fec7" dir="auto"/><p id="33ba15e2-9005-8022-be38-f30d146fbf35" class="" dir="auto">在進行 DMA 或高效能運算（如 GPU 運算）前，必須調用 <code>mlock()</code> 或核心內部的 <code>pin_user_pages()</code>。這是為了防止 OS 在傳輸中途啟動 Page Reclaim 或 Swap，導致 DMA 寫入的物理位置變成別人的資料。</p><hr id="33ba15e2-9005-806f-ae4f-c43e0ee72208" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-807f-90f2-cfb092d5af8f" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-80d6-83cc-f1cd4e993b96" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: 可用記憶體減少</strong></mark></p><p id="60db03f3-897d-4e8e-8617-98a7b909e8d3" class="" dir="auto">Pinned Memory 無法被 OS 靈活排程。如果應用程式 Pin 了太多記憶體而不釋放，會導致系統出現<strong>Memory Pressure</strong>，甚至引發 OOM Killer。</p></div></aside><hr id="33ba15e2-9005-80d5-a062-cf78e7632037" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-8086-b86d-e4b9181370b5" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-80f5-a402-f1c63ae538cb" class="" dir="auto">Reference: </p></div></aside><hr id="33ba15e2-9005-8005-8984-f8ee6e9cc643" dir="auto"/></div></details></div></details><details id="33aa15e2-9005-80d0-ad88-cc4341170ff6" open="" class="toggle" dir="auto"><summary><strong>Test</strong></summary><div class="indented"><details id="33aa15e2-9005-8010-a01d-d2ce059d8ed3" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Key Concepts</strong></mark></summary><div class="indented"><details id="33aa15e2-9005-80d5-8c5c-df9a5a28e26b" open="" class="toggle" dir="auto"><summary>理解為什麼需要 DMA：當 CPU 親自搬運資料時會佔用運算資源，DMA 讓裝置直接存取記憶體以釋放 CPU 去做其他工作</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-808b-9fdd-f6ac46636c36" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8087-bc6a-e93b3f5ca928" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-8012-ace1-de2899402d5d" class="" dir="auto">傳統 PIO 模式下，CPU 需親自執行讀寫指令搬運資料，耗費大量運算資源。DMA 允許硬體裝置直接與記憶體交換資料，完全釋放 CPU 去執行其他任務。</p></div></p><hr id="33aa15e2-9005-80f3-9730-ef912032c185" dir="auto"/><p id="33aa15e2-9005-807b-9af2-e9a6bd77be64" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-80d7-a085-f57ab090f233" class="" dir="auto">PIO (Programmed I/O)、CPU Overhead、Hardware Offloading。</p></div></p><hr id="33aa15e2-9005-805a-8472-ce9f1eb3e3bf" dir="auto"/><p id="33aa15e2-9005-804c-8dd4-d5925e1f4738" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-80f8-8db3-ffce08a1490d" class="" dir="auto">在沒有 DMA 的系統中，資料的每個位元組都必須經過 CPU 的暫存器才能寫入記憶體，這在面對高速儲存裝置（如 NVMe SSD）時，會導致 CPU 100% 滿載於無意義的搬運。導入 DMA (Direct Memory Access) 控制器後，CPU 只需下達傳輸指令（起點、終點、大小），搬運過程全由 DMA 硬體代勞。完成後再透過 Interrupt 通知 CPU，從而實現 I/O 傳輸與 CPU 運算的完美並行。</p></div></p></div></aside><hr id="33aa15e2-9005-801b-a4d2-d2dd7c74a7c3" dir="auto"/></div></details><details id="33aa15e2-9005-800d-a137-e55a097d5c29" open="" class="toggle" dir="auto"><summary>理解 DMA 對記憶體的要求，知道裝置使用 physical address 定址，因此 DMA buffer 必須是 physically contiguous 且 pinned 在實體記憶體中不被 swap 出去</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8061-96c9-f605014e1077" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-802e-af1a-feba768467af" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-807d-9393-ca989c5a14db" class="" dir="auto">傳統 DMA 不具備虛擬位址轉換能力，因此必須提供實體位址（Physical Address）且空間需連續（Contiguous）。此外，該記憶體區塊必須被鎖定（Pinned），防止被 OS 換出。</p></div></p><hr id="33aa15e2-9005-8070-b841-fd39c32df914" dir="auto"/><p id="33aa15e2-9005-803f-906c-e7a9257d1795" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-80e5-8330-db20c8275969" class="" dir="auto">Physical Address、Physically Contiguous、Pinned (Locked) Memory、Page Swap</p></div></p><hr id="33aa15e2-9005-807e-b28e-d0244339f9d9" dir="auto"/><p id="33aa15e2-9005-80bc-93b1-c7fdd8511c9d" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-8048-9d41-c346165a6c6a" class="" dir="auto">DMA 控制器直接掛載在硬體匯流排上，看不懂作業系統層級的虛擬位址，只能根據真實的實體位址來讀寫。因為 DMA 傳輸是獨立於 CPU 運作的非同步過程，若作業系統的虛擬記憶體管理員（VM Subsystem）在傳輸期間將該實體分頁換出（Swap out）到磁碟，或重新分配給其他程序，DMA 就會無意間覆寫錯誤的實體位置，引發致命的 Memory Corruption。因此，進行 DMA 前必須強制將目標分頁 Pinned 釘在實體記憶體中。</p></div></p></div></aside><hr id="33aa15e2-9005-8014-88da-d07ff152c4e2" dir="auto"/></div></details><details id="33aa15e2-9005-806a-a710-f1a315b9528f" open="" class="toggle" dir="auto"><summary>理解 scatter-gather list 的用途，知道它允許一次 DMA 操作描述多段不連續的記憶體區段，避免必須先將資料複製到連續 buffer 的額外開銷</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-800a-8ee0-f744ddd0bc30" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80d6-8397-c60bb21616ee" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-80d0-870b-ebc3cd91ba1b" class="" dir="auto">SGL 是一份記錄多個「實體位址與長度」的清單，允許 DMA 控制器一次性將資料自動分段寫入多個物理上不連續的記憶體區塊，免去 CPU 的複製介入。</p></div></p><hr id="33aa15e2-9005-8019-b497-e9d65e29ad5d" dir="auto"/><p id="33aa15e2-9005-80fd-abdc-ce440f59e352" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-8032-9540-ccc439608f98" class="" dir="auto">Scatter-Gather List (SGL)、Memory Fragmentation、memcpy overhead</p></div></p><hr id="33aa15e2-9005-8022-a0fc-c5122ae8c5cd" dir="auto"/><p id="33aa15e2-9005-80f8-bb69-f31e8b939ff2" class="" dir="auto">Detail<div class="indented"><p id="33ca15e2-9005-80a8-87e7-e19ada912d84" class="" dir="auto">系統長時間運行後，實體記憶體往往會碎片化，極難配置出一大塊連續的空間給 DMA 專用。若硬體不支援 SGL，系統被迫先配置一塊連續的 Bounce Buffer 讓 DMA 寫入，再由 CPU 透過軟體 <code>memcpy</code> 將資料拆分複製到原本不連續的目標分頁。SGL 解決了這個痛點：驅動程式預先將分散的實體位址整理成陣列（List）交給硬體，硬體便能像接力賽一樣，自動將連續的磁碟資料分散填入這些不連續的記憶體碎片中，徹底消除軟體複製的效能折損。</p></div></p></div></aside><hr id="33aa15e2-9005-80f2-8ea5-c1ce82a9c597" dir="auto"/></div></details><details id="33aa15e2-9005-804e-8fa1-e645839827b5" open="" class="toggle" dir="auto"><summary>理解 zero-copy I/O 的概念，知道它讓資料直接在裝置與應用程式 buffer 之間傳輸，省去經由 kernel buffer 中轉的複製成本</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-801b-943f-e494847735e6" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8022-bc61-ca63eeaa299b" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-8097-bad2-c65d51091b19" class="" dir="auto">Zero-copy 讓硬體裝置透過 DMA 直接與應用程式的緩衝區（User Buffer）交換資料，完全跳過作業系統核心（Kernel Buffer）的中轉與 CPU 的記憶體複製。</p></div></p><hr id="33aa15e2-9005-80ec-a4ae-d37b3bc1278a" dir="auto"/><p id="33aa15e2-9005-80d8-8473-eecb446cc81b" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-801b-b2e5-d67b2c53238b" class="" dir="auto">Kernel Buffer Bypass、User Space、Context Switch、O_DIRECT。</p></div></p><hr id="33aa15e2-9005-8015-aa5e-c0ef23f836e1" dir="auto"/><p id="33aa15e2-9005-8080-bfcb-e966d79b5175" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-8094-99c3-d87ffa431f96" class="" dir="auto">傳統檔案讀取（如 <code>read()</code>）會先由 DMA 將資料寫入 OS 的 Page Cache，接著再由 CPU 耗費算力 <code>memcpy</code> 到應用程式層級的 User Buffer，這造成了雙倍的記憶體佔用與額外的 CPU 負擔。Zero-copy I/O（如 Linux 的 <code>O_DIRECT</code>）允許開發者將符合 DMA 嚴格規範的 User Buffer 位址直接交給底層硬體，達成「裝置 → 應用程式」的一步到位傳輸。不過，這種做法也同時放棄了 OS 內建的快取保護，通常只適用於大檔循序掃描或自行管理快取池的高效能資料庫引擎。</p></div></p></div></aside><hr id="33aa15e2-9005-80b0-a254-e3dd74c88f72" dir="auto"/></div></details></div></details><details id="33aa15e2-9005-80d6-94b4-efc6beaab1e3" open="" class="toggle" dir="auto"><summary><mark class="highlight-teal" data-notion-highlight="teal"><strong>Test your understanding</strong></mark></summary><div class="indented"><details id="33aa15e2-9005-800b-a9c1-d8021ac26246" open="" class="toggle" dir="auto"><summary>在PIO 模式下，CPU 要親自搬運資料。如果一顆 NVMe SSD 的 bandwidth 是 7 GB/s，用 PIO 搬運所有資料會有什麼問題？DMA 如何解決這個問題？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80df-841c-da8ce6b0cc1a" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8006-86c9-d5ce1b6d7efd" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-806f-b6b0-f2411f9c3e41" class="" dir="auto">CPU 會花費所有時間在執行記憶體的讀寫指令上，導致滿載且無力處理其他任務。DMA 透過專屬硬體直接將資料寫入記憶體，完全解放 CPU。</p></div></p><hr id="33aa15e2-9005-80f3-b41f-e797b2ccbb5c" dir="auto"/><p id="33aa15e2-9005-806d-9196-dd50ea3c1dd5" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-80e7-80b6-f43b46bbf80e" class="" dir="auto">PIO (Programmed I/O)、CPU Utilization、DMA Controller</p></div></p><hr id="33aa15e2-9005-8066-8a2f-fb130ff0f2fc" dir="auto"/><p id="33aa15e2-9005-80e9-9af7-ec6b74bc55b9" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-80a8-8c03-e660e8bea1d8" class="" dir="auto">PIO 模式要求 CPU 親自逐字節或逐字組地讀取裝置的暫存器，再寫入主記憶體。對於 7 GB/s 這種海量頻寬，CPU 的時脈與匯流排頻寬會被龐大的資料搬移工作完全吃光（佔用率達 100%）。DMA 控制器改變了這個機制，允許 CPU 只下達「起點、終點、長度」的指令，隨後由 DMA 硬體獨立完成裝置與記憶體間的搬運。期間 CPU 可以去執行其他應用程式，大幅提升系統整體吞吐量。</p></div></p></div></aside><hr id="33aa15e2-9005-8063-a4f4-c4e7b826364b" dir="auto"/></div></details><details id="33aa15e2-9005-802c-9624-d4421b1abb87" open="" class="toggle" dir="auto"><summary>為什麼 DMA buffer 必須用 physical address 而不是 virtual address？如果裝置使用 virtual address 去做 DMA，會發生什麼事？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-804e-aa2f-f673a8ed4b2b" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-803b-8323-fbcc47ba53f1" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-80ab-b35a-de6df705be08" class="" dir="auto">因為傳統 DMA 設備不具備 CPU 內的 MMU（記憶體管理單元），看不懂作業系統建立的虛擬位址。若直接餵給它虛擬位址，它會將其當作實體位址寫入，導致覆寫錯誤的記憶體位置。</p></div></p><hr id="33aa15e2-9005-80b0-acfa-ccb2619430a4" dir="auto"/><p id="33aa15e2-9005-80aa-af03-f3e2efe4c7df" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-8028-9e61-c0433b518842" class="" dir="auto">Physical Address、Virtual Address、MMU、Memory Corruption</p></div></p><hr id="33aa15e2-9005-80fc-9ffb-ebb6af1a279c" dir="auto"/><p id="33aa15e2-9005-80b1-9035-cb0b463f0792" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-80bf-9bf9-f1333ef400a3" class="" dir="auto">CPU 存取虛擬位址時，會透過自身的 MMU 與 Page Table 即時轉換成實體位址。但傳統的 DMA 控制器直接掛在系統匯流排上，運作時繞過了 CPU 的 MMU。如果把程式裡的虛擬位址丟給 DMA，它會照著這個數字盲目寫入實體記憶體，極可能覆蓋到系統核心或其他程式的敏感資料，進而引發系統崩潰（Kernel Panic）。</p></div></p></div></aside><hr id="33aa15e2-9005-80fe-b274-e4c3b0242e65" dir="auto"/></div></details><details id="33aa15e2-9005-8018-bfd4-ca00c1ad32d0" open="" class="toggle" dir="auto"><summary>為什麼 DMA buffer 必須被 pin 住不能被 swap out？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80b9-9653-db12a1775950" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8004-aef7-c7ca9844d04c" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-8093-a62e-e2d3ac074956" class="" dir="auto">確保 DMA 傳輸期間，目標的實體記憶體分頁不會被作業系統搬移或置換到硬碟，避免硬體把資料寫錯位置。</p></div></p><hr id="33aa15e2-9005-806e-873b-e6758ff25104" dir="auto"/><p id="33aa15e2-9005-80d8-93a9-f1b077ca4341" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-80ce-8783-ffc513688e10" class="" dir="auto">Pinned Memory、Page Swap、Page Reclaim</p></div></p><hr id="33aa15e2-9005-8006-82bd-cdc935d50b82" dir="auto"/><p id="33aa15e2-9005-807b-bed8-eb84fb494b7f" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-80c0-98f4-f26f2d355eca" class="" dir="auto">作業系統的虛擬記憶體機制會在實體 RAM 不足時，主動把不常用的頁面換出（Swap out）到硬碟，並把該實體空間分配給其他進程。因為 DMA 傳輸是硬體非同步進行的，如果 DMA 準備寫入的實體分頁突然被 OS 換出並重新分配，DMA 就會把資料無情地寫進另一個無辜程式的記憶體中。因此，在發起 DMA 之前，必須透過核心將該頁面 Pinned（鎖定），確保它在物理上絕對靜止。</p></div></p></div></aside><hr id="33aa15e2-9005-80f3-b724-f5e3485347a7" dir="auto"/></div></details><details id="33aa15e2-9005-80ca-b2b2-c777dadf96f6" open="" class="toggle" dir="auto"><summary>沒有 scatter-gather 的時候，如果你的資料分散在 4 個不連續的 physical page，你要怎麼做才能完成 DMA？有了 scatter-gather 之後省掉了什麼？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-801a-88d6-f7077d3c02b6" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80ec-9b7a-f42f5c2056f9" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-8059-833a-f1fe23a81d62" class="" dir="auto">沒 SGL 時，作業系統必須先配置一塊連續的實體記憶體（Bounce Buffer），讓 DMA 寫入後，CPU 再用 <code>memcpy</code> 複製到那 4 個分散的 page 中。SGL 省去了額外的連續記憶體配置與 CPU 複製開銷。</p></div></p><hr id="33aa15e2-9005-806c-8153-dde29e24cce9" dir="auto"/><p id="33aa15e2-9005-805c-abb6-e9f5432669cf" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-800c-a92a-cba839fd4401" class="" dir="auto">Scatter-Gather List (SGL)、Physically Contiguous、memcpy overhead</p></div></p><hr id="33aa15e2-9005-8001-b221-fe259e0ce6da" dir="auto"/><p id="33aa15e2-9005-8021-b3a5-e1fc903e830e" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-80e9-8530-f506ec1e8d5c" class="" dir="auto">傳統 DMA 要求寫入區塊必須「實體連續」。若目標空間分散，OS 必須分配一塊夠大的「連續實體緩衝區」，等 DMA 把資料全搬進來後，CPU 再用軟體迴圈把它們切分並複製到那 4 個不連續的實體分頁。使用 SGL 後，OS 只需給 DMA 控制器一張包含 4 個實體位址與長度的清單，硬體就會像跑接力賽一樣，自動依序把資料精準填入分散的頁面，完全免除 CPU 介入。</p></div></p></div></aside><hr id="33aa15e2-9005-8032-a780-cddb799ab658" dir="auto"/></div></details><details id="33aa15e2-9005-80df-8c3c-cd752524d39e" open="" class="toggle" dir="auto"><summary>Zero-copy I/O 省掉了哪些 overhead？在什麼情況下，zero-copy 反而會比走 kernel page cache 的傳統路徑更慢？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8077-ae3d-cd006255a67a" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80de-9d9a-c758d279be30" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-80c6-b1db-ef9c6515ddac" class="" dir="auto">Zero-copy 省去了資料在 Kernel Space Buffer 與 User Space Buffer 之間的 CPU <code>memcpy</code> 開銷。但如果面臨具有高度時間局部性（反覆讀取相同資料）的工作負載，Zero-copy 會因繞過快取而變慢。</p></div></p><hr id="33aa15e2-9005-80cb-bfce-ef08b6ee26cf" dir="auto"/><p id="33aa15e2-9005-804b-bbb5-df5073277383" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-800f-8ef2-d886d584f5e4" class="" dir="auto">Zero-copy、Page Cache Bypass、Temporal Locality</p></div></p><hr id="33aa15e2-9005-8034-995c-f7a21618074e" dir="auto"/><p id="33aa15e2-9005-801e-a54d-da4a02ce8716" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-80ff-9bc3-e3b4f8b4866d" class="" dir="auto">在傳統 I/O 中，裝置把資料 DMA 到 Kernel Buffer 後，CPU 還需花時間將其複製到 User Buffer。Zero-copy 讓裝置透過 DMA 直接寫入 User Buffer，省下了 CPU 時間與多餘的記憶體佔用。然而，實作 Zero-copy 通常意味著繞過作業系統的 Page Cache（如使用 <code>O_DIRECT</code>）。如果應用程式反覆讀取同一批「熱資料」，傳統路徑可以直接從記憶體（Page Cache）極速返回，而 Zero-copy 卻強迫每次都要向底層慢速磁碟發起實體 I/O，導致延遲暴增。</p></div></p></div></aside><hr id="33aa15e2-9005-8058-baa6-fc3c60dcbb67" dir="auto"/></div></details></div></details><details id="33aa15e2-9005-8094-a513-e233c99a0806" open="" class="toggle" dir="auto"><summary><mark class="highlight-red" data-notion-highlight="red"><strong>Quiz Pool</strong></mark></summary><div class="indented"><ol type="1" id="33aa15e2-9005-805e-9892-f8d553159de4" class="numbered-list" start="1" dir="auto"><li>假設你正在開發一個加密通訊程式，要求所有從硬碟讀取的資料都必須經過 CPU 做 AES 加密之後才能發送給網路卡。 請問在這種情況下，如果不使用特殊硬體 offload，開發者能直接使用 Zero-copy 相關技術完成此任務嗎？為甚麼？<blockquote id="33aa15e2-9005-804e-b670-eb0529d073e2" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80f6-b06c-fe8abbeeb4ff" class="numbered-list" start="1" dir="auto"><li>可以，使用 Zero-copy 可以減少資料搬運量，提高效率。</li></ol><ol type="1" id="33aa15e2-9005-8030-af07-ebb9233cf146" class="numbered-list" start="2" dir="auto"><li>不可以，資料必須經過 CPU 暫存器才能進行加密運算，不能使用 Zero-copy。</li></ol><ol type="1" id="33aa15e2-9005-801b-93d1-daf2a534fbad" class="numbered-list" start="3" dir="auto"><li>不可以。因為 Zero-copy 僅支援大於 4KB 的傳輸，而 AES 加密通常是以 128-bit 為單位進行，兩者單位不相容。</li></ol><ol type="1" id="33aa15e2-9005-8011-b96d-cc4922fcc745" class="numbered-list" start="4" dir="auto"><li>可以，Zero-copy 的使用，釋放出 CPU 去做加密操作。</li></ol></blockquote><details id="33aa15e2-9005-800d-acdc-f7bb04f224b6" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80fc-9017-f5c5e28b1bfe" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8043-9200-c2ce94411bfb" class="" dir="auto">不可以，資料必須經過 CPU 暫存器才能進行加密運算，不能使用 Zero-copy。</p><hr id="33aa15e2-9005-804d-9a60-fcbe1eae150a" dir="auto"/><p id="33aa15e2-9005-8087-87fa-e69bc26cd9e1" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-80f4-9563-d3f8ff92679a" class="" dir="auto">資料必須經過 CPU 暫存器，才能進行 AES 運算。 Zero-copy 的核心在於「不經過 CPU 搬運」，如果資料需要經過 CPU 進行運算（如加密），資料就不能 bypass CPU。</p></div></p><hr id="33ca15e2-9005-8078-9c5c-ed6e9468a882" dir="auto"/><p id="33ca15e2-9005-80f5-9484-f7d5d92a28a4" class="" dir="auto">(1) Zero-copy 不須 CPU 介入，更適合靜態資料的搬移，而 AES 加密需 CPU 進行處理。</p><p id="33ca15e2-9005-80ca-87fc-f335a08aa63c" class="" dir="auto">(3) 干擾選項，Zero-copy 的限制不在於資料大小單位，而在於資料流向。</p><p id="33ca15e2-9005-807a-a40c-ca7353d6bf8c" class="" dir="auto">(4) CPU 完全沒碰到資料，無法進行加密處理。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8006-bf42-cf524687a9fd" dir="auto"/><ol type="1" id="33aa15e2-9005-80ad-8505-cfd55004ec6c" class="numbered-list" start="2" dir="auto"><li>一個系統將 I/O 傳輸從 <strong>Programmed I/O (PIO)</strong> 改為 <strong>DMA (Direct Memory Access)</strong>，但在實測中發現 CPU utilization 並沒有明顯下降，甚至在某些 workload 下反而變差。 請分析最可能的原因：<blockquote id="33aa15e2-9005-80a8-b20c-ddae7399e804" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8085-8ddd-dde0145457d5" class="numbered-list" start="1" dir="auto"><li>DMA 會繞過 CPU cache，導致 CPU cache 命中率上升，進而增加 CPU stall</li></ol><ol type="1" id="33aa15e2-9005-8085-a795-c6df0bc259cf" class="numbered-list" start="2" dir="auto"><li>DMA 只能用於 sequential access，對 random access workload 會完全失效</li></ol><ol type="1" id="33aa15e2-9005-80e0-9b10-de9099d557e0" class="numbered-list" start="3" dir="auto"><li>DMA 傳輸完成後會產生 interrupt，若傳輸粒度太小會造成頻繁 interrupt，增加 CPU 負擔</li></ol><ol type="1" id="33aa15e2-9005-809b-a569-f004648a3397" class="numbered-list" start="4" dir="auto"><li>DMA 傳輸過程中仍需要 CPU 持續輪詢 (polling) 裝置狀態，導致 CPU 無法釋放</li></ol></blockquote><details id="33aa15e2-9005-802d-8464-f0bdfe71914f" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8077-8ff7-cf030c376247" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80bf-b00e-c22cd1c86426" class="" dir="auto">DMA 傳輸完成後會產生 interrupt，若傳輸粒度太小會造成頻繁 interrupt，增加 CPU 負擔</p><hr id="33aa15e2-9005-8034-acf9-f37b68e000bc" dir="auto"/><p id="33aa15e2-9005-8034-9ab0-e4e789347466" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8074-be19-f01c7d2a435d" class="" dir="auto">DMA 雖然減少資料搬運成本，但每次傳輸完成仍會觸發 interrupt。若每次傳輸的資料量太小（chunk size 過小），會導致 interrupt 次數過多，CPU 需頻繁進入 interrupt handler，造成額外負擔，甚至抵消 DMA 的效益。</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-807b-ae18-c110c2b40d8e" dir="auto"/><ol type="1" id="33aa15e2-9005-8022-bc1c-f1c6bcbc67bd" class="numbered-list" start="3" dir="auto"><li>一個高度依賴儲存效能的應用程式需要將系統 RAM 中一個 2 MB 的資料 Buffer 寫入 SSD。 由於作業系統使用 Paging ，這 2 MB 的資料在記憶體中並非連續儲存，而是分散在 512 個不同的 4 KB Physical Page 中。 請問下列哪種方法可以讓儲存控制器以最少的 CPU 指令數且不需經過任何 memory copy（即 Zero-copy） 的情況下，完成這項資料傳輸？<blockquote id="33aa15e2-9005-8071-8b21-d61324894fcb" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80d5-b5ba-c9d3d165b93e" class="numbered-list" start="1" dir="auto"><li>CPU 使用 Zero-copy remapping 修改頁表項目（Page Table Entry, PTE），將儲存控制器的硬體暫存器位址直接映射為與資料頁面相同的實體位址。</li></ol><ol type="1" id="33aa15e2-9005-80e0-b601-f69c54d39362" class="numbered-list" start="2" dir="auto"><li>作業系統準備一份 Scatter-Gather List，其中包含所有 512 個碎片的實體起始位址與長度，並將此清單交給具備 DMA 功能的儲存控制器。</li></ol><ol type="1" id="33aa15e2-9005-80f6-9f92-d5e8eb19c6dd" class="numbered-list" start="3" dir="auto"><li>作業系統核心執行彈跳暫存區（Bounce Buffer）複製，由 CPU 手動將這 512 個碎片資料先複製到一個連續的 2 MB 實體記憶體區塊中，再啟動標準的 DMA 傳輸。</li></ol><ol type="1" id="33aa15e2-9005-804a-9d71-fb801beecaa8" class="numbered-list" start="4" dir="auto"><li>CPU 使用 Programmed I/O 從這 512 個分散頁面中讀取每個 64 位元的資料，並逐一寫入儲存控制器的資料埠</li></ol></blockquote><details id="33aa15e2-9005-806e-8ac9-dd4f1f5b42f5" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8063-8182-f1a9624dfc04" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80e7-9cbb-ec57f9b5b03f" class="" dir="auto">作業系統準備一份 Scatter-Gather List，其中包含所有 512 個碎片的實體起始位址與長度，並將此清單交給具備 DMA 功能的儲存控制器。</p><hr id="33aa15e2-9005-8041-bf22-eb8c78d8e403" dir="auto"/><p id="33aa15e2-9005-8026-b8b2-e3c5d319e819" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8019-887c-e07492b8f203" class="" dir="auto">CPU 唯一的工作是建立那份 SGL。隨後儲存控制器會根據清單內容，從 RAM 的各個位置抓取碎片資料。這實現了在最少 CPU 介入且不需額外複製的情況下搬移分散資料的目標。</p></div></p><hr id="33ca15e2-9005-8027-bc89-f341bbc129ab" dir="auto"/><p id="33ca15e2-9005-804a-b684-c035ee4e2dff" class="" dir="auto">(1) 單純修改 PTE 無法完成 I/O 傳輸。資料仍必須物理性地從 RAM 儲存單元搬移到儲存設備中。Zero-copy remapping 通常用於行程間共享記憶體，而非將資料搬移至硬體。</p><p id="33ca15e2-9005-80d8-9ad0-fc60e503407e" class="" dir="auto">(3) 雖然這能讓不支援 SGL 的簡單 DMA 控制器運作，但它要求 CPU 先進行一次「記憶體對記憶體」的複製。</p><p id="33ca15e2-9005-8085-bbd2-c31d00f78f23" class="" dir="auto">(4) 雖然它避免了額外的記憶體複製，但會消耗大量的 CPU 週期，因為 CPU 被困在一個迴圈中處理 2 MB 傳輸的每一個字組。對於高速儲存設備來說，這是效率最低的做法。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8020-9fef-de13906e261d" dir="auto"/><ol type="1" id="33aa15e2-9005-80c1-ac80-f42491d3e661" class="numbered-list" start="4" dir="auto"><li>某資料庫工程師為了解決系統 CPU 負載過高的問題，決定將儲存引擎的讀取路徑全面改寫為 <strong>零拷貝 I/O（Zero-copy I/O，例如使用 Linux 的 </strong><code><strong>O_DIRECT</strong></code><strong>）</strong>。該資料庫的 workload 主要集中在「頻繁反覆讀取同一批熱點索引區塊（Hot index blocks）」。改寫上線後，工程師原本預期能省下大量的 CPU <code>memcpy</code> 開銷並提升效能，但實際測試卻發現資料庫的讀取延遲大幅增加，整體吞吐量嚴重衰退。根據 DMA 與 I/O 軟體堆疊的原理，造成此反直覺現象的最主要原因是什麼？<blockquote id="33aa15e2-9005-8045-aa75-ebf01569874c" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8041-a9bd-e27e63d92f8c" class="numbered-list" start="1" dir="auto"><li><code>O_DIRECT</code> 會強制 DMA 控制器退化成 <strong>Programmed I/O（PIO）</strong>模式。在 PIO 模式下，CPU 必須親自參與每一個位元組的搬運，這不僅沒有省下 CPU 資源，反而導致 CPU 被 I/O 傳輸完全卡死。</li></ol><ol type="1" id="33aa15e2-9005-8047-ae96-de11e36592f5" class="numbered-list" start="2" dir="auto"><li>應用程式透過標準 <code>malloc()</code> 分配的 User buffer 預設在實體記憶體中是不連續的（Physically fragmented）。由於 Zero-copy 必須使用實體連續的記憶體，DMA 控制器為了處理這些碎片，耗費了大量時間在硬體層級進行重組。</li></ol><ol type="1" id="33aa15e2-9005-800e-a891-c475ba9cce6d" class="numbered-list" start="3" dir="auto"><li>零拷貝 I/O 會導致目標記憶體區塊被永久 <strong>Pinned（釘住）</strong>在實體記憶體中無法被作業系統 Swap out。當熱點索引區塊不斷增加時，會迅速耗盡所有的實體記憶體，引發系統嚴重崩潰。</li></ol><ol type="1" id="33aa15e2-9005-80f7-9528-c88036e9c7c1" class="numbered-list" start="4" dir="auto"><li>零拷貝 I/O 雖然省下了將資料從 Kernel buffer 複製到 User buffer 的 CPU 開銷，但也同時<strong>完全繞過了作業系統的 Page cache（分頁快取）</strong>。對於頻繁反覆讀取熱資料的負載，原本可以直接從記憶體快取中極速命中的請求，現在全部被迫轉換成對底層 NVMe SSD 的實體 I/O 讀取，導致延遲大幅增加。</li></ol></blockquote><details id="33aa15e2-9005-8075-b682-c462b4b9f8c3" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8020-bbbb-f219ea4a9e60" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8010-aae3-efb00801097d" class="" dir="auto">零拷貝 I/O 雖然省下了將資料從 Kernel buffer 複製到 User buffer 的 CPU 開銷，但也同時完全繞過了作業系統的 Page cache（分頁快取）。對於頻繁反覆讀取熱資料的負載，原本可以直接從記憶體快取中極速命中的請求，現在全部被迫轉換成對底層 NVMe SSD 的實體 I/O 讀取，導致延遲大幅增加。</p><hr id="33aa15e2-9005-809d-bb68-e842e18ced3b" dir="auto"/><p id="33aa15e2-9005-80ca-a0f4-cbd821772c75" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-809c-8f43-fa4fa773d91c" class="" dir="auto">這是正確的。根據講義，Zero-copy 的核心代價就是放棄了 Kernel 的 Page cache。在資料庫頻繁讀取「熱點資料」的場景中，Page cache 的命中率通常極高，直接從 DRAM 讀取的延遲遠低於向 SSD 發送 DMA 請求。強行套用 Zero-copy 反而會讓每個讀取指令都必須走完完整的 PCIe 與 NVMe 實體傳輸路徑，導致效能嚴重衰退。Zero-copy 真正適合的是「只讀一次」或「循序大檔案」等 Cache 命中率低的場景。</p></div></p><hr id="33ca15e2-9005-8001-9a6c-c702a321bc06" dir="auto"/><p id="33ca15e2-9005-80cb-837a-c8c385f919e5" class="" dir="auto">(1) 這是錯誤的觀念。使用 O_DIRECT 達成 Zero-copy 時，底層依然是完全依賴硬體 DMA 控制器來將資料從 SSD 直接搬運到應用程式的 User buffer 中，並不會退化成古老且低效的 PIO（由 CPU 親自跑迴圈搬資料）模式。</p><p id="33ca15e2-9005-80ee-bf4e-d6562e98e326" class="" dir="auto">(2) 這混淆了 DMA 的限制與現代解法。雖然簡單的 DMA 確實需要實體連續記憶體，但現代系統與 NVMe 協定廣泛支援 Scatter-Gather List（SGL） 或是 PRP 機制。這允許 DMA 控制器直接且高效地處理分散在多個實體分頁上的記憶體，並不會因此產生巨大的重組延遲。</p><p id="33ca15e2-9005-8033-9a81-f4920fbe1d89" class="" dir="auto">(3) 這個推論只對了一半。DMA 傳輸期間，記憶體確實必須被 Pinned 以防止 OS 將其 Swap 出去造成資料損壞。然而，Pinning 是動態的，通常只在 I/O 操作進行的期間鎖定，完成後就會釋放（或者由資料庫自行管理特定的固定緩衝池），並不會因為使用了 Zero-copy 就無條件「永久」鎖住所有記憶體導致系統立刻崩潰。效能立刻衰退的主因是失去了 Cache。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80f2-86ce-e489586f6822" dir="auto"/><ol type="1" id="33aa15e2-9005-80b8-a063-de8d28aabe81" class="numbered-list" start="5" dir="auto"><li>某資料分析系統將 I/O 路徑從 <code>read()</code>（使用 OS page cache）改為 <strong>direct I/O（例如使用 O_DIRECT，繞過 OS page cache）</strong>。 系統在以下兩種 workload 上進行測試：<aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80a1-babd-ed250d945473" dir="ltr"><div style="width:100%"><ul id="33aa15e2-9005-80d8-8b8a-db84f2fee4b3" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Workload A：</strong> 連續掃描大型資料集，每筆資料只讀取一次</li></ul><ul id="33aa15e2-9005-8099-8fd4-e51d2229af1a" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Workload B：</strong> 反覆讀取一個大小為 2× DRAM 的資料集，且存取具有 temporal locality，其 working set 明顯小於可用 DRAM，因此 page cache hit rate 很高</li></ul></div></aside><p id="33aa15e2-9005-80a7-9bf3-c6b11df9b4e0" class="" dir="auto">實驗結果顯示，workload A 效能提升，但 workload B 效能顯著下降。 假設儲存裝置為 NVMe SSD，且 I/O queue depth 足夠高，請選出最合理的解釋：</p><blockquote id="33aa15e2-9005-8008-a00e-cb513e9961c9" class="" dir="auto"><ol type="1" id="33aa15e2-9005-807a-a063-e04d6dcef3ee" class="numbered-list" start="1" dir="auto"><li>在 workload B 中，direct I/O 無法利用 OS page cache 的 readahead 機制，導致 sequential throughput 下降</li></ol><ol type="1" id="33aa15e2-9005-80b8-ac94-c345dc72b490" class="numbered-list" start="2" dir="auto"><li>在 workload B 中，由於資料集大於 DRAM，page cache 無法有效運作，因此 direct I/O 與 <code>read()</code> 應具有相同效能</li></ol><ol type="1" id="33aa15e2-9005-8007-afd0-ea2890133a28" class="numbered-list" start="3" dir="auto"><li>在 workload B 中，direct I/O 會限制 I/O queue depth，導致無法充分利用 NVMe 的內部平行性</li></ol><ol type="1" id="33aa15e2-9005-8020-8120-d984c6b5eba2" class="numbered-list" start="4" dir="auto"><li>在 workload B 中，<code>read()</code> 可利用 page cache 保留近期使用的 hot data，而 direct I/O 每次都需從 SSD 重新讀取，導致效能下降</li></ol></blockquote><details id="33aa15e2-9005-8074-bdac-e2f23c70de1c" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8033-a895-c54e843b701e" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8049-b9cc-d0b748fdeac7" class="" dir="auto">在 workload B 中，<code>read()</code> 可利用 page cache 保留近期使用的 hot data，而 direct I/O 每次都需從 SSD 重新讀取，導致效能下降</p><hr id="33aa15e2-9005-8093-a83d-ef628fd6101e" dir="auto"/><p id="33aa15e2-9005-80d7-9066-c50af214dfdb" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-80d6-871c-e8fe9a564085" class="" dir="auto"><code>read()</code> 透過 page cache 保留最近使用的資料，使得具有 temporal locality 的存取可以直接命中 DRAM。 direct I/O（O_DIRECT）繞過 page cache，使每次讀取都需從 SSD 載入資料，無法利用 locality，導致效能下降。</p></div></p><hr id="33ca15e2-9005-8081-b2e9-fb681e2c8f18" dir="auto"/><p id="33ca15e2-9005-80cc-8230-cc15c2669177" class="" dir="auto">(1) 雖然 direct I/O 繞過 page cache，因此也不會使用 OS 的 readahead，但題目中的 workload B 重點是 temporal locality，而非 sequential throughput。 即使沒有 readahead，主要效能差異仍來自 cache reuse，而不是 prefetch。</p><p id="33ca15e2-9005-80c4-95d3-f4f3ddf76796" class="" dir="auto">(2) 題目已明確指出 working set 明顯小於 DRAM，因此 page cache 可以保留大部分 hot data，並達到很高的 hit rate。 即使整體資料集大於 DRAM，只要存取具有 temporal locality，page cache 仍然能有效降低 I/O 次數。</p><p id="33ca15e2-9005-80f4-9f4c-c59f4778a362" class="" dir="auto">(3) I/O queue depth 通常由應用程式與 driver 控制，而不是 direct I/O 的直接限制因素。 在題目假設 queue depth 足夠高的情況下，NVMe 平行性並不是瓶頸。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80a7-92be-d2b88098f6ca" dir="auto"/><ol type="1" id="33aa15e2-9005-8022-bac8-fce7211a91f0" class="numbered-list" start="6" dir="auto"><li>在一個未啟用 IOMMU 的 Linux 系統中，你使用 <code>O_DIRECT</code> 從 NVMe SSD 讀取 16KB 資料到 user space buffer。該 buffer 對應到 4 個連續的 virtual pages，但在 physical memory 中分別對應到 4 個不連續的 physical pages。driver 使用 <code>get_user_pages()</code> 將這些 pages pin 住，並建立一個包含 4 個 entry 的 scatter-gather list（SGL），每個 entry 都是 (physical_address, length)，交給 DMA controller 執行傳輸。<br/>在 DMA 傳輸尚未完成時，系統觸發 memory compaction，試圖移動部分 pages。<br/>請問以下哪一個敘述是正確的？<blockquote id="33aa15e2-9005-80d5-8047-f8d58d1ef334" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8010-8dd0-d4fa4a5cf6a6" class="numbered-list" start="1" dir="auto"><li>只要使用 scatter-gather list，DMA controller 就可以在傳輸過程中根據 page table 重新解析 virtual address，因此不需要 pin pages。</li></ol><ol type="1" id="33aa15e2-9005-800b-8786-d2a6906a53a4" class="numbered-list" start="2" dir="auto"><li>pin pages 的主要作用是確保 scatter-gather list 中記錄的 physical address 在 DMA 期間保持有效，即使 virtual address 不變，未 pin 仍可能導致 DMA 寫入錯誤位置。</li></ol><ol type="1" id="33aa15e2-9005-8079-a156-f5859306fb64" class="numbered-list" start="3" dir="auto"><li>如果改成先 DMA 到一塊 kernel 中的 contiguous buffer，再 memcpy 到 user buffer，則為了確保 memcpy 正確，user buffer 仍需要在整個 DMA 過程中被 pin。</li></ol><ol type="1" id="33aa15e2-9005-80f8-9a86-e7cb9201d34c" class="numbered-list" start="4" dir="auto"><li>因為使用 O_DIRECT 繞過 page cache，kernel 不會再對這些 pages 進行 migration 或 compaction，因此 pin 並非必要。</li></ol></blockquote><details id="33aa15e2-9005-80db-a8fd-c0821442db7e" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80fc-ac9e-dc76437d7409" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8023-9023-dbc7bc31153c" class="" dir="auto">pin pages 的主要作用是確保 scatter-gather list 中記錄的 physical address 在 DMA 期間保持有效，即使 virtual address 不變，未 pin 仍可能導致 DMA 寫入錯誤位置。</p><hr id="33aa15e2-9005-80b7-9ffa-e6a252008466" dir="auto"/><p id="33aa15e2-9005-80bd-a8d2-dc0f722af8ab" class="" dir="auto">解析: <div class="indented"><p id="bc994d21-e28f-4f4d-ae61-a2a7aeb9c7b1" class="" dir="auto">DMA controller（在沒有 IOMMU 的情況下）完全依賴 driver 提供的 physical address， 並不會查詢 page table。scatter-gather list 中記錄的是一組固定的 physical address。 若沒有 pin，kernel 可能進行 page migration 或 swap，導致這些 physical pages 改變或被回收。 即使 user space 的 virtual address 完全沒有變，DMA 仍會寫入舊的 physical address， 造成資料毀損。</p></div></p><hr id="33ca15e2-9005-8085-aaca-edb3955da1a5" dir="auto"/><p id="33ca15e2-9005-80e9-9441-df8a6de24470" class="" dir="auto">(1) 這個選項混淆了 scatter-gather 與 virtual memory。SGL 中存的是 physical address， DMA controller 並不會在傳輸時查詢 page table 或重新做 virtual-to-physical 轉換。 scatter-gather 只是讓 DMA 可以處理多段不連續的 physical memory，並不提供任何動態位址轉換能力。 因此如果 physical page 被移動，SGL 仍會失效。</p><p id="33ca15e2-9005-8037-ae21-c224b816a4ca" class="" dir="auto">(3) 在這種設計下，DMA 的目標是 kernel buffer，而不是 user buffer。需要穩定的是 kernel 的 DMA buffer（其 physical address）， 而不是 user buffer。memcpy 是 CPU 經由 virtual address 存取 user memory，會透過 MMU 做正確轉換， 不依賴固定的 physical address，因此 user buffer 不需要因為 DMA 而被 pin。</p><p id="33ca15e2-9005-8012-b69d-d8b2745722b9" class="" dir="auto">(4) O_DIRECT 只代表 I/O 不經過 page cache，並不代表 kernel 不會對這些 pages 做 memory management。 user pages 仍然屬於一般的 virtual memory 管理範疇，可能被 migration、swap（若未 pin）或 compaction 影響。 因此 O_DIRECT 並不能取代 pinning 的需求。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8090-8534-f247a3918a1e" dir="auto"/><ol type="1" id="33aa15e2-9005-8022-91af-d89ae2074257" class="numbered-list" start="7" dir="auto"><li>你正在優化一個高效能 NVMe I/O path，並評估是否導入 Scatter-Gather List（SGL）來降低 memcpy 成本並提升 throughput。<br/>已知 NVMe 單一 read command 要求對應的磁碟位址 LBA 必須是連續的，而 SGL 的作用在於描述多段分散的記憶體區塊，讓 DMA 可以直接將資料寫入多個 buffer。<br/>在以下四種實際情境中，請判斷在哪一種情況下，使用 SGL 能最有效避免額外 memcpy，並帶來最明顯的效能提升。<blockquote id="33aa15e2-9005-8038-9202-c887b3b4e683" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80e9-97ac-c4f7cbd4daf2" class="numbered-list" start="1" dir="auto"><li><strong>影片串流服務</strong> 順序讀取一段 8MB 的影片資料，裝置可透過單一 base address 與長度完成 DMA，且不支援多段記憶體描述。</li></ol><ol type="1" id="33aa15e2-9005-8049-bbe7-c0fb8144345c" class="numbered-list" start="2" dir="auto"><li><strong>儲存系統</strong> 讀取一段連續的 16KB 磁碟資料，並將資料直接寫入 4 個分開配置的 4KB page。</li></ol><ol type="1" id="33aa15e2-9005-80c9-a53f-cfd5afcc06bf" class="numbered-list" start="3" dir="auto"><li><strong>影像處理程式</strong> 讀取一張 16MB 的圖片檔案，並將其寫入一個裝置可直接以單一位址區段存取的輸入 buffer。</li></ol><ol type="1" id="33aa15e2-9005-80ff-b9e1-ef77750a2bbe" class="numbered-list" start="4" dir="auto"><li><strong>備份系統</strong> 順序讀取大型檔案，並將資料寫入一塊由 DMA API 保證為單一連續區段的 buffer。</li></ol></blockquote><details id="33aa15e2-9005-80da-b276-e97bfee7550b" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8082-839b-d784bdbdfca1" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8050-b540-d7b3c7e26c16" class="" dir="auto"><strong>儲存系統</strong> 讀取一段連續的 16KB 磁碟資料，並將資料直接寫入 4 個分開配置的 4KB page。</p><hr id="33aa15e2-9005-80ac-8a3a-f53e4377e5f6" dir="auto"/><p id="33aa15e2-9005-809d-b0b0-deec560fce16" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-80e7-8a27-f01f04367835" class="" dir="auto">此情境中磁碟位址是連續的，因此可以用單一 NVMe command 完成讀取； 但目標 buffer 分散在多個 page。 使用 SGL 可讓 DMA 直接將資料寫入這些分散的 buffer，避免先集中再拆分， 因此能有效降低 memcpy 成本並提升效能。</p></div></p><hr id="33ca15e2-9005-805c-8c32-ee32909b0fdd" dir="auto"/><p id="33ca15e2-9005-800e-89a4-c2fc078bd289" class="" dir="auto">(1) 此情境中裝置僅支援單一區段的 DMA 存取，不支援分段描述。 因此無法使用 SGL，也不存在需要避免的資料重組或 memcpy 問題， 使用 SGL 不會帶來任何效益。</p><p id="33ca15e2-9005-8053-89dc-c55f1c7539eb" class="" dir="auto">(3) 此情境中 DMA 目標為單一區段，裝置不需要處理多段記憶體。 因此不涉及資料重組或額外 memcpy，使用 SGL 不會帶來效能提升。</p><p id="33ca15e2-9005-8080-9eca-f71574fa82e3" class="" dir="auto">(4) 此類 buffer 已由系統保證為單一可供 DMA 使用的區段， 不需要額外的分段描述。 因此不會有額外 memcpy 問題，SGL 無法提供效益。 </p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80aa-9aa7-ee90bfa12393" dir="auto"/><ol type="1" id="33aa15e2-9005-806d-84cb-cd84af367e1f" class="numbered-list" start="8" dir="auto"><li>一名缺乏經驗的開發者在 user space 中使用 malloc() 宣告了一個 1 MB 的記憶體陣列， 並試圖將這個陣列的指標位址直接傳遞給一個傳統的 DMA controller（該 controller 不支援 IOMMU）， 要求硬體將磁碟資料寫入該位址。這個操作會引發什麼災難性的後果，其根本原因為何？<blockquote id="33aa15e2-9005-8000-befe-d278d670d152" class="" dir="auto"><ol type="1" id="33aa15e2-9005-804b-b613-ec50cea53069" class="numbered-list" start="1" dir="auto"><li>DMA controller 會自動將這 1 MB 的請求拆分成 256 個 4 KB 的 interrupt，導致 CPU 陷入 interrupt storm 而癱瘓。</li></ol><ol type="1" id="33aa15e2-9005-809f-8fc4-cbc9c6988fee" class="numbered-list" start="2" dir="auto"><li>記憶體分配會直接失敗，因為 malloc() 無法在作業系統中分配出高達 1 MB 且實體連續的記憶體空間。</li></ol><ol type="1" id="33aa15e2-9005-80bc-88a1-e9cbd8656ee7" class="numbered-list" start="3" dir="auto"><li>DMA controller 會將該 virtual address 誤認為 physical address 並直接寫入，導致覆寫到系統其他不可預知的 physical memory 區域，造成資料毀損或系統崩潰。</li></ol><ol type="1" id="33aa15e2-9005-80d2-aa87-dc3678e0ac41" class="numbered-list" start="4" dir="auto"><li>作業系統會偵測到非法的記憶體存取，立刻觸發 page fault 並將該應用程式強制終止 segmentation fault</li></ol></blockquote><details id="33aa15e2-9005-80d4-97ba-e1e4871915d4" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8030-a765-ce4724c6e5a6" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80ea-8115-f9dc6f937d9e" class="" dir="auto">DMA controller 會將該 virtual address 誤認為 physical address 並直接寫入，導致覆寫到系統其他不可預知的 physical memory 區域，造成資料毀損或系統崩潰。</p><hr id="33aa15e2-9005-8048-83ed-e11ce1c5317b" dir="auto"/><p id="33aa15e2-9005-80c8-9efc-d0c509fd89c7" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-802a-90b1-e56b910fe880" class="" dir="auto">應用程式拿到的指標是 virtual address，在 physical memory 中極可能是破碎且不連續的。 傳統 DMA controller 看不懂 virtual address，也沒有 CPU 的 MMU 可以幫忙翻譯。 它會把收到的數字當成 physical address 直接覆寫，這會摧毀作業系統或其他程式的資料。</p></div></p><hr id="33ca15e2-9005-808a-be86-e705ad5a26ad" dir="auto"/><p id="33ca15e2-9005-80f9-b1bd-d122f364e965" class="" dir="auto">(1) controller 不會因為收到錯誤的位址格式就改變其中斷行為模式。它只會忠實地對指定的錯誤位置執行連續的記憶體寫入。</p><p id="33ca15e2-9005-80b9-9174-f4545f1b686d" class="" dir="auto">(2) malloc() 分配的是 virtual memory，分配 1 MB 虛擬連續空間非常容易。問題不在於分配失敗，而在於開發者將 virtual address 錯誤地餵給了只懂 physical address 的硬體。</p><p id="33ca15e2-9005-8069-bb76-d8d6e7ba517c" class="" dir="auto">(4) page fault 是由 CPU 的 MMU 觸發的。在這個情境中，是 DMA controller 繞過了 CPU 直接對 RAM 進行讀寫， CPU 根本不知道硬體正在寫入錯誤的實體位置，因此不會觸發 page fault 來保護應用程式。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8035-a9bf-f6c44e6ddca7" dir="auto"/><ol type="1" id="33aa15e2-9005-80b3-a162-f923939f6496" class="numbered-list" start="9" dir="auto"><li>某學生主張： 「 DMA 是 interrupt 的進階版本，兩者只是減少 CPU 負擔的程度不同。」 以下哪個回應最精準？<blockquote id="33aa15e2-9005-80c5-870e-f7acfa9d823f" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8096-9d5b-cf021293496a" class="numbered-list" start="1" dir="auto"><li>兩者皆用於減少 CPU 與裝置之間的資料傳輸時間，但沒有前後版本的關係</li></ol><ol type="1" id="33aa15e2-9005-8081-adef-e34996ac6d1f" class="numbered-list" start="2" dir="auto"><li>DMA 仍需透過 CPU 執行 load/store 指令來完成資料搬移，不算一種進階</li></ol><ol type="1" id="33aa15e2-9005-803a-ba4b-c3d79712e918" class="numbered-list" start="3" dir="auto"><li>沒錯， interrupt 主要讓裝置與 CPU 間的資料同步， DMA 用於提升同步效率</li></ol><ol type="1" id="33aa15e2-9005-8037-abea-e12982713a75" class="numbered-list" start="4" dir="auto"><li>DMA 是資料傳輸方式，interrupt 是通知機制，兩者沒有前後版本的關係</li></ol></blockquote><details id="33aa15e2-9005-8038-adc0-e7753d258fe9" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-808b-9cab-c7989fbfe340" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80a2-94dd-f4c7650326de" class="" dir="auto">DMA 是資料傳輸方式，interrupt 是通知機制，兩者沒有前後版本的關係</p><hr id="33aa15e2-9005-806a-a65d-fbf1b34d9826" dir="auto"/><p id="33aa15e2-9005-80bb-a6f5-e2957f83ce93" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-805e-b52c-ed5f7387cc21" class="" dir="auto">DMA 是允許資料在外部設備與記憶體之間直接傳輸、不需要通過 CPU 的方法； interrupt 則是通知 CPU 的方法。</p></div></p><hr id="33ca15e2-9005-80e2-96a5-d7cdf1f7198c" dir="auto"/><p id="33ca15e2-9005-8076-bf20-fc93094b263a" class="" dir="auto">(1) DMA 是一種讓裝置不經過 CPU 直接對記憶體進行讀寫的傳輸機制， 不需 CPU 逐筆執行 load/store 指令，因此減少的是 CPU 的負擔與介入程度； interrupt 則是一種通知機制，它的目的在於避免 CPU 持續 polling， 而不是用來加速資料傳輸</p><p id="33ca15e2-9005-80f5-b5ef-e790f47482c2" class="" dir="auto">(2) DMA 的重點就在於可以不需要透過 CPU load/store 搬資料， 而 CPU 在這個機制當中只負責設定、不參與實際傳輸</p><p id="33ca15e2-9005-804e-b84e-df8332ff5bf5" class="" dir="auto">(3) interrupt 主要用於通知 CPU 裝置狀態，而非資料同步； 而 DMA 的目的是資料搬移</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-803c-b9b2-c410f65257dd" dir="auto"/><ol type="1" id="33aa15e2-9005-8037-8da0-c06929aeddab" class="numbered-list numbered-list-digits-2" start="10" dir="auto"><li>為何在缺乏 IOMMU 或 DMA access control 時，DMA 可能帶來安全風險，例如：DMA 遊戲外掛？<blockquote id="33aa15e2-9005-8005-a0de-cf9a6e031b28" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80bf-9c99-f9917ff07ebe" class="numbered-list" start="1" dir="auto"><li>因為 DMA 一定需要 physically contiguous memory，只要 memory 碎片化就會直接造成資安漏洞。</li></ol><ol type="1" id="33aa15e2-9005-8023-b4e1-eb6612cd21e1" class="numbered-list" start="2" dir="auto"><li>因為 DMA 一定會繞過 CPU 的所有控制邏輯，所以 CPU 完全無法得知任何 DMA 行為。</li></ol><ol type="1" id="33aa15e2-9005-8008-ad8c-f0df35c1068d" class="numbered-list" start="3" dir="auto"><li>因為 DMA 只能使用 virtual address，導致位址映射混亂，才會產生安全問題。</li></ol><ol type="1" id="33aa15e2-9005-8091-9bc0-f3c9adf735a7" class="numbered-list" start="4" dir="auto"><li>因為 DMA device 可直接對 memory 做讀寫；若缺乏 isolation 與 permission control，可能讀到或覆寫不該存取的 memory 區域。</li></ol></blockquote><details id="33aa15e2-9005-80b0-aad9-e11b123ebad4" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80ca-bc9c-f61b97c5fe14" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-804f-b589-fca6e02d7836" class="" dir="auto">因為 DMA device 可直接對 memory 做讀寫；若缺乏 isolation 與 permission control，可能讀到或覆寫不該存取的 memory 區域。</p><hr id="33aa15e2-9005-8080-8338-f51092064617" dir="auto"/><p id="33aa15e2-9005-8087-aa3f-dc5ffeadcab3" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8004-a862-cae080fdf682" class="" dir="auto">這是核心原因。DMA 直接對 memory 搬運資料，若沒有 IOMMU 或適當的 DMA access control，device 可能越權存取敏感 memory，造成資料外洩、資料毀損， 甚至 system stability 問題。</p></div></p><hr id="33ca15e2-9005-8086-9141-c780cae8296c" dir="auto"/><p id="33ca15e2-9005-8080-b517-de22b64a9eb1" class="" dir="auto">(1) memory 是否連續屬於可用性與效能問題，且可透過 scatter-gather 緩解；這不是 DMA 安全風險的根本原因。根本仍是是否有正確的 access isolation 與 permission control。</p><p id="33ca15e2-9005-80fe-8a73-e556778e4ab0" class="" dir="auto">(2) DMA 不是完全脫離 CPU。CPU/driver 仍會參與 setup 與 completion handling。 風險重點在於 memory access isolation 不足，而不是 CPU 完全看不到 DMA。</p><p id="33ca15e2-9005-80aa-a0ba-e899981548f7" class="" dir="auto">(3) DMA 常見使用的是 physical address（或經 IOMMU 轉換後的 address），不是只能用 virtual address。安全風險來源是存取範圍控制不足，不是位址型別本身。</p></div></aside></div></details></li></ol></div></details></div></details></div></div><hr id="33aa15e2-9005-80f8-8463-eea62097901e" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80de-98b7-f83c3624b191" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8033-9ce2-fdf4536dc412" class="" dir="auto">
+</p></div></aside></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

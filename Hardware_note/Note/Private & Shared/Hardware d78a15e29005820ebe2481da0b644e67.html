@@ -1,0 +1,773 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Hardware</title><meta name="data-notion-page-icon" content="/icons/computer-chip_gray.svg"/><link rel="icon" href="https://app.notion.com/icons/computer-chip_gray.svg"/><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+/* Override strong tags inside headings to maintain consistent weight */
+h1 strong,
+h2 strong,
+h3 strong {
+	font-weight: 600;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 10px;
+	padding: 1rem;
+}
+
+/* For default-background callouts, render the border outline. */
+.callout.block-color-default_background {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+figure,
+aside,
+details {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+
+	table.collection-content {
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	table.collection-content th,
+	table.collection-content td {
+		overflow-wrap: anywhere;
+	}
+
+	table.collection-content td > .user,
+	table.collection-content td > time {
+		white-space: pre-wrap;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content-wrapper {
+	overflow-x: auto;
+}
+
+@media only print {
+	.collection-content-wrapper {
+		overflow-x: visible;
+	}
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.collection-content td {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.column-list {
+	display: flex;
+	gap: 46px;
+}
+
+.column {
+	min-width: 0;
+	overflow: hidden;
+}
+
+.column > *:first-child {
+	margin-top: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding-inline: 0.125rem;
+	padding-block: 0.375rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+table {
+	border-collapse: collapse;
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol.numbered-list.numbered-list-digits-2 {
+	padding-inline-start: 2em;
+}
+
+ol.numbered-list.numbered-list-digits-3plus {
+	padding-inline-start: 2.4em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+/*
+ * Render emoji icons using a ::before pseudo-element to keep the glyph
+ * out of the DOM textContent traversal. This avoids double-rendering icons
+ * in callouts and page titles.
+ * NOTE(slim/html-export-pseudo-icons): I can't tagref this because it will
+ * flag as a duplicate tag after codegen.
+ */
+.icon[data-emoji]::before {
+	content: attr(data-emoji);
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.callout img.notion-static-icon {
+	width: 1em;
+	height: 1em;
+}
+
+.callout p {
+	margin: 0;
+}
+
+.callout h1,
+.callout h2,
+.callout h3 {
+	margin: 0 0 0.6rem;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	margin-right: 0.4em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+blockquote.quote-large {
+	font-size: 1.25em;
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.tab {
+	margin: 1.25em 0;
+	padding-inline: 1rem;
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.highlight-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.highlight-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.highlight-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.highlight-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.highlight-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.highlight-default_background {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray_background {
+	background: rgba(42, 28, 0, 0.07);
+}
+.highlight-brown_background {
+	background: rgba(139, 46, 0, 0.086);
+}
+.highlight-orange_background {
+	background: rgba(224, 101, 1, 0.129);
+}
+.highlight-yellow_background {
+	background: rgba(211, 168, 0, 0.137);
+}
+.highlight-teal_background {
+	background: rgba(0, 100, 45, 0.09);
+}
+.highlight-blue_background {
+	background: rgba(0, 124, 215, 0.094);
+}
+.highlight-purple_background {
+	background: rgba(102, 0, 178, 0.078);
+}
+.highlight-pink_background {
+	background: rgba(197, 0, 93, 0.086);
+}
+.highlight-red_background {
+	background: rgba(223, 22, 0, 0.094);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.block-color-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.block-color-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.block-color-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.block-color-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.block-color-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(240, 239, 237, 1);
+}
+.block-color-brown_background {
+	background: rgba(245, 237, 233, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 235, 222, 1);
+}
+.block-color-yellow_background {
+	background: rgba(249, 243, 220, 1);
+}
+.block-color-teal_background {
+	background: rgba(232, 241, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(229, 242, 252, 1);
+}
+.block-color-purple_background {
+	background: rgba(243, 235, 249, 1);
+}
+.block-color-pink_background {
+	background: rgba(250, 233, 241, 1);
+}
+.block-color-red_background {
+	background: rgba(252, 233, 231, 1);
+}
+.select-value-color-default { background-color: rgba(42, 28, 0, 0.07); }
+.select-value-color-gray { background-color: rgba(28, 19, 1, 0.11); }
+.select-value-color-brown { background-color: rgba(127, 51, 0, 0.156); }
+.select-value-color-orange { background-color: rgba(196, 88, 0, 0.203); }
+.select-value-color-yellow { background-color: rgba(209, 156, 0, 0.282); }
+.select-value-color-green { background-color: rgba(0, 96, 38, 0.156); }
+.select-value-color-blue { background-color: rgba(0, 118, 217, 0.203); }
+.select-value-color-purple { background-color: rgba(92, 0, 163, 0.141); }
+.select-value-color-pink { background-color: rgba(183, 0, 78, 0.152); }
+.select-value-color-red { background-color: rgba(206, 24, 0, 0.164); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style><style>@import url('https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex-swap.min.css')</style></head><body><article id="d78a15e2-9005-820e-be24-81da0b644e67" class="page serif" data-notion-page-icon="/icons/computer-chip_gray.svg"><header><img class="page-cover-image" src="Hardware/2bb146f811030e9a91b6654ac23101d1.jpg" style="object-position:center 34.74%"/><div class="page-header-icon page-header-icon-with-cover"><img class="icon notion-static-icon" src="https://app.notion.com/icons/computer-chip_gray.svg"/></div><h1 class="page-title" dir="auto">Hardware</h1><p class="page-description" dir="auto"></p><table class="properties"><tbody><tr class="property-row property-row-created_time"><th><span class="icon property-icon"><img src="https://app.notion.com/icons/clock_gray.svg" style="width:14px;height:14px;display:block"/></span>Created</th><td><time datetime="2026-01-27T11:00">January 27, 2026 11:00 AM</time></td></tr><tr class="property-row property-row-multi_select"><th><span class="icon property-icon"><img src="https://app.notion.com/icons/list_gray.svg" style="width:14px;height:14px;display:block"/></span>Tags</th><td></td></tr></tbody></table></header><div class="page-body"><div id="f0ba15e2-9005-8295-93ba-0151e560a219" class="column-list" data-notion-column-list="" dir="auto"><div id="c7ea15e2-9005-83ee-b09b-81564afb7c65" style="width:12.5%" class="column" data-notion-column-ratio="0.125" dir="auto"><hr id="11fa15e2-9005-82a3-ba36-014626921953" dir="auto"/><figure id="202a15e2-9005-82bf-90b9-811d5315e52c" class="image" data-notion-image="Hardware/Hardware.jpg" dir="ltr"><a href="Hardware/Hardware.jpg"><img style="width:336px" src="Hardware/Hardware.jpg"/></a></figure><h3 id="087a15e2-9005-82c8-ae7b-81cc3b4159fd" class="" dir="auto">NTHU</h3><details id="598a15e2-9005-83b9-86eb-015f3d0f435e" open="" class="block-color-gray toggle" data-notion-highlight="gray" dir="auto"><summary>CS210401</summary><div class="indented"><details id="c2ca15e2-9005-8371-9195-01e8a1408dde" open="" class="block-color-blue toggle" data-notion-highlight="blue" dir="auto"><summary>Sources</summary><div class="indented"><details id="1a8a15e2-9005-8347-97cb-019187f7679c" open="" class="block-color-gray toggle" data-notion-highlight="gray" dir="auto"><summary>OCW</summary><div class="indented"><ul id="aa8a15e2-9005-83a9-8533-0129ed44e972" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Verilog Intro<figure id="e05a15e2-9005-8316-ad17-01dabf153e5e" dir="ltr"><a href="https://youtube.com/playlist?list=PLG3uxYlJz1efRsrZ5_ovcCnbJxl6uRtPX&amp;si=9zrNYSOivFoytqaV" class="bookmark source"><div class="bookmark-info"><div class="bookmark-text"><div class="bookmark-title">Hardware - Verilog</div></div><div class="bookmark-href"><img src="https://www.youtube.com/s/desktop/db8cd7aa/img/favicon_144x144.png" class="icon bookmark-icon"/>https://youtube.com/playlist?list=PLG3uxYlJz1efRsrZ5_ovcCnbJxl6uRtPX&amp;si=9zrNYSOivFoytqaV</div></div><img src="https://i.ytimg.com/vi/lBZNzkTDzro/hqdefault.jpg" class="bookmark-image"/></a></figure></li></ul><ul id="956a15e2-9005-8210-810f-0135ab989e48" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Course Record<figure id="bd6a15e2-9005-83d7-8678-01b6db39be8e" dir="ltr"><a href="https://youtube.com/playlist?list=PLG3uxYlJz1edUzGH7DB5DL_Hwd7YT198h&amp;si=If29rCgAL2pdWb3F" class="bookmark source"><div class="bookmark-info"><div class="bookmark-text"><div class="bookmark-title">Hardware - Record</div></div><div class="bookmark-href"><img src="https://www.youtube.com/s/desktop/e2b70753/img/favicon_144x144.png" class="icon bookmark-icon"/>https://youtube.com/playlist?list=PLG3uxYlJz1edUzGH7DB5DL_Hwd7YT198h&amp;si=If29rCgAL2pdWb3F</div></div><img src="https://i.ytimg.com/vi/6Zp9HAL1Sdg/hqdefault.jpg" class="bookmark-image"/></a></figure><p id="c4da15e2-9005-83e6-b6c6-0130685cbed7" class="" dir="auto">
+</p></li></ul></div></details><details id="88ea15e2-9005-83a0-ad37-01a35f6eaf63" open="" class="block-color-gray toggle" data-notion-highlight="gray" dir="auto"><summary>Slide</summary><div class="indented"><figure id="8eda15e2-9005-8250-b8d2-815f18787da1" dir="ltr"><a href="https://drive.google.com/drive/folders/1BF2fz4zgrHnfrSCNsVzbvDRXcVjok3PA?usp=sharing" class="bookmark source"><div class="bookmark-info"><div class="bookmark-text"><div class="bookmark-title">Hardware - Google Drive</div></div><div class="bookmark-href"><img src="https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png" class="icon bookmark-icon"/>https://drive.google.com/drive/folders/1BF2fz4zgrHnfrSCNsVzbvDRXcVjok3PA?usp=sharing</div></div></a></figure></div></details><details id="799a15e2-9005-8305-98e6-011ced5ea850" open="" class="block-color-gray toggle" data-notion-highlight="gray" dir="auto"><summary>GitHub</summary><div class="indented"><ul id="3fda15e2-9005-8271-a70d-816a998b0889" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Assignment<figure id="a2ca15e2-9005-83dc-9316-810448d95e18" dir="ltr"><div class="source">https://github.com/ivylingchiang/NTHU_HardwareDesign</div></figure></li></ul><ul id="03da15e2-9005-832d-9df9-0179ff7d71a5" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Final Project<figure id="d56a15e2-9005-8333-9e95-0140c607a731" dir="ltr"><div class="source">https://github.com/ivylingchiang/NTHU_HardwareDesign-FinalProject</div></figure></li></ul><p id="620a15e2-9005-8270-8d9f-812c6f045470" class="" dir="auto">
+</p></div></details></div></details></div></details><details id="ac3a15e2-9005-8312-87b3-017053af3224" open="" class="block-color-gray toggle" data-notion-highlight="gray" dir="auto"><summary>CS543300</summary><div class="indented"><details id="279a15e2-9005-82d2-b103-8188306bba4b" open="" class="block-color-blue toggle" data-notion-highlight="blue" dir="auto"><summary>Sources</summary><div class="indented"><p id="53ea15e2-9005-82c1-94dd-81a4226d0b84" class="" dir="auto"><mark class="highlight-default" data-notion-highlight="default"><a href="https://lego.sys-nthu.tw/policies">Course Web</a></mark></p><p id="31fa15e2-9005-80f9-8a92-f2cd32e73fc6" class="" dir="auto"><mark class="highlight-default" data-notion-highlight="default"><a href="https://github.com/ivylingchiang/ast26-quiz-ivyling.git">GitHub</a></mark></p></div></details></div></details><hr id="ea8a15e2-9005-835f-acf9-816f1344ff85" dir="auto"/><figure id="5aba15e2-9005-835d-ac30-0198589d5b39" class="image" data-notion-image="Hardware/c6422d43ffe7171f7f25159dc4ff5721.jpg" dir="ltr"><a href="Hardware/c6422d43ffe7171f7f25159dc4ff5721.jpg"><img style="width:181.33750915527344px" src="Hardware/c6422d43ffe7171f7f25159dc4ff5721.jpg"/></a></figure><h3 id="340a15e2-9005-836d-86ed-0179cf35de95" class="" dir="auto">NCKU</h3><p id="bafa15e2-9005-831f-91dc-01a52f45e6c6" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">loading …</mark></p><p id="617a15e2-9005-829e-8b8e-018a0ff94336" class="" dir="auto">
+</p></div><div id="ce8a15e2-9005-82b0-b30e-819fdb4e988e" style="width:87.5%" class="column" data-notion-column-ratio="0.875" dir="auto"><hr id="e2fa15e2-9005-821d-9e2f-81fb96a162d7" dir="auto"/><h1 id="eb8a15e2-9005-830d-aae3-01ca229f1730" class="block-color-default_background" data-notion-highlight="default_background" dir="auto">Hardware Design and Lab.</h1><blockquote id="97ba15e2-9005-83d1-85c9-01b05f5fd1e5" class="block-color-gray" data-notion-highlight="gray" dir="auto">Includes the fundamental concepts of hardware design and their implementation on the FPGA board(<a href="https://digilent.com/reference/programmable-logic/basys-3/start">Basys 3</a>). </blockquote><hr id="b3ea15e2-9005-823d-8c5a-814327bd420f" dir="auto"/><h2 id="ceda15e2-9005-82f1-8165-81df9e68a88e" class="block-color-blue" data-notion-highlight="blue" dir="auto">Course Outline</h2><p id="ec2a15e2-9005-82ef-bdd5-81f547ecae2e" class="" dir="auto">1. Gate-level modeling</p><p id="b13a15e2-9005-82cc-8f03-81b45482c106" class="" dir="auto">2. Data-flow modeling and Behavioral modeling</p><p id="2bca15e2-9005-82f7-985e-81481b6c9d94" class="" dir="auto">3. Sequential circuits &amp; FPGA board</p><p id="2efa15e2-9005-8319-80d1-01266e7c946c" class="" dir="auto">4. Finite State Machines &amp; FPGA board</p><p id="d3ba15e2-9005-828a-907e-810cbde50b1e" class="" dir="auto">5. Advanced circuit implementation, Finite State Machine, and FPGA board</p><p id="42da15e2-9005-823d-a257-81f684f04918" class="" dir="auto">6. Integration with different sensors and peripherals</p><p id="7c6a15e2-9005-8239-9f1a-81529f64e84f" class="" dir="auto">7. Final Project: The students will submit a proposal, then exercise their creativity to build the project.</p><hr id="90ba15e2-9005-8204-a08e-81afc1839b90" dir="auto"/><h2 id="a94a15e2-9005-824e-8a71-01cf0c261bcb" class="block-color-red" data-notion-highlight="red" dir="auto">Note</h2><figure id="2f5a15e2-9005-8010-af59-ddcd309a6317" class="link-to-page"><a href="Hardware/Basic%20Verilog%202f5a15e290058010af59ddcd309a6317.html" data-notion-page-id="2f5a15e2-9005-8010-af59-ddcd309a6317" data-notion-space-id="e8ca15e2-9005-814c-9a7f-0003626048ef"><span class="icon" data-emoji="🖤"></span>Basic Verilog</a></figure><figure id="2f5a15e2-9005-808b-a844-f15c2cf98a74" class="link-to-page"><a href="Hardware/Practice%202f5a15e29005808ba844f15c2cf98a74.html" data-notion-page-id="2f5a15e2-9005-808b-a844-f15c2cf98a74" data-notion-space-id="e8ca15e2-9005-814c-9a7f-0003626048ef"><span class="icon" data-emoji="🖤"></span>Practice</a></figure><figure id="2f9a15e2-9005-80db-9b9a-e246a52ac1bd" class="link-to-page"><a href="Hardware/VLSI%20Digital%20Signal%20Processing%202f9a15e2900580db9b9ae246a52ac1bd.html" data-notion-page-id="2f9a15e2-9005-80db-9b9a-e246a52ac1bd" data-notion-space-id="e8ca15e2-9005-814c-9a7f-0003626048ef"><span class="icon" data-emoji="🎸"></span>VLSI Digital Signal Processing</a></figure><hr id="fe2a15e2-9005-8231-98b9-019083586241" dir="auto"/><h1 id="328a15e2-9005-8009-a6a2-d0204508ee84" class="" dir="auto"> Introduction to Embedded Systems</h1><blockquote id="328a15e2-9005-800d-9052-d2480dbc4d21" class="block-color-gray" data-notion-highlight="gray" dir="auto">The course is divided into theoretical lectures and practical lab sessions. Labs are designed to reinforce lecture content with hands-on experience using microprocessor development boards.</blockquote><hr id="328a15e2-9005-809c-b25b-e2aa61464b66" dir="auto"/><h2 id="328a15e2-9005-80b8-8cd2-f31f0cf1a3e7" class="block-color-blue" data-notion-highlight="blue" dir="auto">Course Outline</h2><p id="bfb7ef4f-f58c-446a-9b44-497c45f35390" class="" dir="auto">This course will introduce the architecture and design process of embedded systems. We will introduce the operation mechanism of microprocessor software such as registers, I/O ports, addressing modes, timers, and interrupts. Upon mastering microprocessor<br/>principles, the course will proceed to introduce common microprocessor interfaces including UART, I2C, and ADC/DAC. Furthermore, students will be guided to apply embedded operating systems for projects. The objective of this course is to cultivate students&#x27; capabilities in embedded system design, enabling them to independently develop systems tailored to specific requirements.</p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="328a15e2-9005-8033-8d5c-d291660fbf71" dir="ltr"><div style="width:100%"><p id="328a15e2-9005-8084-b7c7-e48975d2ff85" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">課程共12個實驗，完成每個實驗5%: 60%<br/>Final Test: 40%</mark></p></div></aside><hr id="328a15e2-9005-8009-978f-f0be515dec38" dir="auto"/><h2 id="328a15e2-9005-806e-8755-c325014700f1" class="block-color-red" data-notion-highlight="red" dir="auto">NOTE</h2><figure id="328a15e2-9005-80a0-9aa5-f5ab0da0a2bf" class="link-to-page"><a href="Hardware/Introduction%20to%20Embedded%20Systems%20328a15e2900580a09aa5f5ab0da0a2bf.html" data-notion-page-id="328a15e2-9005-80a0-9aa5-f5ab0da0a2bf" data-notion-space-id="e8ca15e2-9005-814c-9a7f-0003626048ef"><span class="icon" data-emoji="🔧"></span>Introduction to Embedded Systems</a></figure><hr id="328a15e2-9005-80d5-967e-cedeea6c7743" dir="auto"/><h1 id="af6a15e2-9005-8275-8981-81901486d027" class="" dir="auto">Storage System Design and Implementation</h1><blockquote id="c66a15e2-9005-83c3-b25f-81d706f63fd6" class="block-color-gray" data-notion-highlight="gray" dir="auto">file-system, operating system, storage system, distributed system, research-oriented</blockquote><hr id="496a15e2-9005-82f4-b1d9-81422b44be18" dir="auto"/><h2 id="4f0a15e2-9005-820d-83b2-81c236e0d02b" class="block-color-blue" data-notion-highlight="blue" dir="auto">Course Outline</h2><p id="eddd1cb8-ccb8-4714-947f-50cdcfb928e2" class="" dir="auto">In this course, we will explore the design and implementation of advanced storage systems. We will learn the foundational principles and cutting-edge research that shape how modern operating systems manage data. Please view the details here:</p><p id="2b463a28-69ba-4409-9391-80f12fc8ddb6" class="" dir="auto">https://lego.sys-nthu.tw/policies</p><hr id="3d2a15e2-9005-8302-8f5c-017d23a49a46" dir="auto"/><h2 id="65ea15e2-9005-8214-9865-8149bca7f9d2" class="block-color-red" data-notion-highlight="red" dir="auto">NOTE</h2><figure id="3eda15e2-9005-82e0-a652-8143d2cbaf87" class="link-to-page"><a href="Hardware/Storage%20System%20Design%20and%20Implementation%203eda15e2900582e0a6528143d2cbaf87.html" data-notion-page-id="3eda15e2-9005-82e0-a652-8143d2cbaf87" data-notion-space-id="e8ca15e2-9005-814c-9a7f-0003626048ef"><span class="icon" data-emoji="🔖"></span>Storage System Design and Implementation</a></figure><figure id="31fa15e2-9005-8031-99e0-cb2dbcee7808" class="link-to-page"><a href="Hardware/Flash%20&amp;%20SSD%20Internals%2031fa15e29005803199e0cb2dbcee7808.html" data-notion-page-id="31fa15e2-9005-8031-99e0-cb2dbcee7808" data-notion-space-id="e8ca15e2-9005-814c-9a7f-0003626048ef"><span class="icon" data-emoji="🧱"></span>Flash &amp; SSD Internals</a></figure><figure id="31fa15e2-9005-8036-954c-e5804d394e09" class="link-to-page"><a href="Hardware/I%20O%20Interfaces%20&amp;%20NVMe%2031fa15e290058036954ce5804d394e09.html" data-notion-page-id="31fa15e2-9005-8036-954c-e5804d394e09" data-notion-space-id="e8ca15e2-9005-814c-9a7f-0003626048ef"><span class="icon" data-emoji="🧭"></span>I/O Interfaces &amp; NVMe</a></figure><figure id="31fa15e2-9005-80dd-b9f5-fa67ce777213" class="link-to-page"><a href="Hardware/Indexing%20&amp;%20Data%20Structures%2031fa15e2900580ddb9f5fa67ce777213.html" data-notion-page-id="31fa15e2-9005-80dd-b9f5-fa67ce777213" data-notion-space-id="e8ca15e2-9005-814c-9a7f-0003626048ef"><span class="icon" data-emoji="🔧"></span>Indexing &amp; Data Structures</a></figure><figure id="31fa15e2-9005-8078-b744-ea3464ff8f34" class="link-to-page"><a href="Hardware/File%20Systems%2031fa15e290058078b744ea3464ff8f34.html" data-notion-page-id="31fa15e2-9005-8078-b744-ea3464ff8f34" data-notion-space-id="e8ca15e2-9005-814c-9a7f-0003626048ef"><span class="icon" data-emoji="✉️"></span>File Systems</a></figure><figure id="31fa15e2-9005-80cb-a790-ce12761adc81" class="link-to-page"><a href="Hardware/Reliability%20&amp;%20Coding%2031fa15e2900580cba790ce12761adc81.html" data-notion-page-id="31fa15e2-9005-80cb-a790-ce12761adc81" data-notion-space-id="e8ca15e2-9005-814c-9a7f-0003626048ef"><span class="icon" data-emoji="🎆"></span>Reliability &amp; Coding</a></figure><figure id="31fa15e2-9005-8099-a2bf-db232bf382fd" class="link-to-page"><a href="Hardware/Data%20Systems%2031fa15e290058099a2bfdb232bf382fd.html" data-notion-page-id="31fa15e2-9005-8099-a2bf-db232bf382fd" data-notion-space-id="e8ca15e2-9005-814c-9a7f-0003626048ef"><span class="icon" data-emoji="🌇"></span>Data Systems</a></figure><hr id="c86a15e2-9005-82d5-858c-01dbe9630386" dir="auto"/><h3 id="340a15e2-9005-80f7-a00f-edc4e4c0a140" class="" dir="auto"><mark class="highlight-purple" data-notion-highlight="purple">RESEARCH</mark></h3><details id="340a15e2-9005-8058-bd86-e288d9490e6f" open="" class="toggle" dir="auto"><summary><strong>Record File</strong></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="340a15e2-9005-80c8-a09a-f3259f593901" dir="ltr"><div style="width:100%"><details id="340a15e2-9005-8092-9b50-fdb03c277b3c" open="" class="toggle" dir="auto"><summary><strong>雲端共用資料夾</strong></summary><div class="indented"><ul id="342a15e2-9005-80ad-8e96-f02a8d6e1158" class="bulleted-list" dir="auto"><li style="list-style-type:disc">總覽，所有資料都在這邊</li></ul><ul id="342a15e2-9005-80aa-a532-ee1e092308c6" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><a href="https://drive.google.com/drive/folders/1dbeILrT_JIdh0MgaCUZ_ppOX1HSbljik">https://drive.google.com/drive/folders/1dbeILrT_JIdh0MgaCUZ_ppOX1HSbljik</a></li></ul></div></details><details id="340a15e2-9005-804c-b7e8-c1e9f9b83fd7" open="" class="toggle" dir="auto"><summary><strong>Guide Line</strong></summary><div class="indented"><ul id="342a15e2-9005-8091-a91f-dbb8ebc21183" class="bulleted-list" dir="auto"><li style="list-style-type:disc">題目說明，包含背景、研究問題、建議文獻、建議探索的 codebase、以及如何開始</li></ul><ul id="342a15e2-9005-80e6-b58c-d98860637338" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><a href="https://docs.google.com/document/d/1VnBZn60Dsb0aj-bW-ONwQQui-VO2Sq12lappLLVw1dI/edit?tab=t.0">https://docs.google.com/document/d/1VnBZn60Dsb0aj-bW-ONwQQui-VO2Sq12lappLLVw1dI/edit?tab=t.0</a></li></ul></div></details><details id="340a15e2-9005-8076-a821-c9b8ed331e73" open="" class="toggle" dir="auto"><summary><strong>Project Tracking</strong></summary><div class="indented"><ul id="342a15e2-9005-8012-8f2f-c0474bf4bf1c" class="bulleted-list" dir="auto"><li style="list-style-type:disc">專題進度追蹤工具(組員資料、分工/ 13 個 milestone/ 每週填一列/ )</li></ul><ul id="342a15e2-9005-802d-98bc-c82618709ab8" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><a href="https://docs.google.com/spreadsheets/d/1upbmA7gq4fMJc0Zj6-rspH8lhR6tTqzgUfC8KrCHwfY/edit?gid=379339229#gid=379339229">https://docs.google.com/spreadsheets/d/1upbmA7gq4fMJc0Zj6-rspH8lhR6tTqzgUfC8KrCHwfY/edit?gid=379339229#gid=379339229</a></li></ul></div></details><details id="340a15e2-9005-804f-b374-f159c75e9bd5" open="" class="toggle" dir="auto"><summary><strong>Research Log</strong></summary><div class="indented"><ul id="342a15e2-9005-80c3-a472-ff8ba059b26b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">研究日誌</li></ul><ul id="342a15e2-9005-800c-8be2-e00a649243c3" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><a href="https://docs.google.com/document/d/1bidmbOY4wmb8xB9KDwPkUx-JnkVKslc-KTWdK1AbaBE/edit?tab=t.0">https://docs.google.com/document/d/1bidmbOY4wmb8xB9KDwPkUx-JnkVKslc-KTWdK1AbaBE/edit?tab=t.0</a></li></ul></div></details><details id="340a15e2-9005-80e9-8275-eceb36a3f575" open="" class="toggle" dir="auto"><summary><strong>Learning Notes</strong></summary><div class="indented"><ul id="342a15e2-9005-8046-a866-c4451e024f3a" class="bulleted-list" dir="auto"><li style="list-style-type:disc">記錄學習筆記</li></ul><ul id="342a15e2-9005-8061-8556-ca59ba767097" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><a href="https://docs.google.com/document/d/1N-wQ0_MkPHC4N2-YzUmkDPHxt0fOYFsAjRHIR4qeD0Q/edit?tab=t.0">https://docs.google.com/document/d/1N-wQ0_MkPHC4N2-YzUmkDPHxt0fOYFsAjRHIR4qeD0Q/edit?tab=t.0</a></li></ul></div></details></div></aside><details id="344a15e2-9005-80e3-9870-cf234b2e1a0e" open="" class="toggle" dir="auto"><summary>Key Word File</summary><div class="indented"><figure id="344a15e2-9005-8077-b9f6-fea577fcd7dc" class="link-to-page"><a href="Hardware/Record%20344a15e290058077b9f6fea577fcd7dc.html" data-notion-page-id="344a15e2-9005-8077-b9f6-fea577fcd7dc" data-notion-space-id="e8ca15e2-9005-814c-9a7f-0003626048ef"><img class="icon notion-static-icon" src="https://app.notion.com/icons/airplane_lightgray.svg"/>Record</a></figure></div></details></div></details><details id="340a15e2-9005-801c-860f-e2a69c681ce1" open="" class="toggle" dir="auto"><summary><strong>Final Result</strong></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="340a15e2-9005-80c5-8000-e02cbdbdf923" dir="ltr"><div style="width:100%"><ul id="ff317485-944b-4cdb-b337-e4828638a326" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Demo 影片：</strong> 每組製作一段展示影片，呈現專題成果。</li></ul><ul id="1c8d5fcf-63ef-4c7b-8acf-fdb74e1e9b1e" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>書面報告：</strong> 描述研究動機、方法、實驗設計與實驗結果。</li></ul><ul id="44038ea3-f1bc-45ef-ba80-a31aeb127d86" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>GitHub Repository：</strong> 存放所有程式碼，實驗必須具備可重複性（reproducibility）。</li></ul></div></aside></div></details><hr id="340a15e2-9005-8004-b322-dc45df9bf4df" dir="auto"/></div></div><h3 id="a3ba15e2-9005-83d6-9613-01ad313c5464" class="" dir="auto">Comment</h3><aside class="block-color-gray callout" data-notion-callout="" data-notion-callout-background="gray" style="white-space:pre-wrap;display:flex" id="d08a15e2-9005-82ed-9bcd-01b8bb6eaeef" dir="ltr"><div style="width:100%"><p id="a8aa15e2-9005-83e4-af14-01c1b6ad26b3" class="" dir="auto">Anything want to add ?</p></div></aside><p id="360a15e2-9005-839b-8034-81965c3c09f5" class="" dir="auto">
+</p><p id="b6aa15e2-9005-8202-87e5-819e46222750" class="" dir="auto">
+</p><p id="17aa15e2-9005-8378-ac3d-01c46fdaa11e" class="" dir="auto">
+</p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

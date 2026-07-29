@@ -1,0 +1,770 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Block I/O Fundamentals</title><meta name="data-notion-page-icon" content="🧱"/><link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2290%22%3E%F0%9F%A7%B1%3C%2Ftext%3E%3C%2Fsvg%3E"/><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+/* Override strong tags inside headings to maintain consistent weight */
+h1 strong,
+h2 strong,
+h3 strong {
+	font-weight: 600;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 10px;
+	padding: 1rem;
+}
+
+/* For default-background callouts, render the border outline. */
+.callout.block-color-default_background {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+figure,
+aside,
+details {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+
+	table.collection-content {
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	table.collection-content th,
+	table.collection-content td {
+		overflow-wrap: anywhere;
+	}
+
+	table.collection-content td > .user,
+	table.collection-content td > time {
+		white-space: pre-wrap;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content-wrapper {
+	overflow-x: auto;
+}
+
+@media only print {
+	.collection-content-wrapper {
+		overflow-x: visible;
+	}
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.collection-content td {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.column-list {
+	display: flex;
+	gap: 46px;
+}
+
+.column {
+	min-width: 0;
+	overflow: hidden;
+}
+
+.column > *:first-child {
+	margin-top: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding-inline: 0.125rem;
+	padding-block: 0.375rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+table {
+	border-collapse: collapse;
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol.numbered-list.numbered-list-digits-2 {
+	padding-inline-start: 2em;
+}
+
+ol.numbered-list.numbered-list-digits-3plus {
+	padding-inline-start: 2.4em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+/*
+ * Render emoji icons using a ::before pseudo-element to keep the glyph
+ * out of the DOM textContent traversal. This avoids double-rendering icons
+ * in callouts and page titles.
+ * NOTE(slim/html-export-pseudo-icons): I can't tagref this because it will
+ * flag as a duplicate tag after codegen.
+ */
+.icon[data-emoji]::before {
+	content: attr(data-emoji);
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.callout img.notion-static-icon {
+	width: 1em;
+	height: 1em;
+}
+
+.callout p {
+	margin: 0;
+}
+
+.callout h1,
+.callout h2,
+.callout h3 {
+	margin: 0 0 0.6rem;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	margin-right: 0.4em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+blockquote.quote-large {
+	font-size: 1.25em;
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.tab {
+	margin: 1.25em 0;
+	padding-inline: 1rem;
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.highlight-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.highlight-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.highlight-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.highlight-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.highlight-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.highlight-default_background {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray_background {
+	background: rgba(42, 28, 0, 0.07);
+}
+.highlight-brown_background {
+	background: rgba(139, 46, 0, 0.086);
+}
+.highlight-orange_background {
+	background: rgba(224, 101, 1, 0.129);
+}
+.highlight-yellow_background {
+	background: rgba(211, 168, 0, 0.137);
+}
+.highlight-teal_background {
+	background: rgba(0, 100, 45, 0.09);
+}
+.highlight-blue_background {
+	background: rgba(0, 124, 215, 0.094);
+}
+.highlight-purple_background {
+	background: rgba(102, 0, 178, 0.078);
+}
+.highlight-pink_background {
+	background: rgba(197, 0, 93, 0.086);
+}
+.highlight-red_background {
+	background: rgba(223, 22, 0, 0.094);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.block-color-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.block-color-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.block-color-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.block-color-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.block-color-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(240, 239, 237, 1);
+}
+.block-color-brown_background {
+	background: rgba(245, 237, 233, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 235, 222, 1);
+}
+.block-color-yellow_background {
+	background: rgba(249, 243, 220, 1);
+}
+.block-color-teal_background {
+	background: rgba(232, 241, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(229, 242, 252, 1);
+}
+.block-color-purple_background {
+	background: rgba(243, 235, 249, 1);
+}
+.block-color-pink_background {
+	background: rgba(250, 233, 241, 1);
+}
+.block-color-red_background {
+	background: rgba(252, 233, 231, 1);
+}
+.select-value-color-default { background-color: rgba(42, 28, 0, 0.07); }
+.select-value-color-gray { background-color: rgba(28, 19, 1, 0.11); }
+.select-value-color-brown { background-color: rgba(127, 51, 0, 0.156); }
+.select-value-color-orange { background-color: rgba(196, 88, 0, 0.203); }
+.select-value-color-yellow { background-color: rgba(209, 156, 0, 0.282); }
+.select-value-color-green { background-color: rgba(0, 96, 38, 0.156); }
+.select-value-color-blue { background-color: rgba(0, 118, 217, 0.203); }
+.select-value-color-purple { background-color: rgba(92, 0, 163, 0.141); }
+.select-value-color-pink { background-color: rgba(183, 0, 78, 0.152); }
+.select-value-color-red { background-color: rgba(206, 24, 0, 0.164); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style><style>@import url('https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex-swap.min.css')</style></head><body><article id="33aa15e2-9005-803a-847e-daa06ed1d9cc" class="page serif" data-notion-page-icon="🧱"><header><img class="page-cover-image" src="https://app.notion.com/images/page-cover/met_william_morris_1877_willow.jpg" style="object-position:center 90%"/><div class="page-header-icon page-header-icon-with-cover"><span class="icon" data-emoji="🧱"></span></div><h1 class="page-title" dir="auto"><strong>Block I/O Fundamentals</strong></h1><p class="page-description" dir="auto"></p><table class="properties"><tbody></tbody></table></header><div class="page-body"><div id="33aa15e2-9005-8027-8aca-cc3ad243eb79" class="column-list" data-notion-column-list="" dir="auto"><div id="33aa15e2-9005-80dd-a221-d197e7058d96" style="width:18.75%" class="column" data-notion-column-ratio="0.1875" dir="auto"><hr id="33aa15e2-9005-80d1-8136-f979a8fb7a19" dir="auto"/><figure id="33aa15e2-9005-8064-9103-d3eede77f941" class="image" data-notion-image="../../Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg" dir="ltr"><a href="../../Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg"><img style="width:548.375px" src="../../Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg"/></a></figure><p id="33aa15e2-9005-80bf-8f92-d94b0f415862" class="" dir="auto">
+</p></div><div id="33aa15e2-9005-809a-8a2b-ebf39075d58a" style="width:81.25%" class="column" data-notion-column-ratio="0.8125" dir="auto"><h3 id="33aa15e2-9005-8032-b8e2-f3c1888e6029" class="" dir="auto">Block I/O Fundamentals</h3><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8051-af07-f85f50ecff7c" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-809f-ba8b-e4fb86734293" class="" dir="auto">每次你按下 Ctrl+S 存檔、打開一個 app、或是載入遊戲的關卡，背後都有一連串的 I/O 操作在你看不到的地方發生。你的程式發出讀寫請求，作業系統把它轉成 block device 的操作，再交給底層硬體執行。同樣一個遊戲，在一台電腦上 2 秒就載入完成，在另一台卻要 30 秒，差異不只是「硬體比較快」這麼簡單，而是整條 I/O 路徑的效率問題。要理解這些差異，我們得先從最底層的抽象開始。</p></div></aside><blockquote id="33aa15e2-9005-8003-afb5-f47fe6bdf00e" class="" dir="auto">Reference: </blockquote><hr id="33aa15e2-9005-80da-94b9-d200441f6a18" dir="auto"/><details id="33aa15e2-9005-8094-9582-ec8d8355dda6" open="" class="toggle" dir="auto"><summary><strong>Classification</strong></summary><div class="indented"><p id="33aa15e2-9005-803a-9c53-e3b063dc3fee" class="" dir="auto">
+</p><hr id="33aa15e2-9005-8020-b081-cf8009568eb8" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80a9-8fd6-fcd239f05724" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80e1-a983-e758029d1f7a" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Extra Component</mark></p><hr id="33aa15e2-9005-801a-aa2b-fa66d1d5b06b" dir="auto"/><p id="33aa15e2-9005-80a4-bf42-f48b863c0d7f" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Reference:</mark></p></div></aside><hr id="33aa15e2-9005-80c4-8a63-f354eb584754" dir="auto"/></div></details><details id="33aa15e2-9005-805c-bb87-e330e14f675d" open="" class="toggle" dir="auto"><summary><strong>Key Word Definition/ Discussion</strong></summary><div class="indented"><details id="33aa15e2-9005-801d-ad62-f9ef0d8e1d91" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Block device</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8094-937b-d4dd9a708767" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-802e-9b82-f8207807b011" class="" dir="auto">Block device 是一種儲存裝置介面，資料以「固定大小的 block」為單位進行讀寫（例如 512B / 4KB），並透過 block address（LBA）來存取。</p></div></aside><hr id="33aa15e2-9005-809e-bdd8-cef61a259c73" dir="auto"/><p id="3b1a8ab0-a218-4683-bbe3-d9c23f2603fa" class="" dir="auto"><strong>Block Device Abstraction</strong></p><p id="1ef55a66-5add-4aa0-af98-3ef2cd0e4ecf" class="" dir="auto">作業系統把所有儲存裝置（不管是 HDD、SSD、還是 NVMe）都抽象成一個「由固定大小 block 排成的陣列」。每個 block 通常是 512 bytes 或 4KB。你不需要去想「我要把資料寫到 SSD 裡面第 3 顆 NAND chip 的第 17 個 block 的第 42 個 page」，你只需要指定 block 編號，告訴 OS 你要讀或寫，剩下的事情由 device driver 和裝置本身去處理。</p><p id="d584cea2-3508-41c0-9a38-f75f738f67a2" class="" dir="auto">這個 abstraction layer 是所有儲存系統的共同基礎。不管你後面學的是 file system、database、還是 key-value store，它們最底層都是在對 block device 發出 read 和 write 請求。搞清楚這層抽象的性質和限制，後面的東西會順很多。</p><hr id="33aa15e2-9005-8088-9579-d9d129c8e210" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80fc-980a-c3486e25e47d" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8044-b10b-f899d40b4795" class="" dir="auto">Reference: </p></div></aside><hr id="33aa15e2-9005-8021-a1b7-d18efe480546" dir="auto"/></div></details><details id="33ba15e2-9005-805b-b1bd-dccfb47c3155" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>IOPS vs Bandwidth</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-8064-a2c1-c75183e21cfe" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-80f8-afd6-ebf0598a4116" class="" dir="auto">衡量儲存系統效能的兩大基礎指標，分別對應不同特性的 Workload。</p></div></aside><hr id="33ba15e2-9005-8097-ba47-d453cd296f71" dir="auto"/><p id="f4432607-b9f8-4b5c-9fcc-10a613e838ee" class="" dir="auto"><strong>IOPS</strong>（I/O Operations Per Second）衡量的是「每秒能完成幾次 I/O 操作」。主要反映儲存裝置處理高頻率、小檔案的併發能力。</p><p id="33ba15e2-9005-802b-9398-fa62a3cbc3ff" class="" dir="auto"><strong>Bandwidth</strong>（也叫 throughput）衡量的是「每秒能傳多少資料量」，單位通常是 MB/s 或 GB/s。主要反映連續讀寫大檔案的能力。</p><hr id="33ba15e2-9005-80b6-86f3-c85545151077" dir="auto"/><ul id="6ff05785-fe2d-4250-85ef-7c7fcb97bc4d" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Random Small I/O (瓶頸在 IOPS)：</strong> <p id="33ba15e2-9005-8052-ac74-ecb3c7461e84" class="" dir="auto">例如遊戲載入關卡時，需要讀取大量幾 KB 的材質、模型與著色器檔案，或資料庫進行大量隨機 Point Lookup。<br/>假設一顆 NVMe SSD 的 Random 4KB Read 可達 500K IOPS，每次讀 4KB，實際頻寬只用到約 2 GB/s（500K × 4KB），遠未達到硬體頻寬上限，但 IOPS 已經飽和。</p></li></ul><ul id="e6df29fe-9c67-46e9-9646-bf2f71e8faaf" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Sequential Large I/O (瓶頸在 Bandwidth)：</strong> <p id="33ba15e2-9005-800e-9762-c20cebefd1f4" class="" dir="auto">例如將一部 10GB 的影片複製到另一個資料夾，或影片串流應用的連續讀取。<br/>假設每次讀取 256KB 的大 Block，在達到硬體 3.5 GB/s 的 Bandwidth 上限時，IOPS 需求僅約 14K（3.5 GB/s ÷ 256KB），此時瓶頸完全在資料吞吐量。</p></li></ul><p id="a2e1ae42-3f50-4f5c-ac4d-89c2341b5567" class="" dir="auto">因此，評估儲存效能的第一個問題永遠是：「Workload 屬於 Random Small I/O 還是 Sequential Large I/O？」釐清這點才能決定正確的優化方向。</p><hr id="33ba15e2-9005-8086-acf0-c60d78177fa4" dir="auto"/><figure id="33ba15e2-9005-80ad-8ca4-ea6efb7161ed" class="image" data-notion-image="Block%20I%20O%20Fundamentals/image.png" dir="ltr"><a href="Block%20I%20O%20Fundamentals/image.png"><img style="width:950.2625122070312px" src="Block%20I%20O%20Fundamentals/image.png"/></a></figure><hr id="33ba15e2-9005-8003-b73e-dc62db3a9823" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-80e4-ba12-fc2515e37764" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-80ab-9aa2-e273be7e1964" class="" dir="auto">Reference: </p></div></aside><hr id="33ba15e2-9005-8060-8c5a-e66f0f1a4035" dir="auto"/></div></details><details id="33ba15e2-9005-80e4-b26f-ed62bdc24af4" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Throughput</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-8094-b0ae-f4d643e5ab5f" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-803b-8583-ee907b56273f" class="" dir="auto">系統在單位時間內「實際成功處理並傳遞的資料量」。</p></div></aside><hr id="33ba15e2-9005-8023-be20-c72827545204" dir="auto"/><p id="4e269452-1741-4727-b003-d2c064c43982" class="" dir="auto">雖然 Throughput（吞吐量）常與 Bandwidth（頻寬）混用，但兩者在嚴謹的系統設計中有著微妙差異。Bandwidth 偏向描述「理論最大傳輸上限」（水管的物理粗細），而 Throughput 是描述「實際達到的有效傳輸率」（實際流出的水量）。</p><p id="94e95493-fe7a-4dab-bde7-e378723be2e3" class="" dir="auto">在儲存系統中，Throughput 的高低會受到 I/O 大小、佇列深度 (Queue Depth)、處理器負載以及檔案系統的軟體開銷等因素綜合影響。</p><hr id="33ba15e2-9005-80cf-98ca-f821a85b24d3" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-80f2-8d26-f25833254014" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-8046-b13d-ce2a46c17372" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: 忽略 Protocol &amp; Software Overhead</strong></mark></p><p id="ec1737c6-7f3f-47df-a968-7789f6db3252" class="" dir="auto">應用程式層級測量到的 Throughput 通常會低於硬體規格書上標示的 Bandwidth上限。這是因為資料從應用層穿越 File System、OS Kernel (VFS)、Device Driver 到最終的 PCIe/NVMe 匯流排，每一層都會加上 Header 或是產生額外的 Context Switch 與處理延遲。在計算效能瓶頸時，不能單看硬體規格，必須扣除這些 Overhead（即所謂的 Goodput）。</p></div></aside><hr id="33ba15e2-9005-8070-ac5b-e895005b8ea5" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-8096-aedb-e685fa3bdf57" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-80b2-b5b1-dc1c68a18af8" class="" dir="auto">Reference: </p></div></aside><hr id="33ba15e2-9005-8074-b288-e6514a806b2c" dir="auto"/></div></details><details id="33ba15e2-9005-8042-96bf-c9c77651c139" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Latency</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-804e-adb1-cfba3f40a0c0" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-80f8-9ea7-ea1c92329319" class="" dir="auto">延遲。從應用程式發出一個 I/O 請求，到收到「處理完成」通知所需的時間。</p></div></aside><hr id="33ba15e2-9005-806a-afa9-d43b6a89b2ba" dir="auto"/><p id="33024bfd-b3a0-4524-8bef-3ce300dbd379" class="" dir="auto">單位通常為毫秒 (ms) 或微秒 (μs)。對現代儲存系統而言，Latency 是一段累積的時間，包含：<div class="indented"><ol type="1" id="c2341278-07d1-4290-9d06-892af15ed158" class="numbered-list" start="1" dir="auto"><li><strong>Software Latency:</strong> OS System Call 轉換、File System 處理、Block Layer 排隊的時間。</li></ol><ol type="1" id="5a2c0c64-db6c-4862-b555-46156b861c78" class="numbered-list" start="2" dir="auto"><li><strong>Hardware Interface Latency:</strong> 指令在 PCIe/NVMe 匯流排上傳輸的時間。</li></ol><ol type="1" id="661d8384-c107-4df2-9349-eef2cba13582" class="numbered-list" start="3" dir="auto"><li><strong>Media Latency:</strong> 裝置內部 Controller 處理邏輯（如 FTL Address Translation）與實際對 NAND Flash 進行物理讀寫的時間。</li></ol></div></p><p id="9afd03cf-9a23-4be1-8e69-4ff1ef4333b6" class="" dir="auto">從 HDD (約 10ms) 演進到 SATA SSD (約 100μs)，再到高階 NVMe SSD (可低於 20μs)，Latency 的數量級壓縮極大改變了軟體設計的假設。</p><hr id="33ba15e2-9005-80d4-85d4-cde04b9890cc" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-8018-a05d-c5c1fc6e6646" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-8097-88a8-c7478b4524a2" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: 只看平均延遲 (Average Latency)，忽視長尾延遲 (Tail Latency)。</strong></mark></p><p id="81f35727-0a89-4088-ac11-1bd7b8aad5b1" class="" dir="auto">在大型分散式系統或資料庫中，看 P99 或 P99.9 Latency（最慢的 1% 或 0.1% 的請求耗時）比看平均值更具指標性。即使 SSD 的平均延遲極低，但若偶爾因為裝置內部的 Garbage Collection 或 Wear Leveling 觸發而導致個別 I/O 卡頓數十毫秒（Latency Spike），就會嚴重拖垮整體系統的回應時間。</p></div></aside><hr id="33ba15e2-9005-8055-a224-d15b5ecec39e" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-80d4-990e-e6cae475bc2c" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-8058-9216-f5b1986d3518" class="" dir="auto">Reference: </p></div></aside><hr id="33ba15e2-9005-80e6-9a95-d73d839df23a" dir="auto"/></div></details><details id="33ba15e2-9005-8076-8e08-d3d2fd7005f4" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Synchronous I/O vs Asynchronous I/O</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-807c-83ef-c221b602bd91" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-801c-a2f9-d88f2205484d" class="" dir="auto">應用程式發出 I/O 請求（如 <code>read()</code> System Call）時，執行緒 (Thread) 等待資料返回的行為模式。</p></div></aside><hr id="33ba15e2-9005-8095-bb8f-d63c22651379" dir="auto"/><p id="80c0cd1d-4e96-4197-80e2-89f3a39e74d0" class="" dir="auto"><strong>Synchronous I/O：</strong><div class="indented"><p id="33ba15e2-9005-80d9-b1a9-e0b30ee7b5c0" class="" dir="auto">呼叫 read() 之後，你的 thread 就被 block 住了，一直等到資料從裝置搬到記憶體、kernel 把結果複製到你的 user space buffer 之後才會返回。在等待的這段時間，這個 thread 什麼事都不能做。如果你要同時發 100 個 I/O 請求，你就需要 100 個 thread，每個 thread block 在自己的 read() 上。</p></div></p><p id="e19bb616-e588-4768-bb40-e8852976c70a" class="" dir="auto"><strong>Asynchronous I/O：</strong><div class="indented"><p id="33ba15e2-9005-80fd-9c81-fbd51b2df27b" class="" dir="auto">你提交一個 I/O 請求之後，呼叫立刻返回。你的 thread 可以繼續做其他事情，甚至繼續提交更多 I/O 請求。等 I/O 完成之後，你再透過某種機制（例如 polling、callback、或檢查 completion queue）拿到結果。</p></div></p><hr id="33ba15e2-9005-8098-9fe1-c0185fb6efc7" dir="auto"/><p id="c757728e-1d4b-4cb5-b492-728a9b5b84ed" class="" dir="auto">設計抉擇的演進：<div class="indented"><p id="33ba15e2-9005-804b-8af1-f3302c4926e4" class="" dir="auto">想像一個高併發的 Web Server，同時處理上千個請求。<br/>在 HDD 時代，一次 Random I/O 耗時約 10ms，Synchronous I/O 的阻塞尚可接受，CPU 大多在閒置等待。<br/>但在 NVMe 時代，一次 Random Read 降至 100μs 左右，而一次 Thread Context Switch 的成本約為 1-5μs。<br/>若繼續使用 Synchronous I/O 搭配大量 Thread，頻繁的 Context Switch 與 Thread Scheduling 開銷將會吃掉極大比例的 CPU 資源。</p></div></p><p id="33ba15e2-9005-807b-8ede-fbbef4105f6a" class="" dir="auto">這正是為何現代高效能儲存框架（如 Linux 的 io_uring）皆全面轉向 Asynchronous I/O 架構的原因。</p><hr id="33ba15e2-9005-80c4-b499-e249383ae8f0" dir="auto"/><figure id="33ba15e2-9005-8021-b3a3-dd191e4ae461" class="image" data-notion-image="Block%20I%20O%20Fundamentals/image%201.png" dir="ltr"><a href="Block%20I%20O%20Fundamentals/image%201.png"><img style="width:950.2625122070312px" src="Block%20I%20O%20Fundamentals/image%201.png"/></a></figure><hr id="33ba15e2-9005-809a-b942-ef562adbb41a" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-808a-ba76-c1622d87b0d8" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-8056-9d70-e8489e997fa1" class="" dir="auto">Reference: <a href="https://sys-nthu.github.io/os25-fall/handouts/buffercache.html">https://sys-nthu.github.io/os25-fall/handouts/buffercache.html</a></p></div></aside><hr id="33ba15e2-9005-80d7-91d3-c456cab4b95c" dir="auto"/></div></details><details id="33ba15e2-9005-80e8-ba75-e95a2ebc7bb9" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Interrupt vs Polling</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-8067-a877-e50246cacf09" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-800a-ae87-db286c1b82b1" class="" dir="auto">I/O 完成後，硬體裝置通知 CPU「資料已就緒」的兩種底層機制。</p></div></aside><hr id="33ba15e2-9005-80b2-a069-eaf2d78e6577" dir="auto"/><p id="fc7cbfb7-bec0-47ad-9bab-f2fe147fc3b8" class="" dir="auto"><strong>Interrupt（中斷）</strong>：<div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-80a6-91df-ca3933d94245" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-8039-bfd9-c5c74ddd1f81" class="" dir="auto">裝置完成 I/O 之後，主動送一個 hardware interrupt 給 CPU。CPU 收到 interrupt 之後暫停手上的工作，跳去執行 interrupt handler 來處理完成的 I/O。這是裝置主動通知 CPU 的方式。</p><ul id="4f73dc15-d5de-4155-bc16-0266866d4779" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>優點：</strong> CPU 在等待期間不浪費資源，可執行其他任務。</li></ul><ul id="5bd04bb5-179a-41eb-ae9c-9f42744eb299" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>缺點：</strong> 每次 Interrupt 切換的耗時約需數微秒。當裝置極快（如 NVMe）、I/O 密度極高時，每秒可能產生數十萬次中斷，CPU 處理中斷的 Overhead 將成為嚴重負擔，引發所謂的 <strong>Interrupt Storm</strong>。</li></ul></div></aside></div></p><p id="cf3df54f-6131-4087-8b5d-8de640223a90" class="" dir="auto"><strong>Polling（輪詢）</strong>：<div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-800e-90e1-c8b25a3081fc" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-801c-8ca6-ca05fb349008" class="" dir="auto">CPU 不等裝置通知，而是自己不斷去檢查「I/O 好了沒？好了沒？賀啊沒啦？賀啊沒啦？」。具體來說就是反覆讀取裝置的某個 status register 或 completion queue，直到發現有新的完成結果。</p><ul id="dbd0f857-023d-4246-b787-125d1c51c9a0" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>優點：</strong> 省去了中斷觸發與 Context Switch 的巨大開銷，I/O 一完成即可在下一次迴圈被立刻捕捉，具備極低的 Latency。</li></ul><ul id="a42a5271-bc82-4c32-a60d-14162d56180d" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>缺點：</strong> CPU 在等待期間處於 Busy-Waiting（空轉），會持續消耗運算資源與電力。</li></ul></div></aside></div></p><blockquote id="33ba15e2-9005-8010-b2eb-ee6def438474" class="" dir="auto">當 I/O Latency 降至微秒等級且吞吐量極大時，Polling 反而比 Interrupt 更具效能優勢。現代的高效能驅動（如 Linux 核心的 Hybrid Polling 或 SPDK）會根據負載動態切換：在 I/O 密集時使用 Polling 極大化效能，在系統閒置時退回 Interrupt 以節省 CPU。</blockquote><figure id="33ba15e2-9005-8043-9607-cc26d17b0244" class="image" data-notion-image="Block%20I%20O%20Fundamentals/image%202.png" dir="ltr"><a href="Block%20I%20O%20Fundamentals/image%202.png"><img style="width:950.2625122070312px" src="Block%20I%20O%20Fundamentals/image%202.png"/></a></figure><hr id="33ba15e2-9005-804d-a1ab-c2151a78f72a" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-8002-be7e-d2d9571f0e37" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-80e7-bf48-d4a08e5d82a0" class="" dir="auto">Reference:  <a href="https://dl.acm.org/doi/10.1145/3538643.3539747">https://dl.acm.org/doi/10.1145/3538643.3539747</a></p></div></aside><hr id="33ba15e2-9005-80d8-922f-d633f290d4af" dir="auto"/></div></details></div></details><details id="33aa15e2-9005-80aa-bc9b-cac1a10d2ef0" open="" class="toggle" dir="auto"><summary><strong>Test</strong></summary><div class="indented"><details id="33aa15e2-9005-80d8-a8d5-d19dee50c8e8" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Key Concepts</strong></mark></summary><div class="indented"><details id="33aa15e2-9005-801b-8162-f1ac55236980" open="" class="toggle" dir="auto"><summary>理解 block device abstraction 如何將底層儲存裝置抽象為固定大小的 block，以及為什麼這是所有儲存系統的共同基礎</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8036-aedb-e084204c36e6" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80d4-bd59-e2664de5553e" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-80fa-b39d-e4a9985c880f" class="" dir="auto">為了遮蔽底層物理硬體的複雜性，並配合儲存媒體（如 Flash 或磁碟）硬體層面「區塊讀寫」的物理特性，提供統一的高效存取介面。</p></div></p><hr id="33aa15e2-9005-806b-9be9-d640e4d7a903" dir="auto"/><p id="33aa15e2-9005-80dd-aa55-e4fe3f90338a" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-808c-a5fb-d205f10ce9cc" class="" dir="auto">Abstraction (抽象化)、LBA (Logical Block Address)、硬體物理特性</p></div></p><hr id="33aa15e2-9005-80e0-bb5f-de097b77047d" dir="auto"/><p id="33aa15e2-9005-807c-8f44-cfb53bbfffd6" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-8055-9de6-de807d7b0e92" class="" dir="auto">儲存裝置的物理結構差異極大，HDD 透過磁柱與磁區運作，而 SSD 則由 NAND Flash 的 Page 與 Block 組成。如果直接暴露物理結構，每個軟體都必須為每種硬體撰寫特定的驅動邏輯。透過 Block Device Abstraction，作業系統提供 LBA，讓上層（如檔案系統）統一看待所有裝置。此外，多數儲存硬體在物理上無法做到 byte-level 的寫入（例如 SSD 寫入最小單位是 Page，通常為 4KB），以 Block 為單位進行 I/O 能最大化資料傳輸與匯流排的效率。</p></div></p></div></aside><hr id="33aa15e2-9005-80ed-b37c-d8bf757757b2" dir="auto"/></div></details><details id="33aa15e2-9005-8048-9a4a-e64e89f42dea" open="" class="toggle" dir="auto"><summary>理解 IOPS 與 bandwidth 這兩個效能指標的差異，以及不同工作負載（random small I/O vs. sequential large I/O）分別會受限於哪一個指標</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80b5-a3f1-f10595559235" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-802d-9f42-d90a3fc64b71" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-8029-9ce3-f29e31f6ef8a" class="" dir="auto">IOPS 衡量每秒操作次數（處理能力的密度），Bandwidth 衡量每秒傳輸資料量（資料流的寬度）。隨機小檔看 IOPS，順序大檔看 Bandwidth。</p></div></p><hr id="33aa15e2-9005-805d-a6dc-f671079a3eed" dir="auto"/><p id="33aa15e2-9005-8025-a919-fa1f58a21ab9" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-80ed-8392-f3ef8d7a8b31" class="" dir="auto">Random Small I/O、Sequential Large I/O、Throughput、Bottleneck</p></div></p><hr id="33aa15e2-9005-8097-92f2-c03b4cd86ccf" dir="auto"/><p id="33aa15e2-9005-80c4-b341-c19daaffc6c5" class="" dir="auto">Detail<div class="indented"><ul id="d76b1844-a997-4a5b-ab16-1cd7a8bf6329" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Random Small I/O (IOPS 密集型)</strong>：如資料庫 Point Lookup 或作業系統啟動。因為請求分散在不同位置，裝置處理請求的 Overhead（尋址、指令轉換）成為主導，通常會先撞到 IOPS 上限，此時 Bandwidth 往往還遠低於硬體標稱值。</li></ul><ul id="1958d071-4a93-4df8-ad9d-29062f9d763d" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Sequential Large I/O (Bandwidth 密集型)</strong>：如影片拷貝、大數據備份。資料連續排列，裝置可以一次搬運大量 Block，此時 IOPS 負擔極輕，瓶頸在於實體匯流排（PCIe/SATA）的傳輸極限。<br/>評估系統效能時，必須根據 Workload 的性質（IO Size 與存取分佈）來判斷該關注哪一個指標。</li></ul></div></p></div></aside><hr id="33aa15e2-9005-80ed-82c8-e9a0894614aa" dir="auto"/></div></details><details id="33aa15e2-9005-80f8-a2f4-c7a18c606a0e" open="" class="toggle" dir="auto"><summary>理解 synchronous I/O 與 asynchronous I/O 的差異，知道 synchronous I/O 會阻塞呼叫端直到完成，而 asynchronous I/O 允許提交後繼續執行其他工作</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8016-92ce-c130a359724c" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8007-a10f-cfd845e7ba1a" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-80b7-8852-ce0658e828a5" class="" dir="auto">Synchronous I/O 是「發出請求後原地等待（Blocked）」，Asynchronous I/O 是「發出請求後立刻返回執行其他任務，稍後再收割結果」。</p></div></p><hr id="33aa15e2-9005-80b5-9b49-f99ea04bb8b6" dir="auto"/><p id="33aa15e2-9005-806a-9470-e6d9dba5a22d" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-80f9-aff2-f850ee0afbf7" class="" dir="auto">Blocking/Non-blocking、Thread Utilization、Context Switch、io_uring</p></div></p><hr id="33aa15e2-9005-806b-a1db-c0c79767936e" dir="auto"/><p id="33aa15e2-9005-80c6-9e9d-fdfb590805d3" class="" dir="auto">Detail<div class="indented"><ul id="467a5d82-d26d-41ae-9fb6-0963755e4ee6" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Synchronous I/O</strong>：程式流程簡單，但效率低。Thread 被掛起後會進入 Blocked 狀態，不再佔用 CPU，但也無法處理其他邏輯。在高併發環境下，這會導致需要開啟大量 Thread，引發頻繁的 Context Switch。</li></ul><ul id="61d0f621-88f5-4f3b-b2ad-c957c2043133" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Asynchronous I/O</strong>：程式邏輯較複雜（通常需要 Callback 或 Completion Queue），但效能上限極高。單一 Thread 可以同時「發出」成千上萬個 I/O 請求而不用等待。在微秒級延遲的現代 NVMe SSD 環境中，Asynchronous 模式能極大化系統吞吐量並維持極低的 CPU 指令開銷。</li></ul></div></p></div></aside><hr id="33aa15e2-9005-8053-94dd-d8c35415dc89" dir="auto"/></div></details><details id="33aa15e2-9005-80aa-a0cb-f9cd75080a42" open="" class="toggle" dir="auto"><summary>理解 interrupt 與 polling 這兩種 I/O completion notification 機制的運作方式與適用場景，知道 interrupt 由裝置主動通知 CPU，而 polling 由 CPU 主動檢查完成狀態</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80dc-9069-f24c3bc3c868" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8082-9d86-e843bd107d72" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-8055-8ce8-c7abf8a1a0c1" class="" dir="auto">Interrupt 是裝置「主動」插斷 CPU 告知完成，節省 CPU 但有切換開銷；Polling 是 CPU「主動」循環檢查狀態，消耗 CPU 但 Latency 極低且無切換成本。</p></div></p><hr id="33aa15e2-9005-8059-8595-ee52ad421892" dir="auto"/><p id="33aa15e2-9005-80b4-a1ce-cb35c94bd3a6" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-8087-b12f-fc6b8159f3b5" class="" dir="auto">Interrupt Storm、Busy-waiting、Latency vs Efficiency、Hybrid Polling</p></div></p><hr id="33aa15e2-9005-802a-9bec-cde8480a3ea7" dir="auto"/><p id="33aa15e2-9005-800b-8b3c-d709ade87cb2" class="" dir="auto">Detail<div class="indented"><ul id="3b59990c-8401-49ed-8b0f-7035ce2dd72c" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Interrupt</strong>：適合「慢速裝置」或「低密度 I/O」。CPU 不用浪費時間等硬體，可以去做別的事。但高頻中斷會引發 Interrupt Storm，讓 CPU 陷入無窮的中斷處理，導致效能雪崩。</li></ul><ul id="95d14f30-0994-4cb4-a947-8b9d2df6f653" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Polling</strong>：適合「超快速裝置（如 NVMe）」或「高密度 I/O」。雖然 CPU 會空轉（Busy-waiting），但在高負載下，省去的「儲存/恢復暫存器（Context Switch）」時間反而更划算。現代 Linux 核心常採用 <strong>Adaptive Polling (Hybrid)</strong>，即負載低時用中斷，負載高時自動切換為輪詢。</li></ul></div></p></div></aside><hr id="33aa15e2-9005-80a0-8ad0-edf2959c09b0" dir="auto"/></div></details></div></details><details id="33aa15e2-9005-8030-8e13-efe717d0f490" open="" class="toggle" dir="auto"><summary><mark class="highlight-teal" data-notion-highlight="teal"><strong>Test your understanding</strong></mark></summary><div class="indented"><details id="33aa15e2-9005-8040-9e7f-f5bf5286c5b5" open="" class="toggle" dir="auto"><summary>為什麼 block device abstraction 要把儲存裝置抽象成「固定大小的 block 陣列」，而不是讓應用程式直接以 byte 為單位存取？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8090-aab0-d74eb4b48f55" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-803a-95f5-fc14f9d17185" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-80d6-a90d-de726403ea84" class="" dir="auto">為了遮蔽底層物理硬體的複雜性，並配合儲存媒體（如 Flash 或磁碟）硬體層面「區塊讀寫」的物理特性，提供統一的高效存取介面。</p></div></p><hr id="33aa15e2-9005-80ba-8483-ef8058c07e98" dir="auto"/><p id="33aa15e2-9005-803b-a36f-d7aee6928f67" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-80e5-b56f-cbb22d03aed6" class="" dir="auto">Abstraction (抽象化)、LBA (Logical Block Address)、硬體物理特性</p></div></p><hr id="33aa15e2-9005-80de-a989-d84f049282e0" dir="auto"/><p id="33aa15e2-9005-8088-a911-f1784b545323" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-803a-bc3b-efaed57f2330" class="" dir="auto">儲存裝置的物理結構差異極大，HDD 透過磁柱與磁區運作，而 SSD 則由 NAND Flash 的 Page 與 Block 組成。如果直接暴露物理結構，每個軟體都必須為每種硬體撰寫特定的驅動邏輯。透過 Block Device Abstraction，作業系統提供 LBA，讓上層（如檔案系統）統一看待所有裝置。此外，多數儲存硬體在物理上無法做到 byte-level 的寫入（例如 SSD 寫入最小單位是 Page，通常為 4KB），以 Block 為單位進行 I/O 能最大化資料傳輸與匯流排的效率。</p></div></p></div></aside><hr id="33aa15e2-9005-80c4-b22a-db67a651091b" dir="auto"/></div></details><details id="33aa15e2-9005-8052-ae38-d144bc40974f" open="" class="toggle" dir="auto"><summary>一顆 SSD 標示 random 4KB read IOPS 是 500K，sequential read bandwidth 是 3.5 GB/s。如果你的 workload 是 random 4KB read，你的實際 bandwidth 上限是多少？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8053-a373-dca169e7f1c5" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80f5-aab2-f74db3e0fb89" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-80e4-8d0f-e21052fe4737" class="" dir="auto">實際 Bandwidth 上限為 2 GB/s</p></div></p><hr id="33aa15e2-9005-80d3-8e9a-f8b4b5961600" dir="auto"/><p id="33aa15e2-9005-8003-9e5e-df64470be6b9" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-809f-9165-cc14ff322716" class="" dir="auto">IOPS Bottleneck、Random Small I/O</p></div></p><hr id="33aa15e2-9005-8012-a4cf-c3c1207d684d" dir="auto"/><p id="33aa15e2-9005-80dd-abeb-ef2760078f60" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-8066-b00f-c6bdd8431761" class="" dir="auto">儲存效能會受限於 IOPS 與 Bandwidth 兩者中「先到達」的瓶頸。在此 Workload 下，每次讀取大小為 4KB，當控制器的指令處理能力達到 500K IOPS 極限時，總資料傳輸量為：<code>500,000 * 4KB = 2,000,000 KB/s</code>，換算約為 2 GB/s。這表示系統已經因為「隨機小檔讀取」撞到了 IOPS 瓶頸，永遠無法跑滿硬體宣稱的 3.5 GB/s 物理頻寬極限。</p></div></p></div></aside><hr id="33aa15e2-9005-80c4-95b0-ccdccfddbab0" dir="auto"/></div></details><details id="33aa15e2-9005-8042-9681-f7d04d2ca791" open="" class="toggle" dir="auto"><summary>在NVMe SSD 環境下，為什麼大量 thread 搭配 synchronous I/O 的做法會變得很沒效率？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-802f-9360-c23011739e1d" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80ce-a3f3-e1b375cc56bb" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-80f6-af3f-d2d28ba1cd76" class="" dir="auto">因為 NVMe 的 I/O 延遲極低（微秒級），大量 Thread 的阻塞與喚醒會造成頻繁的 Context Switch，這部分的 CPU 開銷甚至會蓋過實際的 I/O 等待時間。</p></div></p><hr id="33aa15e2-9005-809c-a31b-cb86516cea17" dir="auto"/><p id="33aa15e2-9005-8077-8568-c1d4edfaaac3" class="" dir="auto">Key Concept<div class="indented"><p id="ea653b84-abd7-461b-8fca-1b336ef542af" class="" dir="auto">Context Switch Overhead、Thread Starvation、NVMe Latency</p></div></p><hr id="33aa15e2-9005-8092-b7b6-cf1727a61642" dir="auto"/><p id="33aa15e2-9005-8060-bcd8-f5169cfb3766" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-802e-9f53-f1d6d6c08cc2" class="" dir="auto">Synchronous I/O 的特性是發出系統呼叫後，Thread 會被 OS 掛起（Blocked）。在 HDD 時代（延遲約 10ms），將 Thread 掛起並切換給其他人工作是很划算的；但在 NVMe 時代，一次 Random Read 僅需數十微秒，而 OS 進行 Thread Context Switch 的成本約需 1~5 微秒。若使用大量 Thread，CPU 資源將被嚴重浪費在排程與切換狀態上，而非執行真正的應用邏輯，導致效率低落。</p></div></p></div></aside><hr id="33aa15e2-9005-80ea-991d-d6bafb5b7883" dir="auto"/></div></details><details id="33aa15e2-9005-809a-a321-d1a6c2fddb04" open="" class="toggle" dir="auto"><summary>描述一個 interrupt 比 polling 好的場景，和一個 polling 比 interrupt 好的場景。</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8014-ae6b-fcc7508bf26b" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8012-a019-e9d43cdb2f05" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-8032-854e-d4d53a6c8160" class="" dir="auto"><strong>Interrupt 較佳：</strong> I/O 請求稀疏且延遲較高的場景（如傳統 HDD）。<br/><strong>Polling 較佳：</strong> I/O 極度密集且延遲極低的場景（如 NVMe 高併發環境）。</p></div></p><hr id="33aa15e2-9005-80fb-ad6d-ff82c8cd83f2" dir="auto"/><p id="33aa15e2-9005-8038-add6-d9b11ba50886" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-80d6-8e79-cc2f7792099c" class="" dir="auto">Interrupt Storm、Busy-waiting、I/O Density</p></div></p><hr id="33aa15e2-9005-8099-873b-e90102044109" dir="auto"/><p id="33aa15e2-9005-808f-beff-dc4734a180f6" class="" dir="auto">Detail<div class="indented"><ul id="fb31e63e-295b-4b99-8228-fddbcb96a535" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Interrupt 適用：</strong> 當系統 I/O 請求不多，或硬體處理速度較慢時，使用 Interrupt 可以讓 CPU 在漫長的等待期間去執行其他任務，不會空轉浪費資源。</li></ul><ul id="c75dfb3c-4955-4b2b-a15a-d66d7a6bfa79" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Polling 適用：</strong> 當使用 NVMe SSD 且面臨極高 IOPS 吞吐時，Interrupt 機制會導致 CPU 每秒必須中斷數十萬次（Interrupt Storm），光是處理中斷就耗盡效能。此時改用 Polling 讓 CPU 專心在迴圈中檢查完成狀態，省去 Context Switch 的開銷，反而能大幅降低延遲。</li></ul></div></p></div></aside><hr id="33aa15e2-9005-807d-b2da-dee9e3f00054" dir="auto"/></div></details></div></details><details id="33aa15e2-9005-8007-bcd7-cdb03fbcfe76" open="" class="toggle" dir="auto"><summary><mark class="highlight-red" data-notion-highlight="red"><strong>Quiz Pool</strong></mark></summary><div class="indented"><ol type="1" id="33aa15e2-9005-803c-858c-e38d747f412e" class="numbered-list" start="1" dir="auto"><li>你正在為一個資料庫系統進行效能調整。該伺服器搭載一顆規格為 <strong>隨機 4KB 讀取 500K IOPS</strong> 與 <strong>順序讀取頻寬 4 GB/s</strong> 的 NVMe SSD。 為了減少索引的深度，你決定將資料庫的讀取單位（Page Size）從原本的 4KB 提高到 128KB，且 workload 依然維持隨機讀取。 在完成 Page Size 的調整後，請預測該系統最可能觀察到的效能變化為何？<blockquote id="33aa15e2-9005-804c-a382-d31816510bcd" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80dc-b603-fe464c3cf6f2" class="numbered-list" start="1" dir="auto"><li>Throughput 會下降，因為 SSD 處理 128KB random I/O 的 Internal Overhead 遠高於處理 4KB。</li></ol><ol type="1" id="33aa15e2-9005-8001-b0a5-c52069af670f" class="numbered-list" start="2" dir="auto"><li>IOPS 將大幅下降至約 31K 左右，因為系統會先觸發 bandwidth 的硬體物理頻寬瓶頸。</li></ol><ol type="1" id="33aa15e2-9005-8071-b44b-f3022dbfa8ba" class="numbered-list" start="3" dir="auto"><li>依然能維持 500K IOPS 的水準，因為隨機讀取指令的處理上限是由控制器 (SSD Controller) 決定，與資料塊大小無關。</li></ol><ol type="1" id="33aa15e2-9005-801f-a3c1-eea272d8115a" class="numbered-list" start="4" dir="auto"><li>IOPS 將提升至 1M 以上，因為 128KB 的大區塊請求會被控制器自動判定為 Sequential I/O 並進行加速。</li></ol></blockquote><details id="33aa15e2-9005-80ac-8f04-c639e9f90af8" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80eb-831f-e065558681df" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-804c-a8d3-f24cc4a412f7" class="" dir="auto"><code>bandwidth(每秒讀多少資料) = IOPS(每秒多少次讀取) * 一次讀取多少資料</code></p><p id="33ba15e2-9005-8043-88a1-d5e4675ec358" class="" dir="auto">IOPS 將大幅下降至約 31K 左右，因為系統會先觸發 bandwidth 的硬體物理頻寬瓶頸。</p><hr id="33aa15e2-9005-80e3-be05-f02a48e3d8e5" dir="auto"/><p id="33aa15e2-9005-80f6-83a9-e75a8a8e9e00" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-80ba-9b49-dae16d672465" class="" dir="auto">當請求大小變為 128KB 時，達到 500K IOPS 需要 500K x 128KB = 64GB/s。 然而硬體上限僅 4GB/s，因此實際 IOPS 會被限制在 4000MB/128KB ~ 31250。 這說明瓶頸已從 IOPS 轉向了 bandwidth。</p></div></p><hr id="33ba15e2-9005-8036-a296-d03ee24a4fed" dir="auto"/><p id="33ba15e2-9005-80c8-a57f-e6fa5611671e" class="" dir="auto">(1) 事實上，Page Size 變大通常會讓 throughput 上升或維持在頂峰。 處理一個 128KB 的請求，控制器只需要進行 1 次地址轉換；若拆成 32 個 4KB 請求，則需 32 次流程。 因此，加大 Page Size 反而能更有效率地利用頻寬。 </p><p id="33ba15e2-9005-8074-ad0b-f414281f0c7d" class="" dir="auto">(3) 雖然 SSD 控制器可能每秒能處理 50 萬個「指令」，但它無法每秒搬運超過 4GB 的資料。 若要維持 500K IOPS 且每次讀 128KB，硬體頻寬必須達到 64GB/s，遠超硬體極限。</p><p id="33ba15e2-9005-80f4-be5a-c616fce59b9f" class="" dir="auto">(4) Random 或 Sequential 是由 LBA（邏輯區塊位址）是否連續決定的，跟單一 Page 的大小無關。 即便 Page 很大，只要每次讀取的位置在磁碟上是跳躍的，它依然屬於 random I/O。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-808e-a037-e691a70a3f36" dir="auto"/><ol type="1" id="33aa15e2-9005-80ae-bdd0-f50c27d1a444" class="numbered-list" start="2" dir="auto"><li>本章節提到 IOPS 與 bandwidth、Synchronous I/O 與 Asynchronous I/O、 Interrupt 與 Polling，以下融合這三者的觀念，請問哪項敘述最為正確?<blockquote id="33aa15e2-9005-80f8-b54e-defa43f887e3" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8005-83af-c9fda7cbee60" class="numbered-list" start="1" dir="auto"><li>在 High IOPS 的場景，使用 Interrupt 機制容易導致 CPU 頻繁 context switch</li></ol><ol type="1" id="33aa15e2-9005-807a-9634-cef83b5998e9" class="numbered-list" start="2" dir="auto"><li>當我要把一個 10GB 的影片複製到另一個資料夾，面臨 High bandwidth 需求， 應將 I/O 機制由 Interrupt 切換為 Polling 以提升吞吐量</li></ol><ol type="1" id="33aa15e2-9005-807c-998f-cea319e19c6a" class="numbered-list" start="3" dir="auto"><li>在 IO 請求稀疏時，為了降低系統 Latency，應使用 Polling 模式</li></ol><ol type="1" id="33aa15e2-9005-8009-be0c-f2d2be1f8eba" class="numbered-list" start="4" dir="auto"><li>使用 Asynchronous I/O 時，是使用 Interrupt 機制而不是 Polling</li></ol></blockquote><details id="33aa15e2-9005-802d-bd3b-f4aaa641ec6c" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80d5-94c2-fbcef7de55d6" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80b5-87ae-f6f31b4fa63b" class="" dir="auto">在 High IOPS 的場景，使用 Interrupt 機制容易導致 CPU 頻繁 context switch</p><hr id="33aa15e2-9005-808f-a50c-d80c5ef5fb45" dir="auto"/><p id="33aa15e2-9005-803c-9977-e44b3ba97a92" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8055-a227-df3e3a9fe847" class="" dir="auto">敘述正確，並且頻繁 context switch 會導致 CPU 必須不斷暫停當前工作並保存暫存器 狀態，導致 CPU 成為效能瓶頸</p></div></p><hr id="33ba15e2-9005-80fa-840a-d5bf27b62a2f" dir="auto"/><p id="33ba15e2-9005-809a-95e4-e6853de472d4" class="" dir="auto">(2) 複製大檔案屬於 High bandwidth 但通常是 Low IOPS 的場景。此時使用 Polling 並 沒有幫助反而會消耗大量 CPU 資源。</p><p id="33ba15e2-9005-80fc-a50b-f07eb3290512" class="" dir="auto">(3) 使用 Polling 模式來降低 Latency 比較適用於極高 IOPS 的場景，在 IO 請求稀疏時使用 會使 CPU 空轉極度浪費資源。</p><p id="33ba15e2-9005-8007-9251-caa8f086a903" class="" dir="auto">(4) Asynchronous I/O 是應用程式與 OS 間的溝通方式，Interrupt/Polling 則是 OS 與硬體 間的溝通方式，兩者不同。例如 io_uring 是 asynchronous，但有 polling 模式。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-803f-84b9-c08df2381d69" dir="auto"/><ol type="1" id="33aa15e2-9005-801a-8aed-dd9759ea686c" class="numbered-list" start="3" dir="auto"><li>你有一個 SSD，規格如下：<aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80e9-9dbe-f2cc076c8442" dir="ltr"><div style="width:100%"><ul id="33aa15e2-9005-8066-9532-ea8066b291fd" class="bulleted-list" dir="auto"><li style="list-style-type:disc">bandwidth 上限：1.5 GiB/s</li></ul><ul id="33aa15e2-9005-805a-b21f-ff0b8f0cc672" class="bulleted-list" dir="auto"><li style="list-style-type:disc">當 CPU 的 interrupt 高於每秒 380 千次，會出現 interrupt storm，所以會切換成 Polling 模式。</li></ul><ul id="33aa15e2-9005-8089-994d-c6ce5fb1087a" class="bulleted-list" dir="auto"><li style="list-style-type:disc">假設可以直接用 bandwidth = IOPS * IO Size，來算 IOPS。</li></ul></div></aside><p id="33aa15e2-9005-804c-a9ce-e9f9a147a4d0" class="" dir="auto">今天我先 Random 4KiB read 一陣子，再 Sequential 256KiB write 一陣子。 請問在操作 1 的 4KiB 負載下，該 SSD 的 IOPS 表現最接近每秒幾千次，以及兩個操作的 CPU 模式？</p><blockquote id="33aa15e2-9005-803f-aaab-ec44d0b14110" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80d0-bad4-dc14057ae881" class="numbered-list" start="1" dir="auto"><li>每秒 393 千次；操作 1: Polling 模式；操作 2: Interrupt 模式</li></ol><ol type="1" id="33aa15e2-9005-8004-82bf-f7d9ad131e19" class="numbered-list" start="2" dir="auto"><li>每秒 375 千次；操作 1: Interrupt 模式；操作 2: Interrupt 模式</li></ol><ol type="1" id="33aa15e2-9005-805c-a884-c24e4cd24c78" class="numbered-list" start="3" dir="auto"><li>每秒 393 千次；操作 1: Interrupt 模式；操作 2: Interrupt 模式</li></ol><ol type="1" id="33aa15e2-9005-80eb-be87-ff07a3b62163" class="numbered-list" start="4" dir="auto"><li>每秒 6.144 千次；操作 1: Interrupt 模式；操作 2: Interrupt 模式</li></ol></blockquote><details id="33aa15e2-9005-8088-a459-c48a1446304c" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8007-bb84-f19164d29e07" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-809c-a42f-d4678168bca0" class="" dir="auto">每秒 393 千次；操作 1: Polling 模式；操作 2: Interrupt 模式</p><hr id="33aa15e2-9005-8080-af02-f23567357a0f" dir="auto"/><p id="33aa15e2-9005-80f7-abfd-ca604e8be0f3" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8059-9c02-f0f3555d79b2" class="" dir="auto">GiB 是以 1024 為基底的單位，所以 1.5 GiB/s = 1.5 * 1024 * 1024 KiB/s。 <br/>操作 1: 1.5 * 1024 * 1024 / 4 = 每秒 393 千次。所以是 Polling 模式。 <br/>操作 2: 1.5 * 1024 * 1024 / 256 = 每秒 6.144 千次。所以是 Interrupt 模式。</p></div></p><hr id="33ba15e2-9005-80dd-9157-e7016c44bf85" dir="auto"/><p id="33ba15e2-9005-8053-b30b-c271638a1290" class="" dir="auto">(2) GiB 是以 1024 為基底的單位，而 GB 是以 1000 為基底的單位。 所以不小心算成 1.5 * 1000 * 1000 / 4 = 每秒 375 千次。</p><p id="33ba15e2-9005-80c2-80c1-e283c3ffb65f" class="" dir="auto">(3) 操作 1 中，每秒 393 千次大於每秒 380 千次，所以會出現 interrupt storm，會切換成 Polling 模式。</p><p id="33ba15e2-9005-80bc-b476-ef8e85221792" class="" dir="auto">(4) 題目的敘述是需要求操作 1 的 IOPS 表現最接近每秒幾千次，而不是計算操作 2。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8013-a100-fb66ab043645" dir="auto"/><ol type="1" id="33aa15e2-9005-804d-8434-d4fa15fa50c2" class="numbered-list" start="4" dir="auto"><li>某個伺服器應用程式為處理傳入的網路請求，使用 Synchronous I/O 並將每筆請求的紀錄寫入本地儲存設備。 在壓力測試期間，管理員觀察到伺服器的 throughput 大幅下降且 Latency 增加，然而 CPU 使用率卻維持在極低的水準。 下列何者最能解釋為何在 CPU 閒置的情況下，吞吐量依然低落？<blockquote id="33aa15e2-9005-80b5-9b61-d7ffc6057b64" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80c1-b166-c982d289c6df" class="numbered-list" start="1" dir="auto"><li>儲存設備使用的是 Interrupt-driven I/O ，而高頻率的中斷導致 CPU 將所有時間都花在執行 ISR 上。</li></ol><ol type="1" id="33aa15e2-9005-80b3-b11c-e1710e9a8782" class="numbered-list" start="2" dir="auto"><li>系統正利用 DMA 來處理資料傳輸；由於 CPU 在資料搬移過程中被繞過，因此它會一直保持在閒置狀態，直到硬體為整批資料傳輸完成發送的訊號。</li></ol><ol type="1" id="33aa15e2-9005-804b-bf60-ef44b62107e4" class="numbered-list" start="3" dir="auto"><li>每個 Worker Thread 在等待儲存 I/O 完成時皆進入了 Blocked State，導致這些執行緒無法被用來處理新的傳入網路請求。</li></ol><ol type="1" id="33aa15e2-9005-8043-8201-d15f9fc1c9c6" class="numbered-list" start="4" dir="auto"><li>作業系統正在使用 Polling 來檢查儲存設備的狀態，這導致 CPU 在等待 I/O 完成期間無法執行任何應用程式層級的程式碼。</li></ol></blockquote><details id="33aa15e2-9005-80e1-a764-d210e3684901" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80e3-98aa-e5f95a9f1686" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8071-bc2f-c13b8640dfc1" class="" dir="auto">每個 Worker Thread 在等待儲存 I/O 完成時皆進入了 Blocked State，導致這些執行緒無法被用來處理新的傳入網路請求。</p><hr id="33aa15e2-9005-8085-a441-fdb9c594b096" dir="auto"/><p id="33aa15e2-9005-80b5-8088-e4665f81cc12" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8089-8479-d25cb0c90af1" class="" dir="auto">當一個執行緒發出同步請求時，作業系統排程器會將該執行緒從 Running 改為 Blocked 。若儲存設備反應慢，執行緒就會長時間阻塞。CPU 使用率低是因為排程器找不到任何 Ready 的執行緒來執行。</p></div></p><hr id="33ba15e2-9005-8006-9b65-ce19cd17fcb6" dir="auto"/><p id="33ba15e2-9005-8059-83f8-e1472f618d5f" class="" dir="auto">(1) 雖然 interrupt storm 是真實存在的 I/O 問題，但它會表現為極高的 CPU 使用率，因為 CPU 必須不斷進行 context switch 來處理 ISR，而不會導致 CPU 閒置。</p><p id="33ba15e2-9005-80c6-b714-f9d094d69c6b" class="" dir="auto">(2) 無論資料如何搬移，吞吐量低是因為執行緒被卡住了，而不是因為 CPU 在等傳輸完成的訊號。</p><p id="33ba15e2-9005-80bc-b3cf-f075ad5150d4" class="" dir="auto">(4) 如果系統正在進行 busy waiting，CPU 使用率通常會非常高，因為 CPU 正積極地執行指令來檢查狀態暫存器，而不是處於閒置狀態。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8053-956d-d7784d6d6d1a" dir="auto"/><ol type="1" id="33aa15e2-9005-80c6-9f12-ebfd50670a43" class="numbered-list" start="5" dir="auto"><li>某高效能資料庫系統最近從舊有的 SATA SSD 升級至頂級的 <strong>NVMe SSD</strong>（標示隨機 <code>4KB</code> 讀取可達 1,000K IOPS）。工程團隊原先使用大量的 threads 搭配傳統的同步讀取指令（<code>pread()</code>），並依賴硬體中斷（Interrupts）來處理海量的 point lookups。<br/>升級硬體後，他們發現系統的 IOPS 遠遠達不到 NVMe 的硬體規格上限，且 CPU 的使用率極高，大量時間被消耗在 kernel space 的 context switch 與 interrupt handling 上。<br/>根據 Block I/O 的底層特性與現代 NVMe 最佳化策略（如《What Modern NVMe Storage Can Do, And How To Exploit It》論文所述），工程團隊應該採取下列哪一種 I/O 存取架構的組合，才能在最小化 CPU 開銷的同時，徹底榨乾這顆 NVMe SSD 的隨機讀取效能？<blockquote id="33aa15e2-9005-80e6-8182-fb1bae7c4644" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8053-a051-e4345df1043e" class="numbered-list" start="1" dir="auto"><li>改用<strong>非同步 I/O</strong> 框架來避免執行緒阻塞，但必須強制底層設備關閉輪詢，完全依賴<strong>硬體中斷</strong>來通知 CPU，因為輪詢會導致 CPU 百分之百空轉，絕對會拖慢整體系統效能。</li></ol><ol type="1" id="33aa15e2-9005-8071-b9f0-e415ebfe0816" class="numbered-list" start="2" dir="auto"><li>捨棄隨機 <code>4KB</code> 讀取，將所有 I/O 請求在軟體層打包成 <code>4MB</code> 的 sequential large I/O，並繼續使用同步 I/O 搭配輪詢。</li></ol><ol type="1" id="33aa15e2-9005-80bf-94c3-fe9ec56c36b3" class="numbered-list" start="3" dir="auto"><li>維持<strong>同步 I/O（Synchronous I/O）架構，但將原本的 100 個執行緒暴增至 10,000 個執行緒，並強制系統全面使用Interrupt</strong>模式以節省 CPU 的空轉時間。</li></ol><ol type="1" id="33aa15e2-9005-8077-a4e8-fd7780340a46" class="numbered-list" start="4" dir="auto"><li>全面改用<strong>非同步 I/O（Asynchronous I/O）框架（如 </strong><code><strong>io_uring</strong></code><strong>）並搭配Polling</strong>機制。非同步 I/O 能用極少的執行緒同時提交海量請求，免除執行緒阻塞與切換的開銷；而輪詢則能讓 CPU 主動檢查完成佇列，徹底消除極高 IOPS 密度下產生的<strong>Interrupt storm</strong>。</li></ol></blockquote><details id="33aa15e2-9005-8099-9a2c-cf4a295171cf" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80fd-aa58-fe51c4337da4" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-809e-b86e-d1b6566ab1fd" class="" dir="auto">全面改用非同步 I/O（Asynchronous I/O）框架（如 io_uring）並搭配Polling機制。非同步 I/O 能用極少的執行緒同時提交海量請求，免除執行緒阻塞與切換的開銷；而輪詢則能讓 CPU 主動檢查完成佇列，徹底消除極高 IOPS 密度下產生的Interrupt storm。</p><hr id="33aa15e2-9005-80ed-a2b0-f7429fea792a" dir="auto"/><p id="33aa15e2-9005-80b3-8f01-eaa438205dd5" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8009-a091-fbde71c28c70" class="" dir="auto">這是正確的解決方案。在微秒級延遲的 NVMe SSD 上，傳統的同步 I/O 會導致執行緒頻繁被阻塞，引發昂貴的上下文切換。此外，當 I/O 密度高達每秒百萬次時，依賴硬體中斷會產生中斷風暴，導致 CPU 花費極大代價在儲存暫存器與跳轉處理程式上。根據論文的實驗結論，改用 io_uring 搭配 IOPOLL（主動輪詢），能消除這些系統呼叫與中斷的開銷，是徹底發揮現代 NVMe 效能的最佳解法。</p></div></p><hr id="33ba15e2-9005-80a5-a84d-e0ccb1555238" dir="auto"/><p id="33ba15e2-9005-804e-93df-f23eeae3bbe2" class="" dir="auto">(1) 這個選項的推論只對了一半。非同步 I/O 確實能避免阻塞，但在 NVMe SSD 高達百萬 IOPS 的全速運轉場景下，「輪詢會拖慢系統」是錯誤的傳統觀念。在極高負載且超低延遲的情境中，不斷跳轉的中斷處理成本遠大於 CPU 輪詢狀態暫存器的成本。</p><p id="33ba15e2-9005-8075-8b7d-c511f4c6eca2" class="" dir="auto">(2) 這個選項混淆了 IOPS 與 bandwidth 的應用場景。資料庫的點查詢本質上就是隨機的小資料存取。如果為了迎合大區塊循序讀寫，強行把毫不相干的 <code>4KB</code> 請求打包成 <code>4MB</code> 讀取，會造成極其嚴重的 read amplification，浪費 NVMe SSD 寶貴的頻寬，且同步 I/O 依然會卡住執行緒。</p><p id="33ba15e2-9005-80f6-b897-d73fb43e7607" class="" dir="auto">(3) 這是一個常見的效能調校迷思。雖然增加執行緒數量表面上可以提高 queue depth，但在 NVMe 極低的延遲下，一萬個執行緒會引發災難性的上下文切換開銷。且強制使用中斷模式，在極高 IOPS 負載下只會加劇中斷風暴的問題，反而浪費更多 CPU 資源。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80af-a49e-fe7c3fa5c1b1" dir="auto"/><ol type="1" id="33aa15e2-9005-802d-9561-fffc67d79273" class="numbered-list" start="6" dir="auto"><li>根據 HotStorage &#x27;22 的研究（&quot;When Poll is More Energy Efficient than Interrupt&quot;），在 Ultra-low Latency (ULL) 儲存環境下，Linux Kernel 提供了三種 I/O Completion 機制：<aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8091-b82e-fd4e984d142d" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-809c-884a-e7bedecd22cb" class="" dir="auto">Interrupt：由硬體發出通知，涉及 context switch。<br/>Classic Polling：CPU 持續在迴圈中檢查狀態（busy-polling），不釋放 CPU 資源。<br/>Hybrid Polling：結合兩者，先讓 Thread 進入 Sleep 再進行 Polling，旨在降低 CPU Utilization。</p></div></aside><p id="33aa15e2-9005-8030-bab7-f09c2d24ac69" class="" dir="auto">實驗觀察到一個反直覺的現象：Hybrid Polling 的 CPU Utilization 雖然明顯低於 Classic Polling，但其整機 Power Consumption 卻反而較高。請問造成此現象的核心繫統原因為何？</p><blockquote id="33aa15e2-9005-80da-b123-d35bbcd7bb5e" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80d5-b43f-fae96c29b7c3" class="numbered-list" start="1" dir="auto"><li>Hybrid Polling 在 Poll 階段會強制鎖定 PCIe Bus 的 bandwidth，導致 Data Path 產生 Congestion 並消耗額外的 Energy。</li></ol><ol type="1" id="33aa15e2-9005-8000-addd-c75c72ee84d0" class="numbered-list" start="2" dir="auto"><li>為了管理 Sleep 與喚醒機制，Kernel Scheduler 產生的 context switch 與 hrtimer 維護成本導致了大量的 Load/Store 指令開銷，其 Power Overhead 超過了單純 busy-polling。</li></ol><ol type="1" id="33aa15e2-9005-8044-b9e7-f6ea3fd816ae" class="numbered-list" start="3" dir="auto"><li>Classic Polling 模式能透過持續存取讓 CPU 維持在最低的 Clock Frequency（DVFS），從而降低整體 Power Consumption。</li></ol><ol type="1" id="33aa15e2-9005-8020-b76c-c4de3905aa20" class="numbered-list" start="4" dir="auto"><li>Hybrid Polling 會強制觸發 CPU 的深度 C-state 切換，導致 SSD 的 DMA 控製器必須反覆重啟，增加了硬體端的 Power Consumption。</li></ol></blockquote><details id="33aa15e2-9005-80b0-8592-dee4858f997b" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-806a-ac46-ef666e1b51ff" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8049-a169-fad3da5ffb97" class="" dir="auto">為了管理 Sleep 與喚醒機制，Kernel Scheduler 產生的 context switch 與 hrtimer 維護成本導致了大量的 Load/Store 指令開銷，其 Power Overhead 超過了單純 busy-polling。</p><hr id="33aa15e2-9005-8071-bf24-d457c91b11f7" dir="auto"/><p id="33aa15e2-9005-8022-9e68-eb89f2319aec" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8088-9e79-f6ba3d672f9a" class="" dir="auto">系統軟體在極短 Latency 內頻繁切換 Thread 狀態與處理 Timer 的 Fixed Cost 極高。相比之下，Classic Polling 雖然佔用 CPU Cycle，但其 Execution Path 極簡，產生的額外 Instruction Overhead 反而較小。</p></div></p><hr id="33ba15e2-9005-80ff-9d56-d5494de22c08" dir="auto"/><p id="33ba15e2-9005-80be-ae34-c284c64bfcfb" class="" dir="auto">(1) Polling 行為僅是讀取 Memory-mapped I/O Register，並不會對 PCIe Bus 造成實質性的 Congestion 與 Energy 損耗。</p><p id="33ba15e2-9005-80e7-a5ee-ea2323ede276" class="" dir="auto">(3) Classic Polling 通常會讓 CPU 維持在 Active 狀態以追求最低 Latency，並非透過降頻省電。</p><p id="33ba15e2-9005-801f-8f19-df4506654a96" class="" dir="auto">(4) 論文指出 Power Consumption 增加主要來自 Host 端處理 Scheduling 與 Timer 的 Software Overhead，與 SSD 端的 DMA 或硬體狀態無關。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-808e-8800-c472f6f78381" dir="auto"/><ol type="1" id="33aa15e2-9005-8045-beff-c8ab90bfb2f5" class="numbered-list" start="7" dir="auto"><li>某遊戲引擎需要載入一萬個散落的 4KB 小檔案。團隊經歷三次迭代：<aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33ba15e2-9005-807a-abb2-c98561fb7b73" dir="ltr"><div style="width:100%"><p id="33ba15e2-9005-8083-a1e5-d8c9235ddd07" class="" dir="auto">(1) 單一執行緒 synchronous I/O 逐一讀取，載入極慢；<br/>(2) 改用 asynchronous I/O 一次提交所有請求，載入變快但觸發上萬次 interrupt，CPU 負載飆高；<br/>(3) 將小檔案預先打包成一個 40MB 連續檔案，改回單次 synchronous I/O 讀取。</p></div></aside><p id="33ba15e2-9005-809b-8039-e084833350df" class="" dir="auto">關於這三次迭代背後的 block I/O 原理，下列何者最精確？</p><blockquote id="33aa15e2-9005-8035-be0c-c94c8cb6cf71" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8024-a948-c9f376ff5035" class="numbered-list" start="1" dir="auto"><li>版本(2) CPU 負載飆高是因為 asynchronous I/O 繞過 block device abstraction，CPU 必須以 byte 為單位搬運資料。</li></ol><ol type="1" id="33aa15e2-9005-80d1-ae84-cc396dfc24bd" class="numbered-list" start="2" dir="auto"><li>版本(1) 的瓶頸在 IOPS 並發不足；版本(2) 解決並發但引發 interrupt storm；版本(3) 將 workload 從 random small I/O 轉為 sequential large I/O，瓶頸轉移至 bandwidth。</li></ol><ol type="1" id="33aa15e2-9005-80d2-bff5-e8ab0f7145da" class="numbered-list" start="3" dir="auto"><li>版本(1) 的瓶頸在 bandwidth 不足；版本(3) 證明只要檔案夠大，synchronous I/O 就不會 block 執行緒。</li></ol><ol type="1" id="33aa15e2-9005-805e-8a82-c800c65b1f6e" class="numbered-list" start="4" dir="auto"><li>版本(3) 讀取 40MB 檔案時，驅動程式會自動切成一萬個 4KB 請求以最大化 IOPS，並強制使用 polling。</li></ol></blockquote><details id="33aa15e2-9005-80ad-bb3b-e47f65d31647" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8038-a26b-ca68a57a1712" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8074-bbbc-d2e3afaa7d96" class="" dir="auto">版本(1) 的瓶頸在 IOPS 並發不足；版本(2) 解決並發但引發 interrupt storm；版本(3) 將 workload 從 random small I/O 轉為 sequential large I/O，瓶頸轉移至 bandwidth。</p><hr id="33aa15e2-9005-8084-9d1e-dee9dbadbe2c" dir="auto"/><p id="33aa15e2-9005-80e0-8504-fdb9afdc7d9f" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-808b-8dfc-fc701f528d95" class="" dir="auto">版本(1) 的單一執行緒與 synchronous I/O 模式因為一次只能有一個執行中（in-flight）的請求，無法產生足夠的並發 I/O 來發揮硬體的 IOPS 能力；版本(2) 利用 asynchronous I/O 解決了阻塞問題並提升了並發度，但大量的小型 I/O 完成通知引發了中斷風暴；版本(3) 透過打包檔案，受限於 IOPS 的隨機讀取轉化為受限於 bandwidth 的連續讀取，僅需少數的 I/O 請求與中斷即可完成相同資料量的傳輸。</p></div></p><hr id="33ba15e2-9005-8054-9cd9-e6effdc1a024" dir="auto"/><p id="33ba15e2-9005-80d4-8817-cceb9704f675" class="" dir="auto">(1) 無論是 synchronous 或 asynchronous I/O，作業系統與硬體溝通時始終遵循 block device abstraction 的規範，以固定大小的區塊（block）為單位進行操作，不會直接以位元組（byte）為單位存取。版本(2) 的 CPU 飆高是因為處理大量 interrupt 的 context switch cost。</p><p id="33ba15e2-9005-8070-9b20-f85c5cd6041c" class="" dir="auto">(3) 讀取散落的 4KB 小檔案（random small I/O）的瓶頸在於 IOPS，而非 bandwidth。此外，使用 synchronous I/O 時，無論讀取的檔案多大，發出系統呼叫的執行緒都一定會被 block ，直到資料完全載入記憶體為止。</p><p id="33ba15e2-9005-80b3-8e28-f2b134fa5835" class="" dir="auto">(4) 讀取連續的 40MB 大檔案屬於 sequential large I/O，其效能指標在於 bandwidth 而非 IOPS。雖然作業系統或硬體底層可能會依照最大傳輸單元分割大請求，但其目的是最大化連續傳輸的頻寬，而非追求高 IOPS，也不會強制綁定 polling 模式。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80f5-b97a-cd1e252be4ee" dir="auto"/><ol type="1" id="33aa15e2-9005-8059-9dd0-dbf78212257d" class="numbered-list" start="8" dir="auto"><li>你正在設計一個 high-frequency logging 系統，應用程式每次都產生 512B 的 log record， 並且要求 <code>fsync()</code> 後才算成功。底層儲存裝置是 SSD，對外提供的 block device abstraction 為 4KB logical block。壓力測試時發現：<aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-808b-837f-eb17512e971e" dir="ltr"><div style="width:100%"><ol type="1" id="33aa15e2-9005-80fc-8b94-dbf9ebe1f4b2" class="numbered-list" start="1" dir="auto"><li>改成 muti-threads + asynchronous I/O 後，throughput 有提升，但 tail latency 仍然明顯偏高</li></ol><ol type="1" id="33aa15e2-9005-803e-92c2-cbeccc6032da" class="numbered-list" start="2" dir="auto"><li>CPU profile 顯示 interrupt handling 佔比很高</li></ol><ol type="1" id="33aa15e2-9005-801a-8052-d2cc6531a68b" class="numbered-list" start="3" dir="auto"><li>裝置 bandwidth 還沒滿，但 IOPS 已接近上限</li></ol></div></aside><p id="33aa15e2-9005-80d9-9c41-eb2f21c196a3" class="" dir="auto">在不改硬體的前提下，下列哪個調整最能解決問題，原因為何？</p><blockquote id="33aa15e2-9005-8095-a90d-e7a0164b7c0b" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8073-a7c0-c24ab6ff7134" class="numbered-list" start="1" dir="auto"><li>維持目前 asynchronous I/O，改用更高 thread 數即可，因為 block device abstraction 只影響 address 轉換，不影響效能。</li></ol><ol type="1" id="33aa15e2-9005-80f5-99cb-dcc4aba7adda" class="numbered-list" start="2" dir="auto"><li>把 log writer 改成先在記憶體聚合到 4KB 再批次提交；搭配 asynchronous I/O 保持 queue depth，並在高 IOPS 區段視情況使用 polling 以降低 interrupt cost。</li></ol><ol type="1" id="33aa15e2-9005-8021-902c-da80340e5ae4" class="numbered-list" start="3" dir="auto"><li>把每筆 512B log 改成每秒一次的 8MB 順序寫入，並回到 synchronous I/O；大 I/O 一定同時提升吞吐與資料即時性。</li></ol><ol type="1" id="33aa15e2-9005-8012-b6ba-e9a6290c4f54" class="numbered-list" start="4" dir="auto"><li>維持 512B 同步寫入，但把通知機制改成 polling；因為 polling 一定比 Interrupt 快，所以可以同時解決 tail latency 與 IOPS 瓶頸。</li></ol></blockquote><details id="33aa15e2-9005-80dd-a9b0-e78a309a35ed" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8062-a171-e839b264e536" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8078-934e-d2dde9f6c405" class="" dir="auto">把 log writer 改成先在記憶體聚合到 4KB 再批次提交；搭配 asynchronous I/O 保持 queue depth，並在高 IOPS 區段視情況使用 polling 以降低 interrupt cost。</p><hr id="33aa15e2-9005-802b-97ff-fff0b9a7c54d" dir="auto"/><p id="33aa15e2-9005-8098-b4b4-df25b157efc9" class="" dir="auto">解析: <div class="indented"><p id="065f5f8e-2a25-4920-b4ca-3a10c9368df2" class="" dir="auto">第一，將 512B 請求對齊到 4KB block，可減少因大小不匹配造成的額外 metadata 與 write amplification。 第二，asynchronous I/O 讓系統維持足夠 in-flight requests，不會像 synchronous I/O 那樣頻繁阻塞。 第三，在高 IOPS 場景下可用 polling 降低大量 interrupt 的 context switch 成本。 由於目前 IOPS 是 bottleneck，優先減少每筆 I/O 的固定成本最有效。</p></div></p><hr id="33ba15e2-9005-80e3-916b-e1650302f227" dir="auto"/><p id="33ba15e2-9005-80d5-9a5c-eef580b9e749" class="" dir="auto">(1) block abstraction 不只是地址命名，I/O 大小與對齊也會直接影響效能。 在 4KB block 裝置上持續送大量 512B durable writes，增加 thread 數通常只會放大排程與中斷成本， 不會從根本解決 IOPS 壓力與 tail latency 問題。</p><p id="33ba15e2-9005-8030-a47b-dc8d50a9f618" class="" dir="auto">(3) 大區塊順序寫入確實有機會提高 bandwidth 利用率，但題目中有要求 <code>fsync()</code> 後才算成功， 每秒才 fsync 會明顯改變 durability 與即時性要求。這種改動可能不適合 high-frequency logging。</p><p id="33ba15e2-9005-8046-b057-f6b781420004" class="" dir="auto">(4) Polling 並不是在所有負載都更快。若核心問題是大量 512B 更新與 4KB block 大小不匹配， 單純換通知方式無法消除 read-modify-write 的放大成本，也無法顯著降低每筆 log 的 block 層開銷。</p></div></aside></div></details></li></ol></div></details></div></details></div></div><hr id="33aa15e2-9005-80e9-9ec8-ee5eb5b11851" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8026-a787-f76bf6d948ed" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80d8-b7c8-e7bf4d62f98a" class="" dir="auto">
+</p></div></aside></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

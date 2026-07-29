@@ -1,0 +1,772 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Flash &amp; SSD Internals</title><meta name="data-notion-page-icon" content="🧱"/><link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2290%22%3E%F0%9F%A7%B1%3C%2Ftext%3E%3C%2Fsvg%3E"/><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+/* Override strong tags inside headings to maintain consistent weight */
+h1 strong,
+h2 strong,
+h3 strong {
+	font-weight: 600;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 10px;
+	padding: 1rem;
+}
+
+/* For default-background callouts, render the border outline. */
+.callout.block-color-default_background {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+figure,
+aside,
+details {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+
+	table.collection-content {
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	table.collection-content th,
+	table.collection-content td {
+		overflow-wrap: anywhere;
+	}
+
+	table.collection-content td > .user,
+	table.collection-content td > time {
+		white-space: pre-wrap;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content-wrapper {
+	overflow-x: auto;
+}
+
+@media only print {
+	.collection-content-wrapper {
+		overflow-x: visible;
+	}
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.collection-content td {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.column-list {
+	display: flex;
+	gap: 46px;
+}
+
+.column {
+	min-width: 0;
+	overflow: hidden;
+}
+
+.column > *:first-child {
+	margin-top: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding-inline: 0.125rem;
+	padding-block: 0.375rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+table {
+	border-collapse: collapse;
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol.numbered-list.numbered-list-digits-2 {
+	padding-inline-start: 2em;
+}
+
+ol.numbered-list.numbered-list-digits-3plus {
+	padding-inline-start: 2.4em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+/*
+ * Render emoji icons using a ::before pseudo-element to keep the glyph
+ * out of the DOM textContent traversal. This avoids double-rendering icons
+ * in callouts and page titles.
+ * NOTE(slim/html-export-pseudo-icons): I can't tagref this because it will
+ * flag as a duplicate tag after codegen.
+ */
+.icon[data-emoji]::before {
+	content: attr(data-emoji);
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.callout img.notion-static-icon {
+	width: 1em;
+	height: 1em;
+}
+
+.callout p {
+	margin: 0;
+}
+
+.callout h1,
+.callout h2,
+.callout h3 {
+	margin: 0 0 0.6rem;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	margin-right: 0.4em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+blockquote.quote-large {
+	font-size: 1.25em;
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.tab {
+	margin: 1.25em 0;
+	padding-inline: 1rem;
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.highlight-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.highlight-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.highlight-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.highlight-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.highlight-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.highlight-default_background {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray_background {
+	background: rgba(42, 28, 0, 0.07);
+}
+.highlight-brown_background {
+	background: rgba(139, 46, 0, 0.086);
+}
+.highlight-orange_background {
+	background: rgba(224, 101, 1, 0.129);
+}
+.highlight-yellow_background {
+	background: rgba(211, 168, 0, 0.137);
+}
+.highlight-teal_background {
+	background: rgba(0, 100, 45, 0.09);
+}
+.highlight-blue_background {
+	background: rgba(0, 124, 215, 0.094);
+}
+.highlight-purple_background {
+	background: rgba(102, 0, 178, 0.078);
+}
+.highlight-pink_background {
+	background: rgba(197, 0, 93, 0.086);
+}
+.highlight-red_background {
+	background: rgba(223, 22, 0, 0.094);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.block-color-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.block-color-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.block-color-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.block-color-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.block-color-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(240, 239, 237, 1);
+}
+.block-color-brown_background {
+	background: rgba(245, 237, 233, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 235, 222, 1);
+}
+.block-color-yellow_background {
+	background: rgba(249, 243, 220, 1);
+}
+.block-color-teal_background {
+	background: rgba(232, 241, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(229, 242, 252, 1);
+}
+.block-color-purple_background {
+	background: rgba(243, 235, 249, 1);
+}
+.block-color-pink_background {
+	background: rgba(250, 233, 241, 1);
+}
+.block-color-red_background {
+	background: rgba(252, 233, 231, 1);
+}
+.select-value-color-default { background-color: rgba(42, 28, 0, 0.07); }
+.select-value-color-gray { background-color: rgba(28, 19, 1, 0.11); }
+.select-value-color-brown { background-color: rgba(127, 51, 0, 0.156); }
+.select-value-color-orange { background-color: rgba(196, 88, 0, 0.203); }
+.select-value-color-yellow { background-color: rgba(209, 156, 0, 0.282); }
+.select-value-color-green { background-color: rgba(0, 96, 38, 0.156); }
+.select-value-color-blue { background-color: rgba(0, 118, 217, 0.203); }
+.select-value-color-purple { background-color: rgba(92, 0, 163, 0.141); }
+.select-value-color-pink { background-color: rgba(183, 0, 78, 0.152); }
+.select-value-color-red { background-color: rgba(206, 24, 0, 0.164); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style><style>@import url('https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex-swap.min.css')</style></head><body><article id="31fa15e2-9005-8031-99e0-cb2dbcee7808" class="page serif" data-notion-page-icon="🧱"><header><img class="page-cover-image" src="https://app.notion.com/images/page-cover/gradients_8.png" style="object-position:center 70%"/><div class="page-header-icon page-header-icon-with-cover"><span class="icon" data-emoji="🧱"></span></div><h1 class="page-title" dir="auto"><strong>Flash &amp; SSD Internals</strong></h1><p class="page-description" dir="auto"></p></header><div class="page-body"><figure id="02b76e46-e7a7-4f3b-ad82-018df39e2d14" class="image" data-notion-image="https://lego.sys-nthu.tw/assets/icons/pillar-flash-ssd-nobg.png" dir="ltr"><a href="https://lego.sys-nthu.tw/assets/icons/pillar-flash-ssd-nobg.png"><img style="width:20px" src="https://lego.sys-nthu.tw/assets/icons/pillar-flash-ssd-nobg.png"/></a></figure><div id="31fa15e2-9005-80bd-a6df-c70f170d91a1" class="column-list" data-notion-column-list="" dir="auto"><div id="31fa15e2-9005-800f-984c-c61f9bebfbca" style="width:25%" class="column" data-notion-column-ratio="0.25" dir="auto"><hr id="31fa15e2-9005-80ef-a8d6-f4439fd60c30" dir="auto"/><figure id="31fa15e2-9005-8059-be46-e3bb09a8273e" class="image" data-notion-image="Flash%20&amp;%20SSD%20Internals/54e67483-1b94-4481-a1ab-155a91eddc9c.png" dir="ltr"><a href="Flash%20&amp;%20SSD%20Internals/54e67483-1b94-4481-a1ab-155a91eddc9c.png"><img style="width:291.4851485148515px" src="Flash%20&amp;%20SSD%20Internals/54e67483-1b94-4481-a1ab-155a91eddc9c.png"/></a></figure><hr id="323a15e2-9005-80da-8cb8-ca4bca74f9b3" dir="auto"/><p id="323a15e2-9005-8057-9054-de17abc411c6" class="" dir="auto"><strong>NOTE Outline</strong><div class="indented"><p id="31fa15e2-9005-808b-a70a-ef10d3806ed4" class="" dir="auto"><mark class="highlight-blue" data-notion-highlight="blue"><strong>Basic</strong></mark><div class="indented"><p id="31fa15e2-9005-8048-bcf4-e88e2a6e4511" class="" dir="auto"><mark class="highlight-default" data-notion-highlight="default"><a href="https://app.notion.com/p/323a15e29005809baf30f5ad6df32463?pvs=21">NAND Flash Fundamentals</a></mark></p><p id="31fa15e2-9005-808b-8d85-c2ac136cad6a" class="" dir="auto"><mark class="highlight-default" data-notion-highlight="default"><a href="https://app.notion.com/p/323a15e29005800e8919fbdacfb0fe9e?pvs=21">Flash Translation Layer</a></mark></p><p id="31fa15e2-9005-800b-9efa-ebe586a3e6c5" class="" dir="auto"><mark class="highlight-default" data-notion-highlight="default"><a href="Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/SSD%20Garbage%20Collection%20339a15e29005809a9e34e37a32b55f27.html">SSD Garbage Collection</a></mark></p><p id="31fa15e2-9005-8071-8b3b-cfbc60305009" class="" dir="auto"><mark class="highlight-default" data-notion-highlight="default"><a href="Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/Write%20Amplification%20339a15e29005805da13ed973609ecb8f.html">Write Amplification</a></mark></p></div></p><p id="31fa15e2-9005-808b-812c-c5a650ee3472" class="" dir="auto"><mark class="highlight-red" data-notion-highlight="red"><strong>Advance</strong></mark><div class="indented"><p id="31fa15e2-9005-808d-90fc-e5b82385cfd2" class="" dir="auto"><mark class="highlight-default" data-notion-highlight="default"><a href="Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/SSD%20Steady-State%20Behavior%20339a15e290058072955bec39baec2db6.html">SSD Steady-State Behavior</a></mark></p></div></p></div></p><hr id="323a15e2-9005-8019-bd3d-d3939b22de31" dir="auto"/><p id="339a15e2-9005-809a-b26a-c336cd13097c" class="" dir="auto">
+</p></div><div id="31fa15e2-9005-801c-a0fe-e6fa40acb9e1" style="width:75%" class="column" data-notion-column-ratio="0.75" dir="auto"><h1 id="31fa15e2-9005-800a-8c13-e579c52cd88b" class="" dir="auto">Material</h1><h3 id="31fa15e2-9005-800d-9417-db5df04ae977" class="" dir="auto"><mark class="highlight-blue" data-notion-highlight="blue"><strong>NAND Flash Fundamentals</strong></mark></h3><details id="339a15e2-9005-8062-a4d1-f39f0e372094" open="" class="toggle" dir="auto"><summary><strong>Intro</strong></summary><div class="indented"><aside class="block-color-default_background callout" data-notion-callout="" data-notion-callout-background="default_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8063-8935-de9cbe80e636" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80fb-968e-f9a0878c034d" class="" dir="auto">NAND flash 是現代 SSD 的底層儲存介質，理解它的物理特性是學習所有 SSD 相關主題的基礎。我們需要知道 SLC、MLC、TLC、QLC 等不同 cell type 如何在每個 cell 中儲存不同數量的 bit，以及它們在容量、速度與耐久性之間的取捨。NAND flash 的儲存結構是階層式的：page 是最小的讀寫單位，多個 page 組成一個 block，block 再往上組成 plane 與 die。最關鍵的物理限制是 erase-before-write constraint，我們無法直接覆寫已經寫過的 page，必須先將整個 block 抹除才能重新寫入。每個 block 能承受的 P/E cycle 數量有限，超過後 cell 就會開始不穩定，這也是 SSD 壽命的根本瓶頸。理解這些基礎限制，我們才能明白為什麼 SSD 的韌體需要如此複雜的管理機制。</p></div></aside></div></details><details id="31fa15e2-9005-8088-bc43-ee1bce2ea18a" open="" class="block-color-gray_background toggle" data-notion-highlight="gray_background" dir="auto"><summary><mark class="highlight-default_background" data-notion-highlight="default_background"><strong>Course Resource</strong></mark></summary><div class="indented"><details id="31fa15e2-9005-80f5-8a4e-cdebf1085a82" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue">Key words</mark><mark class="highlight-blue" data-notion-highlight="blue"><strong> </strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="31fa15e2-9005-80f5-bef2-c616ef500964" dir="ltr"><div style="width:100%"><p id="bf740b71-c37e-4217-b467-c5ac64839bd9" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">SLC, MLC, TLC, QLC, page, block, plane, die, P/E cycle, erase-before-write, endurance, retention </mark></p></div></aside></div></details><details id="31fa15e2-9005-809c-9bf4-fb392f5e7411" open="" class="toggle" dir="auto"><summary><mark class="highlight-red" data-notion-highlight="red">Recommended Resources</mark></summary><div class="indented"><p id="31fa15e2-9005-80de-95f7-de5f68f0704a" class="" dir="auto"><a href="https://safari.ethz.ch/projects_and_seminars/fall2022/lib/exe/fetch.php?media=pns_modern_ssds_fall2022_2nd_after_meeting.pdf">Basics of NAND Flash-Based SSDs, Dr. Mohammad Sadrosadati (2022)</a>,  <a href="https://www.youtube.com/watch?v=4VTwOMmsnJY">Youtube video</a></p></div></details><details id="31fa15e2-9005-8051-b12f-f21b8ece45fd" open="" class="toggle" dir="auto"><summary><mark class="highlight-brown" data-notion-highlight="brown">Related Papers</mark></summary><div class="indented"><p id="31fa15e2-9005-8082-b1dd-fe19bcab8440" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/ssd-iq">https://lego.sys-nthu.tw/papers/ssd-iq</a></p><p id="31fa15e2-9005-8050-bc51-cdb8d5f3eedc" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/zns">https://lego.sys-nthu.tw/papers/zns</a></p><p id="31fa15e2-9005-8064-a78f-d51c1c423236" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/co-design-btree-zns">https://lego.sys-nthu.tw/papers/co-design-btree-zns</a></p><p id="31fa15e2-9005-80ef-803b-d19b654ab4df" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/flash-coded-storage">https://lego.sys-nthu.tw/papers/flash-coded-storage</a></p></div></details></div></details><details id="31fa15e2-9005-8010-bec7-f1c08bcd2c48" open="" class="toggle" dir="auto"><summary><strong>Note </strong></summary><div class="indented"><p id="339a15e2-9005-804b-b5a6-deb44fecb3d9" class="" dir="auto"><a href="Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/NAND%20Flash%20Fundamentals%20339a15e290058052ba01ec869af1a4b3.html" data-notion-page-id="339a15e2-9005-8052-ba01-ec869af1a4b3" data-notion-space-id="e8ca15e2-9005-814c-9a7f-0003626048ef"><span class="icon" data-emoji="🧱"></span>NAND Flash Fundamentals</a> </p></div></details><hr id="323a15e2-9005-80af-854a-ef6d4ed97e73" dir="auto"/><h3 id="31fa15e2-9005-8040-beef-c1744afdf4ce" class="" dir="auto"><mark class="highlight-blue" data-notion-highlight="blue">Flash Translation Layer</mark></h3><details id="339a15e2-9005-80e4-badf-fdb7377b1558" open="" class="toggle" dir="auto"><summary><strong>Intro</strong></summary><div class="indented"><aside class="block-color-default_background callout" data-notion-callout="" data-notion-callout-background="default_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80fd-986e-c2a0db699820" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8077-8fe1-d11af16006ac" class="" dir="auto">由於 NAND flash 的 erase-before-write 限制，SSD 不能像傳統硬碟一樣直接在原地覆寫資料，因此需要一層韌體來管理邏輯位址與實體位址之間的對應，這就是 Flash Translation Layer（FTL）。FTL 將作業系統看到的 LBA（Logical Block Address）映射到實際 NAND flash 上的 PBA（Physical Block Address），並採用 out-of-place write 策略：每次寫入都寫到新的空白 page，再更新 mapping table 讓 LBA 指向新位置。Mapping table 的設計有不同粒度的取捨：page-level mapping 提供最大彈性但需要大量 SRAM 來儲存映射表，block-level mapping 節省記憶體但會增加不必要的資料搬移。理解 FTL 的運作方式，我們才能解釋為什麼 SSD 的行為與 HDD 有本質上的不同，以及為什麼上層軟體的存取模式會對 SSD 效能產生巨大影響。</p></div></aside></div></details><details id="323a15e2-9005-809f-9435-e04a820ad7c7" open="" class="toggle" dir="auto"><summary><mark class="highlight-default_background" data-notion-highlight="default_background"><strong>Course Resource</strong></mark></summary><div class="indented"><details id="323a15e2-9005-805f-9142-f7ef59d75b16" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue">Key words</mark><mark class="highlight-blue" data-notion-highlight="blue"><strong> </strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="323a15e2-9005-80ac-8e67-e17e940325e7" dir="ltr"><div style="width:100%"><p id="23e1e2d4-a43b-4e98-a4b1-f48bf1755165" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">FTL, LBA, PBA, mapping table, out-of-place write, page-level mapping, block-level mapping, DFTL, SRAM</mark></p></div></aside></div></details><details id="323a15e2-9005-80a5-8613-c1dd981af869" open="" class="toggle" dir="auto"><summary><mark class="highlight-red" data-notion-highlight="red">Recommended Resources</mark></summary><div class="indented"><p id="339a15e2-9005-80ee-8b8f-e6e2f5e06288" class="" dir="auto"><a href="https://www.cse.cuhk.edu.hk/~mcyang/csci5550/2020S/Lec06%20Flash%20Memory.pdf">https://www.cse.cuhk.edu.hk/~mcyang/csci5550/2020S/Lec06%20Flash%20Memory.pdf</a></p></div></details><details id="323a15e2-9005-80b3-a067-f29be41e719b" open="" class="toggle" dir="auto"><summary><mark class="highlight-brown" data-notion-highlight="brown">Related Papers</mark></summary><div class="indented"><p id="770884d1-428a-4ac2-a3b6-6698667dc08a" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/flash-coded-storage">https://lego.sys-nthu.tw/papers/flash-coded-storage</a></p><p id="339a15e2-9005-80b1-929c-d6800b00a071" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/co-design-btree-zns">https://lego.sys-nthu.tw/papers/co-design-btree-zns</a></p><p id="339a15e2-9005-80ef-8ee5-c1cd4d35539d" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/ssd-iq">https://lego.sys-nthu.tw/papers/ssd-iq</a></p><p id="339a15e2-9005-80de-8d59-c4b496478510" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/zns">https://lego.sys-nthu.tw/papers/zns</a></p><p id="339a15e2-9005-80d4-b105-e648f5648f7a" class="" dir="auto">
+</p><p id="323a15e2-9005-80fe-a594-c74e4a9eb1f4" class="" dir="auto">
+</p></div></details></div></details><details id="323a15e2-9005-80f4-a29d-e909a541e594" open="" class="toggle" dir="auto"><summary><strong>Note</strong></summary><div class="indented"><p id="339a15e2-9005-80c2-be04-eeb00457df1f" class="" dir="auto"><a href="Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/Flash%20Translation%20Layer%20339a15e290058024b507e1d480511602.html" data-notion-page-id="339a15e2-9005-8024-b507-e1d480511602" data-notion-space-id="e8ca15e2-9005-814c-9a7f-0003626048ef"><span class="icon" data-emoji="🧱"></span>Flash Translation Layer</a> </p></div></details><hr id="323a15e2-9005-8099-b23e-dd34e65b393e" dir="auto"/><h3 id="31fa15e2-9005-80b9-ad97-fa23afca565d" class="" dir="auto"><mark class="highlight-blue" data-notion-highlight="blue">SSD Garbage Collection</mark></h3><details id="339a15e2-9005-80e8-812f-cb9f4bb58938" open="" class="toggle" dir="auto"><summary><strong>Intro</strong></summary><div class="indented"><aside class="block-color-default_background callout" data-notion-callout="" data-notion-callout-background="default_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8026-b565-e538ec1bbe6f" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80a0-a0c7-f878d156a1a3" class="" dir="auto">因為 FTL 採用 out-of-place write，隨著時間推移，NAND flash 上會累積大量 invalid page（舊版本的資料），這些 page 所在的 block 無法直接被重新利用。Garbage collection（GC）的工作就是挑選含有較多 invalid page 的 block，將其中仍然有效的 page 搬移到其他 block，然後將整個 block 抹除以回收空間。SSD 會預留一部分使用者看不到的空間作為 over-provisioning（OP），讓 GC 在搬移資料時有足夠的緩衝空間可以運作。選擇哪個 block 來回收是一個重要的策略問題：greedy 策略挑 invalid page 最多的 block 以最大化立即回收的空間，而 cost-benefit 策略則同時考慮資料的冷熱程度以減少長期的搬移開銷。此外，wear leveling 機制確保所有 block 的 P/E cycle 使用量盡量平均，避免某些 block 提早損壞。理解 GC 的運作是掌握 SSD 效能特性的關鍵，因為它直接影響寫入延遲與 SSD 壽命。</p></div></aside></div></details><details id="323a15e2-9005-801a-9334-d3c2c5cbc71d" open="" class="toggle" dir="auto"><summary><mark class="highlight-default_background" data-notion-highlight="default_background"><strong>Course Resource</strong></mark></summary><div class="indented"><details id="323a15e2-9005-802e-8705-e57c4f227b84" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue">Key words</mark><mark class="highlight-blue" data-notion-highlight="blue"><strong> </strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="323a15e2-9005-8017-a535-f660d25f75ca" dir="ltr"><div style="width:100%"><p id="323a15e2-9005-803a-878c-ce1bfb579479" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">SSD Garbage Collection garbage collection, invalid page, valid page, over-provisioning, greedy policy, cost-benefit policy, wear leveling, victim selection</mark></p></div></aside></div></details><details id="323a15e2-9005-808a-ab22-c1da99e9a922" open="" class="toggle" dir="auto"><summary><mark class="highlight-red" data-notion-highlight="red">Recommended Resources</mark></summary><div class="indented"><p id="339a15e2-9005-808b-bd2c-cb2154d7d20e" class="" dir="auto"><a href="https://www.cse.cuhk.edu.hk/~mcyang/csci5550/2020S/Lec06%20Flash%20Memory.pdf">https://www.cse.cuhk.edu.hk/~mcyang/csci5550/2020S/Lec06%20Flash%20Memory.pdf</a></p></div></details><details id="323a15e2-9005-8032-9d91-e210ef4bb3f8" open="" class="toggle" dir="auto"><summary><mark class="highlight-brown" data-notion-highlight="brown">Related Papers</mark></summary><div class="indented"><p id="323a15e2-9005-80c4-aa81-d5c6356a09b8" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/ssd-iq">https://lego.sys-nthu.tw/papers/ssd-iq</a></p><p id="339a15e2-9005-80ce-96fe-f453e5c33325" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/zns">https://lego.sys-nthu.tw/papers/zns</a></p><p id="339a15e2-9005-8076-a17d-eb23c69bdace" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/co-design-btree-zns">https://lego.sys-nthu.tw/papers/co-design-btree-zns</a></p><p id="339a15e2-9005-8072-a7c1-e31bf7469ff5" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/flash-coded-storage">https://lego.sys-nthu.tw/papers/flash-coded-storage</a></p></div></details></div></details><details id="323a15e2-9005-80ce-a993-c856f0172373" open="" class="toggle" dir="auto"><summary><strong>Note</strong></summary><div class="indented"><p id="339a15e2-9005-80ab-bc69-eeb7d27cbcd6" class="" dir="auto"><a href="Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/SSD%20Garbage%20Collection%20339a15e29005809a9e34e37a32b55f27.html" data-notion-page-id="339a15e2-9005-809a-9e34-e37a32b55f27" data-notion-space-id="e8ca15e2-9005-814c-9a7f-0003626048ef"><span class="icon" data-emoji="🧱"></span>SSD Garbage Collection</a> </p></div></details><hr id="323a15e2-9005-8062-b0b5-cd3614186fda" dir="auto"/><h3 id="31fa15e2-9005-80d1-bc4a-da194151b059" class="" dir="auto"><mark class="highlight-blue" data-notion-highlight="blue">Write Amplification</mark></h3><details id="339a15e2-9005-803d-a701-ff918c48ec59" open="" class="toggle" dir="auto"><summary><strong>Intro</strong></summary><div class="indented"><aside class="block-color-default_background callout" data-notion-callout="" data-notion-callout-background="default_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8033-ab89-c5ec705da0c0" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80b0-bf31-e0373f65381f" class="" dir="auto">Write amplification 是衡量 SSD 效率的核心指標，定義為 WAF = 實際寫入 NAND flash 的資料量除以上層應用程式要求寫入的資料量。理想情況下 WAF 應為 1，但實際上幾乎不可能達到。GC 在搬移 valid page 時會產生額外的寫入；檔案系統的 journaling 機制會將同一筆資料先寫入 journal 再寫入正式位置；LSM-Tree 型態的儲存引擎在 compaction 過程中也會反覆搬移資料；而 RAID 架構中的 partial-stripe update 同樣會造成多餘的寫入。WAF 越高，SSD 的實際壽命就越短，因為每個 cell 的 P/E cycle 消耗得更快，同時寫入效能也會下降。我們在設計和評估儲存系統時，必須將 write amplification 視為一個需要從硬體到軟體全面考量的系統層級問題。</p></div></aside></div></details><details id="323a15e2-9005-800f-a830-eec2fd949601" open="" class="toggle" dir="auto"><summary><mark class="highlight-default_background" data-notion-highlight="default_background"><strong>Course Resource</strong></mark></summary><div class="indented"><details id="323a15e2-9005-80ed-ae66-e2d66c6921a9" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue">Key words</mark><mark class="highlight-blue" data-notion-highlight="blue"><strong> </strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="323a15e2-9005-80d3-ac0a-f8d9ed1f9d8e" dir="ltr"><div style="width:100%"><p id="323a15e2-9005-8099-9fae-f63755957b0f" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Write Amplification write amplification, WAF, GC overhead, journaling overhead, compaction, partial-stripe write, SSD lifetime</mark></p></div></aside></div></details><details id="323a15e2-9005-8019-a248-e8c6a2d16efc" open="" class="toggle" dir="auto"><summary><mark class="highlight-red" data-notion-highlight="red">Recommended Resources</mark></summary><div class="indented"><p id="33aa15e2-9005-8038-95fc-c4666e412d06" class="" dir="auto">None</p></div></details><details id="323a15e2-9005-807a-84ce-c9c3f418cdae" open="" class="toggle" dir="auto"><summary><mark class="highlight-brown" data-notion-highlight="brown">Related Papers</mark></summary><div class="indented"><p id="323a15e2-9005-80b7-86f4-dd0003f2fe47" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/ssd-iq">https://lego.sys-nthu.tw/papers/ssd-iq</a></p><p id="33aa15e2-9005-805e-9c56-dd1ad18dc5fb" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/zns">https://lego.sys-nthu.tw/papers/zns</a></p><p id="33aa15e2-9005-808b-8900-f0f5df8d5b92" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/co-design-btree-zns">https://lego.sys-nthu.tw/papers/co-design-btree-zns</a></p><p id="33aa15e2-9005-807b-8b75-ece9100fd71a" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/watt">https://lego.sys-nthu.tw/papers/watt</a></p><p id="33aa15e2-9005-80f8-8fd0-e65ff25e6f6e" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/wisckey">https://lego.sys-nthu.tw/papers/wisckey</a></p><p id="33aa15e2-9005-809e-b6de-e620bd96f792" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/flash-coded-storage">https://lego.sys-nthu.tw/papers/flash-coded-storage</a></p><p id="33aa15e2-9005-803d-8aea-ffbad5834ecc" class="" dir="auto">
+</p></div></details></div></details><details id="323a15e2-9005-80b5-9694-da2376f4d1ea" open="" class="toggle" dir="auto"><summary><strong>Note</strong></summary><div class="indented"><p id="339a15e2-9005-8011-8eba-d1e114b2be59" class="" dir="auto"><a href="Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/Write%20Amplification%20339a15e29005805da13ed973609ecb8f.html" data-notion-page-id="339a15e2-9005-805d-a13e-d973609ecb8f" data-notion-space-id="e8ca15e2-9005-814c-9a7f-0003626048ef"><span class="icon" data-emoji="🧱"></span>Write Amplification</a> </p></div></details><hr id="323a15e2-9005-8014-bb38-da48cfae30cf" dir="auto"/><h3 id="31fa15e2-9005-802f-9d68-c7f077928352" class="" dir="auto"><mark class="highlight-red" data-notion-highlight="red">SSD Steady-State Behavior</mark></h3><details id="339a15e2-9005-8085-8c77-ef8ddfcab18d" open="" class="toggle" dir="auto"><summary><strong>Intro</strong></summary><div class="indented"><aside class="block-color-default_background callout" data-notion-callout="" data-notion-callout-background="default_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-806f-b6a6-ef41461b7118" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80a8-9eea-f70f514ae4e2" class="" dir="auto">在這個進階主題中，我們將深入探討 SSD 在長時間持續寫入後的真實效能表現。當 SSD 剛開箱或剛被 secure erase 過時，所有 block 都是乾淨的，此時寫入效能非常好，但這個 fresh state 並不能代表實際使用情境。當可用空間逐漸耗盡後，SSD 進入 steady state，每次寫入都可能觸發 GC，而 GC 與使用者的 I/O 請求競爭 NAND flash 的頻寬，導致 tail latency 出現劇烈的 spike。</p><p id="33aa15e2-9005-8023-8431-e1493bd119dd" class="" dir="auto">我們會探討 over-provisioning 比例如何影響 steady state 的效能表現，以及為什麼業界的 benchmark 如果只測 fresh state 就會嚴重高估 SSD 的實際效能。結合先前學到的 garbage collection 與 write amplification 概念，我們將建立一套正確的 benchmarking methodology，學會如何設計實驗來反映 SSD 在生產環境中的真實行為。</p></div></aside></div></details><details id="323a15e2-9005-80b7-83d9-fa3d39e85d75" open="" class="toggle" dir="auto"><summary><mark class="highlight-default_background" data-notion-highlight="default_background"><strong>Course Resource</strong></mark></summary><div class="indented"><details id="323a15e2-9005-80d4-b413-db2cd7a4d0ee" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue">Key words</mark><mark class="highlight-blue" data-notion-highlight="blue"><strong> </strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="323a15e2-9005-80f4-8ad9-ec63af6c1d92" dir="ltr"><div style="width:100%"><p id="323a15e2-9005-8075-b9d7-d577177474ea" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">SSD Steady-State Behavior steady state, fresh state, tail latency, over-provisioning, GC interference, benchmarking methodology, precondition</mark></p></div></aside></div></details><details id="323a15e2-9005-80aa-adcc-ec89e451c5d8" open="" class="toggle" dir="auto"><summary><mark class="highlight-red" data-notion-highlight="red">Recommended Resources</mark></summary><div class="indented"><p id="33aa15e2-9005-8023-8c07-ff014c7648a9" class="" dir="auto"><a href="https://sys-nthu.github.io/os25-fall/handouts/buffercache.html#cache-inside-ssd">https://sys-nthu.github.io/os25-fall/handouts/buffercache.html#cache-inside-ssd</a></p><p id="33aa15e2-9005-8064-8dbc-dfc9a580b16c" class="" dir="auto"><a href="https://events.static.linuxfound.org/sites/events/files/slides/vault17-ssd-contract.pdf">https://events.static.linuxfound.org/sites/events/files/slides/vault17-ssd-contract.pdf</a></p></div></details><details id="323a15e2-9005-803c-b1a8-ce16d28cf3fd" open="" class="toggle" dir="auto"><summary><mark class="highlight-brown" data-notion-highlight="brown">Related Papers</mark></summary><div class="indented"><p id="323a15e2-9005-8048-b600-e0128581a60a" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/ssd-iq">https://lego.sys-nthu.tw/papers/ssd-iq</a></p><p id="33aa15e2-9005-801d-a80c-ca832e91c1e9" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/watt">https://lego.sys-nthu.tw/papers/watt</a></p></div></details></div></details><details id="323a15e2-9005-803a-9372-d2bf3eca4cc0" open="" class="toggle" dir="auto"><summary><strong>Note</strong></summary><div class="indented"><p id="339a15e2-9005-80c3-9e02-fa1c66dcd023" class="" dir="auto"><a href="Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/SSD%20Steady-State%20Behavior%20339a15e290058072955bec39baec2db6.html" data-notion-page-id="339a15e2-9005-8072-955b-ec39baec2db6" data-notion-space-id="e8ca15e2-9005-814c-9a7f-0003626048ef"><span class="icon" data-emoji="🔧"></span>SSD Steady-State Behavior</a> </p></div></details></div></div><hr id="31fa15e2-9005-801b-abf4-d29825209839" dir="auto"/><figure id="339a15e2-9005-8066-a473-d4169657a6a8" class="link-to-page"><a href="Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals%20339a15e290058066a473d4169657a6a8.html" data-notion-page-id="339a15e2-9005-8066-a473-d4169657a6a8" data-notion-space-id="e8ca15e2-9005-814c-9a7f-0003626048ef">NOTE-Flash &amp; SSD Internals</a></figure><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="323a15e2-9005-8034-a6d9-d284cf1d98c5" dir="ltr"><div style="width:100%"></div></aside><p id="339a15e2-9005-8028-9413-d9d8c46d1b73" class="" dir="auto">
+</p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

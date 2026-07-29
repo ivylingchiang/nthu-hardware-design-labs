@@ -1,0 +1,769 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Flash Translation Layer</title><meta name="data-notion-page-icon" content="🧱"/><link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2290%22%3E%F0%9F%A7%B1%3C%2Ftext%3E%3C%2Fsvg%3E"/><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+/* Override strong tags inside headings to maintain consistent weight */
+h1 strong,
+h2 strong,
+h3 strong {
+	font-weight: 600;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 10px;
+	padding: 1rem;
+}
+
+/* For default-background callouts, render the border outline. */
+.callout.block-color-default_background {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+figure,
+aside,
+details {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+
+	table.collection-content {
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	table.collection-content th,
+	table.collection-content td {
+		overflow-wrap: anywhere;
+	}
+
+	table.collection-content td > .user,
+	table.collection-content td > time {
+		white-space: pre-wrap;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content-wrapper {
+	overflow-x: auto;
+}
+
+@media only print {
+	.collection-content-wrapper {
+		overflow-x: visible;
+	}
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.collection-content td {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.column-list {
+	display: flex;
+	gap: 46px;
+}
+
+.column {
+	min-width: 0;
+	overflow: hidden;
+}
+
+.column > *:first-child {
+	margin-top: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding-inline: 0.125rem;
+	padding-block: 0.375rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+table {
+	border-collapse: collapse;
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol.numbered-list.numbered-list-digits-2 {
+	padding-inline-start: 2em;
+}
+
+ol.numbered-list.numbered-list-digits-3plus {
+	padding-inline-start: 2.4em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+/*
+ * Render emoji icons using a ::before pseudo-element to keep the glyph
+ * out of the DOM textContent traversal. This avoids double-rendering icons
+ * in callouts and page titles.
+ * NOTE(slim/html-export-pseudo-icons): I can't tagref this because it will
+ * flag as a duplicate tag after codegen.
+ */
+.icon[data-emoji]::before {
+	content: attr(data-emoji);
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.callout img.notion-static-icon {
+	width: 1em;
+	height: 1em;
+}
+
+.callout p {
+	margin: 0;
+}
+
+.callout h1,
+.callout h2,
+.callout h3 {
+	margin: 0 0 0.6rem;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	margin-right: 0.4em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+blockquote.quote-large {
+	font-size: 1.25em;
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.tab {
+	margin: 1.25em 0;
+	padding-inline: 1rem;
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.highlight-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.highlight-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.highlight-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.highlight-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.highlight-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.highlight-default_background {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray_background {
+	background: rgba(42, 28, 0, 0.07);
+}
+.highlight-brown_background {
+	background: rgba(139, 46, 0, 0.086);
+}
+.highlight-orange_background {
+	background: rgba(224, 101, 1, 0.129);
+}
+.highlight-yellow_background {
+	background: rgba(211, 168, 0, 0.137);
+}
+.highlight-teal_background {
+	background: rgba(0, 100, 45, 0.09);
+}
+.highlight-blue_background {
+	background: rgba(0, 124, 215, 0.094);
+}
+.highlight-purple_background {
+	background: rgba(102, 0, 178, 0.078);
+}
+.highlight-pink_background {
+	background: rgba(197, 0, 93, 0.086);
+}
+.highlight-red_background {
+	background: rgba(223, 22, 0, 0.094);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.block-color-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.block-color-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.block-color-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.block-color-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.block-color-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(240, 239, 237, 1);
+}
+.block-color-brown_background {
+	background: rgba(245, 237, 233, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 235, 222, 1);
+}
+.block-color-yellow_background {
+	background: rgba(249, 243, 220, 1);
+}
+.block-color-teal_background {
+	background: rgba(232, 241, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(229, 242, 252, 1);
+}
+.block-color-purple_background {
+	background: rgba(243, 235, 249, 1);
+}
+.block-color-pink_background {
+	background: rgba(250, 233, 241, 1);
+}
+.block-color-red_background {
+	background: rgba(252, 233, 231, 1);
+}
+.select-value-color-default { background-color: rgba(42, 28, 0, 0.07); }
+.select-value-color-gray { background-color: rgba(28, 19, 1, 0.11); }
+.select-value-color-brown { background-color: rgba(127, 51, 0, 0.156); }
+.select-value-color-orange { background-color: rgba(196, 88, 0, 0.203); }
+.select-value-color-yellow { background-color: rgba(209, 156, 0, 0.282); }
+.select-value-color-green { background-color: rgba(0, 96, 38, 0.156); }
+.select-value-color-blue { background-color: rgba(0, 118, 217, 0.203); }
+.select-value-color-purple { background-color: rgba(92, 0, 163, 0.141); }
+.select-value-color-pink { background-color: rgba(183, 0, 78, 0.152); }
+.select-value-color-red { background-color: rgba(206, 24, 0, 0.164); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style><style>@import url('https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex-swap.min.css')</style></head><body><article id="339a15e2-9005-8024-b507-e1d480511602" class="page serif" data-notion-page-icon="🧱"><header><img class="page-cover-image" src="https://app.notion.com/images/page-cover/met_william_morris_1877_willow.jpg" style="object-position:center 90%"/><div class="page-header-icon page-header-icon-with-cover"><span class="icon" data-emoji="🧱"></span></div><h1 class="page-title" dir="auto"><strong>Flash Translation Layer</strong></h1><p class="page-description" dir="auto"></p><table class="properties"><tbody></tbody></table></header><div class="page-body"><div id="339a15e2-9005-8030-800f-e8fe9fba9ade" class="column-list" data-notion-column-list="" dir="auto"><div id="339a15e2-9005-8023-9431-ccd8bb5ee8ab" style="width:18.75%" class="column" data-notion-column-ratio="0.1875" dir="auto"><hr id="339a15e2-9005-8056-926b-f3c0822887fc" dir="auto"/><figure id="339a15e2-9005-80f8-ab49-e728579bb53f" class="image" data-notion-image="Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg" dir="ltr"><a href="Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg"><img style="width:548.375px" src="Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg"/></a></figure><p id="339a15e2-9005-8019-8550-d5ae1f564202" class="" dir="auto">轉換單位表</p><p id="0b63f304-d5de-4f60-8cf9-08353678b5f6" class="" dir="auto">1 Byte = 8 Bits<br/>1 Kilobyte (KB) = 1024 Bytes<br/>1 Megabyte (MB) = 1024 KB<br/>1 Gigabyte (GB) = 1024 MB<br/>1 Terabyte (TB) = 1024 GB<br/>1 Petabyte (PB) = 1024 TB<br/>1 Exabyte (EB) = 1024 PB<br/>1 Zettabyte (ZB) = 1024 EB<br/>1 Yottabyte (YB) = 1024 ZB</p><hr id="339a15e2-9005-8026-b015-c4763d31a3fc" dir="auto"/><p id="339a15e2-9005-80d0-9dad-d1e1dc6aaca0" class="" dir="auto">1 Kilobyte (KB) = 10^3 Bytes<br/>1 Megabyte (MB) = 10^6 KB<br/>1 Gigabyte (GB) = 10^9 MB<br/>1 Terabyte (TB) = 10^12 GB<br/>1 Petabyte (PB) = 10^15 TB<br/>1 Exabyte (EB) = 10^18 PB<br/>1 Zettabyte (ZB) = 10^21 EB<br/>1 Yottabyte (YB) = 10^24 ZB</p></div><div id="339a15e2-9005-8048-9fbc-d694fde4f8c2" style="width:81.25%" class="column" data-notion-column-ratio="0.8125" dir="auto"><h3 id="339a15e2-9005-80d4-9282-e7379923f0a8" class="" dir="auto"><strong>Flash Translation Layer</strong></h3><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80a7-96da-d8807c0df07d" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80f6-be24-dee84a38bc14" class="" dir="auto"><em><mark class="highlight-gray" data-notion-highlight="gray">&quot;We can solve any problem by introducing an extra level of indirection.&quot;</mark></em></p><p id="339a15e2-9005-80ea-8848-e1c72dbce65c" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">FTL是介於SSD前端和後端之間的一個轉換層，前端指的是和Host用Protocol溝通的那邊，後端是真正儲存資料的實體的Nand Flash這邊。以前傳統的Hard Disk可以直接從Host指定把資料存在硬碟裡的任何區域，SSD中間多一層FTL就是傳統硬碟和固態硬碟不同之處，和固態硬碟使用的Nand Flash特性有關。</mark></p><hr id="339a15e2-9005-805b-9ba4-ea3b50763f22" dir="auto"/><p id="0417e5a8-07bf-4d53-952c-05cea835175a" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown">必須先Erase，才能Program。寫入之前要先抹除，沒有抹除而直接複寫的話資料會壞掉讀不出來。而且抹除的時間 » 寫入的時間 » 讀取的時間。</mark></p><p id="382b1aad-8ab6-499d-ac09-4f9feac9342f" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown">抹除和讀寫的單位不一樣，抹除的最小單位是一個Block，讀寫的最小單位是一個Page，一個Block大約是64個Page(或更多)。</mark></p><p id="48f04bbe-ddde-48d7-bd7f-8bcd1500175d" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown">Nand Flash是有壽命的，他的壽命可以用Block的PE Cycle (Program/Erase Cycle)來計算，SLC大概50K次、MLC大概3K次、TLC小於1K次，使用超過這些次數不一定真的會壞掉，但是有很高的機率資料會越來越難讀出來。</mark></p><p id="339a15e2-9005-806e-af37-e512b42871a2" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown">資料存進去後，若只一直讀取而不再抹除重寫，周圍的Page裡面儲存的電子(代表0和1的bits)會被讀取的電壓所影響，而造成資料錯誤。</mark></p></div></aside><blockquote id="339a15e2-9005-802e-a9e2-e742d95bbe76" class="" dir="auto">Reference: <a href="https://chienweichih.github.io/flash-translation-layer/">Flash Translation Layer (FTL)</a></blockquote><hr id="339a15e2-9005-807e-a586-f5f82cbfbb98" dir="auto"/><details id="339a15e2-9005-8007-b5c1-ec9ae4f2f629" open="" class="toggle" dir="auto"><summary><strong>Classification</strong></summary><div class="indented"><p id="339a15e2-9005-8060-b8cb-d012aaa141da" class="" dir="auto">
+</p><hr id="339a15e2-9005-80f9-a28e-ed7914751611" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8062-a139-ec25353b9b52" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8034-9b23-f019ef5f42bc" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Extra Component</mark></p><hr id="339a15e2-9005-8099-8021-daca638b02ef" dir="auto"/><p id="339a15e2-9005-8083-b0b0-f66f785a7083" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Reference:</mark></p></div></aside><hr id="339a15e2-9005-80c9-b9b8-c3991a610238" dir="auto"/></div></details><details id="339a15e2-9005-801b-9ada-ea838c81efb3" open="" class="toggle" dir="auto"><summary><strong>Key Word Definition/ Discussion</strong></summary><div class="indented"><details id="339a15e2-9005-808b-b3ac-e5dbcdf8f85f" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Flash Translation Layer(FTL)</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8066-9dc1-ec3b23f55ec5" dir="ltr"><div style="width:100%"><p id="22b97036-6253-439b-810b-1231a6d09b44" class="" dir="auto">主機對 SSD 發出的指令都是以 LBA（Logical Block Address）為單位。但 NAND flash 內部的實體位置會不斷變動：同一筆資料可能因為 garbage collection 被搬到不同的 physical page。如果沒有 FTL，主機每次讀取都需要知道資料目前在哪個 physical page，這顯然不切實際。</p><p id="b790eaff-ea86-4b96-904f-08b77fcd5c86" class="" dir="auto">它透過建立間接層（Indirection Layer），將主機端的連續邏輯世界與 NAND Flash 破碎、動態的實體世界解耦合。</p></div></aside><hr id="339a15e2-9005-80f6-9e1f-e5619dc2bc03" dir="auto"/><p id="339a15e2-9005-8027-afda-fa8551cd0a74" class="" dir="auto"><strong>FTL 的四大核心任務</strong></p><ul id="eab2bbeb-b1cd-4a73-9efb-14cd8cd7812b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Address Translation：維護 LBA 到 PBA 的映射。</li></ul><ul id="6ed21ab8-9de8-4ba2-aaee-83d17827b669" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Garbage Collection（GC）：清空 Invalid Pages 以釋放可用空間。</li></ul><ul id="5fdcb8d9-02c1-44b2-84ac-f9ca547b3a5a" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Wear Leveling（抹寫均衡）：確保所有 NAND Block 的抹除次數平均，延長 SSD 壽命。</li></ul><ul id="8bf64f36-c237-4cf6-b533-2107e4d8d490" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Bad Block Management（壞區塊管理）：標記並隔離出廠或使用中產生的損壞 Block。</li></ul><figure id="339a15e2-9005-8079-b4e2-c38eb28a552e" class="image" data-notion-image="Flash%20Translation%20Layer/d6d04438-ff77-4a1d-ae08-6b556a2a1bb1.png" dir="ltr"><a href="Flash%20Translation%20Layer/d6d04438-ff77-4a1d-ae08-6b556a2a1bb1.png"><img style="width:424.7887323943662px" src="Flash%20Translation%20Layer/d6d04438-ff77-4a1d-ae08-6b556a2a1bb1.png"/></a></figure><hr id="339a15e2-9005-800a-8331-e21eb788a791" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8020-9c46-e3e57cfe2bf9" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-803d-8486-f0f8870e73c7" class="" dir="auto">Reference: </p></div></aside><hr id="339a15e2-9005-80e5-98f4-d58ed857841a" dir="auto"/></div></details><details id="339a15e2-9005-8035-8d27-d9e3c7b4a765" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>LBA(Logical Block Address) vs PBA(Physical Block Address)</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80ee-891b-cc5e55b932db" dir="ltr"><div style="width:100%"><p id="b743230f-dc77-4d84-8944-1ed49a27c5bd" class="" dir="auto"><strong>LBA (Logical Block Address)</strong>：主機視角（Host View）。由 OS 或檔案系統發出，在主機眼中，儲存空間是「連續且固定」的。</p><p id="cdff6d3b-c090-4d90-8aee-23bf86e66df1" class="" dir="auto"><strong>PBA (Physical Block Address)</strong>：實體視角（Physical View）。NAND Flash 內部的真實位置。因為 FTL 的 Wear Leveling 和 GC 機制，同一筆資料（同一個 LBA）在 SSD 內部的物理位置是「離散且會不斷變動」的。</p></div></aside><hr id="339a15e2-9005-8029-8d68-f3c11fe2bac5" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-807e-8be3-d5c02345010f" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8002-a36e-e3ff9410a8fd" class="" dir="auto">Reference: </p></div></aside><hr id="339a15e2-9005-8039-b6f7-f83188a26a54" dir="auto"/></div></details><details id="339a15e2-9005-8021-b97a-e402050a7dd1" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Mapping Table</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80e8-9da1-f9dc42b9a70f" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8076-bc8e-ec2ef572eef3" class="" dir="auto">FTL 維護一張 mapping table，記錄每個 LBA 對應到哪個 PBA（Physical Block Address，更準確地說是 physical page address）。</p><p id="339a15e2-9005-8043-ad3c-df2217f59e7c" class="" dir="auto">FTL 依賴 Mapping Table 來進行 LBA 到 PBA 的 Lookup。但這張表存在 SRAM 中，具備 <strong>Volatile（揮發性）</strong>，斷電即消失。一旦映射表遺失，整顆 SSD 在邏輯上等同損壞。</p></div></aside><hr id="339a15e2-9005-80ad-9502-c0f9ebf3963e" dir="auto"/><p id="5f5c042c-4133-48cc-a7e4-cd005a8f9536" class="" dir="auto"><strong>持久化策略 (Persistence Mechanisms)：</strong></p><ul id="9508c70b-0c94-4526-8864-526dfbd19b5e" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Checkpoint</strong>：定期將整張 Mapping Table 寫入 NAND Flash。</li></ul><ul id="9098c18e-c3f1-40a9-973e-04666a4cda96" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Logging</strong>：每次更新 Mapping 時記錄一筆 Log，開機時 Replay Log 重建表格。</li></ul><ul id="258ad34a-810f-4fa3-b255-e2e85f2f3211" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Hybrid (Checkpoint + Log)</strong>：定期備份整張表，期間的微小變動用 Log 紀錄，兼顧效能與還原速度。</li></ul><ul id="82a0bce4-951c-4683-9232-675c5396fd49" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>硬體防護 (PLP)</strong>：企業級 SSD 會配備大電容（Power-loss protection capacitor），在異常斷電時提供黃金幾毫秒，讓控制器把 SRAM 中的 <strong>Dirty Entry</strong> (已修改但尚未寫入 NAND 的條目) Flush 到 NAND 中。</li></ul><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-809b-a65c-dde1dddde583" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80ba-8c1c-d0c03460ceaa" class="" dir="auto">這也是為什麼 SSD 通常有一顆大電容（power-loss protection capacitor）：斷電時提供足夠的電力讓 controller 把 SRAM 中的 dirty mapping entry flush 到 NAND flash，確保不會掉資料。</p></div></aside><hr id="339a15e2-9005-803c-9075-f22a1fd7bc16" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80b5-9164-d3ada872389f" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80da-a1bb-e10d543be3a6" class="" dir="auto">Reference: </p></div></aside><hr id="339a15e2-9005-804c-9530-d38063b1f828" dir="auto"/></div></details><details id="339a15e2-9005-8088-9507-d7583a915626" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Out-of-place write</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8073-9358-cc2be4bac37f" dir="ltr"><div style="width:100%"><p id="5951fd5e-12e3-41eb-89fa-d3447670f3f0" class="" dir="auto"><strong>Why Out-of-place?</strong><div class="indented"><p id="695fb5cf-90cc-4a94-8058-eb2c9417af1f" class="" dir="auto">NAND Flash 存在物理限制：Erase-before-write。且抹除單位（Block）大於寫入單位（Page）。若要在原位覆寫，會導致嚴重的延遲，因此必須永遠寫到新的空白位置。</p></div></p></div></aside><hr id="339a15e2-9005-802d-b984-ff2fae92b201" dir="auto"/><p id="af244509-a4af-48fa-a96b-0e5cb953a47a" class="" dir="auto"><strong>運作流程</strong></p><ol type="1" id="cdbd5332-97f5-47c5-a32b-f49e1f7ce639" class="numbered-list" start="1" dir="auto"><li>從 free page pool 取得一個空白的 physical page</li></ol><ol type="1" id="339a15e2-9005-80de-b1e5-e447c5f11833" class="numbered-list" start="2" dir="auto"><li>把新資料寫入這個 page</li></ol><ol type="1" id="339a15e2-9005-8071-be0e-c48a0d762f5b" class="numbered-list" start="3" dir="auto"><li>更新 mapping table：將LBA 指向新的 PBA</li></ol><ol type="1" id="339a15e2-9005-8015-bf8d-f77a64f4f7e2" class="numbered-list" start="4" dir="auto"><li>將舊的 physical page 標記為 invalid，等待 GC 回收</li></ol><p id="839b9ab8-b7e6-434f-a3b2-a3fb8f7941a2" class="" dir="auto"><strong>關鍵影響與副作用：</strong></p><ul id="85c98b79-c6da-458f-b27f-90c37cf47867" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Random 變 Sequential</strong>：主機端的 Random Write，經過 FTL 後在 NAND 物理層面都會變成 Sequential Write（一直往空白 Page 寫），這是 SSD 隨機寫入遠勝 HDD 的底層原因。</li></ul><ul id="eef5851b-d4a5-488a-9609-a9418c4c9902" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Write Amplification (WA，寫入放大)</strong>：因不斷產生 Invalid Page 觸發 GC 搬移有效資料，導致 SSD 實際寫入的資料量大於主機請求的寫入量。</li></ul><hr id="339a15e2-9005-80ad-ae9e-e5cd2744fdfb" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-809f-9e13-e48c0d968ee8" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-802a-ae40-e62bbacac600" class="" dir="auto">Reference: </p></div></aside><hr id="339a15e2-9005-803a-a6bb-ef099da4e23d" dir="auto"/></div></details><details id="339a15e2-9005-8065-a516-fe589a19d182" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Page-level mapping vs Block-level mapping</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8034-9e37-fd29eab5c5c5" dir="ltr"><div style="width:100%"><p id="f48053cc-0459-44cb-9f9c-f7d54c63a467" class="" dir="auto">Page：快、彈性、高記憶體</p><p id="5643e3da-4bf7-42d8-b694-89337772f7cd" class="" dir="auto">Block：慢、省記憶體</p></div></aside><hr id="339a15e2-9005-802d-8fc2-d0fe91b25168" dir="auto"/><p id="db511017-e518-44f3-b192-5adfe98af5a8" class="" dir="auto">Mapping table 的粒度是 FTL 設計中最關鍵的取捨。</p><div id="339a15e2-9005-80ba-837e-f418541a2626" class="column-list" data-notion-column-list="" dir="auto"><div id="339a15e2-9005-8044-99f3-cab0685b2538" style="width:50%" class="column" data-notion-column-ratio="0.5" dir="auto"><blockquote id="2974b2cc-3a22-4b4b-b1b6-aec83554b259" class="" dir="auto"><strong>Page-level mapping</strong>：<p id="339a15e2-9005-80ec-a57e-f60b250e2041" class="" dir="auto">每個 logical page 獨立映射到一個 physical page。</p><ul id="045d0364-d3c0-4314-a617-a0e7c7ec03ea" class="bulleted-list" dir="auto"><li style="list-style-type:disc">優點：完全的靈活性。任何 LBA 可以映射到任何 physical page，random write 效能最好。</li></ul><ul id="c382a4ab-a731-4847-ac02-70e0dfb06879" class="bulleted-list" dir="auto"><li style="list-style-type:disc">缺點：mapping table 巨大。以一顆 1 TB SSD 為例，假設 page size 為 4 KB，共有 1 TB / 4 KB = 256M 個 page。每個 entry 需要 4 bytes（32-bit PBA），mapping table 總共需要 256M x 4 bytes = <strong>1 GB</strong> 的 SRAM。SRAM 極其昂貴，1 GB 的 SRAM 成本可能比 SSD 本身還高。</li></ul></blockquote></div><div id="339a15e2-9005-80e7-a4d9-fdf635f8d33d" style="width:50%" class="column" data-notion-column-ratio="0.5" dir="auto"><blockquote id="9e63a070-ea01-42bf-afa2-1b3350810f84" class="" dir="auto"><strong>Block-level mapping</strong>：<p id="339a15e2-9005-8059-bd47-efc66c2c1f48" class="" dir="auto">以 block 為單位做映射。一個 logical block 內的所有 page 按照 offset 對應到 physical block 內的相同 offset。</p><ul id="cc13528e-b88a-4193-9938-bd394b4f37b3" class="bulleted-list" dir="auto"><li style="list-style-type:disc">優點：mapping table 極小。如果每個 block 有 256 個 page，table 只需要 256M / 256 = 1M 個 entry，約 4 MB 的 SRAM。</li></ul><ul id="68dcc7b6-3ed5-47a5-bd99-aa7c88c7e04f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">缺點：靈活性極差。如果你只更新 block 內的一個 page，必須把整個 block 的有效資料讀出來，寫到新的 block，再更新 mapping。這等於把 random write 變成了整個 block 的 read-modify-write，效能很差。</li></ul></blockquote></div></div><figure id="339a15e2-9005-803a-a485-cf6d066d3b9b" class="image" data-notion-image="Flash%20Translation%20Layer/987daf59-39a3-4ed2-9c22-57ec532f7208.png" dir="ltr"><a href="Flash%20Translation%20Layer/987daf59-39a3-4ed2-9c22-57ec532f7208.png"><img style="width:422.73878020713465px" src="Flash%20Translation%20Layer/987daf59-39a3-4ed2-9c22-57ec532f7208.png"/></a></figure><hr id="339a15e2-9005-806e-aa41-ed3477600c21" dir="auto"/><table id="b94505ce-828e-4bbc-9c5b-e2156b6e7bab" class="simple-table" dir="ltr"><tbody><tr id="9f2d988a-c09d-4fd9-9407-55c056a433a6" dir="ltr"><td id="xVbP" class="" style="width:239px">比較維度</td><td id="kJiE" class="" style="width:315px">Page-level Mapping</td><td id="\@Fs" class="" style="width:311px">Block-level Mapping</td></tr><tr id="61646a1a-af0c-46d9-bb84-a101df02c33f" dir="ltr"><td id="xVbP" class="" style="width:239px">映射單位</td><td id="kJiE" class="" style="width:315px">Logical Page → Physical Page</td><td id="\@Fs" class="" style="width:311px">Logical Block →  Physical Block</td></tr><tr id="65eaa56b-0f6a-4898-a423-d35b9a864e52" dir="ltr"><td id="xVbP" class="" style="width:239px">SRAM 消耗</td><td id="kJiE" class="" style="width:315px">極大（約 SSD 容量的 0.1%）</td><td id="\@Fs" class="" style="width:311px">極小</td></tr><tr id="5cf579ee-9f68-42b6-80be-bc9f03357724" dir="ltr"><td id="xVbP" class="" style="width:239px">靈活性</td><td id="kJiE" class="" style="width:315px">完全彈性，Random Write 效能極佳</td><td id="\@Fs" class="" style="width:311px">靈活性差，更新單一 Page 會牽動整個 Block</td></tr><tr id="13197353-3b2f-422a-83f5-9b4d98b69899" dir="ltr"><td id="xVbP" class="" style="width:239px">小檔寫入效能</td><td id="kJiE" class="" style="width:315px">優秀</td><td id="\@Fs" class="" style="width:311px">極差（需執行 Read-Modify-Write）</td></tr></tbody></table><p id="339a15e2-9005-80be-97d4-cd0912d82e63" class="" dir="auto">這裡有一個數字值得記住：page-level mapping 的 SRAM 需求大約是 SSD 容量的 0.1%。<br/>以 1TB SSD、4KB Page Size 為例，Page-level 需要高達 <strong>1GB</strong> 的 SRAM。SRAM 成本極高，這在消費級產品上是不現實的。</p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80af-8112-fe1428deb344" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80bb-8a12-dfc479fe1aa4" class="" dir="auto">Reference: </p></div></aside><hr id="339a15e2-9005-806a-8ade-f5fe342de9ce" dir="auto"/></div></details><details id="339a15e2-9005-801f-a64f-f17edc2706ca" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>DFTL</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-803d-8361-f6a460f1fd0d" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8086-accb-e959880767c2" class="" dir="auto">既然 page-level 太貴，block-level 太慢，實際的 SSD 怎麼做？答案是 hybrid 方案，其中最具代表性的是 DFTL（Demand-based FTL）。<br/>DFTL 借鑑了作業系統中 <strong>Virtual Memory (虛擬記憶體) / Demand Paging</strong> 的概念，用有限的 SRAM 拼出接近 Page-level 的效能。</p></div></aside><hr id="339a15e2-9005-8030-b716-fd5eb30aab0d" dir="auto"/><p id="690dfe49-2844-429a-affa-c8677b048d15" class="" dir="auto"><strong>架構與運作原理：</strong></p><ul id="829deb1b-213e-4bde-8db6-223a8bccd5c5" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>NAND Flash</strong>：存放完整的 Page-level Mapping Table（Global Translation Directory）。</li></ul><ul id="9699faa2-c02c-48f4-bf45-8d9f35a93f14" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>SRAM</strong>：只快取最常被存取的 Mapping Entries，稱為 <strong>CMT (Cached Mapping Table)</strong>。</li></ul><ul id="4664c0b6-f06d-4520-82a1-a5886bb50863" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>存取邏輯</strong>：<ul id="c7d23731-62af-45e1-9c3b-d4c6f1b71faa" class="bulleted-list" dir="auto"><li style="list-style-type:circle"><strong>CMT Hit</strong>：直接在 SRAM 取得 PBA，極速讀寫。</li></ul><ul id="aec68e84-fff0-43a6-87b3-c111e53f9dba" class="bulleted-list" dir="auto"><li style="list-style-type:circle"><strong>CMT Miss</strong>：發生類似 Page Fault 的狀況，必須去 NAND 讀取 Translation Page，會產生額外延遲。滿載時需透過 LRU 演算法淘汰舊 Entry。</li></ul></li></ul><figure id="339a15e2-9005-8051-b22b-f82e4f3d5a16" class="image" data-notion-image="Flash%20Translation%20Layer/c7f10188-cf73-47ad-a8d7-1ced76a69c51.png" dir="ltr"><a href="Flash%20Translation%20Layer/c7f10188-cf73-47ad-a8d7-1ced76a69c51.png"><img style="width:431.0554561717353px" src="Flash%20Translation%20Layer/c7f10188-cf73-47ad-a8d7-1ced76a69c51.png"/></a></figure><hr id="339a15e2-9005-80cb-8817-d11891c8f77f" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80de-97f4-f92593125ae0" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-803c-9538-cfe0699d25cb" class="" dir="auto">DFTL 嚴重依賴 Workload 的 Locality。如果遇到極端的 Random Workload，會導致 CMT Hit Rate 暴跌，引發頻繁的 CMT Miss 與 NAND Read，效能會發生斷崖式下降。</p><hr id="339a15e2-9005-8072-9b63-d4b8926f672c" dir="auto"/><p id="687f5762-15df-4078-a158-28421c78959a" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown">DFTL 的效能取決於 CMT hit rate。如果 workload 有良好的 locality（大多數存取集中在少數 LBA），CMT hit rate 高，效能接近 page-level mapping。但如果 workload 是完全 random 的，大量 CMT miss 會產生額外的 NAND flash 讀取（讀 translation page），嚴重影響效能。</mark></p><p id="1d01ce4f-a88c-48d7-91ee-010ca30f489b" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown">除了 DFTL，還有其他混合策略。例如把 NAND flash 空間分成 </mark><mark class="highlight-brown" data-notion-highlight="brown"><strong>data block</strong></mark><mark class="highlight-brown" data-notion-highlight="brown"> 和 </mark><mark class="highlight-brown" data-notion-highlight="brown"><strong>log block</strong></mark><mark class="highlight-brown" data-notion-highlight="brown">：data block 用 block-level mapping，random write 先寫到少量的 log block（用 page-level mapping），等 log block 滿了再 merge 回 data block。這類設計的目標都是一樣的：用有限的 SRAM 預算，在盡可能多的 workload pattern 下提供接近 page-level mapping 的效能。</mark></p></div></aside><hr id="339a15e2-9005-80df-94a1-cd282d20e1ac" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8002-b0ef-ea6270d46aee" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8054-8e26-cd13b301502f" class="" dir="auto">Reference: </p></div></aside><hr id="339a15e2-9005-80a4-a199-cadc8de2c2fa" dir="auto"/></div></details><details id="339a15e2-9005-80f2-9faa-c28791a0db86" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>SRAM</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-807b-b99b-e145d0a68efa" dir="ltr"><div style="width:100%"><p id="6b89268a-526a-454f-a894-ebe5c8c23a1a" class="" dir="auto">SRAM 具備「快、小、貴、揮發性」四大特點，在 SSD 控制器中主要負責兩大任務：</p><ul id="79c2b609-c2f9-4298-956e-d333c3c51986" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Mapping Cache</strong>：存放 CMT。</li></ul><ul id="e6270757-64c2-42d0-9dfc-83f513e2363f" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Write Buffer</strong>：緩衝主機寫入的資料。</li></ul></div></aside><hr id="339a15e2-9005-8096-aa30-e70b05fa2b2c" dir="auto"/><ul id="9de6c81d-873c-4014-9594-3d11dbdedb48" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>系統設計考量：</strong><br/>• <strong>SRAM 太小</strong>  →  CMT 容量不足，DFTL 效能暴跌。<br/>• <strong>SRAM 太大</strong> →  BOM (Bill of Materials) 成本爆炸，失去市場競爭力。</li></ul><hr id="339a15e2-9005-80aa-8955-d75a6062236c" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80d7-8bf8-eb76883abe95" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80e9-8013-c66bbd0209b3" class="" dir="auto">Reference: </p></div></aside><hr id="339a15e2-9005-8029-b073-e90b22e1d866" dir="auto"/></div></details></div></details><details id="339a15e2-9005-80f2-b223-d31deb9d71ba" open="" class="toggle" dir="auto"><summary><strong>Test</strong></summary><div class="indented"><details id="339a15e2-9005-804a-857e-ce063c80e734" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Key Concepts</strong></mark></summary><div class="indented"><details id="339a15e2-9005-8043-8fc8-efd696cf8903" open="" class="toggle" dir="auto"><summary>理解 FTL 如何將 LBA（Logical Block Address）映射到 PBA（Physical Block Address），以及為什麼這層轉譯是必要的</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80cd-b137-df75c98dd9d2" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80a4-9a0e-ca5a4782f9a4" class="" dir="auto">Answer<div class="indented"><p id="339a15e2-9005-80e1-9ff1-fabef0eff286" class="" dir="auto">FTL 是一個軟體/韌體間接層，負責將主機看見的連續邏輯位址 (LBA)，翻譯成 NAND Flash 動態變化的實體位址 (PBA)。</p></div></p><hr id="339a15e2-9005-806a-9b76-c77d7d8cdd07" dir="auto"/><p id="339a15e2-9005-8037-91a1-c916aa048ed8" class="" dir="auto">Key Concept<div class="indented"><p id="339a15e2-9005-801f-9a92-da57c52b6a11" class="" dir="auto">Indirection Layer (間接層) / Decoupling (解耦合)</p></div></p><hr id="339a15e2-9005-80d3-8e6d-e51bbe659453" dir="auto"/><p id="339a15e2-9005-809d-b543-c635ef6d3c88" class="" dir="auto">Detail<div class="indented"><p id="339a15e2-9005-802a-8119-d6b9797b7c02" class="" dir="auto">主機（OS）預期儲存裝置是固定且連續的區塊；但 NAND Flash 因為物理限制，資料位置會因為垃圾回收 (GC) 或抹寫均衡 (Wear Leveling) 不斷搬移。如果沒有 FTL，主機就必須自己管理這些破碎的物理位置。FTL 完美解耦了這兩端，讓主機能像用普通硬碟一樣使用 SSD。</p></div></p></div></aside><hr id="339a15e2-9005-809e-a71e-c582eeaa35a5" dir="auto"/></div></details><details id="339a15e2-9005-80b4-8dd4-f99c9c9948ef" open="" class="toggle" dir="auto"><summary>理解 out-of-place write 策略的運作方式：每次寫入都寫到新的空白 page，再更新 mapping table</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80ce-9567-e13b13ec4d3b" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8000-a213-da981adede87" class="" dir="auto">Answer<div class="indented"><p id="339a15e2-9005-807c-b910-c7ea225fd3cd" class="" dir="auto">SSD 不會在原實體位置覆寫資料，而是將新資料寫入新的空白 Page，並將舊 Page 標記為失效 (Invalid)。</p></div></p><hr id="339a15e2-9005-801d-8f44-e373bd4dfe0d" dir="auto"/><p id="339a15e2-9005-806a-b8e9-dbdc3caee2c1" class="" dir="auto">Key Concept<div class="indented"><p id="339a15e2-9005-8024-8f99-ea29a74a40ff" class="" dir="auto">Erase-before-write (寫入前抹除) / Invalid Page</p></div></p><hr id="339a15e2-9005-804b-a579-da532955d4fa" dir="auto"/><p id="339a15e2-9005-80c9-ac35-c7fe30aee0b2" class="" dir="auto">Detail<div class="indented"><p id="339a15e2-9005-8069-9d80-e77a4e07badf" class="" dir="auto">NAND Flash 必須先「抹除 (Erase)」才能「寫入 (Program)」，且抹除單位 (Block) 遠大於寫入單位 (Page)。如果在原位覆寫，必須搬移整個 Block 的資料，速度極慢。因此，FTL 永遠把資料寫到下一個空白位置，再把 Mapping Table 的指標更新過去。</p></div></p></div></aside><hr id="339a15e2-9005-803c-8983-e45e5494a77b" dir="auto"/></div></details><details id="339a15e2-9005-80dc-a511-c1c829ae9f01" open="" class="toggle" dir="auto"><summary>了解 page-level mapping 與 block-level mapping 的差異，以及它們在彈性與 SRAM 記憶體開銷之間的取捨</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80c1-933f-e0472112d992" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80e5-9e35-d68326107202" class="" dir="auto">Answer<div class="indented"><p id="339a15e2-9005-80df-ba69-e2036bfb8d39" class="" dir="auto">Page-level 效能極佳但極耗 SRAM 記憶體；Block-level 極省記憶體但隨機寫入效能極差。</p></div></p><hr id="339a15e2-9005-8067-b0ea-d2513e75dbaa" dir="auto"/><p id="339a15e2-9005-802d-b323-f3d81e38bd47" class="" dir="auto">Key Concept<div class="indented"><p id="339a15e2-9005-807b-9904-d569a6c047c1" class="" dir="auto">Mapping Granularity (映射粒度) / Read-Modify-Write (讀改寫)</p></div></p><hr id="339a15e2-9005-80da-9077-e7a82368e5f6" dir="auto"/><p id="339a15e2-9005-809a-88b5-d2ed60f1fe25" class="" dir="auto">Detail<div class="indented"><p id="339a15e2-9005-8064-bcee-c77a98061b74" class="" dir="auto">Page-level 讓每個 Page 獨立映射，SRAM 需求約佔 SSD 總容量的 0.1%（極其昂貴）。Block-level 則綁定整個 Block 的 offset，只需少量 SRAM，但如果只更新 4KB 資料，卻必須把幾 MB 的整個 Block 讀出來修改再重新寫入，產生災難性的效能瓶頸。</p></div></p></div></aside><hr id="339a15e2-9005-8064-9896-dcb8b06d9ea4" dir="auto"/></div></details><details id="339a15e2-9005-8020-b4e1-cc4e2deffcac" open="" class="toggle" dir="auto"><summary>知道 DFTL 等混合式 mapping 方案如何在有限的 SRAM 資源下兼顧效能與記憶體使用量</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80ae-aeee-cd11b2b108c8" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8086-8c6e-c7e54e4b0748" class="" dir="auto">Answer<div class="indented"><p id="339a15e2-9005-8009-8969-f846148b4295" class="" dir="auto">將完整的 Page-level 映射表存放在便宜的 NAND 中，只在 SRAM 快取最常存取的條目 (CMT)。</p></div></p><hr id="339a15e2-9005-8089-9123-e5031fdb8766" dir="auto"/><p id="339a15e2-9005-8083-98e8-e4c3af081df6" class="" dir="auto">Key Concept<div class="indented"><p id="339a15e2-9005-8027-a6cf-ff76b9ea2e91" class="" dir="auto">Demand Paging / Cached Mapping Table (CMT) / Locality (局部性)</p></div></p><hr id="339a15e2-9005-80bd-9641-dc5252570b85" dir="auto"/><p id="339a15e2-9005-805e-9fc3-f4e06d7649f9" class="" dir="auto">Detail<div class="indented"><p id="339a15e2-9005-80d0-9188-c53f3e61c1eb" class="" dir="auto">借鑑作業系統虛擬記憶體的概念。大部分的工作負載都有局部性（只頻繁存取某些區塊），因此只要 SRAM 快取夠準確，就能用極小的記憶體成本，達到逼近純 Page-level 的超高效能。</p></div></p></div></aside><hr id="339a15e2-9005-808a-8124-f49ed955fcfc" dir="auto"/></div></details></div></details><details id="339a15e2-9005-8029-bebb-fc123f828c1b" open="" class="toggle" dir="auto"><summary><mark class="highlight-teal" data-notion-highlight="teal"><strong>Test your understanding</strong></mark></summary><div class="indented"><details id="339a15e2-9005-80f1-96c0-cc3cabfd912e" open="" class="toggle" dir="auto"><summary>一顆 2 TB SSD，page size 為 16 KB。如果採用 page-level mapping 且每個 entry 佔 4 bytes，mapping table 需要多少 SRAM？如果改用 block-level mapping（每個 block 有 512 個 page），又需要多少？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8093-ae23-e8b85b8069e5" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80f8-9411-fbcab67bcb27" class="" dir="auto"><strong>Answer</strong><div class="indented"><p id="339a15e2-9005-8020-98ed-c71e8f8b9666" class="" dir="auto">Page-level 需要 512 MB；Block-level 需要 1 MB</p></div></p><hr id="339a15e2-9005-80d9-9387-f66685d82e7d" dir="auto"/><p id="339a15e2-9005-8088-828e-c58a708e5df9" class="" dir="auto"><mark class="highlight-blue" data-notion-highlight="blue"><strong>Key Concept</strong></mark><div class="indented"><p id="339a15e2-9005-8041-99dc-db4fce061329" class="" dir="auto">Mapping Table Size Calculation</p></div></p><hr id="339a15e2-9005-8094-aded-ee0f8f59c221" dir="auto"/><p id="339a15e2-9005-804c-b8ca-c1b287761f18" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Detail</strong></mark><div class="indented"><p id="339a15e2-9005-8022-9715-c5319bd3ca66" class="" dir="auto"><strong>Page-level</strong>：<div class="indented"><p id="339a15e2-9005-805b-a9ef-c3c879776f9d" class="" dir="auto">總 Page 數 = 2 TB / 16 KB = 128,000,000 (128M)個。<br/>每個 entry 4 bytes → 128M × 4 bytes = <strong>512 MB</strong>。</p></div></p><p id="339a15e2-9005-80f6-9c8f-fc29575c9021" class="" dir="auto"><strong>Block-level</strong>：<div class="indented"><p id="339a15e2-9005-80bb-8fd6-c3783267f1fd" class="" dir="auto">總 Block 數 = 128M / 512 = 250,000 (250K) 個。<br/>250K × 4 bytes ~ <strong>1 MB</strong>。</p></div></p></div></p></div></aside><hr id="339a15e2-9005-80c8-b619-e761b2df1c80" dir="auto"/></div></details><details id="339a15e2-9005-8087-9318-d60a1f47da96" open="" class="toggle" dir="auto"><summary>為什麼 out-of-place write 讓 SSD 的 random write 在物理層面變成 sequential write？這個特性對 SSD 與 HDD 的效能差距有什麼影響？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-800b-aabb-c0023c91155b" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80b2-bc33-f4d624db13bb" class="" dir="auto">Answer<div class="indented"><p id="339a15e2-9005-801b-8b5e-f7a7af904efa" class="" dir="auto">因為不管主機給的 LBA 多麼隨機，FTL 都是將資料循序填入 NAND 中下一個連續的空白實體 Page。</p></div></p><hr id="339a15e2-9005-8097-9d22-c305cebbc8d7" dir="auto"/><p id="339a15e2-9005-801e-aa46-f8fc2c967d9b" class="" dir="auto">Key Concept<div class="indented"><p id="339a15e2-9005-809c-8a47-c132040f4a10" class="" dir="auto">Physical Sequential Write / 物理尋軌延遲</p></div></p><hr id="339a15e2-9005-80bd-afcf-c6c26da6990c" dir="auto"/><p id="339a15e2-9005-806d-a3ef-f96cd3162b9d" class="" dir="auto">Detail<div class="indented"><p id="339a15e2-9005-8003-bdf3-dbb64e76baa2" class="" dir="auto">在 HDD 中，隨機寫入會導致磁頭在碟片上瘋狂移動（Seek time），耗時極長。但 SSD 透過 Out-of-place write，在底層一律轉換為「循序寫入」空白區塊。這是 SSD 隨機寫入效能能徹底輾壓 HDD 的根本原因。</p></div></p></div></aside><hr id="339a15e2-9005-809a-a98b-d28ba5db6704" dir="auto"/></div></details><details id="339a15e2-9005-80f5-aba7-ef2b36a50d46" open="" class="toggle" dir="auto"><summary>DFTL 的 CMT miss 會導致什麼額外開銷？在什麼樣的 workload pattern 下，DFTL 的效能會明顯退化？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80d9-8953-d243fdcfc1d2" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8081-9be9-f3e217ff3825" class="" dir="auto">Answer<div class="indented"><p id="339a15e2-9005-80bf-bf62-f99791949530" class="" dir="auto">需額外去 NAND 讀取映射表，若替換的條目是髒資料 (Dirty) 還需寫入 NAND。在完全隨機 (Uniform Random) 的 Workload 下效能會嚴重退化。</p></div></p><hr id="339a15e2-9005-8041-aba5-e8621778b662" dir="auto"/><p id="339a15e2-9005-809c-9949-f447c260035c" class="" dir="auto">Key Concept<div class="indented"><p id="339a15e2-9005-8068-b398-d8f373bfb6fe" class="" dir="auto">Translation Page overhead / Cache Thrashing</p></div></p><hr id="339a15e2-9005-8097-a888-cb345e858284" dir="auto"/><p id="339a15e2-9005-80c5-8b85-c929c9d78c7f" class="" dir="auto">Detail<div class="indented"><p id="339a15e2-9005-8041-be65-ee5565a64869" class="" dir="auto">CMT miss 時，SSD 必須暫停實際的資料讀寫，先去 Flash 把缺失的 Mapping entry 抓出來（NAND Read）；如果 SRAM 滿了要淘汰被改過的舊 entry，還要先寫回 Flash（NAND Write）。缺乏局部性的隨機存取會導致頻繁 Miss，讓延遲暴增。</p></div></p></div></aside><hr id="339a15e2-9005-803a-b6a6-e5feb52179c3" dir="auto"/></div></details><details id="339a15e2-9005-8029-8a41-c21cef2b235e" open="" class="toggle" dir="auto"><summary>假設一個混合式 FTL 使用 log block 方案，當 log block 滿了需要與 data block merge 時，最壞情況下需要多少次 NAND flash 讀寫操作？請用具體的 block/page 數量來說明。</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-803d-923f-ef889bdfa6c6" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80d9-9352-fd54fee35fa7" class="" dir="auto">Answer<div class="indented"><p id="339a15e2-9005-80fa-b8de-dcf34395fcc5" class="" dir="auto">最壞情況是 Full Merge，需要讀取與寫入各 N 次 (假設有 N 個 Page)</p></div></p><hr id="339a15e2-9005-80e3-b7fa-f794307350da" dir="auto"/><p id="339a15e2-9005-80bb-9790-cac0f93bd70e" class="" dir="auto">Key Concept<div class="indented"><p id="339a15e2-9005-800c-85d6-cfb16ce8f6f9" class="" dir="auto">Full Merge / Write Amplification</p></div></p><hr id="339a15e2-9005-80cc-bbc0-e854d16175e2" dir="auto"/><p id="339a15e2-9005-802e-b9d9-cf3655c09f46" class="" dir="auto">Detail<div class="indented"><p id="339a15e2-9005-800f-8101-fee6d0ff3bea" class="" dir="auto">最壞情況下，Log block 裡面的 N 個 Page 剛好分屬於 N 個不同的 Data block。這代表 FTL 必須針對這 N 個 Data block 各自執行一次 Read-Modify-Write：把舊 Block 沒更新的資料讀出來、合上 Log block 的單一 Page，再寫入新 Block。開銷極大。</p></div></p></div></aside><hr id="339a15e2-9005-80de-8bb2-d9c2fd707850" dir="auto"/></div></details><details id="339a15e2-9005-802f-bf39-c3955aa5b3d6" open="" class="toggle" dir="auto"><summary>如果 SSD 沒有 power-loss protection，突然斷電後重新開機時會發生什麼事？FTL 如何恢復 mapping table 的一致性？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8051-a4f5-fbfbc5027e6b" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-801e-82d7-d406b97d499f" class="" dir="auto">Answer<div class="indented"><p id="339a15e2-9005-80b2-ab45-d77d88c3f1af" class="" dir="auto">SRAM 中尚未寫入 NAND 的 Mapping data 會遺失。重啟時需透過掃描 Flash 的日誌 (Log) 或 OOB 區域來重建映射表。</p></div></p><hr id="339a15e2-9005-805e-9dc3-f7f3c06bd48f" dir="auto"/><p id="339a15e2-9005-801e-ab2c-f12ef514743f" class="" dir="auto">Key Concept<div class="indented"><p id="339a15e2-9005-80fc-b1b6-f8fc31de2983" class="" dir="auto">Dirty Entry Loss / Table Reconstruction</p></div></p><hr id="339a15e2-9005-80e7-ae19-e7592d3995be" dir="auto"/><p id="339a15e2-9005-8041-af27-c374eaceb5cf" class="" dir="auto">Detail<div class="indented"><p id="339a15e2-9005-80d5-9bdb-dd2e9350680d" class="" dir="auto">如果沒有電容撐住最後幾毫秒把 SRAM 寫回，最新寫入的資料雖然物理上存在 Flash 裡，但 FTL 「忘記」在哪了。開機時，控制器必須緩慢地掃描每個實體 Page 後方的 Out-of-Band (OOB) 區域（裡面會備註該 Page 屬於哪個 LBA），一塊一塊把 Mapping table 拼湊回來。</p></div></p></div></aside><hr id="339a15e2-9005-80e2-88bc-de23edb6584f" dir="auto"/></div></details></div></details><details id="339a15e2-9005-8065-b06e-f61c86bafebe" open="" class="toggle" dir="auto"><summary><mark class="highlight-red" data-notion-highlight="red"><strong>Quiz Pool</strong></mark></summary><div class="indented"><ol type="1" id="339a15e2-9005-8090-b23a-ed389ca01623" class="numbered-list" start="1" dir="auto"><li>假設我們使用 DFTL（Demand-based FTL）當作我們 FTL 的設計，假設 CMT 容量僅能容納 4 個 mapping entries，淘汰策略選擇 LRU 並假設 CMT 一剛開始是空的，則如果我們從 SSD 選擇一部影片循環播放，該影片對應之 mapping entries 為 e0~e4， 並假設不需要處理其他事情，則 steady-state 的 CMT hit rate 為多少?<blockquote id="339a15e2-9005-80fa-8ff6-ee2b72c30647" class="" dir="auto"><ol type="1" id="339a15e2-9005-80ff-a20e-ff68800bcb74" class="numbered-list" start="1" dir="auto"><li>0%</li></ol><ol type="1" id="339a15e2-9005-80e3-8b71-e836893c8990" class="numbered-list" start="2" dir="auto"><li>20%</li></ol><ol type="1" id="339a15e2-9005-8040-aac9-f3a399f934b9" class="numbered-list" start="3" dir="auto"><li>40%</li></ol><ol type="1" id="339a15e2-9005-80f2-96e9-fd4690319c9c" class="numbered-list" start="4" dir="auto"><li>80%</li></ol></blockquote><details id="339a15e2-9005-800b-91a0-da9a0669b21f" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80f6-b7dc-e5c956357236" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80e8-80cb-f64f4a5f6311" class="" dir="auto">0%</p><hr id="339a15e2-9005-80ba-a4ca-effdc22af7c9" dir="auto"/><p id="339a15e2-9005-80be-8cbc-f7ea3f9a775e" class="" dir="auto">解析: <div class="indented"><p id="339a15e2-9005-80fc-adbd-d538dd7f2156" class="" dir="auto">因為影片是循環播放的，所以實際上讀取順序是 e0,e1,e2,e3,e4,e0,e1.....以此類推， 而在 CMT 找 e0 時會找不到，所以會 miss 並載入 e0，找 e1 時會找不到，所以會 miss 並載入 e1....以此類推 直到 CMT 裡現在有 e0~e3 的資料，需要 e4 時，因為 miss 要載入 e4，此時發現沒位置放了，因為淘汰策略選擇 LRU， 所以會將 e0 換成 e4，此時 CMT 裡面的內容是 {e4,e1,e2,e3}，而接下來又需要 e0，發現 miss 卻又沒位置放，依據 LRU， 又會把等下要用的 e1 淘汰，以此類推</p></div></p></div></aside></div></details></li></ol><hr id="339a15e2-9005-8054-9989-f915758a799b" dir="auto"/><ol type="1" id="339a15e2-9005-80f6-8fba-faac7925fc6b" class="numbered-list" start="2" dir="auto"><li>假設此時 Host 發出一個讀取請求，但目前 CMT 已滿，且發生 Cache Miss，而在 CMT 中準備被替換掉的 victim entry 是 dirty 狀態。 請問要完成這筆讀取，NAND Flash 要執行哪些物理操作？<blockquote id="339a15e2-9005-808e-b630-df5ee6547512" class="" dir="auto"><ol type="1" id="339a15e2-9005-803d-8317-d0b36082e132" class="numbered-list" start="1" dir="auto"><li>2 次讀取操作</li></ol><ol type="1" id="339a15e2-9005-809b-bfb0-e33073583d42" class="numbered-list" start="2" dir="auto"><li>1 次讀取操作</li></ol><ol type="1" id="339a15e2-9005-80ae-a6c8-d1199887883f" class="numbered-list" start="3" dir="auto"><li>1 次讀取操作和 1 次寫入操作</li></ol><ol type="1" id="339a15e2-9005-8036-b731-ea79495a3874" class="numbered-list" start="4" dir="auto"><li>1 次寫入操作和 2 次讀取操作</li></ol></blockquote><details id="339a15e2-9005-800e-85a3-cfeda681b278" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80cc-8b76-f75614f8ae59" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-800d-82db-ccf83b8636f3" class="" dir="auto">1 次寫入操作和 2 次讀取操作。</p><hr id="339a15e2-9005-8072-932b-de57f0f9f39a" dir="auto"/><p id="339a15e2-9005-80b7-91ab-ee044155d588" class="" dir="auto">解析: <div class="indented"><p id="339a15e2-9005-8024-a550-dea542ecf4f3" class="" dir="auto">因為 Victim Entry 是 Dirty 的，必須先將它寫回 Flash 中的 GTD 進行更新。 由於 NAND Flash 只能 Out-of-place write，進行一次寫入操作。 從 Flash 的 translation page 將該 entry 讀取到 CMT 中，進行一次讀取操作。 獲得實體位址後，再去 Flash 讀取 Data 回傳給 Host。進行第二次讀取操作。</p></div></p></div></aside></div></details></li></ol><hr id="339a15e2-9005-8045-9b5b-e2b045c9b706" dir="auto"/><ol type="1" id="339a15e2-9005-8043-a4b2-d11aa5f7bb59" class="numbered-list" start="3" dir="auto"><li>現代 SSD Controller 經常透過快取技術平衡 TLC 顆粒的效能瓶頸。我們希望能在不額外增加硬體與封裝成本的前提下，有效緩解 TLC 寫入速度較慢的問題，下列哪一項技術是目前最主流且能直接達成的解決方案？<blockquote id="339a15e2-9005-8053-ae8d-db4796f57039" class="" dir="auto"><ol type="1" id="339a15e2-9005-8093-a81f-fe03ec170ac8" class="numbered-list" start="1" dir="auto"><li>依賴 Controller 內部整合的 SRAM 緩衝區，為寫入的資料提供快取空間。</li></ol><ol type="1" id="339a15e2-9005-80e9-9d68-ed510b3a5539" class="numbered-list" start="2" dir="auto"><li>利用 NVMe 協定的 Host Memory Buffer (HMB) 功能，借用主機端 DRAM 作為寫入資料的快取空間。</li></ol><ol type="1" id="339a15e2-9005-8061-bf41-dcd025d202f4" class="numbered-list" start="3" dir="auto"><li>利用 NAND Flash 顆粒內部內建的實體 SLC 區域，為寫入的資料提供快取空間。</li></ol><ol type="1" id="339a15e2-9005-80d4-a4ad-c54b608c3937" class="numbered-list" start="4" dir="auto"><li>透過 FTL 演算法將部分 TLC 空間動態配置為 1-bit 模式操作，為寫入的資料提供快取空間。</li></ol></blockquote><details id="339a15e2-9005-8012-8bd5-dbe06a0ee7db" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8011-a83e-f8f95942e001" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-802b-aa76-f6ff3305dd0f" class="" dir="auto">透過 FTL 將部分 TLC 動態配置為 1-bit 模式 (pSLC Caching)</p><hr id="339a15e2-9005-80c1-b4a8-c95d418e7fd3" dir="auto"/><p id="339a15e2-9005-8072-8960-fc069d1aa1f0" class="" dir="auto">解析: <div class="indented"><p id="339a15e2-9005-80c9-971c-df04cb73009e" class="" dir="auto">TLC 本身是 3-bit/cell，但 FTL 可以控制只在 Cell 中寫入 1-bit 的資料（模擬 SLC 的行為）。這大幅加快了寫入速度，且因為是直接利用既有的 TLC 顆粒，不需要增加額外的硬體與封裝成本，是現代 SSD 解決 Burst Write 效能的標準做法。</p></div></p><hr id="339a15e2-9005-80a4-ae2b-f058a4b95572" dir="auto"/><p id="339a15e2-9005-8043-bcb4-c4a47dcafcce" class="" dir="auto">(3) TLC 顆粒並不會內建一塊 SLC 區域，雖然早期或某些特殊應用曾混用不同製程的顆粒，但實體 SLC 顆粒極度昂貴。若增加實體的 SLC 晶片與封裝，會直接違反題幹 不額外增加硬體與封裝成本的限制。</p><p id="339a15e2-9005-800d-be78-e1bd4680bf2a" class="" dir="auto">(1) Controller 內部的 SRAM 容量僅數 MB，主要用於存放指令與少量 Mapping Cache，容量不足以承載使用者寫入的資料。</p><p id="339a15e2-9005-80c0-a136-edf71da9d235" class="" dir="auto">(2) NVMe 的 HMB 技術確實是利用主機端記憶體，但其設計目的是為了存放 Mapping Table (Metadata) 設計的，而非用於快取 User Data。</p></div></aside></div></details></li></ol><hr id="339a15e2-9005-80ff-831c-c01acc4700bf" dir="auto"/><ol type="1" id="339a15e2-9005-8040-958e-ff8b2dbe10b1" class="numbered-list" start="4" dir="auto"><li>一個 SSD 使用 DFTL。mapping table 的完整版本存放在 NAND flash 中，而 SRAM 中只存放一部分 mapping entries 作為 Cached Mapping Table (CMT) 假設 workload 為 <strong>uniform random write across the entire SSD</strong>，以下哪個現象最可能發生？<blockquote id="339a15e2-9005-805f-8d97-e052af897e6c" class="" dir="auto"><ol type="1" id="339a15e2-9005-80d8-9dca-f80b9e621f07" class="numbered-list" start="1" dir="auto"><li>CMT miss 只會增加 NAND read，不會增加 NAND write</li></ol><ol type="1" id="339a15e2-9005-8061-a83a-cd601c9a8c11" class="numbered-list" start="2" dir="auto"><li>CMT eviction 可能導致額外 NAND write amplification</li></ol><ol type="1" id="339a15e2-9005-8099-96b3-eb45acf700f5" class="numbered-list" start="3" dir="auto"><li>CMT eviction 只會在 sequential workload 發生</li></ol><ol type="1" id="339a15e2-9005-80ac-9b55-e0f3d8f03cf7" class="numbered-list" start="4" dir="auto"><li>CMT eviction 不會影響效能，因為 mapping entry 很小</li></ol></blockquote><details id="339a15e2-9005-8032-901d-df236e8e2083" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8061-9ba8-e3af1b88668c" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80b6-b32d-f0c3bf109986" class="" dir="auto">CMT eviction 可能導致 額外 NAND write amplification</p><hr id="339a15e2-9005-80f6-b611-ce0d6d3b4b23" dir="auto"/><p id="339a15e2-9005-80c4-b537-f1ced9b054ae" class="" dir="auto">解析: <div class="indented"><p id="339a15e2-9005-8043-8fa1-ff5de01d9eb5" class="" dir="auto">在 uniform random write workload 下，大量不同的 LBA 會被更新，導致 CMT 不斷發生 miss 和 eviction。當被淘汰的 mapping entry 是 dirty entry 時，FTL 需要將修改過的 translation page 寫回 NAND flash，因此會產生額外的 NAND write。這種 translation page write 會增加整體 write amplification。</p></div></p><hr id="339a15e2-9005-8004-8484-fcf481c600f4" dir="auto"/><p id="339a15e2-9005-80e3-a57c-fcad50e2a851" class="" dir="auto">(4) mapping entry 雖然很小，但 translation page 的寫入單位是 NAND page，例如 4 KB 或 8 KB。當一個 entry 被修改時，整個 translation page 可能需要重新寫入 NAND flash，因此 eviction 仍然可能帶來顯著的寫入成本。</p><p id="339a15e2-9005-8043-87a2-fbe3ff0ad3f4" class="" dir="auto">(3) CMT eviction 的發生與 workload 的 access locality 有關，而不是只會在 sequential workload 發生。實際上在 sequential workload 中，由於 locality 較好，CMT eviction 反而較少。</p><p id="339a15e2-9005-800b-9240-d0c852c31024" class="" dir="auto">(1) DFTL 在 CMT miss 時確實會產生額外的 translation page read，但 eviction 時如果 mapping entry 是 dirty，FTL 必須將對應的 translation page 寫回 NAND flash。由於 translation page 的寫入粒度是整個 page，而不是單一 entry，因此即使只有一個 mapping entry 被修改，也可能導致整個 translation page 被重新寫入，這會增加 NAND write 次數。</p></div></aside></div></details></li></ol><hr id="339a15e2-9005-8099-a181-f1990b043e0c" dir="auto"/><ol type="1" id="339a15e2-9005-80fe-b0e3-ff265bbe2f1c" class="numbered-list" start="5" dir="auto"><li>在資料庫索引中，更新一筆用戶紀錄通常只需要修改一個 <code>4KB</code> 的資料片段。假設我們將這個 4KB 的更新指令，送給一顆為了極致省成本而採用純 <strong>Block-level mapping</strong>（假設其實體 Block 大小為 <code>4MB</code>）的舊式 SSD。<p id="339a15e2-9005-8096-b705-e07ed31a9bb1" class="" dir="auto">由於 NAND flash 存在「寫入前必須抹除 (Erase-before-write)」的物理限制，SSD 控制器為了解決這個 4KB 的更新，在底層確切會執行什麼樣的物理懲罰操作？為什麼這種架構會在現代高效能 SSD 中被淘汰？</p><blockquote id="339a15e2-9005-80c4-b4c2-d2f902684326" class="" dir="auto"><ol type="1" id="339a15e2-9005-80f9-9b48-d6805e3df885" class="numbered-list" start="1" dir="auto"><li>控制器會將這 <code>4KB</code> 的新資料寫入一個全新的空白 Physical page，並單獨在 SRAM 中更新該 Page 的路由條目，同時將舊的 Page 標記為 Invalid，等待未來的 garbage collection 回收。</li></ol><ol type="1" id="339a15e2-9005-8034-bfed-f6f465b90d9b" class="numbered-list" start="2" dir="auto"><li>控制器會透過施加更高的編程電壓 (Programming voltage)，直接在該 <code>4KB</code> Page 目前的實體位置上進行強制覆寫 (In-place overwrite)，代價是會加速消耗該 Cell 的 <code>P/E cycle</code> 壽命。</li></ol><ol type="1" id="339a15e2-9005-80fa-b155-dcdf9b4e5432" class="numbered-list" start="3" dir="auto"><li>控制器會將這 <code>4KB</code> 的更新暫存在 SSD 的斷電保護電容 (Capacitor) 中，直到累積滿 <code>4MB</code> 形成一個完整的 Block 後才一次寫入 Flash，這雖然避免了寫入放大，但會導致嚴重的寫入延遲。</li></ol><ol type="1" id="339a15e2-9005-8006-a95d-e6b91d73be54" class="numbered-list" start="4" dir="auto"><li>控制器必須將舊 Block 中剩餘的有效資料全部讀入 RAM，將這 <code>4KB</code> 的新資料合併進去後，再將完整的 <code>4MB</code> 資料寫入到一個全新且已抹除的 Physical block 中。這個 <strong>Read-Modify-Write</strong> 過程會引發極度嚴重的 write amplification (寫入放大)。</li></ol></blockquote><details id="339a15e2-9005-8079-94d4-e071efabd0b2" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80f1-b656-f196cb3a4638" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80a6-90b8-edb35e7becb7" class="" dir="auto">控制器必須將舊 Block 中剩餘的有效資料全部讀入 RAM，將這 <code>4KB</code> 的新資料合併進去後，再將完整的 <code>4MB</code> 資料寫入到一個全新且已抹除的 Physical block 中。這個 <strong>Read-Modify-Write</strong> 過程會引發極度嚴重的 write amplification (寫入放大)。</p><hr id="339a15e2-9005-8027-b463-e3480b4c7cb5" dir="auto"/><p id="339a15e2-9005-80bc-a2e5-c78dafd7b309" class="" dir="auto">解析: <div class="indented"><p id="339a15e2-9005-80d1-acf8-db7c70806aff" class="" dir="auto">這是正確的。根據講義，在純 Block-level mapping 中，對照表的粒度只到 4MB 的 Block。如果你只更新其中一個 4KB Page，FTL 無法像 Page-level mapping 那樣隨便找個新 Page 寫入並更新指標。它必須將整個 4MB 區塊的有效資料讀出來，在記憶體中替換掉那 4KB，然後重新寫入一個完整的 4MB 新區塊。這種災難性的 Read-Modify-Write 開銷是 Block-level mapping 被淘汰的主因。</p></div></p><hr id="339a15e2-9005-8027-b3e7-d36a9851ecff" dir="auto"/><p id="339a15e2-9005-8023-973b-de2e275731e2" class="" dir="auto">(3) 這代表對 SSD 硬體元件的嚴重誤解。斷電保護電容 (Capacitor) 是用來儲存「電能」的，目的是在突然斷電時提供緊急電力讓 SRAM 的資料寫入 Flash 中。電容絕對不是用來儲存或暫存「資料」的緩衝區。</p><p id="339a15e2-9005-8030-a4e3-c2121a93a6c3" class="" dir="auto">(1) 這個選項完美描述了 <strong>Page-level mapping</strong> 的運作方式（Out-of-place write），而非 Block-level mapping。純 Block-level mapping 沒有記錄單一 Page 位置的能力，因此無法做到這麼細粒度的靈活跳轉。</p><p id="339a15e2-9005-8085-96d3-c9a995bad455" class="" dir="auto">(2) 這嚴重違反了 NAND Flash 最根本的物理定律。NAND flash 無論施加多大的電壓，都<strong>絕對無法</strong>進行 In-place overwrite（因為電子只能加不能減）。要清除資料，唯一的方法就是以龐大的 Block 為單位執行 Erase 操作。</p></div></aside></div></details></li></ol><hr id="339a15e2-9005-80e0-8165-dea524a54c6b" dir="auto"/><ol type="1" id="339a15e2-9005-8035-8477-ec419fde3cd6" class="numbered-list" start="6" dir="auto"><li>現今的 SSD 大多採用 DFTL 或混合式 mapping 來管理 Flash 的 mapping table，請問下列關於這些 FTL 的敘述何者正確？<blockquote id="339a15e2-9005-8043-9cb0-e0fb24925b9d" class="" dir="auto"><ol type="1" id="339a15e2-9005-809d-a9e9-f34f3d3c6f2d" class="numbered-list" start="1" dir="auto"><li>CMT 不會定期將資料寫回 Flash 中，因為其中的資料不會揮發</li></ol><ol type="1" id="339a15e2-9005-8073-946b-cfde2b989757" class="numbered-list" start="2" dir="auto"><li>FTL 採用 out-of-place write，當發生 random write 時，舊的 physical page 會被標記為 invalid，而新資料則會配置到新的 free page，並以 sequential 方式寫入 SSD</li></ol><ol type="1" id="339a15e2-9005-80b5-a306-eda3e3b4e96c" class="numbered-list" start="3" dir="auto"><li>DFTL 的演算法中，在滿的時候通常會利用 LRU 來淘汰 CMT 裡的資料，是基於 Spatial Locality</li></ol><ol type="1" id="339a15e2-9005-804c-8e82-dfd0ab96743a" class="numbered-list" start="4" dir="auto"><li>除了 DFTL 的演算法外，Log block 的方法能徹底消除 Block-level mapping 在小資料更新中，所需要的 Read-Modify-Write</li></ol></blockquote><details id="339a15e2-9005-80f9-9dab-f92b0e764160" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8092-a76c-f6892a690975" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8042-86f2-d528290d25ce" class="" dir="auto">FTL 採用 out-of-place write，當發生 random write 時，舊的 physical page 會被標記為 invalid，而新資料則會配置到新的 free page，並以 sequential 方式寫入 SSD</p><hr id="339a15e2-9005-80de-9195-d4da50cbe726" dir="auto"/><p id="339a15e2-9005-80f6-ae81-ff0e343a9946" class="" dir="auto">解析: <div class="indented"><p id="339a15e2-9005-802d-833e-c8b5dc0eed02" class="" dir="auto">SSD 不能進行覆寫，所以會將原本的 physical page 標記為 invalid，並將新資料連續地寫入空白的 Page，所以 SSD 的 random write 效能很高。</p></div></p><hr id="339a15e2-9005-803b-851b-c89c8faf36cb" dir="auto"/><p id="339a15e2-9005-80e6-ba0e-f1ed8ae764dd" class="" dir="auto">(1) CMT 中的 SRAM 屬於揮發性記憶體，斷電後資料會遺失，因此需要定期將 Mapping table 寫回 Flash 中，以確保資料的持久性。</p><p id="339a15e2-9005-802c-979d-c8c6752a1412" class="" dir="auto">(3) LRU 是基於 temporal locality，認為最近被訪問的資料在未來也很可能會被訪問，而不是 Spatial Locality。</p><p id="339a15e2-9005-80f0-b4e6-df35b7072148" class="" dir="auto">(4) Log block 只能起到緩衝的作用，最後還是需要將資料寫回原本的 block，因此仍然會有 Read-Modify-Write 的問題。 </p></div></aside></div></details></li></ol><hr id="339a15e2-9005-8065-b83f-f9328f26e6e9" dir="auto"/><ol type="1" id="339a15e2-9005-805e-b992-eb4128e4b9bb" class="numbered-list" start="7" dir="auto"><li>在一個採用 Fully-associative log-block 方案的混合式 FTL 中，假設一個 block 的大小為 <em>N</em> 個 pages。系統目前僅使用一個 log block 來處理寫入，且該 log block 已滿（內含 <em>N</em> 個 valid pages）。請考慮以下兩種極端場景，且兩者最終都必須透過 Full Merge 來清空該 log block：<aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-802d-971c-c12f9e3ced93" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-804c-9937-d6e8fcb14158" class="" dir="auto">場景甲：該 log block 內 <em>N</em> 個 valid pages 的 LBA 均不重複，且完整覆蓋了「同一個」data block 的所有 LBA。</p><p id="339a15e2-9005-807b-96bd-f1c33709d1a8" class="" dir="auto">場景乙：該 log block 內 <em>N</em> 個 valid pages 分別屬於 <em>N</em> 個「不同的」data block，且每個 data block 均僅有 1 個 page 被更新。</p></div></aside><p id="339a15e2-9005-80ec-a033-c35071459d06" class="" dir="auto">若要將資料完全整理好並釋放空間，則關於這兩個場景的 NAND flash 讀寫與抹除（erase）次數消耗，下列敘述何者正確？</p><blockquote id="339a15e2-9005-80fb-a4a5-ec554635bafa" class="" dir="auto"><ol type="1" id="339a15e2-9005-801c-ab3e-e509ae069e7e" class="numbered-list" start="1" dir="auto"><li>場景乙的 page 讀寫次數為場景甲的 <em>N</em> 倍，且需要抹除 <em>N</em>+1 個 blocks。</li></ol><ol type="1" id="339a15e2-9005-80a6-a6a6-c5d7d90f397f" class="numbered-list" start="2" dir="auto"><li>場景甲的 page 讀寫開銷會達到 <em>NimesN</em> 次，因為它必須把整個 NAND flash 晶片中所有無效的 pages 全部重新掃描一遍。</li></ol><ol type="1" id="339a15e2-9005-8079-8c48-dde6edac43bb" class="numbered-list" start="3" dir="auto"><li>場景甲與場景乙造成的系統延遲與 write amplification 完全相同，因為兩者都是在回收一個滿的 log block。</li></ol><ol type="1" id="339a15e2-9005-80f3-b001-ef967619aa28" class="numbered-list" start="4" dir="auto"><li>場景乙可以透過 switch merge 直接取代舊資料，因此只需要執行 0 次 page 讀取與 1 次 block 抹除。</li></ol></blockquote><details id="339a15e2-9005-8061-ba3c-ce77ace5d975" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8022-ae5c-db148a8d3a7a" dir="ltr"><div style="width:100%"><p id="173d5a59-a548-4cac-a7d3-ead424b50926" class="" dir="auto">場景乙的 page 讀寫次數為場景甲的<em>N</em>倍，且需要抹除<em>N</em>+1 個 blocks。</p><hr id="339a15e2-9005-80de-abe0-dbb3d88cfe3b" dir="auto"/><p id="339a15e2-9005-80d5-82c0-d89a20f1126d" class="" dir="auto">解析: <div class="indented"><p id="b7b94e8f-8850-4fa6-9b08-71edd268c47f" class="" dir="auto">場景甲只需對單一 data block 進行一次 full merge，代價為<em>N</em>次 page 讀取與<em>N</em>次 page 寫入。 而在場景乙中，由於<em>N</em>個 pages 散落在<em>N</em>個不同的 data block，且每個 block 都只有1 個 page 在 log block 中，FTL 必須針對這<em>N</em>個 data blocks 各別執行一次 full merge（讀取該 block 原本的<em>N</em>−1 個舊 page 加上 log block 中1 個新 page，再寫入新 block）。 這導致總讀寫次數膨脹為<em>N</em>×<em>N</em>次（即場景甲的<em>N</em>倍），並需要抹除<em>N</em>個舊 data blocks 與1 個 log block，總計<em>N</em>+1 次。</p></div></p><hr id="339a15e2-9005-8025-b826-f0f91af32564" dir="auto"/><p id="339a15e2-9005-8018-a6a6-eb5f85fa8d6e" class="" dir="auto">(2) 在場景甲中，所有的變更都收斂在同一個 data block 內。FTL 只需要讀取該特定 block 的舊資料與該 log block 的新資料進行合併即可，不需要掃描整個晶片。</p><p id="339a15e2-9005-80b4-b7af-f5c544edce53" class="" dir="auto">(3) 這個選項忽略了 log block 的 associativity。當 log block 內的資料散落在不同 data blocks 時，FTL 無法在單次操作中完成重組，必須觸發多次獨立的合併流程，導致系統開銷成倍數暴增。</p><p id="339a15e2-9005-8029-a19f-edaf125483ca" class="" dir="auto">(4) Switch merge 只能發生在 log block 內的資料與原本的 data block 完全一致（同一個 block 且順序相同）的情況下。場景乙的資料分散在多個不同的 blocks 且題目已限制必須執行 full merge，因此絕對無法使用 switch merge。</p></div></aside></div></details></li></ol><hr id="339a15e2-9005-80bf-831e-d4abc0bdb153" dir="auto"/><ol type="1" id="339a15e2-9005-8069-b4b8-c7fc149ac057" class="numbered-list" start="8" dir="auto"><li>In the DFTL architecture <strong>of an enterprise-grade SSD equipped with Power-Loss Protection (PLP)</strong>, a Cached Mapping Table (CMT) is maintained in SRAM. When an unexpected power loss occurs, how does the SSD controller handle the &quot;dirty&quot; mapping entries in SRAM (entries that have been updated but not yet written back to NAND Flash) to ensure the SSD does not lose the locations of newly written data upon the next boot?<blockquote id="339a15e2-9005-80ca-9811-fef690ecb037" class="" dir="auto"><ol type="1" id="339a15e2-9005-80ad-9311-e0907784fecf" class="numbered-list" start="1" dir="auto"><li>It relies on a large power-loss protection (PLP) capacitor on the SSD circuit board to provide temporary power, giving the controller enough time to flush the dirty mapping entries from SRAM to NAND Flash.</li></ol><ol type="1" id="339a15e2-9005-80fb-94e8-c5d48e266474" class="numbered-list" start="2" dir="auto"><li>The SSD forces a synchronous out-of-place write to the Flash every time a mapping entry is updated in SRAM, so no extra handling is needed during power loss.</li></ol><ol type="1" id="339a15e2-9005-8007-a0e7-c3989a9a54fc" class="numbered-list" start="3" dir="auto"><li>It primarily relies on the OS file system&#x27;s journaling mechanism. After a reboot, the journal is replayed to restore the underlying FTL&#x27;s mapping state.</li></ol><ol type="1" id="339a15e2-9005-80ed-956a-eb3a15e4e01a" class="numbered-list" start="4" dir="auto"><li>Because a dirty entry represents obsolete data ready to be garbage-collected, losing it during a power loss will not corrupt the data, thus requiring no special protection.</li></ol></blockquote><details id="339a15e2-9005-8053-b816-f84c7279abd7" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-808f-8f95-ff53bfac98d1" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8023-a937-f999fb68d515" class="" dir="auto">It relies on a large power-loss protection (PLP) capacitor on the SSD circuit board to provide temporary power, giving the controller enough time to flush the dirty mapping entries from SRAM to NAND Flash.</p><hr id="339a15e2-9005-80c0-9433-faf2faca6ba4" dir="auto"/><p id="339a15e2-9005-805c-b353-e41b3da1266e" class="" dir="auto">解析: <div class="indented"><p id="339a15e2-9005-8077-bb07-dc937b549837" class="" dir="auto">This is a standard practice for enterprise or high-end SSDs. The large capacitor provides crucial milliseconds to seconds of power, ensuring that critical volatile data (including user data and the mapping table) safely lands in the non-volatile Flash.</p></div></p><hr id="339a15e2-9005-80bc-8bd6-d42e7f435988" dir="auto"/><p id="339a15e2-9005-80d8-abc2-fc4a3fad6c32" class="" dir="auto">(2) If every modification required a synchronous write to Flash, it would cause extreme write latency and write amplification, completely defeating the performance purpose of caching the Mapping Table in SRAM.</p><p id="339a15e2-9005-8044-80f2-f1c2ddf7df8f" class="" dir="auto">(3) OS journaling ensures file system consistency, but the OS is unaware of the underlying FTL&#x27;s LBA-to-PBA mapping. The FTL&#x27;s persistence must be handled independently by the SSD controller.</p><p id="339a15e2-9005-8013-a39b-e6457de05f0a" class="" dir="auto">(4) This is conceptually backward. A dirty entry represents the newest LBA-to-PBA mapping. If this information is lost, the SSD will not be able to locate the user&#x27;s most recently written data, leading to severe data loss.</p></div></aside></div></details></li></ol><hr id="339a15e2-9005-803c-9ebb-eea8a2a64df3" dir="auto"/><ol type="1" id="339a15e2-9005-80ec-8caa-e4f267c5c302" class="numbered-list" start="9" dir="auto"><li>某 SSD 採用 hybrid FTL（log-block based），並使用 fully-associative log block。 每個 block 包含 <em>N</em> 個 pages。<br/>系統目前有一個 data block DB0（對應一段連續的 LBA 範圍），以及一個 log block LB0。 LB0 用來暫存對 DB0 的更新。<br/>在某一時刻，LB0 已寫滿，且 controller 觀察到：<aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-801b-9f69-c6eef7a3ad02" dir="ltr"><div style="width:100%"><ol type="1" id="339a15e2-9005-80f8-b4bb-fe0098e05069" class="numbered-list" start="1" dir="auto"><li>LB0 中的所有 page 均對應到 DB0 的 LBA 範圍</li></ol><ol type="1" id="339a15e2-9005-80aa-9df8-efb75057f3c4" class="numbered-list" start="2" dir="auto"><li>每個 logical page 在 LB0 中最多只出現一次</li></ol><ol type="1" id="339a15e2-9005-8032-baec-fcb522059936" class="numbered-list" start="3" dir="auto"><li>LB0 已包含該 LBA 範圍內所有 logical pages 的最新版本</li></ol><ol type="1" id="339a15e2-9005-807a-b681-c2b3aa1c5ed1" class="numbered-list" start="4" dir="auto"><li>寫入順序是連續且與邏輯位移一致的</li></ol></div></aside><p id="339a15e2-9005-8069-9c30-d67367218f00" class="" dir="auto">系統接下來需要回收 LB0 並釋放空間。請問在此情況下，FTL 最可能採用的 merge 策略與其 NAND 操作開銷為何？</p><blockquote id="339a15e2-9005-8058-ad53-e6138412b2b9" class="" dir="auto"><ol type="1" id="339a15e2-9005-80b8-85dc-f4ec23dffd35" class="numbered-list" start="1" dir="auto"><li>採用 full merge，需要約 <em>N</em> 次 page read 與 <em>N</em> 次 page write。</li></ol><ol type="1" id="339a15e2-9005-800b-b472-fb90e3d85053" class="numbered-list" start="2" dir="auto"><li>無法進行 merge，因為 log block 必須依照寫入順序與 data block 完全一致才能處理。</li></ol><ol type="1" id="339a15e2-9005-80ee-bfe5-c5ba2e9aa5a1" class="numbered-list" start="3" dir="auto"><li>採用 switch merge，無需 page read/write，只需抹除舊的 data block。</li></ol><ol type="1" id="339a15e2-9005-8035-a47d-f21641176512" class="numbered-list" start="4" dir="auto"><li>採用 partial merge，僅需讀取未被更新的 pages 並寫入新 block。</li></ol></blockquote><details id="339a15e2-9005-803a-b20c-f6f1e8911375" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80ed-b5d0-cbe07b06ce8a" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8044-8ceb-deeea08e7d7b" class="" dir="auto">採用 switch merge，無需 page read/write，只需抹除舊的 data block。</p><hr id="339a15e2-9005-8039-9686-e428307a1c69" dir="auto"/><p id="339a15e2-9005-80b6-8052-db7b9d6f46c2" class="" dir="auto">Key<div class="indented"><p id="339a15e2-9005-8099-962a-d46faf304459" class="" dir="auto">Full Merge: 舊 data block + log block → 合併成新 block(Read N; Write N)</p><p id="339a15e2-9005-805e-b8e3-d9736081224f" class="" dir="auto">Partial Merge: 搬還沒更新的部分</p><p id="339a15e2-9005-80fd-863f-f40d85256f30" class="" dir="auto">Switch Merge: 直接把 log block 當成新的 data block<div class="indented"><p id="44707586-ead3-4c2b-94e9-270b6bd6e794" class="" dir="auto">1. 全部屬於同一個 data block<br/>2. 每個 page 都有（完整覆蓋）<br/>3. 沒有重複更新<br/>4. 順序正確（對齊）</p></div></p></div></p><hr id="339a15e2-9005-80ed-938d-d40a795f9f0a" dir="auto"/><p id="339a15e2-9005-80f3-8a60-c2d86c7229de" class="" dir="auto">解析: <div class="indented"><p id="339a15e2-9005-80bf-bf55-d2f0fd3daade" class="" dir="auto">LB0 已完整且無重複地覆蓋 DB0 的所有 logical pages，因此可直接進行 switch merge。 controller 只需將 LB0 標記為新的 data block，並抹除舊的 DB0，無需進行任何 page-level 的資料搬移。</p></div></p><hr id="339a15e2-9005-8077-a9ee-c12fdb7adeb0" dir="auto"/><p id="339a15e2-9005-804c-a575-e8a0c3bd9978" class="" dir="auto">(1) full merge 僅在 log block 無法完整覆蓋 data block 時才需要。 此情境中已滿足 switch merge 條件，因此不需要進行昂貴的資料整合。</p><p id="339a15e2-9005-8027-a7d8-c8538752ceaa" class="" dir="auto">(2) switch merge 的關鍵在於 logical coverage（是否完整覆蓋）， 而非實體寫入順序是否與原 data block 相同。</p><p id="339a15e2-9005-806f-925c-f8b8dd5f93c5" class="" dir="auto">(4) partial merge 適用於 log block 僅覆蓋部分 pages 的情況。 本題中 LB0 已完整覆蓋所有 pages，因此不需要 partial merge。</p></div></aside></div></details></li></ol><hr id="339a15e2-9005-80c9-8564-dfbf51e9078a" dir="auto"/><ol type="1" id="339a15e2-9005-8085-8976-dd5198e3f6d6" class="numbered-list numbered-list-digits-2" start="10" dir="auto"><li>測試一顆 SSD 時，在大量修改並寫入新資料的過程中突然斷電，經過重啟後發現：<aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80d3-9d8e-c2db9788abe0" dir="ltr"><div style="width:100%"><ol type="1" id="339a15e2-9005-802e-8cc4-efac71fc3574" class="numbered-list" start="1" dir="auto"><li>部分資料未成功獲得修正，仍是舊資料 </li></ol><ol type="1" id="339a15e2-9005-801c-a16a-d9e6db278748" class="numbered-list" start="2" dir="auto"><li>NAND 內已有寫入的新資料並且並未全部遺失</li></ol></div></aside><p id="339a15e2-9005-8024-8ef5-e1f7ab47f26b" class="" dir="auto">若在不考慮 cache 問題的情況下，以下哪個是最有可能的原因</p><blockquote id="339a15e2-9005-8020-bc17-e9a660ed7619" class="" dir="auto"><ol type="1" id="339a15e2-9005-80c7-ac85-f1eb073c1414" class="numbered-list" start="1" dir="auto"><li>因為斷電，NAND flash 自動回復舊資料</li></ol><ol type="1" id="339a15e2-9005-8030-9fa7-f848d9b043c8" class="numbered-list" start="2" dir="auto"><li>SSD 採用 out-of-place write 策略，但 FTL 尚未完成 mapping 的更新</li></ol><ol type="1" id="339a15e2-9005-80f5-a45c-f5c8e344712d" class="numbered-list" start="3" dir="auto"><li>斷電導致 NAND 中的新資料覆寫了舊資料的一部份，造成新舊資料混雜而無法讀取正確內容</li></ol><ol type="1" id="339a15e2-9005-80ca-bb9d-c3b46debd0f2" class="numbered-list" start="4" dir="auto"><li>block 因為斷電導致被 erase</li></ol></blockquote><details id="339a15e2-9005-80e7-b3e2-c84696740cfd" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80f0-9200-e337e6b07de9" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8099-b7fb-d88e138aadaa" class="" dir="auto">SSD 採用 out-of-place write 策略，但 FTL 尚未完成 mapping 的更新</p><hr id="339a15e2-9005-80a5-a001-e1abd02e2ff3" dir="auto"/><p id="339a15e2-9005-80d9-ac44-e4e35e10abfa" class="" dir="auto">解析: <div class="indented"><p id="339a15e2-9005-80de-b1df-ffae08c43662" class="" dir="auto">out-of-place write 把新資料寫到新的 physical page，重啟後 mapping 仍指向舊的 physical page，所以讀到舊資料；新資料雖然存在 NAND 中，但沒有 mapping 指向它，等同不可見</p></div></p><hr id="339a15e2-9005-8077-aaa0-fbcb82eca8b0" dir="auto"/><p id="339a15e2-9005-8032-8cd9-f5ea6e8ca4af" class="" dir="auto">(1) NAND 本身並無 rollback 的機制</p><p id="339a15e2-9005-80a0-a3df-fb739d0ab107" class="" dir="auto">(3) 根據 out-of-place write 機制，每次寫入都會選擇空白的 new page 寫入，而非直接 erase block 來進行資料的改動</p><p id="339a15e2-9005-806e-a05e-c7767426cc6c" class="" dir="auto">(4) block 的 erase 不會因為斷電而突然發生，而是需要對整個 block 施加高電壓</p></div></aside></div></details></li></ol><hr id="339a15e2-9005-8007-8960-cf7a5075c82e" dir="auto"/></div></details></div></details></div></div><hr id="339a15e2-9005-8064-aeb7-ee42da9ddce9" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-806f-9f78-c6ce77f3a1fc" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80de-a82d-e2262232d3a1" class="" dir="auto">
+</p></div></aside></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

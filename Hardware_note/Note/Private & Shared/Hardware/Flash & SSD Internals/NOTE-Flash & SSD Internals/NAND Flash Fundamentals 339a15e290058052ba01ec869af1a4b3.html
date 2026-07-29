@@ -1,0 +1,774 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>NAND Flash Fundamentals</title><meta name="data-notion-page-icon" content="🧱"/><link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2290%22%3E%F0%9F%A7%B1%3C%2Ftext%3E%3C%2Fsvg%3E"/><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+/* Override strong tags inside headings to maintain consistent weight */
+h1 strong,
+h2 strong,
+h3 strong {
+	font-weight: 600;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 10px;
+	padding: 1rem;
+}
+
+/* For default-background callouts, render the border outline. */
+.callout.block-color-default_background {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+figure,
+aside,
+details {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+
+	table.collection-content {
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	table.collection-content th,
+	table.collection-content td {
+		overflow-wrap: anywhere;
+	}
+
+	table.collection-content td > .user,
+	table.collection-content td > time {
+		white-space: pre-wrap;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content-wrapper {
+	overflow-x: auto;
+}
+
+@media only print {
+	.collection-content-wrapper {
+		overflow-x: visible;
+	}
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.collection-content td {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.column-list {
+	display: flex;
+	gap: 46px;
+}
+
+.column {
+	min-width: 0;
+	overflow: hidden;
+}
+
+.column > *:first-child {
+	margin-top: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding-inline: 0.125rem;
+	padding-block: 0.375rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+table {
+	border-collapse: collapse;
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol.numbered-list.numbered-list-digits-2 {
+	padding-inline-start: 2em;
+}
+
+ol.numbered-list.numbered-list-digits-3plus {
+	padding-inline-start: 2.4em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+/*
+ * Render emoji icons using a ::before pseudo-element to keep the glyph
+ * out of the DOM textContent traversal. This avoids double-rendering icons
+ * in callouts and page titles.
+ * NOTE(slim/html-export-pseudo-icons): I can't tagref this because it will
+ * flag as a duplicate tag after codegen.
+ */
+.icon[data-emoji]::before {
+	content: attr(data-emoji);
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.callout img.notion-static-icon {
+	width: 1em;
+	height: 1em;
+}
+
+.callout p {
+	margin: 0;
+}
+
+.callout h1,
+.callout h2,
+.callout h3 {
+	margin: 0 0 0.6rem;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	margin-right: 0.4em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+blockquote.quote-large {
+	font-size: 1.25em;
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.tab {
+	margin: 1.25em 0;
+	padding-inline: 1rem;
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.highlight-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.highlight-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.highlight-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.highlight-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.highlight-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.highlight-default_background {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray_background {
+	background: rgba(42, 28, 0, 0.07);
+}
+.highlight-brown_background {
+	background: rgba(139, 46, 0, 0.086);
+}
+.highlight-orange_background {
+	background: rgba(224, 101, 1, 0.129);
+}
+.highlight-yellow_background {
+	background: rgba(211, 168, 0, 0.137);
+}
+.highlight-teal_background {
+	background: rgba(0, 100, 45, 0.09);
+}
+.highlight-blue_background {
+	background: rgba(0, 124, 215, 0.094);
+}
+.highlight-purple_background {
+	background: rgba(102, 0, 178, 0.078);
+}
+.highlight-pink_background {
+	background: rgba(197, 0, 93, 0.086);
+}
+.highlight-red_background {
+	background: rgba(223, 22, 0, 0.094);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.block-color-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.block-color-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.block-color-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.block-color-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.block-color-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(240, 239, 237, 1);
+}
+.block-color-brown_background {
+	background: rgba(245, 237, 233, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 235, 222, 1);
+}
+.block-color-yellow_background {
+	background: rgba(249, 243, 220, 1);
+}
+.block-color-teal_background {
+	background: rgba(232, 241, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(229, 242, 252, 1);
+}
+.block-color-purple_background {
+	background: rgba(243, 235, 249, 1);
+}
+.block-color-pink_background {
+	background: rgba(250, 233, 241, 1);
+}
+.block-color-red_background {
+	background: rgba(252, 233, 231, 1);
+}
+.select-value-color-default { background-color: rgba(42, 28, 0, 0.07); }
+.select-value-color-gray { background-color: rgba(28, 19, 1, 0.11); }
+.select-value-color-brown { background-color: rgba(127, 51, 0, 0.156); }
+.select-value-color-orange { background-color: rgba(196, 88, 0, 0.203); }
+.select-value-color-yellow { background-color: rgba(209, 156, 0, 0.282); }
+.select-value-color-green { background-color: rgba(0, 96, 38, 0.156); }
+.select-value-color-blue { background-color: rgba(0, 118, 217, 0.203); }
+.select-value-color-purple { background-color: rgba(92, 0, 163, 0.141); }
+.select-value-color-pink { background-color: rgba(183, 0, 78, 0.152); }
+.select-value-color-red { background-color: rgba(206, 24, 0, 0.164); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style><style>@import url('https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex-swap.min.css')</style></head><body><article id="339a15e2-9005-8052-ba01-ec869af1a4b3" class="page serif" data-notion-page-icon="🧱"><header><img class="page-cover-image" src="https://app.notion.com/images/page-cover/met_william_morris_1877_willow.jpg" style="object-position:center 90%"/><div class="page-header-icon page-header-icon-with-cover"><span class="icon" data-emoji="🧱"></span></div><h1 class="page-title" dir="auto"><mark class="highlight-blue" data-notion-highlight="blue"><strong>NAND Flash Fundamentals</strong></mark></h1><p class="page-description" dir="auto"></p><table class="properties"><tbody></tbody></table></header><div class="page-body"><div id="339a15e2-9005-8006-ad58-e8bbf57b497f" class="column-list" data-notion-column-list="" dir="auto"><div id="339a15e2-9005-80d7-8f54-f3dd45cdad72" style="width:18.75%" class="column" data-notion-column-ratio="0.1875" dir="auto"><hr id="339a15e2-9005-801f-8ad8-e55968e5645c" dir="auto"/><figure id="339a15e2-9005-80c6-a157-d163fa51aaf1" class="image" data-notion-image="Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg" dir="ltr"><a href="Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg"><img style="width:548.375px" src="Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg"/></a></figure><p id="339a15e2-9005-80e4-84be-c807495ba195" class="" dir="auto">
+</p></div><div id="339a15e2-9005-80e0-b54e-fbf0b60ceadb" style="width:81.25%" class="column" data-notion-column-ratio="0.8125" dir="auto"><h3 id="339a15e2-9005-8032-83f8-c5bfdf810c03" class="" dir="auto">Flash Memory</h3><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8020-afcf-c523883f973e" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8011-b3b9-f4d02cef0412" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Flash memory is an electronic non-volatile computer memory storage medium that can be electrically erased and reprogrammed.</mark></p></div></aside><blockquote id="339a15e2-9005-80fe-a1a8-d964001c3ec6" class="" dir="auto">Reference: <a href="https://www.adata.com/tw/quikTips/33/">大容量SSD有什麼好處</a>, <a href="https://www.ssstc.com/tw/knowledge-detail/nand-flash-types-comparison/">NAND Flash快閃記憶體的類型</a>,  <a href="https://makerpro.cc/2024/04/flash-memory-principle-and-application-part1/">【Maker電子學】Flash 記憶體的原理與應用</a>, <a href="https://en.wikipedia.org/wiki/Flash_memory">Flash memory</a>, <a href="https://www.geeksforgeeks.org/operating-systems/what-is-flash-memory/">What is Flash Memory?</a>, <a href="https://wiki.csie.ncku.edu.tw/embedded/Flash">Flash-NYCU</a></blockquote><hr id="339a15e2-9005-802e-a01d-f0752a1818fc" dir="auto"/><details id="339a15e2-9005-805e-a907-d822c9c84846" open="" class="toggle" dir="auto"><summary><strong>Classification</strong></summary><div class="indented"><ul id="339a15e2-9005-818e-9c17-cdef296fdf2d" class="bulleted-list" dir="auto"><li style="list-style-type:disc">NAND flash</li></ul><ul id="339a15e2-9005-813f-94c9-def5155d82bf" class="bulleted-list" dir="auto"><li style="list-style-type:disc">NOR flash</li></ul><hr id="339a15e2-9005-81d9-9f9a-e9ddff0422bb" dir="auto"/><p id="339a15e2-9005-818f-b3f9-d65238965c48" class="" dir="auto">Differences between NAND/ NOR flash?<div class="indented"><div id="339a15e2-9005-8120-8a82-fa9cf7d859b3" class="column-list" data-notion-column-list="" dir="auto"><div id="339a15e2-9005-81db-85f1-e17426bed225" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><p id="339a15e2-9005-81de-949e-dabd66debef8" class="" dir="auto">NAND flash</p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8159-a220-d6436561b1aa" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-813c-825a-c57a9661c98c" class="" dir="auto">Storage where memory cells are connected <em>one after another</em>, like a chain.</p><hr id="339a15e2-9005-8125-948a-e368ba6f2118" dir="auto"/><ul id="339a15e2-9005-816a-ba8c-fd5a87d6bab4" class="bulleted-list" dir="auto"><li style="list-style-type:disc">It uses very few wires → saves space</li></ul><ul id="339a15e2-9005-81b7-a344-c5e4b90c6ae2" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Can store a huge amount of data</li></ul></div></aside></div><div id="339a15e2-9005-811d-94d7-e56451f17899" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><p id="339a15e2-9005-817f-a899-e4c81deff1e4" class="" dir="auto">NOR flash</p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-81e4-bee7-c49899a65fbe" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-81f8-83c2-e5bfb642b797" class="" dir="auto">Storage where memory cells are connected <em>side by side</em>, like branches of a tree. Each cell has a direct connection to the bit line.</p><hr id="339a15e2-9005-8157-9405-f29f25e09be6" dir="auto"/><ul id="339a15e2-9005-81ec-b089-d7500f903414" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Fast reading, fast accessing of individual instructions/data</li></ul></div></aside></div></div><hr id="339a15e2-9005-816b-bf86-fa92559f4455" dir="auto"/><table id="339a15e2-9005-8144-92d6-e1610d351f19" class="simple-table" dir="ltr"><thead class="simple-table-header"><tr id="339a15e2-9005-8161-9d1e-e05c04efdf36" dir="ltr"><th id="XSdP" class="simple-table-header-color simple-table-header" style="width:220.46250915527344px"><strong>Aspect</strong></th><th id="DFoJ" class="simple-table-header-color simple-table-header" style="width:359px"><strong>NAND Flash Memory</strong></th><th id="mRuI" class="simple-table-header-color simple-table-header" style="width:345px"><strong>NOR Flash Memory</strong></th></tr></thead><tbody><tr id="339a15e2-9005-8117-a5f5-eccde66bc8a4" dir="ltr"><td id="XSdP" class="" style="width:220.46250915527344px">Architecture</td><td id="DFoJ" class="" style="width:359px">Memory cells connected in series (chain)</td><td id="mRuI" class="" style="width:345px">Memory cells connected in parallel (branch-like)</td></tr><tr id="339a15e2-9005-811a-bc95-faaea9e7edec" dir="ltr"><td id="XSdP" class="" style="width:220.46250915527344px">Storage Density</td><td id="DFoJ" class="" style="width:359px">High – more data can be stored in less space</td><td id="mRuI" class="" style="width:345px">Low – requires more space for same data</td></tr><tr id="339a15e2-9005-81c1-8204-c8cc7bbbe98a" dir="ltr"><td id="XSdP" class="" style="width:220.46250915527344px">Cost per Bit</td><td id="DFoJ" class="" style="width:359px">Cheaper, more cost-effective</td><td id="mRuI" class="" style="width:345px">More expensive</td></tr><tr id="339a15e2-9005-81b3-aa45-c28d9a7616cf" dir="ltr"><td id="XSdP" class="block-color-orange_background" style="width:220.46250915527344px">Read Speed</td><td id="DFoJ" class="block-color-orange_background" style="width:359px">Slower random read; good for sequential reads</td><td id="mRuI" class="block-color-orange_background" style="width:345px">Fast random read, ideal for quick data access</td></tr><tr id="339a15e2-9005-812e-a679-cf4311f198d2" dir="ltr"><td id="XSdP" class="" style="width:220.46250915527344px">Write Speed</td><td id="DFoJ" class="" style="width:359px">Fast for writing large data blocks</td><td id="mRuI" class="" style="width:345px">Fast for writing small amounts of data</td></tr><tr id="339a15e2-9005-817d-b751-fe52a8a78495" dir="ltr"><td id="XSdP" class="" style="width:220.46250915527344px">Erase Operation</td><td id="DFoJ" class="" style="width:359px">Done at block level (large units)</td><td id="mRuI" class="" style="width:345px">Done at byte or sector level (fine-grained)</td></tr><tr id="339a15e2-9005-81d8-b28d-f131820d71db" dir="ltr"><td id="XSdP" class="" style="width:220.46250915527344px">Endurance</td><td id="DFoJ" class="" style="width:359px">Lower program/erase cycles</td><td id="mRuI" class="" style="width:345px">Higher endurance</td></tr><tr id="339a15e2-9005-8140-9cb1-d4748077964b" dir="ltr"><td id="XSdP" class="" style="width:220.46250915527344px">Access Type</td><td id="DFoJ" class="" style="width:359px">Sequential access</td><td id="mRuI" class="" style="width:345px">Random access</td></tr><tr id="339a15e2-9005-81e8-ad26-c6004733d467" dir="ltr"><td id="XSdP" class="" style="width:220.46250915527344px">XIP (Execute-In-Place)</td><td id="DFoJ" class="" style="width:359px">Not supported</td><td id="mRuI" class="" style="width:345px">Supports direct code execution</td></tr><tr id="339a15e2-9005-8110-bc1f-e9b077c88311" dir="ltr"><td id="XSdP" class="block-color-yellow_background" style="width:220.46250915527344px">Best Used For</td><td id="DFoJ" class="block-color-yellow_background" style="width:359px">SSDs, memory cards, USB drives, smartphones</td><td id="mRuI" class="block-color-yellow_background" style="width:345px">BIOS chips, microcontrollers, embedded firmware</td></tr><tr id="339a15e2-9005-81f7-bc5f-c1cf12ffca49" dir="ltr"><td id="XSdP" class="" style="width:220.46250915527344px">Performance Focus</td><td id="DFoJ" class="" style="width:359px">Maximum storage &amp; low cost</td><td id="mRuI" class="" style="width:345px">Fast execution &amp; reliability</td></tr><tr id="339a15e2-9005-81bf-8a8f-d6507f1ce05c" dir="ltr"><td id="XSdP" class="" style="width:220.46250915527344px">Typical Capacity</td><td id="DFoJ" class="" style="width:359px">High (GB–TB)</td><td id="mRuI" class="" style="width:345px">Low (KB–MB)</td></tr></tbody></table></div></p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-81fb-8657-d73c5bd3c3c3" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8126-bc7e-d495d653a38c" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Extra Component</mark><div class="indented"><figure id="339a15e2-9005-815f-989a-e415731149d1" class="block-color-gray link-to-page" data-notion-highlight="gray"><a href="NAND%20Flash%20Fundamentals/EEPROM%20339a15e29005815f989ae415731149d1.html" data-notion-page-id="339a15e2-9005-815f-989a-e415731149d1" data-notion-space-id="e8ca15e2-9005-814c-9a7f-0003626048ef"><span class="icon" data-emoji="🧱"></span>EEPROM</a></figure><figure id="339a15e2-9005-81ab-9392-e0aed38b35a0" class="link-to-page"><a href="NAND%20Flash%20Fundamentals/DRAM%20339a15e2900581ab9392e0aed38b35a0.html" data-notion-page-id="339a15e2-9005-81ab-9392-e0aed38b35a0" data-notion-space-id="e8ca15e2-9005-814c-9a7f-0003626048ef"><span class="icon" data-emoji="🧱"></span>DRAM</a></figure><figure id="339a15e2-9005-81b0-8b4d-cd9f4b5cfbf9" class="link-to-page"><a href="NAND%20Flash%20Fundamentals/SRAM%20339a15e2900581b08b4dcd9f4b5cfbf9.html" data-notion-page-id="339a15e2-9005-81b0-8b4d-cd9f4b5cfbf9" data-notion-space-id="e8ca15e2-9005-814c-9a7f-0003626048ef"><span class="icon" data-emoji="🧱"></span>SRAM</a></figure><figure id="339a15e2-9005-8139-bfac-fb764bdd0cd4" class="link-to-page"><a href="NAND%20Flash%20Fundamentals/SD%20MMC%20eMMC%20339a15e290058139bfacfb764bdd0cd4.html" data-notion-page-id="339a15e2-9005-8139-bfac-fb764bdd0cd4" data-notion-space-id="e8ca15e2-9005-814c-9a7f-0003626048ef"><span class="icon" data-emoji="🧱"></span>SD/MMC/eMMC</a></figure></div></p><hr id="339a15e2-9005-817a-933b-e9728dedb1eb" dir="auto"/><p id="339a15e2-9005-812c-80b4-e1c85bf6dcd0" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Reference(EEPROM): </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://www.kioxia.com/en-jp/rd/technology/nand-flash.html">What is NAND Flash Memory?(KIOXIA)</a></mark><mark class="highlight-gray" data-notion-highlight="gray">, </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://www.infineon.com/knowledge-centre/what-is-nor-flash-memory">What is NAND flash memory?(Infineon)</a></mark><mark class="highlight-gray" data-notion-highlight="gray">, </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://www.infineon.com/knowledge-centre/what-is-nor-flash-memory">What is NOR Flash Memory?</a></mark><mark class="highlight-gray" data-notion-highlight="gray">, </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://www.geeksforgeeks.org/electronics-engineering/differences-between-nand-vs-nor-flash-memory/">Differences Between NAND vs NOR Flash Memory</a></mark><mark class="highlight-gray" data-notion-highlight="gray">, </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://makerpro.cc/2024/04/flash-memory-principle-and-application-part1/">Flash 記憶體的原理與應用—PART1-NVM</a></mark><mark class="highlight-gray" data-notion-highlight="gray">, </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://makerpro.cc/2024/05/flash-memory-principle-and-application-part2/">Flash 記憶體的原理與應用—PART2-EEPROM</a></mark><mark class="highlight-gray" data-notion-highlight="gray">, </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://makerpro.cc/docs/flash-memory-principle-and-application-part7/">Flash 記憶體的原理與應用—PART7-I2C EEPROM</a></mark><mark class="highlight-gray" data-notion-highlight="gray">, </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://makerpro.cc/docs/flash-memory-principle-and-application-part8/">Flash 記憶體的原理與應用—PART8-I2C EEPROM</a></mark><mark class="highlight-gray" data-notion-highlight="gray">, </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://makerpro.cc/docs/flash-memory-principle-and-application-part9/">Flash 記憶體的原理與應用—PART9</a></mark></p><hr id="339a15e2-9005-8131-a639-d01894610b06" dir="auto"/><p id="339a15e2-9005-8119-85c7-ff1531ae0316" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Reference(DRAM/SRAM/SD/MMC/eMMC): </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://www.purestorage.com/tw/knowledge/what-is-dram.html">什麼是 DRAM</a></mark><mark class="highlight-gray" data-notion-highlight="gray">, </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://www.ramxeed.com/zh-tw/tech-column/how-to-choose-memory/">揮發性 vs 非揮發性記憶體：SRAM、DRAM、FeRAM、MRAM 差異比較與選型指南</a></mark><mark class="highlight-gray" data-notion-highlight="gray">, </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://www.appliedmaterials.com/tw/zh_tw/semiconductor/markets-and-inflections/memory/dram.html">DRAM 剖析</a></mark><mark class="highlight-gray" data-notion-highlight="gray">, </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://pass.ncnu.edu.tw/beaver/emag/article/200012/%e9%9a%a8%e6%a9%9f%e5%ad%98%e5%8f%96%e8%a8%98%e6%86%b6%e9%ab%94.pdf">隨機存取記憶體 - DRAM 及SRAM</a></mark><mark class="highlight-gray" data-notion-highlight="gray">, </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://zh.wikipedia.org/zh-tw/%E9%9D%99%E6%80%81%E9%9A%8F%E6%9C%BA%E5%AD%98%E5%82%A8%E5%99%A8">靜態隨機存取記憶體</a></mark><mark class="highlight-gray" data-notion-highlight="gray">, </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://makerpro.cc/2024/06/flash-memory-principle-and-application-part4/">Flash 記憶體的原理與應用—PART4-NOR Flash的結構</a></mark><mark class="highlight-gray" data-notion-highlight="gray">, </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://makerpro.cc/docs/flash-memory-principle-and-application-part17/">Flash記憶體的原理與應用—PART17</a></mark><mark class="highlight-gray" data-notion-highlight="gray">, </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://makerpro.cc/docs/flash-memory-principle-and-application-part18/">Flash記憶體的原理與應用—PART18</a></mark><mark class="highlight-gray" data-notion-highlight="gray">, </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://makerpro.cc/docs/flash-memory-principle-and-application-part19/">Flash 記憶體的原理與應用—PART19</a></mark><mark class="highlight-gray" data-notion-highlight="gray">, </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://makerpro.cc/docs/flash-memory-principle-and-application-part20/">Flash 記憶體的原理與應用—PART20</a></mark><mark class="highlight-gray" data-notion-highlight="gray">, </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://makerpro.cc/docs/flash-memory-principle-and-application-part21/">Flash 記憶體的原理與應用—PART21</a></mark><mark class="highlight-gray" data-notion-highlight="gray">, </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://makerpro.cc/docs/flash-memory-principle-and-application-part22/">Flash 記憶體的原理與應用—PART22</a></mark><mark class="highlight-gray" data-notion-highlight="gray">, </mark></p><hr id="339a15e2-9005-819c-bc26-ee1a5e282b7b" dir="auto"/><p id="339a15e2-9005-8188-a2f3-d31893f61dcf" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Reference(NOR flash): </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://makerpro.cc/2024/05/flash-memory-principle-and-application-part3/">Flash 記憶體的原理與應用—PART3-NOR Flash的故事</a></mark><mark class="highlight-gray" data-notion-highlight="gray">, </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://makerpro.cc/2024/06/flash-memory-principle-and-application-part4/">Flash 記憶體的原理與應用—PART4-NOR Flash的結構</a></mark><mark class="highlight-gray" data-notion-highlight="gray">, </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://makerpro.cc/docs/flash-memory-principle-and-application-part10/">Flash 記憶體的原理與應用—PART10-NOR flash</a></mark><mark class="highlight-gray" data-notion-highlight="gray">, </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://makerpro.cc/docs/flash-memory-principle-and-application-part11/">Flash 記憶體的原理與應用—PART11</a></mark><mark class="highlight-gray" data-notion-highlight="gray">, </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://makerpro.cc/docs/flash-memory-principle-and-application-part12/">Flash 記憶體的原理與應用—PART12</a></mark><mark class="highlight-gray" data-notion-highlight="gray">, </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://makerpro.cc/docs/flash-memory-principle-and-application-part13/">Flash 記憶體的原理與應用—PART13</a></mark><mark class="highlight-gray" data-notion-highlight="gray">, </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://makerpro.cc/docs/flash-memory-principle-and-application-part14/">Flash 記憶體的原理與應用—PART14</a></mark><mark class="highlight-gray" data-notion-highlight="gray">, </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://makerpro.cc/docs/flash-memory-principle-and-application-part15/">Flash 記憶體的原理與應用—PART15</a></mark></p><hr id="339a15e2-9005-81ea-a16e-d648bd8ffc65" dir="auto"/><p id="339a15e2-9005-8101-a20d-cbdbb677259c" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Reference(NAND flash): </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://makerpro.cc/2024/06/flash-memory-principle-and-application-part5/">Flash 記憶體的原理與應用—PART5-NAND flash</a></mark><mark class="highlight-gray" data-notion-highlight="gray">, </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://makerpro.cc/2024/07/flash-memory-principle-and-application-part6/">Flash 記憶體的原理與應用—PART6-NAND Flash</a></mark><mark class="highlight-gray" data-notion-highlight="gray">, </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://makerpro.cc/docs/flash-memory-principle-and-application-part16/">Flash記憶體的原理與應用—PART16-SmartMedia</a></mark><mark class="highlight-gray" data-notion-highlight="gray">, </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://makerpro.cc/docs/flash-memory-principle-and-application-part21/">Flash 記憶體的原理與應用—PART21</a></mark><mark class="highlight-gray" data-notion-highlight="gray">, </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://makerpro.cc/docs/flash-memory-principle-and-application-part22/">Flash 記憶體的原理與應用—PART22</a></mark></p></div></aside><hr id="339a15e2-9005-815f-a56b-c9b39bc423b8" dir="auto"/></div></details><details id="339a15e2-9005-80ca-a2b2-fc8e7193a2a8" open="" class="toggle" dir="auto"><summary><strong>Key Word Definition/ Discussion</strong></summary><div class="indented"><details id="339a15e2-9005-80a6-ac68-c4f6bb895bce" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>SLC、MLC、TLC、QLC</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80e1-83e7-ef9915d51a92" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8052-baa6-d0ade91493db" class="" dir="auto">NAND flash 的基本儲存單元是 <a href="https://zh.wikipedia.org/zh-tw/%E6%B5%AE%E6%A0%85%E9%87%91%E5%B1%9E%E6%B0%A7%E5%8C%96%E7%89%A9%E5%8D%8A%E5%AF%BC%E4%BD%93%E5%9C%BA%E6%95%88%E5%BA%94%E6%99%B6%E4%BD%93%E7%AE%A1">floating-gate transistor</a>（或是較新的<a href="https://en.wikipedia.org/wiki/Charge_trap_flash"> charge-trap cell</a>-3D NAND flash）。透過在 floating gate (或insulating nitride layer)中注入不同數量的電子，改變電晶體的<a href="https://techweb.rohm.com.tw/product/transistors-diodes/transistors/5277/"> threshold voltage</a>。讀取時根據電壓區間判斷對應的 bit 值。在 MLC/TLC/QLC 中，一個 cell 會對應多個電壓區間，從而儲存多個 bits。</p></div></aside><hr id="339a15e2-9005-8031-a0f4-e73f516f3196" dir="auto"/><div id="339a15e2-9005-8046-a282-c7d41120acd3" class="column-list" data-notion-column-list="" dir="auto"><div id="339a15e2-9005-8057-8e92-df346bf507ef" style="width:106.25%" class="column" data-notion-column-ratio="1.0625" dir="auto"><p id="339a15e2-9005-80d6-9b55-c54d2d72843a" class="" dir="auto"><strong>NAND Flash Type</strong><div class="indented"><blockquote id="339a15e2-9005-801a-9b69-da70632ee51a" class="" dir="auto">SLC（Single-Level Cell）：1 bit/cell，區分 2 個電壓等級<br/>MLC（Multi-Level Cell）：2 bits/cell，區分 4 個電壓等級<br/>TLC（Triple-Level Cell）：3 bits/cell，區分 8 個電壓等級<br/>QLC（Quad-Level Cell）：4 bits/cell，區分 16 個電壓等級</blockquote><p id="339a15e2-9005-8063-831c-c7675f99a316" class="" dir="auto">
+</p></div></p></div><div id="339a15e2-9005-8063-b174-f8a89f748362" style="width:68.75000000000001%" class="column" data-notion-column-ratio="0.6875000000000001" dir="auto"><figure id="339a15e2-9005-801f-b8ca-e7ff43452fcd" class="image" data-notion-image="NAND%20Flash%20Fundamentals/image.png" dir="ltr"><a href="NAND%20Flash%20Fundamentals/image.png"><img style="width:432px" src="NAND%20Flash%20Fundamentals/image.png"/></a></figure></div></div><figure id="339a15e2-9005-80d2-a5de-fdfaaf817be7" class="image" data-notion-image="NAND%20Flash%20Fundamentals/image%201.png" dir="ltr"><a href="NAND%20Flash%20Fundamentals/image%201.png"><img style="width:950.25px" src="NAND%20Flash%20Fundamentals/image%201.png"/></a></figure><hr id="339a15e2-9005-8063-80a2-f8f08c6cd1b0" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8085-9dfd-d3e764849b40" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8018-9aac-fd52c27fd6e2" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark><mark class="highlight-default" data-notion-highlight="default"><strong>QLC is a &quot;bad SLC&quot;.</strong></mark></p><p id="339a15e2-9005-8076-a6f5-d91ae499d8bc" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Correct Concept: </strong></mark><mark class="highlight-default" data-notion-highlight="default"><strong>Engineering Trade-off </strong></mark><mark class="highlight-gray" data-notion-highlight="gray"><strong>(QLC’s </strong></mark><mark class="highlight-gray" data-notion-highlight="gray"><strong><a href="https://www.analog.com/en/resources/technical-articles/voltage-margining-made-easy.html">voltage margin</a></strong></mark><mark class="highlight-gray" data-notion-highlight="gray"><strong> between levels is very narrow.)</strong></mark></p></div></aside><hr id="339a15e2-9005-80c6-898d-db6679ed73e4" dir="auto"/><p id="339a15e2-9005-8022-9c8c-de5303d0f109" class="" dir="auto"><strong>QLC vs. SLC</strong><div class="indented"><ol type="1" id="339a15e2-9005-8019-89ef-ddc77f702d02" class="numbered-list" start="1" dir="auto"><li>儲存資料難度上升：主控在寫入(programming)資料時，需要精確控制浮柵中電子的數量；<p id="339a15e2-9005-80f7-a1c8-ff340bf7b2a2" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">TLC 的 program time 約 1-2 ms，QLC 更慢</mark></p></li></ol><ol type="1" id="339a15e2-9005-80ce-b90f-db6c26958a80" class="numbered-list" start="2" dir="auto"><li>讀取資料的難度上升：主控在讀取資料時，也必須非常精確地判斷目前電壓屬於哪個區間(需要更多次的 <a href="https://www.oxmaint.com/blog/post/what-is-a-voltage-sensor-how-does-a-voltage-sensor-work">voltage sensing</a> )，否則可能導致誤讀；<p id="339a15e2-9005-8058-aed3-caf636b1c199" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">SLC 讀取約 25 us，TLC 約 50-75 us，QLC 可達 100+ us</mark></p></li></ol><ol type="1" id="339a15e2-9005-8099-acc6-e0d1cb0889ee" class="numbered-list" start="3" dir="auto"><li>耐久性(endurance)降低：儲存資訊越多，對電壓精度要求越高。Voltage Margin 越窄，能容忍的損傷就越少。而每次 program/erase 都會對氧化層造成損傷，次數越多、浮柵的磨損越大、電壓狀態越不穩定。</li></ol><ol type="1" id="339a15e2-9005-8003-951e-d5137eb86815" class="numbered-list" start="4" dir="auto"><li>容量增加：同樣數量的 cell，QLC 的容量是 SLC 的 4 倍。</li></ol></div></p><hr id="339a15e2-9005-8087-a034-fc15fbfc96c0" dir="auto"/><table id="339a15e2-9005-80a8-a619-ed6d3447540c" class="simple-table" dir="ltr"><tbody><tr id="339a15e2-9005-8081-bb98-e54fd8f35a41" dir="ltr"><td id="z{UR" class="block-color-brown_background" style="width:103.13750457763672px"><strong>Feature</strong></td><td id="UBs=" class="block-color-gray_background" style="width:157.5px"><strong>SLC</strong></td><td id="MoCO" class="block-color-gray_background" style="width:162.2375030517578px"><strong>MLC</strong></td><td id="JU_[" class="block-color-gray_background" style="width:163.2375030517578px"><strong>TLC</strong></td><td id="cTPY" class="block-color-gray_background" style="width:169.41250610351562px"><strong>QLC</strong></td><td id="Gvxy" class="block-color-gray_background" style="width:169.60000610351562px"><strong>PLC</strong></td></tr><tr id="339a15e2-9005-80e8-a022-d70b35e5b762" dir="ltr"><td id="z{UR" class="block-color-brown_background" style="width:103.13750457763672px"><strong>Bits / Cell</strong></td><td id="UBs=" class="" style="width:157.5px">1</td><td id="MoCO" class="" style="width:162.2375030517578px">2</td><td id="JU_[" class="" style="width:163.2375030517578px">3</td><td id="cTPY" class="" style="width:169.41250610351562px">4</td><td id="Gvxy" class="" style="width:169.60000610351562px">5</td></tr><tr id="339a15e2-9005-8010-8f95-debcb839d90a" dir="ltr"><td id="z{UR" class="block-color-brown_background" style="width:103.13750457763672px"><strong>Voltage Levels</strong></td><td id="UBs=" class="" style="width:157.5px">2 </td><td id="MoCO" class="" style="width:162.2375030517578px">4 </td><td id="JU_[" class="" style="width:163.2375030517578px">8</td><td id="cTPY" class="" style="width:169.41250610351562px">16</td><td id="Gvxy" class="" style="width:169.60000610351562px">32</td></tr><tr id="339a15e2-9005-80e4-8bc7-ec03ab2ce9d2" dir="ltr"><td id="z{UR" class="block-color-brown_background" style="width:103.13750457763672px"><strong>P/E Cycles</strong></td><td id="UBs=" class="" style="width:157.5px">100k</td><td id="MoCO" class="" style="width:162.2375030517578px">3k ~ 10k</td><td id="JU_[" class="" style="width:163.2375030517578px">1k ~ 3k</td><td id="cTPY" class="" style="width:169.41250610351562px">100 ~ 1k</td><td id="Gvxy" class="" style="width:169.60000610351562px">50 ~ 200</td></tr><tr id="339a15e2-9005-80b5-99e9-d715f3eff96f" dir="ltr"><td id="z{UR" class="block-color-brown_background" style="width:103.13750457763672px"><strong>Endurance</strong></td><td id="UBs=" class="block-color-yellow_background" style="width:157.5px">High</td><td id="MoCO" class="block-color-teal_background" style="width:162.2375030517578px"></td><td id="JU_[" class="block-color-blue_background" style="width:163.2375030517578px"></td><td id="cTPY" class="block-color-orange_background" style="width:169.41250610351562px"></td><td id="Gvxy" class="block-color-red_background" style="width:169.60000610351562px">Low</td></tr><tr id="339a15e2-9005-8027-b9dc-c798a4cdafd7" dir="ltr"><td id="z{UR" class="block-color-brown_background" style="width:103.13750457763672px"><strong><a href="https://www.atpinc.com/cn/blog/ldpc-ssd-low-density-parity-check-ecc-algorithm">To Enhance Endurance</a></strong></td><td id="UBs=" class="" style="width:157.5px"></td><td id="MoCO" class="" style="width:162.2375030517578px">Error correction code and controller technology</td><td id="JU_[" class="" style="width:163.2375030517578px">Error correction code and wear leveling</td><td id="cTPY" class="" style="width:169.41250610351562px">Error correction code, reserved configuration (OP) and wear leveling</td><td id="Gvxy" class="" style="width:169.60000610351562px">Error correction code, reserved configuration (OP) and wear leveling</td></tr><tr id="339a15e2-9005-80c2-affd-f29c1609059e" dir="ltr"><td id="z{UR" class="block-color-brown_background" style="width:103.13750457763672px"><strong><a href="https://en.wikipedia.org/wiki/IOPS">Relative IOPS</a></strong></td><td id="UBs=" class="block-color-yellow_background" style="width:157.5px">High</td><td id="MoCO" class="block-color-teal_background" style="width:162.2375030517578px"></td><td id="JU_[" class="block-color-blue_background" style="width:163.2375030517578px"></td><td id="cTPY" class="block-color-orange_background" style="width:169.41250610351562px"></td><td id="Gvxy" class="block-color-red_background" style="width:169.60000610351562px">Low</td></tr><tr id="339a15e2-9005-8002-bdd2-e78569c77967" dir="ltr"><td id="z{UR" class="block-color-brown_background" style="width:103.13750457763672px"><strong><a href="https://hackmd.io/@yq_MtXLqQ7quQb0BHoEY5g/HJv4mgcKa">Relative Throughput</a></strong></td><td id="UBs=" class="block-color-yellow_background" style="width:157.5px">High</td><td id="MoCO" class="block-color-teal_background" style="width:162.2375030517578px"></td><td id="JU_[" class="block-color-blue_background" style="width:163.2375030517578px"></td><td id="cTPY" class="block-color-orange_background" style="width:169.41250610351562px"></td><td id="Gvxy" class="block-color-red_background" style="width:169.60000610351562px">Low</td></tr><tr id="339a15e2-9005-8068-a044-c00692b4f884" dir="ltr"><td id="z{UR" class="block-color-brown_background" style="width:103.13750457763672px"><strong><a href="http://blog.csdn.net/allway2/article/details/102292823">Program Latency (µs)</a></strong></td><td id="UBs=" class="block-color-yellow_background" style="width:157.5px">Low</td><td id="MoCO" class="block-color-teal_background" style="width:162.2375030517578px"></td><td id="JU_[" class="block-color-blue_background" style="width:163.2375030517578px"></td><td id="cTPY" class="block-color-orange_background" style="width:169.41250610351562px"></td><td id="Gvxy" class="block-color-red_background" style="width:169.60000610351562px">High</td></tr><tr id="339a15e2-9005-8096-9900-ef545215374b" dir="ltr"><td id="z{UR" class="block-color-brown_background" style="width:103.13750457763672px"><strong>Density (Gb/mm²)</strong></td><td id="UBs=" class="block-color-yellow_background" style="width:157.5px">Low</td><td id="MoCO" class="block-color-teal_background" style="width:162.2375030517578px"></td><td id="JU_[" class="block-color-blue_background" style="width:163.2375030517578px"></td><td id="cTPY" class="block-color-orange_background" style="width:169.41250610351562px"></td><td id="Gvxy" class="block-color-red_background" style="width:169.60000610351562px">High</td></tr><tr id="339a15e2-9005-800b-8cf9-f29777448952" dir="ltr"><td id="z{UR" class="block-color-brown_background" style="width:103.13750457763672px"><strong>Pros </strong></td><td id="UBs=" class="" style="width:157.5px">Ultra-long lifespan, Extreme reliability</td><td id="MoCO" class="" style="width:162.2375030517578px">Balanced performance and cost</td><td id="JU_[" class="" style="width:163.2375030517578px">High density, Mainstream standard</td><td id="cTPY" class="" style="width:169.41250610351562px">Maximum capacity, Lowest cost</td><td id="Gvxy" class="" style="width:169.60000610351562px">Future extreme capacity density</td></tr><tr id="339a15e2-9005-80ba-b7aa-cae8e9108efb" dir="ltr"><td id="z{UR" class="block-color-brown_background" style="width:103.13750457763672px"><strong>Cons</strong></td><td id="UBs=" class="" style="width:157.5px">Low capacity, High cost</td><td id="MoCO" class="" style="width:162.2375030517578px">Performance/Life &lt; SLC</td><td id="JU_[" class="" style="width:163.2375030517578px">Performance relies on SLC Cache</td><td id="cTPY" class="" style="width:169.41250610351562px">Worst endurance &amp; write speeds</td><td id="Gvxy" class="" style="width:169.60000610351562px">Extreme technical challenges</td></tr><tr id="339a15e2-9005-80e8-9f37-f1c7ffbea2da" dir="ltr"><td id="z{UR" class="block-color-brown_background" style="width:103.13750457763672px"><strong>Application</strong></td><td id="UBs=" class="" style="width:157.5px">Enterprise-level applications with extremely high requirements for performance, lifespan, and reliability</td><td id="MoCO" class="" style="width:162.2375030517578px">Mid-to-high-end consumer-grade SSDs, and some enterprise-level applications</td><td id="JU_[" class="" style="width:163.2375030517578px">Mainstream consumer-grade SSDs for cost-sensitive applications</td><td id="cTPY" class="" style="width:169.41250610351562px">Entry-level consumer SSDs and high-capacity storage applications where cost and capacity requirements outweigh performance and lifespan</td><td id="Gvxy" class="" style="width:169.60000610351562px">Extremely read-intensive applications</td></tr><tr id="339a15e2-9005-80f6-b2f9-e68c7d0b1a27" dir="ltr"><td id="z{UR" class="block-color-brown_background" style="width:103.13750457763672px"><strong>Example</strong></td><td id="UBs=" class="" style="width:157.5px">Industrial automation, medical devices and aerospace systems, High-end servers, data centers, financial trading systems, mission-critical storage</td><td id="MoCO" class="" style="width:162.2375030517578px">Digital cameras and portable media players, Read-intensive workloads, high-performance laptops</td><td id="JU_[" class="" style="width:163.2375030517578px">Laptops, Gaming PCs</td><td id="cTPY" class="" style="width:169.41250610351562px"><a href="https://www.ssstc.com/tw/products/?keyword=CL4">CL4</a>、<a href="https://www.ssstc.com/tw/products/?keyword=CA6">CA6</a>和<a href="https://www.ssstc.com/tw/products/?keyword=CVB">CVB</a> SSD, Big data storage, data lake, archiving, game library, video storage</td><td id="Gvxy" class="" style="width:169.60000610351562px">Cold data storage and archiving</td></tr></tbody></table><hr id="339a15e2-9005-80bb-91c5-cbe55d6a991b" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8032-af1a-ee79a412f8be" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8089-827b-e0fbda5c4677" class="" dir="auto">Reference: <a href="https://www.purestorage.com/tw/knowledge/what-is-3d-nand.html">什麼是 3D NAND？運作方式為何？</a>, <a href="https://wiki.csie.ncku.edu.tw/embedded/Flash?revision=373a5b0472d132b5c805c1e979280735f018240f">Flash</a>, <a href="https://scitechvista.nat.gov.tw/Article/c000008/detail?ID=3d3a7515-2f7f-4d39-80fd-6ad22d470f05">矽晶・電子：3C電子產品不可缺的靈魂技術–浮閘記憶體</a>, <a href="https://zhuanlan.zhihu.com/p/346850896">Floating Gate VS Charge Trap</a>, <a href="https://zhuanlan.zhihu.com/p/2000692311974225457">3D NAND闪存的容量倍增之路：从闪存的基本原理到SLC/MLC/TLC/QLC/PLC型闪存</a>, <a href="https://vocus.cc/article/68689d22fd89780001c6a832">NAND Flash壽命與寫入壓力實測經驗分享</a>, <a href="https://aweip.com/index.php/archives/83/">對SSD知識的學習總結</a>, <a href="https://files.futurememorystorage.com/proceedings/2017/20170809_S203B_Ghose.pdf">Vulnerabilities in MLC NAND Flash Memory Programming</a>, <a href="https://blog.csdn.net/rainy_day/article/details/4001658">Nand Introduction</a>, <a href="https://blog.csdn.net/zhuzongpeng/article/details/140620901">SSD性能与NAND速率的关系</a></p></div></aside><hr id="339a15e2-9005-80f8-9d30-ff5c9f49031d" dir="auto"/></div></details><details id="339a15e2-9005-80a9-bb1b-eaf1bdb316b6" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Cell, Page(R/W), Block(ERASE), Plane, Die</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8005-876d-f91d5ab34521" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8052-b216-e35f43c63b9e" class="" dir="auto">NAND FLASH Storage Hierarchy:<div class="indented"><p id="339a15e2-9005-8092-b84c-d4bb934ce7f0" class="" dir="auto">一個Device有若干個DIE （或叫LUN ），每個DIE有若干個Plane ，每個Plane有若干個Block ，每個Block有若干個Page 。每個(或多個)Page對應一個Wordline ，由成千上萬個儲存單元(cell)構成。</p><p id="339a15e2-9005-80af-a8ba-d9463f09ee4f" class="" dir="auto">由小到大結構:<div class="indented"><p id="339a15e2-9005-809f-b194-e258056bae8c" class="" dir="auto"><strong>Cell → Page → Block → Plane → Die → Device</strong></p></div></p></div></p></div></aside><hr id="339a15e2-9005-8068-b4ec-c2dde78cfc52" dir="auto"/><p id="339a15e2-9005-80e5-92dd-ee0999f27084" class="" dir="auto"><strong>Detail of each architecture</strong><div class="indented"><ul id="339a15e2-9005-80cb-a28f-f4288d96ff4a" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Page</strong>（典型大小 4-16 KB）<strong>：</strong>最小的讀取與寫入單位。你不能只寫 512 bytes，必須寫滿一整個 page。</li></ul><ul id="339a15e2-9005-8045-87f3-e81412cffa47" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Block</strong>（典型大小 256-512 個 page，即 4-8 MB）<strong>：</strong>最小的抹除單位 (erase)。這個粒度差異是 SSD 設計複雜度的根源。</li></ul><ul id="339a15e2-9005-80df-8ee7-c257f3a8d4cf" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Plane：</strong>一個 die 內通常有 2-4 個 plane。同一個 die 的不同 plane 可以並行操作（multi-plane operation），這是 SSD 提升吞吐量的重要機制。</li></ul><ul id="339a15e2-9005-80c8-9ec0-d385c9135385" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Die：</strong>一個獨立的 NAND flash 晶片。一顆 SSD 裡可能有 4-16 個 die，controller 可以對不同 die 發出獨立的指令（die-level parallelism）。</li></ul></div></p><div id="339a15e2-9005-80b2-ba72-c9d82a68887d" class="column-list" data-notion-column-list="" dir="auto"><div id="339a15e2-9005-80e7-bfce-e9f32fdb234f" style="width:56.25%" class="column" data-notion-column-ratio="0.5625" dir="auto"><figure id="339a15e2-9005-8076-a874-d64026f48e7a" class="image" data-notion-image="NAND%20Flash%20Fundamentals/aa014ab3-7316-49f7-ba0d-dd3be68b1f74.png" dir="ltr"><a href="NAND%20Flash%20Fundamentals/aa014ab3-7316-49f7-ba0d-dd3be68b1f74.png"><img style="width:480px" src="NAND%20Flash%20Fundamentals/aa014ab3-7316-49f7-ba0d-dd3be68b1f74.png"/></a></figure></div><div id="339a15e2-9005-803a-aef1-dfda3e273234" style="width:43.75%" class="column" data-notion-column-ratio="0.4375" dir="auto"><p id="339a15e2-9005-80de-a722-e29ba1ef0862" class="" dir="auto">
+</p><p id="339a15e2-9005-80a5-b586-e86e35df1864" class="" dir="auto">
+</p><figure id="339a15e2-9005-809d-a6b2-fc5ce0e7e4c0" class="image" data-notion-image="NAND%20Flash%20Fundamentals/image%202.png" dir="ltr"><a href="NAND%20Flash%20Fundamentals/image%202.png"><img style="width:528px" src="NAND%20Flash%20Fundamentals/image%202.png"/></a></figure><p id="339a15e2-9005-80e5-a1a4-c032ce9bbe94" class="" dir="auto">
+</p></div></div><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8054-a166-cf8e6c9c3115" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8005-ad7e-d1271a6aff39" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray"><strong>Important:</strong></mark><div class="indented"><p id="339a15e2-9005-80f1-9920-c3652a92fbf1" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">讀寫粒度是 page（16 KB），但抹除粒度是 block（4 MB 以上），這個 250 倍以上的粒度差異，是為什麼有 SSD 管理機制的根本原因。</mark></p></div></p></div></aside><hr id="339a15e2-9005-802c-b8fe-faa659aa1fbb" dir="auto"/><div id="339a15e2-9005-80d4-929f-f926cc6e80b8" class="column-list" data-notion-column-list="" dir="auto"><div id="339a15e2-9005-8023-b28f-e5ad0fcefdcf" style="width:68.75%" class="column" data-notion-column-ratio="0.6875" dir="auto"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80b8-9c0e-f40eafdf0497" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80ee-95df-c5f57f56f24a" class="" dir="auto"><strong>Block Architecture</strong><div class="indented"><p id="339a15e2-9005-80e8-a3d9-e4fefdbc767b" class="" dir="auto">WordLine對應著一個或若干個Page ，取決於SLC,MLC或TLC 。對SLC來說，一個WordLine對應一個Page ； MLC則對應2個Page ，這兩個Page是一對： Lower Page和Upper Page ； TLC對應3個Page 。</p><p id="339a15e2-9005-8021-a8c9-d18268c0efda" class="" dir="auto">Page有多大，WordLine上面就有多少個儲存單元（ Cell ），就有多少個Bitline 。</p><p id="339a15e2-9005-806f-8677-c4c530c397f4" class="" dir="auto">Block 當中的所有這些儲存單元（ Cell ）都是共用一個基板的</p></div></p></div></aside></div><div id="339a15e2-9005-8016-977a-ec7a33260ab3" style="width:31.250000000000007%" class="column" data-notion-column-ratio="0.31250000000000006" dir="auto"><figure id="339a15e2-9005-801c-82a2-dcd8f09a0826" class="image" data-notion-image="NAND%20Flash%20Fundamentals/image%203.png" dir="ltr"><a href="NAND%20Flash%20Fundamentals/image%203.png"><img style="width:240px" src="NAND%20Flash%20Fundamentals/image%203.png"/></a></figure></div></div><hr id="339a15e2-9005-80f3-8d5e-f530654f5012" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80a1-8e0a-cbe431a9fd0b" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8064-bce0-f0458f9377fd" class="" dir="auto">Reference: <a href="https://jia.je/kb/hardware/nand_flash.html">NAND Flash</a>, <a href="http://blog.csdn.net/qq_38106009/article/details/126267117">SSD內部邏輯結構</a>, <a href="https://zhuanlan.zhihu.com/p/447734000">SSD简介（3）- 闪存芯片NOR/NAND/2D/3D</a>, <a href="https://jeffprogrammer.wordpress.com/2018/02/08/%E6%B7%BA%E8%AB%87-ssd/">淺談 SSD</a>, <strong><a href="http://www.ssdfans.com/?p=8074">快閃記憶體基礎</a></strong></p></div></aside><hr id="339a15e2-9005-8018-a854-e4f73001e560" dir="auto"/></div></details><details id="339a15e2-9005-8065-b3a5-ee4d1c03a3a4" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Erase-before-write</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-800e-8259-d6dde1338bfd" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80fb-aea0-d108e1de7c31" class="" dir="auto">固態的擦除是以block為單位、讀寫以page為單位，Nand的物理特性決定了他不能覆蓋寫入。</p></div></aside><p id="339a15e2-9005-807a-801f-c13d0a32f5d3" class="" dir="auto">Nand flash 使用浮動柵級晶極管儲存電子，每個cell僅能由0→1 (注入電子)。而ERASE這個動作是指對一整個Block施加高壓電，將所有電子移除(回復到0的狀態)，以重新寫入數據。</p><p id="339a15e2-9005-8044-94f9-f2ffe38a0454" class="" dir="auto">因此如果我們要對一個已有資料的page進行寫入或是修改時，必須先把這個page所在的block中的資料讀出、將block清空後再把所有資料寫入(而這樣會耗費很大的時間，因此SSD又延伸出<a href="https://app.notion.com/p/323a15e29005800e8919fbdacfb0fe9e?pvs=21">Flash Translation Layer</a>以降低讀寫latency)。</p><figure id="339a15e2-9005-8032-9592-fdadfc703e41" class="image" data-notion-image="NAND%20Flash%20Fundamentals/e04efdc1-7454-4dff-b9a6-af7a25633ce7.png" dir="ltr"><a href="NAND%20Flash%20Fundamentals/e04efdc1-7454-4dff-b9a6-af7a25633ce7.png"><img style="width:438.7279151943462px" src="NAND%20Flash%20Fundamentals/e04efdc1-7454-4dff-b9a6-af7a25633ce7.png"/></a></figure><hr id="339a15e2-9005-80bd-956e-f5b3b955dd40" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-807c-95c8-d1d5b7a97615" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-802f-94ab-fdff6a18014a" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://www.notion.so/323a15e29005800e8919fbdacfb0fe9e?pvs=25">Flash Translation Layer</a></mark><mark class="highlight-gray" data-notion-highlight="gray">(out-of-place write controller)</mark><div class="indented"><p id="339a15e2-9005-80b0-82c2-ecfa4df6e9e4" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">如果每次更新一個 16 KB 的 page 都要搬移整個 4 MB block 的資料，效率豈不是極差？沒錯，所以 SSD 根本不這麼做。SSD 採用 out-of-place write 策略：更新 page 1 時，直接把新資料寫到另一個空白的 page，再更新 mapping table 讓邏輯位址指向新位置。舊的 page 變成 invalid，等之後 garbage collection 來清理。</mark></p></div></p><hr id="339a15e2-9005-80ef-8462-c8a3ecaeea87" dir="auto"/><p id="339a15e2-9005-80fa-a3aa-d36404cd71d7" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Reference: </mark><mark class="highlight-gray" data-notion-highlight="gray"><a href="https://aticleworld.com/why-flash-memory-must-be-erased-before-writing/">Why flash memory must be erased before writing</a></mark></p></div></aside><hr id="339a15e2-9005-802e-b10e-d8186ac7f006" dir="auto"/></div></details><details id="339a15e2-9005-80e5-b391-ec59f52f7a7d" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>P/E cycle limitations and SSD lifespan</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8062-8e7a-c1d16c9ab4a5" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80e5-b87f-e4949af36ed0" class="" dir="auto">每次 erase 操作都會對 cell 的隧穿氧化層（tunnel oxide）造成微小但不可逆的損傷。隨著 P/E cycle 累積，氧化層的絕緣能力下降，cell 的 threshold voltage distribution 會逐漸擴散、重疊，最終無法正確區分不同的電壓等級。</p></div></aside><p id="339a15e2-9005-803e-838c-e7b5be9e79f7" class="" dir="auto">P/E cycle 限制不只影響壽命，也影響 <strong>data retention</strong>。一顆新的 TLC SSD 可以在斷電後保持資料數年，但接近 P/E cycle 上限的 cell，retention 時間可能縮短到幾個月甚至幾週。這就是為什麼企業級 SSD 通常會設定比消費級更保守的 endurance 規格。</p><p id="339a15e2-9005-80ee-8683-e9225379f62e" class="" dir="auto">這也是為什麼你的手機用了兩三年之後會感覺變慢。隨著 P/E cycle 累積，NAND flash cell 的 voltage margin 變窄，controller 需要更多次的 read retry 才能正確讀取資料，再加上長期使用後 garbage collection 的壓力增加，讀寫延遲都會上升。你感受到的「手機變慢」，有一部分就是 NAND flash 物理老化的結果。</p><hr id="339a15e2-9005-806f-9b84-d75aac23cc1b" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8013-afb2-fbb7b378342f" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8098-89e7-ee81ad4122c1" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">以一顆 1 TB TLC SSD、P/E cycle 上限 3,000 為例：如果每次寫滿整顆 SSD 算一次 P/E cycle，理論上總共可以寫入<br/> 1 TB x 3,000 = 3,000 TB = 3 PB 的資料。但實際上因為 write amplification（後面會詳細討論），真正可寫入的資料量會比這個數字少很多。廠商標示的 TBW（Total Bytes Written）規格通常已經把 write amplification 考慮進去了。</mark></p><hr id="339a15e2-9005-806b-b5c8-f529cd98c174" dir="auto"/><p id="339a15e2-9005-8070-8b8b-da0176a99544" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Reference: </mark></p></div></aside><hr id="339a15e2-9005-8032-b5fc-f6e550fec0fa" dir="auto"/></div></details><details id="339a15e2-9005-8052-a7c0-d26afbd55365" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Endurance &amp; Retention</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8023-a1fb-e6b017712dd2" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-804c-9837-d08b80b87b99" class="" dir="auto"><strong>Endurance耐久度:</strong> 記憶體單元可以承受的寫入 / 擦除（Program/Erase, P/E cycles）次數。<div class="indented"><p id="339a15e2-9005-8079-9a08-f38d2f2e4d6e" class="" dir="auto">問題來源：Repeated write/erase damage</p><p id="339a15e2-9005-8006-8880-e2a91915421e" class="" dir="auto">解法：Wear Leveling, Over-Provisioning, Error Correction Code (ECC)</p></div></p><p id="339a15e2-9005-802c-8458-c3af5995c21a" class="" dir="auto"><strong>Retention資料保持時間:</strong> 在沒有電源的情況下，資料能維持正確的時間。<div class="indented"><p id="339a15e2-9005-803e-ae11-c51db0743966" class="" dir="auto">問題來源：Charge leakage<div class="indented"><blockquote id="339a15e2-9005-8091-afd1-f406c941d0ed" class="" dir="auto">即使沒有操作，電子會慢慢穿過絕緣層（oxide）或受到溫度影響逃逸</blockquote></div></p><p id="339a15e2-9005-80c8-bb0c-c4a4bd544d32" class="" dir="auto">解法：Refresh, ECC, Lower density（SLC &gt; TLC &gt; QLC）</p></div></p></div></aside><p id="339a15e2-9005-80bc-bac6-ddde22f320cc" class="" dir="auto">
+</p><hr id="339a15e2-9005-8093-a585-d80f77f5c9f7" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8091-a8cc-e2fb7a07d89a" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80db-90c1-d9fc3493e3c4" class="" dir="auto">Reference:</p></div></aside><hr id="339a15e2-9005-80b0-b6be-db996094d4fc" dir="auto"/></div></details></div></details><details id="339a15e2-9005-8004-ae33-da59282cd48d" open="" class="toggle" dir="auto"><summary><strong>Test</strong></summary><div class="indented"><details id="339a15e2-9005-80fb-b296-daac5e530dc6" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Key Concepts</strong></mark></summary><div class="indented"><details id="339a15e2-9005-8082-bb8f-fc98b2589cfa" open="" class="toggle" dir="auto"><summary>理解 SLC、MLC、TLC、QLC 的差異，以及它們在容量、速度與耐久性（endurance）之間的取捨</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80b5-8f05-dc8ec2918bdd" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80ef-8426-c701282b77f8" class="" dir="auto">Answer<div class="indented"><p id="339a15e2-9005-8049-ba31-e5e85f019376" class="" dir="auto">隨著每個單元（Cell）儲存的位元數從 1 (SLC) 增加到 4 (QLC)，容量成倍翻升，但代價是讀寫速度變慢，且物理磨損造成的壽命（Endurance）呈斷崖式下降。</p></div></p><hr id="339a15e2-9005-80e9-bed1-f1344e8cb75f" dir="auto"/><p id="339a15e2-9005-80d1-9b90-c7392de59225" class="" dir="auto">Key Concept<div class="indented"><p id="339a15e2-9005-8045-8b7f-e1d91ff61171" class="" dir="auto">Bits per Cell / Voltage Margin</p></div></p><hr id="339a15e2-9005-80fe-a0f6-cbcd30758e5f" dir="auto"/><p id="339a15e2-9005-8085-b6cd-f03346793138" class="" dir="auto">Detail<div class="indented"><p id="bca0abdc-4d3a-4103-83e2-10b6ef035b06" class="" dir="auto">SLC 只需區分 2 個電壓狀態，容錯率極高，讀寫極快且壽命長（可達 100k P/E cycles）。但 QLC 需要在相同的實體物理限制內，精細地劃分出 16 個電壓狀態。這使得寫入時需要非常小心的逐步微調（導致寫入極慢），且輕微的電荷流失就會跨越邊界導致讀取錯誤（導致壽命降至僅約 1k P/E cycles）。</p></div></p></div></aside><hr id="339a15e2-9005-8018-9719-c2909068a89c" dir="auto"/></div></details><details id="339a15e2-9005-8085-953a-f8b98166633f" open="" class="toggle" dir="auto"><summary>理解 NAND flash 的儲存階層結構：page 是最小讀寫單位，多個 page 組成 block，block 再往上組成 plane 與 die</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80ac-8277-efd27f514f50" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8077-bdbb-c02287ea9e94" class="" dir="auto">Answer<div class="indented"><p id="339a15e2-9005-8085-a860-cd7c3f64b170" class="" dir="auto">SSD 內部的儲存層級由小到大為：Cell → Page → Block → Plane → Die。其中，<strong>讀取與寫入</strong>的基本單位是 Page，而<strong>抹除</strong>的基本單位是 Block。</p></div></p><hr id="339a15e2-9005-808e-bcd1-edb61998c4a0" dir="auto"/><p id="339a15e2-9005-80d2-8806-fdb6971a9c17" class="" dir="auto">Key Concept<div class="indented"><p id="339a15e2-9005-80e9-8f1b-c0fa9d92d8c1" class="" dir="auto">Asymmetric I/O Unit (非對稱 I/O 單位) / Storage Hierarchy</p></div></p><hr id="339a15e2-9005-8067-8d88-dd33756cca68" dir="auto"/><p id="339a15e2-9005-80c3-9f2a-dcb909882ad2" class="" dir="auto">Detail<div class="indented"><p id="339a15e2-9005-80cf-a77c-fba30fd59ec8" class="" dir="auto">這是不對稱的硬體架構。主機平常是按 4KB 或 16KB（Page）在讀寫資料，但當 SSD 需要清空無效資料以釋放空間時，只能一次性抹除數 MB 的 Block。這正是衍生出 Garbage Collection (垃圾回收) 機制的根本原因。</p></div></p></div></aside><hr id="339a15e2-9005-80c4-9c22-eac8604c97aa" dir="auto"/></div></details><details id="339a15e2-9005-8082-bea6-e2baf9575b81" open="" class="toggle" dir="auto"><summary>理解 erase-before-write constraint，知道為什麼無法直接覆寫已寫入的 page，必須先將整個 block 抹除</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-808e-9021-ddbe1469d069" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8027-befb-dd3a99ba9d07" class="" dir="auto">Answer<div class="indented"><p id="339a15e2-9005-80f5-b134-fc9edbd23f8c" class="" dir="auto">物理上，寫入資料只能將電子「注入」儲存單元，無法單獨將電子「抽出」。若要清除電子，必須對整個 Block 施加高壓統一放電。</p></div></p><hr id="339a15e2-9005-80d8-a5a0-e5bc6115a3b9" dir="auto"/><p id="339a15e2-9005-80be-a955-da07be2a5036" class="" dir="auto">Key Concept<div class="indented"><p id="339a15e2-9005-8051-aae3-c1a226a321ec" class="" dir="auto">Fowler-Nordheim (FN) Tunneling</p></div></p><hr id="339a15e2-9005-8004-a679-f99a5b973e3d" dir="auto"/><p id="339a15e2-9005-80eb-8072-c1bb6a104690" class="" dir="auto">Detail<div class="indented"><p id="339a15e2-9005-80bf-8d4e-dcf13d79ab66" class="" dir="auto">在 NAND Flash 中，沒有電子的狀態代表邏輯 <code>1</code>，注入電子代表邏輯 <code>0</code>。所謂的 Programming（寫入）只能把 <code>1</code> 變成 <code>0</code>。如果你想把 <code>0</code> 改回 <code>1</code>，唯一的物理手段就是執行 Erase，把整個 Block 裡的電子強制抽出。這就是不能原地覆寫 (In-place update) 的原因。</p></div></p></div></aside><hr id="339a15e2-9005-800e-a5dd-ffad11e9811e" dir="auto"/></div></details><details id="339a15e2-9005-80ff-913c-d59b0adc5b40" open="" class="toggle" dir="auto"><summary>每個 block 的 P/E cycle 數量有限，並理解這如何決定 SSD 的壽命與 retention 特性</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8039-8b4c-c46e5bad6ac4" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-805b-896e-c7b811a06e07" class="" dir="auto">Answer<div class="indented"><p id="339a15e2-9005-80b4-a345-f5897e5585ee" class="" dir="auto">每一次的 Program 和 Erase 都會對儲存單元的絕緣層（Tunnel Oxide）造成不可逆的物理傷害。次數滿了會導致嚴重漏電，使資料無法長期保存。</p></div></p><hr id="339a15e2-9005-80e4-8d03-cd1d85ca260c" dir="auto"/><p id="339a15e2-9005-80a4-a6f5-e47f8ae6b7d9" class="" dir="auto">Key Concept<div class="indented"><p id="339a15e2-9005-8087-8a43-e7708b2da648" class="" dir="auto">Tunnel Oxide Degradation (隧道氧化層劣化) / Data Retention</p></div></p><hr id="339a15e2-9005-8038-a530-e7609e492264" dir="auto"/><p id="339a15e2-9005-80a6-b52d-d7bc93fd4ec2" class="" dir="auto">Detail<div class="indented"><p id="339a15e2-9005-8009-bf74-e78889513364" class="" dir="auto">電子進出 Floating Gate 會像子彈一樣打穿氧化層。隨著 P/E cycles 累積，絕緣層會產生越來越多的微小破洞（Charge Trapping）。這會讓原本關在裡面的電子慢慢逃逸，導致一段時間沒通電後，電壓產生偏移，這就是 Data Retention 下降的物理本質。</p></div></p></div></aside><hr id="339a15e2-9005-80fe-a7aa-f314169d643e" dir="auto"/></div></details></div></details><details id="339a15e2-9005-80e3-80b8-c7b1f41be03e" open="" class="toggle" dir="auto"><summary><mark class="highlight-teal" data-notion-highlight="teal"><strong>Test your understanding</strong></mark></summary><div class="indented"><details id="339a15e2-9005-806a-a04e-fff18923632d" open="" class="toggle" dir="auto"><summary>假設你有兩顆容量相同的 SSD，一顆使用 SLC，一顆使用 QLC。在不考慮 controller 設計差異的情況下，它們各自適合什麼樣的 workload？請從 endurance、讀寫速度、成本三個角度分析。</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8014-9512-f509721d2150" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80df-9ec4-e9e3070eeca8" class="" dir="auto">Answer<div class="indented"><p id="339a15e2-9005-8091-9b9c-ea51628874b0" class="" dir="auto">SLC 適合高頻繁隨機寫入、極低延遲的企業級快取；QLC 適合大容量、以讀取為主的冷資料儲存。</p></div></p><hr id="339a15e2-9005-8017-97ef-c4a1672627d9" dir="auto"/><p id="339a15e2-9005-8071-91aa-f43854052949" class="" dir="auto">Key Concept<div class="indented"><p id="339a15e2-9005-805f-a626-dbabbb687b6b" class="" dir="auto">Workload Matching / Cost-Performance Trade-off</p></div></p><hr id="339a15e2-9005-8077-b523-d26f5de40085" dir="auto"/><p id="339a15e2-9005-8067-817b-c9da67ad8102" class="" dir="auto">Detail<div class="indented"><ul id="30dc6fc0-c0db-4eb6-a005-482562c01b68" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>SLC</strong>：Endurance 極高、讀寫最快，但單位成本 (Cost/GB) 昂貴，適合當資料庫的 Transaction Log 或 SSD 內部的 Cache 區塊。</li></ul><ul id="1c998d7e-2acd-4f34-b383-5ca92cdc6e97" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>QLC</strong>：Endurance 極低、寫入緩慢，但擁有極致的成本優勢，適合 WORM (Write Once, Read Many) 場景，如影音串流伺服器或資料備份歸檔。</li></ul></div></p></div></aside><hr id="339a15e2-9005-807a-a5ea-fd908499e4fa" dir="auto"/></div></details><details id="339a15e2-9005-8034-9023-ca7460a0eba9" open="" class="toggle" dir="auto"><summary>一個 block 包含 256 個 page，每個 page 為 16 KB。如果你只需要更新其中一個 page 的資料，在最壞情況下需要搬移多少資料？這個 read-modify-write 的開銷與 block 大小的關係是什麼？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80bc-b480-e11bf56a8e53" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-809f-bc7f-e4800ce0a778" class="" dir="auto">Answer<div class="indented"><p id="339a15e2-9005-8068-a607-eb6112747f86" class="" dir="auto">最壞情況下，為了更新 16 KB 的資料，必須讀取 4 MB 的舊資料、抹除新 Block，並寫回 4 MB 資料。Block 越大，寫入放大越嚴重。</p></div></p><hr id="339a15e2-9005-8013-878e-fb7b4735d180" dir="auto"/><p id="339a15e2-9005-8071-9cd2-e6f44d8c4c49" class="" dir="auto">Key Concept<div class="indented"><p id="339a15e2-9005-8021-87f2-c379427a7668" class="" dir="auto">Read-Modify-Write (RMW) / Write Amplification</p></div></p><hr id="339a15e2-9005-8085-a111-fe4b06351c06" dir="auto"/><p id="339a15e2-9005-8087-a230-eaa88ebaa31a" class="" dir="auto">Detail<div class="indented"><p id="339a15e2-9005-8086-8cdc-e4925c13af40" class="" dir="auto">這就是 Block-level mapping 的致命傷。一個 Block 總大小為 256 * 16 KB = 4096 KB (4 MB)。如果不能寫到新位置，就必須把整個 Block 搬出來修改，產生巨大的效能懲罰與無謂的 P/E cycle 損耗。</p></div></p></div></aside><hr id="339a15e2-9005-806f-853a-ddb8d36c85ee" dir="auto"/></div></details><details id="339a15e2-9005-806b-bc06-f1239107dd28" open="" class="toggle" dir="auto"><summary>一顆 2 TB QLC SSD 的 P/E cycle 上限為 1,000 次。假設 write amplification factor 為 3，這顆 SSD 的預期寫入壽命（以 TB 為單位）大約是多少？請列出計算過程。</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80b3-b606-cde0916d0911" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80d0-80dd-eb52e6c73872" class="" dir="auto">Answer<div class="indented"><p id="e77a83cb-8137-4a75-b015-39a266b5a264" class="" dir="auto">預期的主機可寫入量大約是 666 TB。</p></div></p><hr id="339a15e2-9005-80e5-a846-f7e82be1b2a5" dir="auto"/><p id="339a15e2-9005-8091-bccf-c7bdc5985aff" class="" dir="auto">Key Concept<div class="indented"><p id="339a15e2-9005-8025-8bd6-c958126adbbc" class="" dir="auto">Total Bytes Written (TBW) Calculation</p></div></p><hr id="339a15e2-9005-8091-a12b-f90074974438" dir="auto"/><p id="339a15e2-9005-805b-b92a-cd1635122b22" class="" dir="auto">Detail<div class="indented"><p id="3b28025b-70e4-4086-a510-424cf9a489f6" class="" dir="auto">總物理可寫入壽命 = 2 TB * 1000 次 = 2000 TB。<br/>因為 Write Amplification Factor 為 3 (主機每寫 1 份，SSD 底層要寫 3 份)，所以主機實際能寫入的資料量 = 總物理壽命 / WAF = 2000 / 3 = 666.67 TB。</p></div></p></div></aside><hr id="339a15e2-9005-80a0-a7e8-d5ea8f27e7b2" dir="auto"/></div></details><details id="339a15e2-9005-806d-943f-d714244a018c" open="" class="toggle" dir="auto"><summary>為什麼 NAND flash 的 erase 操作只能以 block 為單位，而不能以 page 為單位？這個物理限制如何驅動了 out-of-place write 策略的採用？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8065-a642-c7b082ec8751" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80e1-a2f3-ded49446bc26" class="" dir="auto">Answer<div class="indented"><p id="339a15e2-9005-80f7-b7c2-fe439de628b5" class="" dir="auto">因為抹除需要施加極高電壓，為了節省晶片面積，數萬個 Cell 會共用同一個基底（Substrate）電路，導致只能大面積抹除。這迫使 SSD 必須將新資料寫入其他空白 Page 以避開抹除延遲。</p></div></p><hr id="339a15e2-9005-80e2-91ed-dd4101a7a574" dir="auto"/><p id="339a15e2-9005-8049-9d11-d71533df212f" class="" dir="auto">Key Concept<div class="indented"><p id="339a15e2-9005-80f0-9cfd-cdecef8c86df" class="" dir="auto">Shared Substrate / Out-of-place write 必然性</p></div></p><hr id="339a15e2-9005-8066-881a-d7ed5c822f76" dir="auto"/><p id="339a15e2-9005-8043-87ba-f1394c3e3c4d" class="" dir="auto">Detail<div class="indented"><p id="339a15e2-9005-808c-90c4-f06a44158ae6" class="" dir="auto">如果允許 In-place write，每次修改 4KB，底層都要先停下來耗費數毫秒抹除整個 Block。為了解決這個硬體缺陷，FTL 被發明出來，透過 Out-of-place write 將更新的資料一律寫入下一個空白的 Page，把漫長的 Erase 動作留給背景的 Garbage Collection 去處理。</p></div></p></div></aside><hr id="339a15e2-9005-80df-947e-cf31a19f83dc" dir="auto"/></div></details><details id="339a15e2-9005-80e1-96b9-e952b85d1b63" open="" class="toggle" dir="auto"><summary>隨著 P/E cycle 累積，cell 的 threshold voltage distribution 會如何變化？這對 SLC 和 QLC 各自的影響程度有什麼不同？請解釋原因。</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8005-83c3-edc39fd3d8fa" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-802d-85a4-eb399ac042a4" class="" dir="auto">Answer<div class="indented"><p id="339a15e2-9005-8059-a1be-c27d4fe02523" class="" dir="auto">電壓分布會因絕緣層受損而逐漸變寬、互相重疊。QLC 由於相鄰電壓狀態的間隔極小，受影響極其嚴重；SLC 則游刃有餘。</p></div></p><hr id="339a15e2-9005-80c1-bed0-f543003531dd" dir="auto"/><p id="339a15e2-9005-8077-818a-e16ae6fb1c14" class="" dir="auto">Key Concept<div class="indented"><p id="339a15e2-9005-8081-aa73-d6c1174caddb" class="" dir="auto">Voltage Distribution Shift / 容錯空間 (Margin)</p></div></p><hr id="339a15e2-9005-80db-b1bd-c1d75ada524c" dir="auto"/><p id="339a15e2-9005-809c-bfe3-c6080cff86d6" class="" dir="auto">Detail<div class="indented"><p id="339a15e2-9005-80c2-a888-d2a82bfc392e" class="" dir="auto">想像一個房間要站人。SLC 只有「左半邊」和「右半邊」兩個狀態，就算老化導致界線有點模糊，還是能輕易分出左右。但 QLC 硬生生把房間切成了 16 等份（16 個 Voltage Levels），界線本來就極窄，一旦老化造成電壓飄移，狀態就會嚴重重疊，導致資料讀出時變成亂碼。</p></div></p></div></aside><hr id="339a15e2-9005-80a7-b921-d44fe2a20650" dir="auto"/></div></details></div></details><details id="339a15e2-9005-8091-a899-e651470320dd" open="" class="toggle" dir="auto"><summary><mark class="highlight-red" data-notion-highlight="red"><strong>Quiz Pool</strong></mark></summary><div class="indented"><ol type="1" id="339a15e2-9005-8033-bf0b-c71c38b24a1f" class="numbered-list" start="1" dir="auto"><li>TLC (Triple-Level Cell) NAND 快閃記憶體每個記憶元儲存 3 位元。 與相同記憶元數量的 SLC (Single-Level Cell) 晶片相比, TLC 提供 <strong>3 倍容量</strong>, 但耐久度 (endurance) 與效能較差。下列哪個選項最能 解釋為何 TLC 的耐久度低於 SLC?<blockquote id="339a15e2-9005-8040-9937-eb6a68a8b64e" class="" dir="auto"><ol type="1" id="339a15e2-9005-807b-9740-ee31e44909ef" class="numbered-list" start="1" dir="auto"><li>TLC 記憶元的物理尺寸較小, 因此磨耗較快</li></ol><ol type="1" id="339a15e2-9005-80dc-82b6-d66803056775" class="numbered-list" start="2" dir="auto"><li>TLC 的頁面大 3 倍, 對晶粒 (die) 造成更大的物理應力</li></ol><ol type="1" id="339a15e2-9005-803b-9b0b-fcf46bdec63d" class="numbered-list" start="3" dir="auto"><li>TLC 每次寫入操作需要 3 倍的程式化/抹除循環</li></ol><ol type="1" id="339a15e2-9005-80d7-82bc-e4ad91b581d5" class="numbered-list" start="4" dir="auto"><li>TLC 需要更窄的電壓邊限 (voltage margin) 來區分 8 個電壓準位, 使記憶元對反覆 P/E 循環 (program/erase cycle) 造成的電荷流失更為敏感</li></ol></blockquote><details id="339a15e2-9005-80ab-b343-d1f8d2473922" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80e8-bf0d-d07ae06906c1" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80f4-bc01-d53b97783427" class="" dir="auto">TLC 需要更窄的電壓邊限 (voltage margin) 來區分 8 個電壓準位, 使記憶元對反覆 P/E 循環 (program/erase cycle) 造成的電荷流失更為敏感</p><hr id="339a15e2-9005-8049-b995-c1e54072121b" dir="auto"/><p id="339a15e2-9005-80d7-a111-ee56353ca422" class="" dir="auto">解析: <div class="indented"><p id="339a15e2-9005-8035-967d-df211a4b9e01" class="" dir="auto">TLC 用8 個電壓準位來儲存 3 位元。相鄰準位之間的 電壓窗口比 SLC 的 2 個準位窄得多。隨著氧化層因程式化/抹除 循環而劣化, 電荷捕捉 (charge trapping) 會使閾值電壓 (threshold voltage) 偏移, 而較窄的邊限會更早導致讀取錯誤。</p></div></p></div></aside></div></details></li></ol><hr id="339a15e2-9005-80a4-9062-e4c80ec7d1bb" dir="auto"/><ol type="1" id="339a15e2-9005-80e7-b3db-ca5f61489d04" class="numbered-list" start="2" dir="auto"><li>某資料中心需要部署一套「高寫入強度」的資料庫系統，預期三年內會持續進行大量隨機寫入。 工程師正在比較兩種 NAND flash 技術：<aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80fa-9c50-f6baba3538ff" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-801b-8aba-c0d3e376e8c4" class="" dir="auto">方案 X : SLC (Single-Level Cell)<br/>方案 Y : QLC (Quad-Level Cell) 假設兩款 SSD 的總容量相同，且使用相同的 controller 設計。 </p></div></aside><p id="339a15e2-9005-80ba-90ca-fb024ef28728" class="" dir="auto">若考慮長期「可寫入總量 (Total Bytes Written, TBW)」，以下哪一項推論最合理？</p><blockquote id="339a15e2-9005-8066-9edf-d20554221814" class="" dir="auto"><ol type="1" id="339a15e2-9005-80dd-9f94-fc88bb3540bf" class="numbered-list" start="1" dir="auto"><li>兩者 TBW 應相同，因為 controller 設計相同。</li></ol><ol type="1" id="339a15e2-9005-80aa-a021-e609b12d8bdb" class="numbered-list" start="2" dir="auto"><li>方案 Y (QLC) TBW 較高，因為每次 erase 可以寫入更多位元。</li></ol><ol type="1" id="339a15e2-9005-805a-974c-e8207daf6cb7" class="numbered-list" start="3" dir="auto"><li>方案 X (SLC) 通常具有較高 TBW，因為每個 cell 儲存的位元較少。</li></ol><ol type="1" id="339a15e2-9005-8009-b3c0-f5374d18c821" class="numbered-list" start="4" dir="auto"><li>方案 Y (QLC) 通常具有較高 TBW，因為其容量較大，可以分散更多寫入。</li></ol></blockquote><details id="339a15e2-9005-8064-ae98-c26fcb237009" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80f2-8680-dd34f1052983" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8015-a85e-ffb74d97dc5d" class="" dir="auto">方案 X (SLC) 通常具有較高 TBW，因為每個 cell 儲存的位元較少。</p><hr id="339a15e2-9005-80ce-aa1e-eacea7db6c9f" dir="auto"/><p id="339a15e2-9005-8053-9f6d-eddcf0a0a741" class="" dir="auto">解析:<div class="indented"><p id="339a15e2-9005-8035-bc9b-c35dd0daa024" class="" dir="auto">SLC 每個 cell 只儲存 1 bit，電壓區間較寬，對電壓漂移與干擾的容忍度較高，因此可承受較多的 P/E (Program/Erase) cycle。 QLC 每 cell 儲存 4 bits，需要更精細的電壓區分，導致 P/E cycle 上限顯著下降。 在高寫入 workload 下，endurance 成為決定 TBW 的主要因素，因此 SLC 通常具有較高 TBW。</p></div></p></div></aside></div></details></li></ol><hr id="339a15e2-9005-80cf-9e81-df530309b7e8" dir="auto"/><ol type="1" id="339a15e2-9005-8038-b5a2-fb8d54d6914d" class="numbered-list" start="3" dir="auto"><li>A data center recently replaced its <code>SLC</code>-based caching tier with <code>QLC</code> SSDs to save costs. After a year of heavy write workloads, the system administrators notice a severe increase in <strong>read tail latency</strong>, even when there are no ongoing background garbage collection (GC) operations.<p id="339a15e2-9005-8067-9f7b-ffab77db2da0" class="" dir="auto">Based on the physical characteristics of NAND flash and error correction mechanisms, what is the fundamental reason for this read latency degradation?</p><blockquote id="339a15e2-9005-80ac-9bf6-f727114ca96a" class="" dir="auto"><ol type="1" id="339a15e2-9005-8021-8b38-c365dc137345" class="numbered-list" start="1" dir="auto"><li>Because <code>QLC</code> does not support <strong>out-of-place updates</strong>, every time a page is updated, the controller must read the entire block, modify the 16KB page, and write the block back, severely blocking concurrent read requests.</li></ol><ol type="1" id="339a15e2-9005-809e-998c-cde6e439deff" class="numbered-list" start="2" dir="auto"><li><code>QLC</code> flash requires managing 16 voltage levels within the same voltage window. As <code>P/E cycles</code> accumulate, the tunnel oxide degrades, causing the threshold voltage distributions to overlap. The controller must perform multiple read retries with shifted reference voltages (e.g., <strong>LDPC soft-decision decoding</strong>) to correctly sense the data, increasing read time.</li></ol><ol type="1" id="339a15e2-9005-80c6-b19d-c7576b2e6b9d" class="numbered-list" start="3" dir="auto"><li>Because <code>QLC</code> cells can only endure around 1,000 <code>P/E cycles</code>, the SSD firmware artificially throttles the read speed to prevent <strong>read disturb</strong> errors from wearing out the remaining lifespan of the cells.</li></ol><ol type="1" id="339a15e2-9005-80ab-b553-ce877638227e" class="numbered-list" start="4" dir="auto"><li><code>QLC</code> erase blocks are significantly larger than <code>SLC</code> erase blocks (e.g., 16MB vs. 2MB). Therefore, even without GC, the read operations must wait longer for the larger blocks to be physically energized before the pages can be sensed.</li></ol></blockquote><details id="339a15e2-9005-8004-9da9-eb3870e0dce5" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8046-b7d6-f526cd0d8d34" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8033-9c62-d90b3bacac06" class="" dir="auto"><code>QLC</code> flash requires managing 16 voltage levels within the same voltage window. As <code>P/E cycles</code> accumulate, the tunnel oxide degrades, causing the threshold voltage distributions to overlap. The controller must perform multiple read retries with shifted reference voltages (e.g., <strong>LDPC soft-decision decoding</strong>) to correctly sense the data, increasing read time.</p><hr id="339a15e2-9005-803e-8f53-cce2dd838b63" dir="auto"/><p id="339a15e2-9005-8086-bfca-f8804b059cdc" class="" dir="auto">Why:<div class="indented"><p id="339a15e2-9005-80b7-ae6a-f2b4dd220509" class="" dir="auto">This is correct. <code>QLC</code> stores 4 bits per cell, requiring 16 tight voltage levels. As <code>P/E cycles</code> increase, oxide damage causes these levels to widen and overlap. To recover data, the SSD controller uses advanced ECC like <strong>LDPC soft-decision decoding</strong>, which physically requires sensing the cell multiple times with different voltage thresholds, drastically increasing the read latency.</p></div></p></div></aside></div></details></li></ol><hr id="339a15e2-9005-8077-95ce-eff41eae56ca" dir="auto"/><ol type="1" id="339a15e2-9005-800e-a4ec-f56e37f9a8d7" class="numbered-list" start="4" dir="auto"><li>在購買 SSD 時，會發現 QLC NAND Flash 相較於 SLC NAND Flash 而言更加便宜，其中使 QLC NAND Flash 比較便宜的原因為?<blockquote id="339a15e2-9005-8051-8dc8-cb0723829acd" class="" dir="auto"><ol type="1" id="339a15e2-9005-8094-9191-e95b77033608" class="numbered-list" start="1" dir="auto"><li>QLC 在製成上，浮閘物理上被切分成很多隔間，所以隔間內的製造難度降低了</li></ol><ol type="1" id="339a15e2-9005-8077-87be-c0e57d934da9" class="numbered-list" start="2" dir="auto"><li>同物理空間大小下，QLC 能擺進更多的 Cell，從而使 QLC NAND Flash 比較便宜</li></ol><ol type="1" id="339a15e2-9005-80e4-b443-f6768083cef8" class="numbered-list" start="3" dir="auto"><li>在相同的物理矽晶片面積下，QLC 能提供 4 倍的資料容量，降低單位容量的製造成本</li></ol><ol type="1" id="339a15e2-9005-8023-b362-daac739bffb8" class="numbered-list" start="4" dir="auto"><li>QLC 與 NVMe 契合度非常高，不用太花費心力去處理資料的轉換</li></ol></blockquote><details id="339a15e2-9005-8012-8e62-e66aae24317d" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-802d-981d-cda722e6bb8e" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80cf-a7d9-cd81bbdc84b7" class="" dir="auto">在相同的物理矽晶片面積下，QLC 能提供 4 倍的資料容量，降低單位容量的製造成本</p><hr id="339a15e2-9005-800d-a188-c42b2341b39b" dir="auto"/><p id="339a15e2-9005-80f4-9ef9-c86d8ac2d02f" class="" dir="auto">解析:<div class="indented"><p id="339a15e2-9005-80a3-920b-e3b64cb6807b" class="" dir="auto">QLC 每個 Cell 可以儲存 4 個 bit，而 SLC 每個 Cell 可以儲存 1 個 bit，在同容量下，QLC 的 Cell 數量是 SLC 的 1/4，因此降低單位容量的製造成本。</p></div></p></div></aside></div></details></li></ol><hr id="339a15e2-9005-80d5-963a-da55f391dfd1" dir="auto"/><ol type="1" id="339a15e2-9005-803c-b66c-ff93a5c48da4" class="numbered-list" start="5" dir="auto"><li>某工程師嘗試更新一個 NAND flash page 的資料，在該 flash 的物理特性中，低電荷狀態 (Erased state) 被定義為邏輯「1」，而注入電荷後的狀態 (Programmed state) 被定義為邏輯「0」 今天他在實驗中想要「直接將部分的 bit 從 0 改回 1 」，而不進行 erase 的操作。 實驗結果發現更新失敗，其最可能的主要原因是什麼?<blockquote id="339a15e2-9005-802b-914e-dbe89079c5bd" class="" dir="auto"><ol type="1" id="339a15e2-9005-80b5-9ade-f1897d673628" class="numbered-list" start="1" dir="auto"><li>programming 操作需要依序寫入 page，不能跳著寫</li></ol><ol type="1" id="339a15e2-9005-8048-81ad-e9f1b9bfa4d8" class="numbered-list" start="2" dir="auto"><li>programming 只能「注入」電荷，不能降低電荷</li></ol><ol type="1" id="339a15e2-9005-80d4-a222-f231521c92ff" class="numbered-list" start="3" dir="auto"><li>NAND flash 不支援 partial write</li></ol><ol type="1" id="339a15e2-9005-8056-8382-cf0453e52c6f" class="numbered-list" start="4" dir="auto"><li>block 太大導致更新失敗</li></ol></blockquote><details id="339a15e2-9005-80e6-832e-f303ed35b0df" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8039-9a46-e751b642964e" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80b9-b7e3-e7441464d148" class="" dir="auto">programming 只能「注入」電荷，不能降低電荷</p><hr id="339a15e2-9005-80c6-9af0-f4998ef0facd" dir="auto"/><p id="339a15e2-9005-807a-aa5e-ffdc19d0b60c" class="" dir="auto">解析:<div class="indented"><p id="339a15e2-9005-8057-9145-fe5eac72fe19" class="" dir="auto">programming 是把電荷注入 floating gate，只能加電子，不能減，因此需要 Erase-before-write</p></div></p></div></aside></div></details></li></ol><hr id="339a15e2-9005-8020-a6f3-ffef9a9cf373" dir="auto"/><ol type="1" id="339a15e2-9005-808e-9970-d9638925118b" class="numbered-list" start="6" dir="auto"><li>A cloud provider needs to choose an SSD for a write-intensive logging workload that writes 20 TB of host data per day. Assume the following steady-state WAF for this workload. Two candidates:<aside class="block-color-default_background callout" data-notion-callout="" data-notion-callout-background="default_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-802a-8049-fffcb4feccff" dir="ltr"><div style="width:100%"><table id="339a15e2-9005-80cf-90a2-c69a1194f50a" class="simple-table" dir="ltr"><thead class="simple-table-header"><tr id="339a15e2-9005-80b3-a25f-d5d912551276" dir="ltr"><th id="oJ[A" class="simple-table-header-color simple-table-header" style="width:337.6875px"></th><th id="gWzG" class="simple-table-header-color simple-table-header" style="width:245px"><strong>SSD A</strong></th><th id="V`d&gt;" class="simple-table-header-color simple-table-header" style="width:227px"><strong>SSD B</strong></th></tr></thead><tbody><tr id="339a15e2-9005-80e0-8978-f7a512279191" dir="ltr"><td id="oJ[A" class="" style="width:337.6875px">Capacity</td><td id="gWzG" class="" style="width:245px">1 TB</td><td id="V`d&gt;" class="" style="width:227px">2 TB</td></tr><tr id="339a15e2-9005-80ad-bdc4-cde2a28955e0" dir="ltr"><td id="oJ[A" class="" style="width:337.6875px">Cell type</td><td id="gWzG" class="" style="width:245px">TLC</td><td id="V`d&gt;" class="" style="width:227px">QLC</td></tr><tr id="339a15e2-9005-80b4-80ac-e2885307f71e" dir="ltr"><td id="oJ[A" class="" style="width:337.6875px">P/E cycle limit</td><td id="gWzG" class="" style="width:245px">3,000</td><td id="V`d&gt;" class="" style="width:227px">1,000</td></tr><tr id="339a15e2-9005-8068-a1f0-ecba2dc2e724" dir="ltr"><td id="oJ[A" class="" style="width:337.6875px">Write amplification factor</td><td id="gWzG" class="" style="width:245px">2</td><td id="V`d&gt;" class="" style="width:227px">4</td></tr></tbody></table></div></aside><p id="339a15e2-9005-80c6-84b5-c0a3162be46e" class="" dir="auto">Approximately how long will each SSD last before reaching its endurance limit?</p><blockquote id="339a15e2-9005-80d0-a6aa-c4c2fb508e31" class="" dir="auto"><ol type="1" id="339a15e2-9005-80a7-a1f7-ed30f3452bc0" class="numbered-list" start="1" dir="auto"><li>SSD A: ~150 days, SSD B: ~100 days</li></ol><ol type="1" id="339a15e2-9005-8035-8595-f4af67003d8b" class="numbered-list" start="2" dir="auto"><li>SSD B lasts longer because it has 2x the capacity</li></ol><ol type="1" id="339a15e2-9005-80b8-a82a-e4683e4dcdea" class="numbered-list" start="3" dir="auto"><li>SSD A: ~75 days, SSD B: ~100 days</li></ol><ol type="1" id="339a15e2-9005-80db-80d5-e9d33f54ed6d" class="numbered-list" start="4" dir="auto"><li>SSD A: ~75 days, SSD B: ~25 days</li></ol></blockquote><details id="339a15e2-9005-8015-b04c-d74b53b8f329" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80e8-95fd-c1cac4c00450" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-802b-9922-f2cb88293aa9" class="" dir="auto">SSD A: ~75 days, SSD B: ~25 days</p><hr id="339a15e2-9005-804c-ab4c-e8275cbc926d" dir="auto"/><p id="339a15e2-9005-80c8-8d65-d641f46d2373" class="" dir="auto">Why:<div class="indented"><p id="339a15e2-9005-8012-883c-ce7eb52029de" class="" dir="auto">TBW_A = 1 TB x 3,000 / 2 = 1,500 TB. <br/>At 20 TB/day, that is 1,500 / 20 = 75 days.</p><p id="339a15e2-9005-8020-be41-eeb9f1b1af95" class="" dir="auto">TBW_B = 2 TB x 1,000 / 4 = 500 TB. <br/>At 20 TB/day, that is 500 / 20 = 25 days. </p><p id="339a15e2-9005-80e0-a982-c2efd6e10e2d" class="" dir="auto">Despite having half the capacity, SSD A lasts 3x longer because TLC&#x27;s higher P/E endurance and lower WAF more than compensate.</p></div></p></div></aside></div></details></li></ol><hr id="339a15e2-9005-8055-9088-d042b3cad213" dir="auto"/><ol type="1" id="339a15e2-9005-803e-a67d-f8d5cd6bd2a7" class="numbered-list" start="7" dir="auto"><li>你在實驗室挖到一顆前人留下來的 2 TB QLC SSD，其平均 P/E cycle count 約為 900 次，已接近該顆 QLC SSD 的額定 P/E cycle 壽命。你打算將它用於一個幾乎只有讀取、極少寫入的 workload。在這種使用情境下，你最可能面臨什麼挑戰？<blockquote id="339a15e2-9005-80a1-9759-dae5193b0b2c" class="" dir="auto"><ol type="1" id="339a15e2-9005-8075-b7f5-cbbe5d58b3f7" class="numbered-list" start="1" dir="auto"><li>因為該 workload 幾乎不包含寫入，P/E cycle count 在使用期間不會再有明顯上升，SSD 壽命不會進一步縮短。</li></ol><ol type="1" id="339a15e2-9005-8068-91d9-f3e436ddbbd9" class="numbered-list" start="2" dir="auto"><li>由於這顆 QLC SSD 已接近其額定 P/E cycle 壽命，controller 可能需要更多次的 read retry 才能正確讀取資料，導致其 read throughput 低於該 SSD 在全新且經過 steady state 時的表現。</li></ol><ol type="1" id="339a15e2-9005-8002-9f12-f9be318fc46f" class="numbered-list" start="3" dir="auto"><li>因為幾乎沒有寫入，不太需要 GC 搬移資料，所以幾乎不會產生 Write Amplification。</li></ol><ol type="1" id="339a15e2-9005-8061-b2ea-c910633c254d" class="numbered-list" start="4" dir="auto"><li>幾乎沒有寫入就不會觸發頻繁的 GC，所以在此情境下 SSD 的老化不會影響 read throughput。</li></ol></blockquote><details id="339a15e2-9005-8062-ac4c-dfd5e8692416" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80e4-b4ef-e1d4605baf8f" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80b2-890a-f085db430c68" class="" dir="auto">由於這顆 QLC SSD 已接近其額定 P/E cycle 壽命，controller 可能需要更多次的 read retry 才能正確讀取資料，導致其 read throughput 低於該 SSD 在全新且經過 steady state 時的表現。</p><hr id="339a15e2-9005-80fa-95dc-fa89695fe3f6" dir="auto"/><p id="339a15e2-9005-80c2-8735-f2a5662028d7" class="" dir="auto">解析:<div class="indented"><p id="339a15e2-9005-80dd-bba1-e28e26bd818b" class="" dir="auto">正確。隨著 P/E cycle 累積，NAND cell 的 threshold voltage distribution 會因 oxide 磨損而逐漸變寬。QLC 需要區分 16 個 voltage level，各 level 之間的 margin 本就極窄，老化後更容易重疊。controller 需要透過 read retry 來正確判讀資料，這些操作會增加讀取延遲，降低 read throughput。</p></div></p></div></aside></div></details></li></ol></div></details></div></details></div></div><hr id="339a15e2-9005-8048-8d85-ea701df84068" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80ed-8664-f92f5e5f8ec8" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80c0-a148-e68e4afe2c62" class="" dir="auto">
+</p></div></aside></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

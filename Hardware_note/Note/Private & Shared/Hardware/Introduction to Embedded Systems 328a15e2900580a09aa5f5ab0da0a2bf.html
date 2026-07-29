@@ -1,0 +1,2770 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Introduction to Embedded Systems</title><meta name="data-notion-page-icon" content="🔧"/><link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2290%22%3E%F0%9F%94%A7%3C%2Ftext%3E%3C%2Fsvg%3E"/><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+/* Override strong tags inside headings to maintain consistent weight */
+h1 strong,
+h2 strong,
+h3 strong {
+	font-weight: 600;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 10px;
+	padding: 1rem;
+}
+
+/* For default-background callouts, render the border outline. */
+.callout.block-color-default_background {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+figure,
+aside,
+details {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+
+	table.collection-content {
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	table.collection-content th,
+	table.collection-content td {
+		overflow-wrap: anywhere;
+	}
+
+	table.collection-content td > .user,
+	table.collection-content td > time {
+		white-space: pre-wrap;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content-wrapper {
+	overflow-x: auto;
+}
+
+@media only print {
+	.collection-content-wrapper {
+		overflow-x: visible;
+	}
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.collection-content td {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.column-list {
+	display: flex;
+	gap: 46px;
+}
+
+.column {
+	min-width: 0;
+	overflow: hidden;
+}
+
+.column > *:first-child {
+	margin-top: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding-inline: 0.125rem;
+	padding-block: 0.375rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+table {
+	border-collapse: collapse;
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol.numbered-list.numbered-list-digits-2 {
+	padding-inline-start: 2em;
+}
+
+ol.numbered-list.numbered-list-digits-3plus {
+	padding-inline-start: 2.4em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+/*
+ * Render emoji icons using a ::before pseudo-element to keep the glyph
+ * out of the DOM textContent traversal. This avoids double-rendering icons
+ * in callouts and page titles.
+ * NOTE(slim/html-export-pseudo-icons): I can't tagref this because it will
+ * flag as a duplicate tag after codegen.
+ */
+.icon[data-emoji]::before {
+	content: attr(data-emoji);
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.callout img.notion-static-icon {
+	width: 1em;
+	height: 1em;
+}
+
+.callout p {
+	margin: 0;
+}
+
+.callout h1,
+.callout h2,
+.callout h3 {
+	margin: 0 0 0.6rem;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	margin-right: 0.4em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+blockquote.quote-large {
+	font-size: 1.25em;
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.tab {
+	margin: 1.25em 0;
+	padding-inline: 1rem;
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.highlight-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.highlight-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.highlight-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.highlight-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.highlight-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.highlight-default_background {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray_background {
+	background: rgba(42, 28, 0, 0.07);
+}
+.highlight-brown_background {
+	background: rgba(139, 46, 0, 0.086);
+}
+.highlight-orange_background {
+	background: rgba(224, 101, 1, 0.129);
+}
+.highlight-yellow_background {
+	background: rgba(211, 168, 0, 0.137);
+}
+.highlight-teal_background {
+	background: rgba(0, 100, 45, 0.09);
+}
+.highlight-blue_background {
+	background: rgba(0, 124, 215, 0.094);
+}
+.highlight-purple_background {
+	background: rgba(102, 0, 178, 0.078);
+}
+.highlight-pink_background {
+	background: rgba(197, 0, 93, 0.086);
+}
+.highlight-red_background {
+	background: rgba(223, 22, 0, 0.094);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.block-color-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.block-color-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.block-color-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.block-color-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.block-color-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(240, 239, 237, 1);
+}
+.block-color-brown_background {
+	background: rgba(245, 237, 233, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 235, 222, 1);
+}
+.block-color-yellow_background {
+	background: rgba(249, 243, 220, 1);
+}
+.block-color-teal_background {
+	background: rgba(232, 241, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(229, 242, 252, 1);
+}
+.block-color-purple_background {
+	background: rgba(243, 235, 249, 1);
+}
+.block-color-pink_background {
+	background: rgba(250, 233, 241, 1);
+}
+.block-color-red_background {
+	background: rgba(252, 233, 231, 1);
+}
+.select-value-color-default { background-color: rgba(42, 28, 0, 0.07); }
+.select-value-color-gray { background-color: rgba(28, 19, 1, 0.11); }
+.select-value-color-brown { background-color: rgba(127, 51, 0, 0.156); }
+.select-value-color-orange { background-color: rgba(196, 88, 0, 0.203); }
+.select-value-color-yellow { background-color: rgba(209, 156, 0, 0.282); }
+.select-value-color-green { background-color: rgba(0, 96, 38, 0.156); }
+.select-value-color-blue { background-color: rgba(0, 118, 217, 0.203); }
+.select-value-color-purple { background-color: rgba(92, 0, 163, 0.141); }
+.select-value-color-pink { background-color: rgba(183, 0, 78, 0.152); }
+.select-value-color-red { background-color: rgba(206, 24, 0, 0.164); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style><style>@import url('https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex-swap.min.css')</style></head><body><article id="328a15e2-9005-80a0-9aa5-f5ab0da0a2bf" class="page serif" data-notion-page-icon="🔧"><header><img class="page-cover-image" src="https://app.notion.com/images/page-cover/webb4.jpg" style="object-position:center 50%"/><div class="page-header-icon page-header-icon-with-cover"><span class="icon" data-emoji="🔧"></span></div><h1 class="page-title" dir="auto">Introduction to Embedded Systems</h1><p class="page-description" dir="auto"></p></header><div class="page-body"><div id="328a15e2-9005-80c9-adc8-ca016be69527" class="column-list" data-notion-column-list="" dir="auto"><div id="328a15e2-9005-806a-8952-cd3d9ef9a433" style="width:6.25%" class="column" data-notion-column-ratio="0.0625" dir="auto"><hr id="328a15e2-9005-80fa-97d2-d15534c71190" dir="auto"/><figure id="328a15e2-9005-80c2-8f10-fa7f5d9300e7" class="image" data-notion-image="Introduction%20to%20Embedded%20Systems/35bdbeb262e6204c87fedadcceba1977.jpg" dir="ltr"><a href="Introduction%20to%20Embedded%20Systems/35bdbeb262e6204c87fedadcceba1977.jpg"><img style="width:625.375px" src="Introduction%20to%20Embedded%20Systems/35bdbeb262e6204c87fedadcceba1977.jpg"/></a></figure><p id="33da15e2-9005-80d8-9b67-dc4557472771" class="" dir="auto">
+</p></div><div id="328a15e2-9005-806e-b17d-f64025807e20" style="width:93.75%" class="column" data-notion-column-ratio="0.9375" dir="auto"><h2 id="328a15e2-9005-8051-9326-e1cc7650d4d0" class="" dir="auto">Before Start</h2><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="328a15e2-9005-80ad-98d0-e1fed5423a04" dir="ltr"><div style="width:100%"><p id="328a15e2-9005-8055-a2ee-c474f74c2ad0" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">We will introduce the operation mechanism of microprocessor software such as registers, I/O ports, addressing modes, timers, and interrupts. Upon mastering microprocessor principles, the course will proceed to introduce common microprocessor interfaces including UART, I2C, and ADC/DAC. </mark></p></div></aside><hr id="328a15e2-9005-802f-be9e-facc5318b08f" dir="auto"/><h3 id="328a15e2-9005-80af-a56d-e1c43a9c8b0a" class="" dir="auto"><mark class="highlight-blue" data-notion-highlight="blue"><a href="https://drive.google.com/file/d/1fyGxkMzs5OTXy1kjwVnelGb1LZ6fc0Lr/view?usp=sharing">Material</a></mark></h3><div id="328a15e2-9005-80a6-975f-e1f718581b5f" class="column-list" data-notion-column-list="" dir="auto"><div id="328a15e2-9005-80b9-bbe0-dfd35539e526" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><ol type="1" id="328a15e2-9005-8093-8b62-da55ead5a42a" class="numbered-list" start="1" dir="auto"><li><mark class="highlight-red" data-notion-highlight="red"><strong><a href="https://www.microchip.com/en-us/product/at89s51">IC: Atmel AT89S51</a></strong></mark></li></ol><ol type="1" id="328a15e2-9005-8061-8d9c-eafca977cf59" class="numbered-list" start="2" dir="auto"><li><a href="https://zh.wikipedia.org/zh-tw/%E9%99%B6%E7%93%B7%E7%94%B5%E5%AE%B9">陶瓷電容</a>:30pF</li></ol><ol type="1" id="328a15e2-9005-80e3-a255-ff447ed9435c" class="numbered-list" start="3" dir="auto"><li><a href="https://zh.wikipedia.org/zh-tw/%E7%94%B5%E8%A7%A3%E7%94%B5%E5%AE%B9">電解電容</a>:25V 10uF</li></ol><ol type="1" id="328a15e2-9005-8095-bb2c-eebcd2f0aee7" class="numbered-list" start="4" dir="auto"><li><a href="https://zh.wikipedia.org/zh-tw/%E7%9F%B3%E8%8B%B1%E6%99%B6%E4%BD%93%E8%B0%90%E6%8C%AF%E5%99%A8">石英震盪器</a>:11.059MHz</li></ol><ol type="1" id="328a15e2-9005-8003-8c42-ee2bf5ddce00" class="numbered-list" start="5" dir="auto"><li><a href="https://www.ariat-tech.tw/blog/Your-Guide-into-2N2222-Transistor.html">2N2222</a></li></ol><ol type="1" id="328a15e2-9005-800f-8e56-c2c9e81639d5" class="numbered-list" start="6" dir="auto"><li><a href="https://hackmd.io/@JustMakeIt/r16uYFRSi">HC-05 藍牙模組</a></li></ol><ol type="1" id="328a15e2-9005-800f-a6f9-d3a3b3720085" class="numbered-list" start="7" dir="auto"><li><a href="https://blog.jmaker.com.tw/sr04/">HC-SR04 超音波模組</a></li></ol><ol type="1" id="328a15e2-9005-80c7-a2bb-e62e47c3c143" class="numbered-list" start="8" dir="auto"><li><a href="https://www.icshop.com.tw/products/368030501175">L298N 馬達驅動模組</a></li></ol><ol type="1" id="328a15e2-9005-80d7-b711-da7cccd76701" class="numbered-list" start="9" dir="auto"><li><a href="https://blog.jmaker.com.tw/uln2003-28byj-48/">ULN2003步進電機驅動板</a>+ <a href="https://www.icshop.com.tw/products/368030500560">5V步進電機28BYJ48步進馬達</a></li></ol></div><div id="328a15e2-9005-8088-9cec-fc6f315c1d4f" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><ol type="1" id="328a15e2-9005-8008-a966-c7b24cb13b8c" class="numbered-list numbered-list-digits-2" start="10" dir="auto"><li>七段顯示器<mark class="highlight-red" data-notion-highlight="red">(</mark><mark class="highlight-red" data-notion-highlight="red"><strong><a href="https://www.opledtw.com/zh-hant/blog/led-configuration-commonanode-cathode-direct/">共陽</a></strong></mark><mark class="highlight-red" data-notion-highlight="red">)</mark></li></ol><ol type="1" id="328a15e2-9005-808a-936e-cd3e56b3783c" class="numbered-list numbered-list-digits-2" start="11" dir="auto"><li>電阻</li></ol><ol type="1" id="328a15e2-9005-806c-9655-d028fe7c5ce7" class="numbered-list numbered-list-digits-2" start="12" dir="auto"><li>LED<mark class="highlight-red" data-notion-highlight="red">(</mark><mark class="highlight-red" data-notion-highlight="red"><strong><a href="https://www.opledtw.com/zh-hant/blog/led-configuration-commonanode-cathode-direct/">共陽</a></strong></mark><mark class="highlight-red" data-notion-highlight="red">)</mark></li></ol><ol type="1" id="328a15e2-9005-8036-9943-d739a2570007" class="numbered-list numbered-list-digits-2" start="13" dir="auto"><li>薄膜喇叭</li></ol><ol type="1" id="328a15e2-9005-8067-8089-fa4eb55bc847" class="numbered-list numbered-list-digits-2" start="14" dir="auto"><li>麵包板、電阻板、紅與黑鱷魚夾</li></ol><ol type="1" id="328a15e2-9005-80c4-a43c-d81232e22054" class="numbered-list numbered-list-digits-2" start="15" dir="auto"><li>單芯線、杜邦線</li></ol><ol type="1" id="328a15e2-9005-8083-9ab6-ed5de98c2ba9" class="numbered-list numbered-list-digits-2" start="16" dir="auto"><li>排母、排針</li></ol><p id="328a15e2-9005-80eb-8186-efd8c2e98244" class="" dir="auto">
+</p></div></div><hr id="328a15e2-9005-807d-87ed-c26b69ec7c91" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="328a15e2-9005-8000-a268-fd5d58cef478" dir="ltr"><div style="width:100%"><p id="328a15e2-9005-80a8-9de6-d0c38bd519cd" class="" dir="auto">Reference: <a href="https://www.eet-china.com/mp/a4985.html">彻底搞懂51单片机各种型号</a>, <a href="https://deepblueread.blogspot.com/2009/12/89s51.html">單晶片89s51</a>, <a href="https://www.ariat-tech.tw/blog/mastering-at89c51-microcontroller-from-pin-configuration-to-interrupt-handling.html">掌握AT89C51微控制器：從引腳配置到中斷處理</a>,<strong> </strong><a href="https://www.opledtw.com/zh-hant/blog/led-configuration-commonanode-cathode-direct/">共陰極，共陽極…等三種最常見的LED連接方式！一次完整解析</a></p></div></aside><hr id="328a15e2-9005-8014-97cd-c7efdc3b3559" dir="auto"/><details open="" class="" dir="auto"><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0"><h3 id="357a15e2-9005-80b5-8079-c9d4d6b1fe06" style="display:inline-block">Important</h3></summary><div class="indented"><details id="357a15e2-9005-80e3-a0c2-eba127617a52" open="" class="toggle" dir="auto"><summary><code>REG51.H</code> </summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="357a15e2-9005-802b-851d-f31fbe962f65" dir="ltr"><div style="width:100%"><p id="357a15e2-9005-801f-9810-d163bd006349" class="" dir="auto">讓編譯器能透過記憶體位址存取晶片相對應的腳位資料。</p></div></aside><hr id="357a15e2-9005-8059-bc0d-c6911f94d9ca" dir="auto"/><details id="357a15e2-9005-8058-9b1b-f51b2bfed51d" open="" class="toggle" dir="auto"><summary>Code  <code>REG51.H</code></summary><div class="indented"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js" integrity="sha512-8VrjxGFLIkS0mgEmO3p46A5OkqATHhrNVwyv2V7yUeZrk1jmSDuI3SOEpC9XHEHUWEOsfzzcJeBlUkee9lKGrw==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><pre id="357a15e2-9005-803b-8a11-c8c549612ac8" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">/*--------------------------------------------------------------------------
+REG51.H
+
+Header file for generic 80C51 and 80C31 microcontroller.
+Copyright (c) 1988-2002 Keil Elektronik GmbH and Keil Software, Inc.
+All rights reserved.
+--------------------------------------------------------------------------*/
+
+#ifndef __REG51_H__
+#define __REG51_H__
+
+/*  BYTE Register  */
+sfr P0   = 0x80;
+sfr P1   = 0x90;
+sfr P2   = 0xA0;
+sfr P3   = 0xB0;
+
+sfr PSW  = 0xD0;
+sfr ACC  = 0xE0;
+sfr B    = 0xF0;
+
+// s pointer
+sfr SP   = 0x81;
+sfr DPL  = 0x82;
+sfr DPH  = 0x83;
+sfr PCON = 0x87;
+
+// Timer  
+sfr TCON = 0x88;
+sfr TMOD = 0x89;
+
+sfr TL0  = 0x8A; // counter0的低8位元
+sfr TH0  = 0x8C; // counter0的高8位元
+
+sfr TL1  = 0x8B; // counter1的低8位元
+sfr TH1  = 0x8D; // counter1的高8位元
+
+
+sfr IE   = 0xA8;
+sfr IP   = 0xB8;
+sfr SCON = 0x98;
+sfr SBUF = 0x99;
+
+
+/*  BIT Register  */
+/*  PSW   */
+sbit CY   = 0xD7;
+sbit AC   = 0xD6;
+sbit F0   = 0xD5;
+sbit RS1  = 0xD4;
+sbit RS0  = 0xD3;
+sbit OV   = 0xD2;
+sbit P    = 0xD0;
+
+/*  TCON  */
+sbit TF1  = 0x8F;
+sbit TR1  = 0x8E;
+sbit TF0  = 0x8D;
+sbit TR0  = 0x8C;
+sbit IE1  = 0x8B;
+sbit IT1  = 0x8A;
+sbit IE0  = 0x89;
+sbit IT0  = 0x88;
+
+/*  IE   */
+sbit EA   = 0xAF;
+sbit ES   = 0xAC;
+sbit ET1  = 0xAB;
+sbit EX1  = 0xAA;
+sbit ET0  = 0xA9;
+sbit EX0  = 0xA8;
+
+/*  IP   */ 
+sbit PS   = 0xBC;
+sbit PT1  = 0xBB;
+sbit PX1  = 0xBA;
+sbit PT0  = 0xB9;
+sbit PX0  = 0xB8;
+
+/*  P3  */
+sbit RD   = 0xB7;
+sbit WR   = 0xB6;
+sbit T1   = 0xB5;
+sbit T0   = 0xB4;
+sbit INT1 = 0xB3;
+sbit INT0 = 0xB2;
+sbit TXD  = 0xB1;
+sbit RXD  = 0xB0;
+
+/*  SCON  */
+sbit SM0  = 0x9F;
+sbit SM1  = 0x9E;
+sbit SM2  = 0x9D;
+sbit REN  = 0x9C;
+sbit TB8  = 0x9B;
+sbit RB8  = 0x9A;
+sbit TI   = 0x99;
+sbit RI   = 0x98;
+
+
+
+#endif</code></pre></div></details><details id="357a15e2-9005-8030-b706-e49d1b13476d" open="" class="toggle" dir="auto"><summary>解析</summary><div class="indented"><hr id="357a15e2-9005-80dd-99ba-ff3e574ceca4" dir="auto"/><details id="357a15e2-9005-8050-ab4f-fa6522dddd94" open="" class="toggle" dir="auto"><summary><code>Header Guard</code></summary><div class="indented"><pre id="357a15e2-9005-805e-b835-e633458421a6" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">#ifndef __REG51_H__
+#define __REG51_H__
+// ... 中間程式碼 ...
+#endif</code></pre><p id="357a15e2-9005-80c7-834c-fc8e86444d35" class="" dir="auto">程式碼的意義為：<div class="indented"><p id="357a15e2-9005-80d2-898b-ea0e990348b2" class="" dir="auto">若 <code>#ifnedf</code> 尚未載入過，就 <code>#define</code>  並讀取其中間的程式碼內容；若已經載入過，則跳到 <code>#endif</code> 。</p></div></p><p id="357a15e2-9005-80cb-bc6c-fe3a16166728" class="" dir="auto">在專案變大時，這樣撰寫標頭檔能防止同樣的檔案被多次載入、重複定義。</p></div></details><details id="357a15e2-9005-807b-9ac1-d1228d362bee" open="" class="toggle" dir="auto"><summary> <code>sfr</code> 與 <code>sbit</code> </summary><div class="indented"><details id="357a15e2-9005-80a7-9265-f7d5467f674b" open="" class="toggle" dir="auto"><summary><code>sfr</code> (Special Function Register - 特殊功能暫存器)</summary><div class="indented"><div id="357a15e2-9005-80e4-a23a-ca6a46e9fdd0" class="column-list" data-notion-column-list="" dir="auto"><div id="357a15e2-9005-80e9-8a8d-cf5020d89276" style="width:62.5%" class="column" data-notion-column-ratio="0.625" dir="auto"><p id="357a15e2-9005-80bd-9ce8-d7f576e90247" class="" dir="auto">可用這個宣告暫存器變數。</p><p id="357a15e2-9005-80f0-9662-c0ba4d404371" class="" dir="auto">一個 <code>sfr</code> 變數可以同時控制8個bits(等於一個Byte)。</p><blockquote id="357a15e2-9005-801e-87f6-d50163231338" class="" dir="auto">在8051晶片上，有四排對外的接腳。<p id="357a15e2-9005-8033-9e42-c1d7fc235d46" class="" dir="auto">分別是 <code>P0</code>、<code>P1</code>、<code>P2</code>、<code>P3</code>，每一排剛好對應8個金屬腳位。</p><p id="357a15e2-9005-8056-a0ce-e8d8f884ef69" class="" dir="auto">P0、P1的功能已經被定為外部記憶體的存取介面。P3上除了特殊功能外，P3.6、P3.7被規劃為外部記憶體的讀寫信號/WR、/RD，然後就用完了。</p></blockquote></div><div id="357a15e2-9005-8094-a24e-f0e97143a928" style="width:37.50000000000001%" class="column" data-notion-column-ratio="0.37500000000000006" dir="auto"><figure id="357a15e2-9005-80b2-b672-f1209a783f75" class="image" data-notion-image="Introduction%20to%20Embedded%20Systems/image.png" dir="ltr"><a href="Introduction%20to%20Embedded%20Systems/image.png"><img style="width:240px" src="Introduction%20to%20Embedded%20Systems/image.png"/></a></figure></div></div><hr id="357a15e2-9005-80b8-8c4f-ca60eb82b9f9" dir="auto"/><p id="357a15e2-9005-80f7-ae30-d60c395e70ba" class="" dir="auto">I/O 埠</p><pre id="357a15e2-9005-80a1-ab78-d17e52e90ed9" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">// 四個腳位記憶體位置是固定的
+sfr P0   = 0x80; // 可當一般gpio使用，或是使用外部記憶體時的address[7~0],data[7~0]。
+sfr P1   = 0x90; // 可當一般gpio使用，P0.0可以設定為計時器2的外部信號輸入腳位。
+sfr P2   = 0xA0; // 可當一般gpio使用，或是使用外部記憶體時的address[15~8]。
+sfr P3   = 0xB0; // 可當一般gpio使用，也歸劃為特殊功能之輸出入腳位，如串列埠、計數器、外部中斷等特殊功能。</code></pre><hr id="357a15e2-9005-80d7-85c4-f7d5a1992b7a" dir="auto"/><p id="357a15e2-9005-80c7-b20a-dd2d4b88feb0" class="" dir="auto">運算暫存器</p><pre id="357a15e2-9005-8010-85de-da8f6a7ab969" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">sfr PSW  = 0xD0; 
+
+// 累加器
+sfr ACC  = 0xE0;
+sfr B    = 0xF0;</code></pre></div></details><details id="357a15e2-9005-80f1-8d9a-df5b66d3326f" open="" class="toggle" dir="auto"><summary><code>sbit</code> (Special Bit - 特殊位元)</summary><div class="indented"><p id="357a15e2-9005-8044-bae7-c09b0d4b8235" class="" dir="auto">Bit-Level 的變數宣告，可單獨控制一個腳位。</p></div></details><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="357a15e2-9005-802e-ae20-d17c27a8042b" dir="ltr"><div style="width:100%"><p id="357a15e2-9005-809a-81ce-fe47bc80fa5f" class="" dir="auto">Ref : <a href="http://www.formosaos.url.tw/my8051/8051_mcu.html">http://www.formosaos.url.tw/my8051/8051_mcu.html</a></p></div></aside></div></details><details id="35ca15e2-9005-80da-b730-fc3abc9535f8" open="" class="toggle" dir="auto"><summary><code>I/O </code>埠 (Input/Output Ports)</summary><div class="indented"><pre id="35ca15e2-9005-8064-a1ba-ee658668b1f7" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">sfr P0   = 0x80;
+sfr P1   = 0x90;
+sfr P2   = 0xA0;
+sfr P3   = 0xB0;</code></pre><p id="35ca15e2-9005-8090-b78e-d81b17588bba" class="" dir="auto">每個 P 都有 8 隻腳，所以總共有 32 隻腳可以控制。</p></div></details><details id="35ca15e2-9005-8054-a161-fce8e93379d7" open="" class="toggle" dir="auto"><summary>核心暫存器</summary><div class="indented"><pre id="35ca15e2-9005-80ee-86ab-c12fbfa62ddf" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">sfr PSW  = 0xD0; // 程式狀態字組 (例如記錄剛剛加法有沒有進位)
+sfr ACC  = 0xE0; // 累加器 (A暫存器)，所有數學運算的主要工作台
+sfr B    = 0xF0; // B暫存器，專門用來配合 A 進行乘法和除法</code></pre></div></details><details id="35ca15e2-9005-80c1-9cc7-e0bdd932701b" open="" class="toggle" dir="auto"><summary>計時器 / 計數器 (Timer / Counter)</summary><div class="indented"><pre id="35ca15e2-9005-8075-9b16-e2fdda9c8b06" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">sfr TCON = 0x88; // 計時器控制面板 (啟動、停止馬錶)
+sfr TMOD = 0x89; // 計時器模式設定 (設定馬錶的工作方式)
+sfr TL0  = 0x8A; // 計時器0 的低8位元 (顯示目前秒數)
+sfr TH0  = 0x8C; // 計時器0 的高8位元
+// ...</code></pre><p id="35ca15e2-9005-80f9-ae96-f7cff27728f3" class="" dir="auto">單晶片常常需要精準計算時間（例如讓 LED 閃爍間隔精準的 1 秒），這就是計時器負責的工作。</p></div></details><details id="35ca15e2-9005-8006-9de5-cae3bf6ce17f" open="" class="toggle" dir="auto"><summary>中斷 (Interrupt)</summary><div class="indented"><pre id="35ca15e2-9005-8066-ab7b-e8b5a087b702" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">sfr IE   = 0xA8; // 中斷致能 (開啟或關閉特定的突發狀況警報)
+sfr IP   = 0xB8; // 中斷優先權 (如果同時發生兩個狀況，誰先處理？)</code></pre></div></details><details id="35ca15e2-9005-8092-b20d-e4d01d6d912a" open="" class="toggle" dir="auto"><summary>序列通訊 (UART / Serial)</summary><div class="indented"><pre id="35ca15e2-9005-80a7-8fef-ee0e6356d796" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">sfr SCON = 0x98; // 序列通訊控制
+sfr SBUF = 0x99; // 序列通訊緩衝區 (你要傳送或接收的資料都放這裡)</code></pre></div></details><hr id="357a15e2-9005-80d2-9a41-c619ede0b325" dir="auto"/></div></details><hr id="35ca15e2-9005-8055-9cbd-eee3e1b2989d" dir="auto"/></div></details><details id="35ca15e2-9005-80ad-b8b9-f82aaaddb698" open="" class="toggle" dir="auto"><summary><code>CLED.c</code> </summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="35ca15e2-9005-8018-b41d-e71c54b3d222" dir="ltr"><div style="width:100%"><p id="367a15e2-9005-80c7-85b3-e28b6d3988fb" class="" dir="auto">LED燈。直接定址。</p><p id="35ca15e2-9005-8023-8405-fee3effdedd3" class="" dir="auto">利用 <code>Char</code> 變數以及位元反向 ( <code>~</code> ) 操作設定 <code>P1</code> 腳位的值，並呼喚 <code>delay</code> 函數讓輸出結果能停留一陣子(keep)，實做 <code>LED</code> 跑馬燈。</p></div></aside><hr id="35ca15e2-9005-8047-8f17-f2a9d4681a80" dir="auto"/><details id="35ca15e2-9005-80e9-bb6b-de7ae232d63e" open="" class="toggle" dir="auto"><summary>Code <code>CLED.c</code></summary><div class="indented"><pre id="35ca15e2-9005-804f-90cd-dbefcec9d62c" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">/* CLED.C for LED */
+
+#include&quot;reg51.h&quot;
+void delay(unsigned int s);
+//void delay(unsigned char s);
+void main()
+{
+	unsigned char LED;
+	LED=0x01;
+	P1=0xfe;
+	while(1)
+	{
+		delay(8000);
+		LED=LED&lt;&lt;1;
+		if (LED == 0)
+		{
+		 	LED = 0x01;
+		}
+		//位元操作  : !僅操作一個位元; ~ 操作全部位元
+		P1=~LED;
+	}
+}
+
+void delay(unsigned int s)
+{
+	unsigned int m;
+	for(m=0;m&lt;s;m++);
+}</code></pre></div></details><details id="35ca15e2-9005-80a6-8b33-c0a67b99dbe2" open="" class="toggle" dir="auto"><summary>解析</summary><div class="indented"><details id="35ca15e2-9005-802d-acf7-c31bbddf29d2" open="" class="toggle" dir="auto"><summary><code>Include</code> &amp; <code>Define function</code></summary><div class="indented"><pre id="35ca15e2-9005-8060-89b3-f019c0862686" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">#include&quot;reg51.h&quot;
+void delay(unsigned int s);</code></pre><ul id="01302b0b-014e-47a9-af4e-55014b6c886f" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code><strong>#include&quot;reg51.h&quot;</strong></code>：因為程式後面會用到 <code>P1</code>，如果沒有這行，編譯器會不認識 <code>P1</code>  </li></ul><ul id="1e900317-b6e4-4aff-9db0-5d5335ce36a4" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code><strong>void delay(unsigned int s);</strong></code>：函式宣告</li></ul></div></details><details id="35ca15e2-9005-80f6-8fec-faa0395f2e98" open="" class="toggle" dir="auto"><summary><code>Main function</code></summary><div class="indented"><pre id="35ca15e2-9005-8049-b613-d07f4d1e622b" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">void main()
+{
+	unsigned char LED;
+	LED=0x01;
+	P1=0xfe;
+	while(1)
+	{
+		delay(8000);
+		LED=LED&lt;&lt;1;
+		if (LED == 0)
+		{
+		 	LED = 0x01;
+		}
+		//位元操作  : !僅操作一個位元; ~ 操作全部位元
+		P1=~LED;
+	}
+}</code></pre><details id="35ca15e2-9005-8041-bf75-e5d9d7bf2ec2" open="" class="toggle" dir="auto"><summary><code>variable</code></summary><div class="indented"><pre id="35ca15e2-9005-80b0-9c43-d7ca0c32f099" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">unsigned char LED;
+LED=0x01;
+P1=0xfe;</code></pre><ul id="35ca15e2-9005-800d-ac2a-e653645b38f4" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code>unsigned char LED;</code> <p id="35ca15e2-9005-8063-9eb4-c4e9c4feafe8" class="" dir="auto">利用unsigned char佔記憶體8-bit的特性，宣告LED變數。</p></li></ul><ul id="35ca15e2-9005-80d5-ae6a-c5e233416dac" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code>LED=0x01;</code> &amp; <code>P1=0xfe;</code><p id="35ca15e2-9005-80f8-92a6-edf6b218cda7" class="" dir="auto">設定初始狀態。<br/><code>0x01</code> ⇒ <code>0000 0001</code><br/><code>0xfe</code> ⇒ <code>1111 1110</code></p><blockquote id="35ca15e2-9005-80c8-88cb-fbed953314c9" class="" dir="auto"><strong>嵌入式重點</strong>：<p id="35ca15e2-9005-8079-9311-cdf9f1b7d822" class="" dir="auto">在 8051 的硬體設計中，通常輸出 <strong>低電位（0） LED 才會亮</strong>。</p></blockquote></li></ul></div></details><details id="35ca15e2-9005-8018-b83b-d2ed6f2baf40" open="" class="toggle" dir="auto"><summary><code>while</code></summary><div class="indented"><pre id="35ca15e2-9005-8055-b52e-f52d1ffeafb6" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">while(1)
+	{
+		delay(8000);
+		LED=LED&lt;&lt;1;
+		if (LED == 0)
+		{
+		 	LED = 0x01;
+		}
+		//位元操作  : !僅操作一個位元; ~ 操作全部位元
+		P1=~LED;
+	}</code></pre><ul id="35ca15e2-9005-80c6-90a6-c876c4ccc300" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code>delay(8000);</code><p id="35ca15e2-9005-8099-b8fd-ed7fa5629e0c" class="" dir="auto">單晶片執行速度極快（一秒鐘可以跑幾十萬次），LED 閃爍的速度會看起來像是一直全亮。呼叫延遲函式讓它停頓。</p></li></ul><ul id="35ca15e2-9005-8079-82ff-ee6029c60e7a" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code>LED=LED&lt;&lt;1;</code><p id="35ca15e2-9005-801e-a638-e303a844af42" class="" dir="auto">讓LED變數左移一位元(最右側補0)。<br/>製造跑馬燈的錯覺。</p></li></ul><ul id="35ca15e2-9005-808c-832a-c4801e05e9fe" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code>if</code><pre id="35ca15e2-9005-8081-8b2a-faa8c60905ed" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">if (LED == 0)
+		{
+		 	LED = 0x01;
+		}</code></pre><p id="35ca15e2-9005-8087-b311-c201b46b5bf0" class="" dir="auto">當全部LED燈變數全為0時(全亮)，將最右側bit設定為1(暗)。</p></li></ul><ul id="35ca15e2-9005-809b-868d-e15494bacb8b" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code>P1=~LED;</code><p id="35ca15e2-9005-804d-9538-fcafc92e99d5" class="" dir="auto">輸出最終值給P1。<br/>(<code>~</code> 代表將LED的值反向輸出給P1，也就是LED燈會亮相反)</p><blockquote id="35ca15e2-9005-80a8-8530-f4fd55640061" class="" dir="auto">註： <code>!</code> 是邏輯反向，用在 True/False 判斷；<code>~</code> 則是對全部 8 個位元逐一翻轉。</blockquote></li></ul></div></details></div></details><details id="35ca15e2-9005-8007-85a2-cff673fe3389" open="" class="toggle" dir="auto"><summary><code>Delay</code></summary><div class="indented"><pre id="35ca15e2-9005-805e-acf8-c7c3703c4267" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">void delay(unsigned int s)
+{
+	unsigned int m;
+	for(m=0;m&lt;s;m++);
+}</code></pre><p id="0dac89f9-a3a7-4853-9f98-05fc68ba6a01" class="" dir="auto">其實就是一個空轉的迴圈。<br/>當我們傳入 8000 時，單晶片就會在這邊默默地從 0 數到 8000 。</p></div></details></div></details></div></details><details id="35ca15e2-9005-808f-b248-ed47b192ff78" open="" class="toggle" dir="auto"><summary><code>CLED2.c</code> </summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="367a15e2-9005-8001-a968-fe5b2c20c1b7" dir="ltr"><div style="width:100%"><p id="367a15e2-9005-80d4-a267-dae683d621e6" class="" dir="auto">LED燈加上7-segment顯示器的紅綠燈。 間接定址、查表。</p></div></aside><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="35da15e2-9005-80bf-a977-c69446c03c79" dir="ltr"><div style="width:100%"><pre id="35da15e2-9005-80bc-903b-e46189ced6c8" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">/*	High On			Low On
+;0:00111111B(3FH)11000000B(C0H)
+;1:00000110B(06H)11111001B(F9H)
+;2:01011011B(5BH)10100100B(A4H)
+;3:01001111B(4FH)10110000B(B0H)
+;4:01100110B(66H)10011001B(99H)
+;5:01101101B(6DH)10010010B(92H)
+;6:01111101B(7DH)10000010B(82H)
+;7:00000111B(07H)11111000B(F8H)
+;8:01111111B(7FH)10000000B(80H)
+;9:01101111B(67H)10010000B(98H)
+;A:01110111B(77H)10001000B(88H)
+;b:01111100B(7CH)10000011B(83H)
+;C:00111001B(39H)11000110B(C6H)
+;d:01011110B(5EH)10100001B(A1H)
+;E:01111001B(79H)10000110B(86H)
+;F:01110001B(71H)10001110B(8EH)
+*/
+  A 
+F   B
+  G 
+E   C
+  D
+  
+// [小數點] + GFEDCBA</code></pre><ul id="366a15e2-9005-80c0-9f96-f8b0843a59d0" class="bulleted-list" dir="auto"><li style="list-style-type:disc">控制七段顯示器的主要運作，使用的是共陽極(低電位亮、高電位不亮)。</li></ul></div></aside><hr id="35da15e2-9005-809d-bcaa-e2ef923c9bfc" dir="auto"/><details id="35da15e2-9005-80e5-baf4-d37f77ec4ca0" open="" class="toggle" dir="auto"><summary>Code <code>CLED2.c</code></summary><div class="indented"><pre id="35da15e2-9005-808c-81d3-d1af5d02634b" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">#include&quot;reg51.h&quot;
+void delay(int s);
+void main()
+{
+  //	unsigned char code H7seg[] ={0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x67,0x77,0x7C,0x39,0x5E,0x79,0x71};
+	unsigned char code L7seg[] ={0xC0,0xF9,0xA4,0xB0,0x99,0x92,0x82,0xF8,0x80,0x98,0x88,0x83,0xC6,0xA1,0x86,0x8E};
+	                           // 0 , 1 , 2 , 3 , 4 , 5 , 6 , 7 , 8 , 9 
+	                           // code  會告訴編譯器要把這首曲子存放在程式記憶體 (ROM)，而不是隨機記憶體 (RAM)。因為樂譜只讀不改，放 ROM 可以省空間。
+	unsigned char i;
+	
+	while(1)
+	{
+		P1=0xbe; //green and red
+		for (i=25;i&gt;5;i--)
+		{
+			ACC= L7seg[i%10];
+			P0 = ACC;
+			ACC= L7seg[i/10];
+			P2 = ACC;
+			delay(31250);
+			delay(31250);
+		}
+		
+		P1=0xde; //yellow and red
+		for (i=5;i&gt;0;i--)
+		{
+			ACC= L7seg[i%10];
+			P0 = ACC;
+			ACC= L7seg[i/10];
+			P2 = ACC;
+			delay(31250);
+			delay(31250);
+		}
+		
+		P1=0xeb; //red and green
+		for (i=74;i&gt;5;i--)
+		{
+			ACC= L7seg[i%10];
+			P0 = ACC;
+			ACC= L7seg[i/10];
+			P2 = ACC;
+			delay(31250);
+			delay(31250);
+		}
+		
+		P1=0xed; //red and yellow
+		for (i=5;i&gt;0;i--)
+		{
+			ACC= L7seg[i%10];
+			P0 = ACC;
+			ACC= L7seg[i/10];
+			P2 = ACC;
+			delay(31250);
+			delay(31250);
+		}
+		
+	}
+}
+
+// 31250 x 16us = 0.5second
+void delay(int s)
+{
+	int m;
+	for(m=0;m&lt;s;m++);
+}
+</code></pre></div></details><details id="35da15e2-9005-8062-98d2-db7ab4f7a47b" open="" class="toggle" dir="auto"><summary>解析</summary><div class="indented"><details id="366a15e2-9005-8046-b99c-e8217fd4afee" open="" class="toggle" dir="auto"><summary><code>while</code></summary><div class="indented"><pre id="366a15e2-9005-80d5-bc87-cbf30f0804bf" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">while(1)
+	{
+		P1=0xbe; //green and red
+		for (i=25;i&gt;5;i--)
+		{
+			ACC= L7seg[i%10];
+			P0 = ACC;
+			ACC= L7seg[i/10];
+			P2 = ACC;
+			delay(31250);
+			delay(31250);
+		}
+		
+		P1=0xde; //yellow and red
+		for (i=5;i&gt;0;i--)
+		{
+			ACC= L7seg[i%10];
+			P0 = ACC;
+			ACC= L7seg[i/10];
+			P2 = ACC;
+			delay(31250);
+			delay(31250);
+		}
+		
+		P1=0xeb; //red and green
+		for (i=74;i&gt;5;i--)
+		{
+			ACC= L7seg[i%10];
+			P0 = ACC;
+			ACC= L7seg[i/10];
+			P2 = ACC;
+			delay(31250);
+			delay(31250);
+		}
+		
+		P1=0xed; //red and yellow
+		for (i=5;i&gt;0;i--)
+		{
+			ACC= L7seg[i%10];
+			P0 = ACC;
+			ACC= L7seg[i/10];
+			P2 = ACC;
+			delay(31250);
+			delay(31250);
+		}	
+	}</code></pre><hr id="366a15e2-9005-8061-94eb-eb7aeece93b9" dir="auto"/><details id="366a15e2-9005-80d4-9605-f97eb3af70bb" open="" class="toggle" dir="auto"><summary>Case1: <code>P1=0xbe;</code> </summary><div class="indented"><pre id="366a15e2-9005-8043-948f-eea80f2bbfe6" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">P1=0xbe; //10111110 green and red
+for (i=25;i&gt;5;i--)
+{
+	ACC= L7seg[i%10];
+	P0 = ACC;
+	ACC= L7seg[i/10];
+	P2 = ACC;
+	delay(31250);
+	delay(31250);
+}</code></pre><hr id="366a15e2-9005-8037-9ef3-e75473fe6470" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="366a15e2-9005-80ad-891e-c20667eec960" dir="ltr"><div style="width:100%"><p id="366a15e2-9005-8033-9c6a-ea1043f4155b" class="" dir="auto">目標<div class="indented"><p id="366a15e2-9005-801a-aa90-eace1d3fc14d" class="" dir="auto">倒計時從 <code>i=25</code> → <code>i=5</code> , 以加速暫存器 <code>ACC</code> 計算當前數值, 並以 <code>P0</code>, <code>P2</code> 兩個輸出接口對接到 7-Segment。</p><p id="366a15e2-9005-80d8-b42a-e704a6142ccd" class="" dir="auto">顯示: 我方綠燈(倒數25秒)，對方紅燈。</p></div></p><hr id="366a15e2-9005-8013-b40f-fd29f8b7772e" dir="auto"/><p id="366a15e2-9005-8071-a3e5-df2ad2e935ae" class="" dir="auto">Counter<div class="indented"><p id="366a15e2-9005-804e-a174-c6adebf6db80" class="" dir="auto">8051單晶片跑一次for 迴圈大約耗費 <code>16us</code>, <code>31250 (delay) x 16us = 0.5 s</code>, 因此呼喚兩次delay function 剛好計數一秒鐘。</p></div></p><hr id="366a15e2-9005-8098-8fb7-cbb0f0c09104" dir="auto"/><p id="366a15e2-9005-800f-b4b7-f9fe615e9624" class="" dir="auto">P-: 顯示輸出<div class="indented"><p id="366a15e2-9005-801f-a6fb-fd9d75450152" class="" dir="auto"><code>P0</code> 顯示倒數個位數; <code>P2</code> 顯示倒數的十位數<br/><code>P1</code> 負責控制LED輸出(10111110)。</p></div></p></div></aside></div></details><details id="366a15e2-9005-80bd-a63f-c4dcda493d02" open="" class="toggle" dir="auto"><summary>Case2: <code>P1=0xde;</code></summary><div class="indented"><pre id="366a15e2-9005-8048-a74a-df4c6455310c" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">P1=0xde; //11011110 yellow and red
+for (i=5;i&gt;0;i--)
+{
+	ACC= L7seg[i%10];
+	P0 = ACC;
+	ACC= L7seg[i/10];
+	P2 = ACC;
+	delay(31250);
+	delay(31250);
+}</code></pre><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="366a15e2-9005-805e-bf35-ed5054e90896" dir="ltr"><div style="width:100%"><p id="366a15e2-9005-80a7-8269-ef23166b260c" class="" dir="auto">目標<div class="indented"><p id="366a15e2-9005-80c6-80a3-e2d7d3211cee" class="" dir="auto">倒計時從 <code>i=5</code> → <code>i=0</code> , 以加速暫存器 <code>ACC</code> 計算當前數值, 並以 <code>P0</code>, <code>P2</code> 兩個輸出接口對接到 7-Segment。</p><p id="366a15e2-9005-80f8-988d-e60eb970e440" class="" dir="auto">顯示: 我方黃燈(倒數5秒)，對方紅燈。</p></div></p></div></aside></div></details><details id="366a15e2-9005-808f-b086-d786afd4afa1" open="" class="toggle" dir="auto"><summary>Case3: <code>P1=0xeb;</code></summary><div class="indented"><pre id="366a15e2-9005-8042-ac4d-d30354aa67fd" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">P1=0xeb; //11101011 red and green
+for (i=74;i&gt;5;i--)
+{
+	ACC= L7seg[i%10];
+	P0 = ACC;
+	ACC= L7seg[i/10];
+	P2 = ACC;
+	delay(31250);
+	delay(31250);
+}</code></pre><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="366a15e2-9005-80f1-89c1-fef5197e1225" dir="ltr"><div style="width:100%"><p id="366a15e2-9005-8081-9092-e922c8bee34f" class="" dir="auto">目標<div class="indented"><p id="366a15e2-9005-80a4-9c55-e214a7cf1de9" class="" dir="auto">倒計時從 <code>i=74</code> → <code>i=5</code> , 以加速暫存器 <code>ACC</code> 計算當前數值, 並以 <code>P0</code>, <code>P2</code> 兩個輸出接口對接到 7-Segment。</p><p id="366a15e2-9005-8046-9a2c-caf38bc02f74" class="" dir="auto">顯示: 我方紅燈(倒數74-5秒)，對方綠燈。</p></div></p></div></aside></div></details><details id="366a15e2-9005-8005-92a9-da308ef2b5c0" open="" class="toggle" dir="auto"><summary>Case4: <code>P1=0xed;</code></summary><div class="indented"><pre id="366a15e2-9005-80f5-aaa4-f243ce576f07" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">P1=0xed; //11101101 red and yellow
+for (i=5;i&gt;0;i--)
+{
+	ACC= L7seg[i%10];
+	P0 = ACC;
+	ACC= L7seg[i/10];
+	P2 = ACC;
+	delay(31250);
+	delay(31250);
+}</code></pre><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="366a15e2-9005-80b1-b4f4-c942aa6124f7" dir="ltr"><div style="width:100%"><p id="366a15e2-9005-80a8-bbd4-d7e36b522733" class="" dir="auto">目標<div class="indented"><p id="366a15e2-9005-8055-8675-fd50f549a953" class="" dir="auto">倒計時從 <code>i=5</code> → <code>i=0</code> , 以加速暫存器 <code>ACC</code> 計算當前數值, 並以 <code>P0</code>, <code>P2</code> 兩個輸出接口對接到 7-Segment。</p><p id="366a15e2-9005-8058-add6-d7aaeb4889b0" class="" dir="auto">顯示: 我方紅燈(倒數五秒)，對方黃燈。</p></div></p></div></aside></div></details></div></details><details id="366a15e2-9005-801a-ad2a-c188bd5dc364" open="" class="toggle" dir="auto"><summary><code>delay</code></summary><div class="indented"><pre id="366a15e2-9005-808f-a0ef-c6672fdca4a8" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">void delay(int s)
+{
+	int m;
+	for(m=0;m&lt;s;m++);
+}</code></pre><hr id="366a15e2-9005-8080-a9f7-dd2281944ca9" dir="auto"/><p id="366a15e2-9005-803d-bd47-e6ca4f6e5a53" class="" dir="auto">計數 → 空轉</p></div></details></div></details></div></details><details id="35da15e2-9005-8025-b9f5-cf2d8f413784" open="" class="toggle" dir="auto"><summary><code>CLED3.c</code> </summary><div class="indented"><p id="367a15e2-9005-80ac-81e9-da8019c3341d" class="" dir="auto">音樂。查表的查表。</p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="35da15e2-9005-8093-9161-f4497a368505" dir="ltr"><div style="width:100%"><pre id="366a15e2-9005-802a-8646-f8e8e6aeb759" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">/*
+;					8051                                        
+;	LSi 247 Hz 4048us/2=2024us=8usx253
+;1	Do	262 Hz 3817us/2=1908us=8usx238.5
+;2	Re	294 Hz 3401us/2=1700us=8usx212.5
+;3	Mi	329 Hz 3040us/2=1520us=8usx190
+;4	Fa	349 Hz 2865us/2=1432us=8usx179
+;5	So	392 Hz 2551us/2=1275us=8usx159.4
+;6	La	440 Hz 2273us/2=1136us=8usx142
+;7	Si	494 Hz 2024us/2=1012us=8usx126.5
+;8	HDo	524 Hz 1908us/2= 954us=8usx119.25
+;9	HRe 588 Hz 1700us/2= 850us=8usx106
+;10	HMi 658 Hz 1520us/2= 760us=8usx95
+;11	HFa	698 Hz 1432us/2= 716us=8usx89
+;12	HSo 784 Hz 1275us/2= 638us=8usx80
+;13	HLa 880 Hz 1136us/2= 568us=8usx71
+;14	HSi 988 Hz 1012us/2= 506us=8usx63
+;15	UDo 277Hz 3610us/2=1805us=8usx225
+;16	URe 311Hz 3215us/2=1608us=8usx201
+;17	UFa 369Hz 2710us/2=1355us=8usx169
+;18	USo 415Hz 2410us/2=1205us=8usx150
+;19	ULA 466Hz 2146us/2=1073us=8usx134
+*/</code></pre><p id="366a15e2-9005-8032-9539-eb060cef96d2" class="" dir="auto">聲音由: 音調、頻率、震幅次數組成</p><p id="366a15e2-9005-80ce-9eda-d2d28f42a5d4" class="" dir="auto">Ex. Do <div class="indented"><p id="366a15e2-9005-80c5-bb1f-cdd15a42ca78" class="" dir="auto">頻率: 262Hz, <br/>震動週期: 1s/262Hz = 3817us, <br/>喇叭切換時間: 3817us/2 = 1908us,<br/>總共呼叫幾次 mdelay  = 切換時間/ 一次 delay 執行的時間(8us) = 1908 / 8 = 238<br/>要喇叭震動的次數 mtime = 一拍(0.25s = 250,000us ) / 每個音符的震動週期</p></div></p><ul id="367a15e2-9005-8021-8043-e42191de74b0" class="bulleted-list" dir="auto"><li style="list-style-type:disc">code  會告訴編譯器要把這首曲子存放在程式記憶體 (ROM)，而不是隨機記憶體 (RAM)。因為樂譜只讀不改，放 ROM 可以省空間。</li></ul></div></aside><hr id="35da15e2-9005-80ee-b39e-d22ef80ecce0" dir="auto"/><details id="35da15e2-9005-80f9-b5a0-f6e8f3b0cdf4" open="" class="toggle" dir="auto"><summary>Code <code>CLED3.c</code></summary><div class="indented"><pre id="35da15e2-9005-80fd-a2ec-c88c9a1f7c03" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">#include&quot;reg51.h&quot;
+void delay(unsigned char s);
+void main()
+{
+	unsigned char code song[] ={1,1,5,5,6,6,5,0,4,4,3,3,2,2,1,0,5,5,4,4,3,3,2,0,5,5,4,4,3,3,2,0,1,1,5,5,6,6,5,0,4,4,3,3,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	unsigned char code mtime[] ={ 61, 65, 73, 82, 87, 98,110,123,131,147,164,174,196,220,247, 69, 78, 92,104,116};
+	unsigned char code mdelay[]={253,238,212,190,179,159,142,126,119,106, 95, 89, 80, 71, 63,225,201,169,150,134};
+	unsigned char count;
+	unsigned char n;
+	int L=sizeof(song)/sizeof(song[0]);
+	while(1)
+	{
+		for (count=0;count&lt;L;count++)
+		{
+			if (song[count]==0)
+			{
+				for (n=0;n&lt;65;n++)
+				{
+					P1=0x55;//nosound
+					delay(60);
+				}
+			}
+			else
+			{
+				for (n=0;n&lt;mtime[song[count]];n++)
+				{
+					P1=0xAA;
+					delay(mdelay[song[count]]);
+					P1=0x55;
+					delay(mdelay[song[count]]);
+				}
+			}
+		}
+	}
+}
+
+void delay(unsigned char s)
+{
+	unsigned char m;
+	for(m=0;m&lt;s;m++){m++;m--;}
+}</code></pre></div></details><details id="35da15e2-9005-808b-8bbc-eefdc8c872b0" open="" class="toggle" dir="auto"><summary>解析</summary><div class="indented"><details id="366a15e2-9005-8066-9b8a-e29177384d41" open="" class="toggle" dir="auto"><summary><code>Main</code></summary><div class="indented"><details id="366a15e2-9005-801e-a457-ca618ea88903" open="" class="toggle" dir="auto"><summary><code>define</code></summary><div class="indented"><pre id="366a15e2-9005-806e-a1af-c81d4978d20a" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">unsigned char code song[] ={1,1,5,5,6,6,5,0,4,4,3,3,2,2,1,0,5,5,4,4,3,3,2,0,5,5,4,4,3,3,2,0,1,1,5,5,6,6,5,0,4,4,3,3,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+unsigned char code mtime[] ={ 61, 65, 73, 82, 87, 98,110,123,131,147,164,174,196,220,247, 69, 78, 92,104,116};
+unsigned char code mdelay[]={253,238,212,190,179,159,142,126,119,106, 95, 89, 80, 71, 63,225,201,169,150,134};
+// code  會告訴編譯器要把這首曲子存放在程式記憶體 (ROM)，而不是隨機記憶體 (RAM)。因為樂譜只讀不改，放 ROM 可以省空間。
+unsigned char count;
+unsigned char n;
+int L=sizeof(song)/sizeof(song[0]);</code></pre><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="366a15e2-9005-807b-b526-ea4cc8faa0e4" dir="ltr"><div style="width:100%"><p id="366a15e2-9005-8014-a02c-e6cc14dbdbbc" class="" dir="auto"><code>song</code>: <div class="indented"><p id="366a15e2-9005-8067-a556-ddec37c24ded" class="" dir="auto">樂譜簡譜</p></div></p><p id="366a15e2-9005-80c7-a697-f5377c9db5e5" class="" dir="auto"><code>mtime</code>: <div class="indented"><p id="366a15e2-9005-80ca-9b30-e0ee7648abc9" class="" dir="auto">音高/頻率控制表。透過不同頻率的延遲，傳入delay函數當中，控制喇叭震動的頻率來調整音調高低。(數字越小、延遲越短、音高越高)</p></div></p><p id="366a15e2-9005-805e-9323-e4b7baacd885" class="" dir="auto"><code>mdelay</code>: <div class="indented"><p id="366a15e2-9005-809d-8c23-c61e4f5f7413" class="" dir="auto">節拍/長度控制表。高音的震動比較快、低音震動比較慢，要平衡每個音符震動的時間。</p></div></p><p id="366a15e2-9005-8032-a294-ccb36e872830" class="" dir="auto"><code>count</code>:<div class="indented"><p id="366a15e2-9005-80cd-8852-f622f2ce3b24" class="" dir="auto">計算當前撥放到第幾個音符</p></div></p><p id="366a15e2-9005-80ac-af53-d506297b3769" class="" dir="auto"><code>n</code>:<div class="indented"><p id="366a15e2-9005-80bc-881b-c554f619b255" class="" dir="auto">計算當前音符撥放了幾次</p></div></p><p id="366a15e2-9005-8085-8af3-fc88241d16b8" class="" dir="auto"><code>L</code>:<div class="indented"><p id="366a15e2-9005-80aa-bc80-e321c07d9b40" class="" dir="auto">自動計算整首歌占用的ROM空間，可以不用手動改迴圈的次數。</p></div></p></div></aside></div></details><details id="366a15e2-9005-808a-a475-fe1a4e00ce16" open="" class="toggle" dir="auto"><summary><code>while</code></summary><div class="indented"><pre id="366a15e2-9005-803b-8e29-f5412b31b891" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">	while(1)
+	{
+		for (count=0;count&lt;L;count++)
+		{
+			//---
+		}
+	}
+}</code></pre><p id="366a15e2-9005-801e-98d8-f18851a9b6ca" class="" dir="auto">利用L計數的迴圈，計算當前撥放到第幾個音符了。<code>while(1)</code> 代表整首歌撥放完後會自動重頭開始撥放。</p></div></details><details id="366a15e2-9005-8058-bd40-e0c9c1bd10e7" open="" class="toggle" dir="auto"><summary><code>if-else</code></summary><div class="indented"><pre id="366a15e2-9005-80da-a415-f4b96249a3bf" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">if (song[count]==0)
+{
+	for (n=0;n&lt;65;n++)
+	{
+		P1=0x55;//nosound
+		delay(60);
+	}
+}
+else
+{
+	for (n=0;n&lt;mtime[song[count]];n++)
+	{
+		P1=0xAA;
+		delay(mdelay[song[count]]);
+		P1=0x55;
+		delay(mdelay[song[count]]);
+	}
+}</code></pre><blockquote id="366a15e2-9005-80a6-99a1-c8f1615e0587" class="" dir="auto">if:<ul id="366a15e2-9005-80b9-b1f1-c7e4c69b0ac2" class="bulleted-list" dir="auto"><li style="list-style-type:disc">檢測是否是休止符(當前音符值為0)</li></ul><ul id="366a15e2-9005-80bb-b9ce-fe956665def8" class="bulleted-list" dir="auto"><li style="list-style-type:disc">若是，則將 0x55 送至 P1 輸出端，並且呼叫 delay 函數，停止喇叭震動(不發出聲音)。</li></ul><p id="366a15e2-9005-8082-a08d-f7f6aa33d2c3" class="" dir="auto">else:</p><ul id="366a15e2-9005-803c-822f-fc3fa4bd2bb3" class="bulleted-list" dir="auto"><li style="list-style-type:disc">若非休止符，則依據當前音符的簡譜順序決定當前喇叭的狀態以及持續時間。</li></ul><ul id="366a15e2-9005-80ed-9017-c00c8c1a1a93" class="bulleted-list" dir="auto"><li style="list-style-type:disc">總共會重複 <code>mtime[song[count]]</code> 次來回震動，每次震動會在 <code>P1 = 0xAA;</code> <code>P1 = 0x55;</code> 之間改變狀態，每次改變狀態的時間則是用 <code>mdelay[song[count]]</code> 查表</li></ul></blockquote></div></details></div></details><details id="366a15e2-9005-80dd-b3d0-f78487cdc7b5" open="" class="toggle" dir="auto"><summary><code>delay</code></summary><div class="indented"></div></details></div></details></div></details><details id="35da15e2-9005-80c2-9902-d36daa981910" open="" class="toggle" dir="auto"><summary><code>CARAUTO.c</code> (2026_4_9)</summary><div class="indented"><p id="367a15e2-9005-80df-a813-de8e881df6ea" class="" dir="auto">使用步進馬達模組接 8051 單晶片模組，讓馬達旋轉。</p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="35da15e2-9005-808e-bd95-dcc38ea78cba" dir="ltr"><div style="width:100%"><pre id="35da15e2-9005-80ca-80ef-f00622e10a57" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">/*******************************************************************************
+;
+; CARAUTO.asm
+; 
+; Car with bluetooth and ultrasonic
+;
+; SD90 motor speed 60 degree/0.1s, design 90 degree/(20ms*8) then 93 (+-) 4*8 = 125 (2.016ms) or 61 (0.984ms)
+;
+; HC-SR04 UltraSonic Speed 340m/sec, 5Vdc, 15mA, Work Frequency 40 Hz, Measure Angle 15 degree, Dim. 45x20x15 mm
+; Distance 2cm (0.11765ms) ~ 400cm (23.53ms), t = 1cm*2/(340m/sec) = 58.825 us
+; 1. Trig: 10us TTL Pulse, then HC-SR04 generates 8 pulses (40kHz)
+; 2. Echo: time period, t = 1cm*2/(340m/sec) = 58.825 us
+;
+; Use Interrupt USART_RXC for bluetooth and TIMER0 MODE1 for control arduino-car
+;
+; CLOCK : 11.059 MHz for baud rate 9600
+;
+;******************************************************************************/</code></pre></div></aside><hr id="35da15e2-9005-8054-88a1-f562bfbf3899" dir="auto"/><details id="35da15e2-9005-80e1-bfb6-d2e44f12d061" open="" class="toggle" dir="auto"><summary>Code <code>CARAUTO.c</code></summary><div class="indented"><pre id="35da15e2-9005-8039-831c-fafac37755a1" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">#include&quot;reg51.h&quot;
+void delay(unsigned char s);
+
+unsigned char SBUF_BUF; 
+unsigned char code mtime[] ={ 61, 65, 73, 82, 87, 98,110,123,131,147,164,174,196,220,247, 69, 78, 92,104,116};
+unsigned char code mdelay[]={253,238,212,190,179,159,142,126,119,106, 95, 89, 80, 71, 63,225,201,169,150,134};
+unsigned char n;
+//unsigned char ATEMP,DPLTEMP,DPHTEMP;
+
+void main()
+{
+	TMOD = 0x21; //	SET TIMER1 MODE 2 and TIMER0 MODE 1. (00100001B)
+	//PT0 = 1; //IP.1 SET TIMER0 INTERRUPT HIGH PRIORITY
+	//TF0 = 0; //TCON.5 CLEAR TIMER0 OVERFLOW
+	//TH0 = (65536-20000)/256;
+	//TL0 = (65536-20000)%256; // -20000 = 45536 = #B1E0H
+	//TR0 = 1; //TCON.4 SET TIMER0 RUN
+
+	TH1 = 253; // baud rate 9600=11059000/(32x12x(256-253))
+	TR1 = 1; //TCON.6 SET TIMER1 RUN
+	PCON = 0x00;
+//	SMOD = 0; // SET PCON.7=0 (SMOD=0)
+	SCON = 0x50; // SET RS232 MODE1, RX ENABLE
+// IE.7(SET ALL INTERRUPT ENABLE);IE.1(ENABLE TIMER0 INTERRUPT); IE.4 (ENABLE USART INT)
+//	IE   = 0x92; // 10010010B
+	IE   = 0x90; // 10010000B
+
+// Initial value
+	P0 = 0x00; // observe SBUF
+	P1 = 0x33; // motor stop
+
+	while(1){
+		if (SBUF_BUF == 0x31) // SBUF =&#x27;1&#x27; =#31H
+		{
+			for (n=0;n&lt;mtime[1];n++)
+			{
+				P1=0xAA;
+				delay(mdelay[1]);
+				P1=0x55;
+				delay(mdelay[1]);
+			}		
+		}
+		else if (SBUF_BUF == 0x32) // SBUF =&#x27;2&#x27; =#32H
+		{
+			for (n=0;n&lt;mtime[2];n++)
+			{
+				P1=0xAA;
+				delay(mdelay[2]);
+				P1=0x55;
+				delay(mdelay[2]);
+			}	
+		}
+		else if (SBUF_BUF == 0x33) // SBUF =&#x27;3&#x27; =#33H
+		{
+			for (n=0;n&lt;mtime[3];n++)
+			{
+				P1=0xAA;
+				delay(mdelay[3]);
+				P1=0x55;
+				delay(mdelay[3]);
+			}
+		}
+		else if (SBUF_BUF == 0x34) // SBUF =&#x27;4&#x27; =#34H
+		{
+			for (n=0;n&lt;mtime[4];n++)
+			{
+				P1=0xAA;
+				delay(mdelay[4]);
+				P1=0x55;
+				delay(mdelay[4]);
+			}
+		}
+		else if (SBUF_BUF == 0x35) // SBUF =&#x27;5&#x27; =#35H
+		{
+			for (n=0;n&lt;mtime[5];n++)
+			{
+				P1=0xAA;
+				delay(mdelay[5]);
+				P1=0x55;
+				delay(mdelay[5]);
+			}		
+		}
+		else if (SBUF_BUF == 0x36) // SBUF =&#x27;6&#x27; =#36H
+		{
+			for (n=0;n&lt;mtime[6];n++)
+			{
+				P1=0xAA;
+				delay(mdelay[6]);
+				P1=0x55;
+				delay(mdelay[6]);
+			}		
+		}
+		else if (SBUF_BUF == 0x37) // SBUF =&#x27;7&#x27; =#37H
+		{
+			for (n=0;n&lt;mtime[7];n++)
+			{
+				P1=0xAA;
+				delay(mdelay[7]);
+				P1=0x55;
+				delay(mdelay[7]);
+			}		
+		}
+		else if (SBUF_BUF == 0x38) // SBUF =&#x27;8&#x27; =#38H
+		{
+			for (n=0;n&lt;mtime[8];n++)
+			{
+				P1=0xAA;
+				delay(mdelay[8]);
+				P1=0x55;
+				delay(mdelay[8]);
+			}		
+		}
+		else
+		{
+			delay(10);
+		}
+	} 
+} 
+void delay(unsigned char s)
+{
+	unsigned char m;
+	for(m=0;m&lt;s;m++);
+}
+void Serial (void) interrupt 4 using 3
+{
+	unsigned char x;
+	RI = 0; // clear RI Flag
+	x = SBUF; // save SBUF for motor control
+
+	if(x!=0x0A &amp;&amp; x!=0x0D){
+		SBUF_BUF = x;
+		P0 = ~x; // observe SBUF
+		SBUF = x +1;	
+		while (TI==0);
+		TI = 0;
+	}
+}</code></pre></div></details><details id="35da15e2-9005-803b-b9af-d9fb93c76ec5" open="" class="toggle" dir="auto"><summary>解析</summary><div class="indented"><details id="367a15e2-9005-80a6-ab2c-cfafc48b2914" open="" class="toggle" dir="auto"><summary><code>define</code></summary><div class="indented"><pre id="367a15e2-9005-8059-8588-ec8249e68d2f" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">unsigned char SBUF_BUF; // SAVE SBUF for motor control
+// 馬達循環次數
+unsigned char code mtime[] ={ 61, 65, 73, 82, 87, 98,110,123,131,147,164,174,196,220,247, 69, 78, 92,104,116};
+// 馬達動的頻率、速度
+unsigned char code mdelay[]={253,238,212,190,179,159,142,126,119,106, 95, 89, 80, 71, 63,225,201,169,150,134};
+unsigned char n;
+//unsigned char ATEMP,DPLTEMP,DPHTEMP;</code></pre><ul id="367a15e2-9005-8070-8f93-ee6841fff523" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code>mtime</code> : 定義馬達循環次數</li></ul><ul id="367a15e2-9005-80b5-873f-e40458295097" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code>mdelay</code> : 數字越小、延遲越短，馬達高低電位切換速度越快(影響速度、頻率)</li></ul></div></details><details id="367a15e2-9005-8071-9709-e2cf28b423c6" open="" class="toggle" dir="auto"><summary><code>main</code></summary><div class="indented"><pre id="367a15e2-9005-8078-9a25-f43ee7f14492" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">void main()
+{
+	TMOD = 0x21; //	SET TIMER1 MODE 2 and TIMER0 MODE 1. (00100001B)
+	//PT0 = 1; //IP.1 SET TIMER0 INTERRUPT HIGH PRIORITY
+	//TF0 = 0; //TCON.5 CLEAR TIMER0 OVERFLOW
+	//TH0 = (65536-20000)/256;
+	//TL0 = (65536-20000)%256; // -20000 = 45536 = #B1E0H
+	//TR0 = 1; //TCON.4 SET TIMER0 RUN
+
+	TH1 = 253; // baud rate 9600=11059000/(32x12x(256-253))
+	TR1 = 1; //TCON.6 SET TIMER1 RUN
+	PCON = 0x00;
+	//	SMOD = 0; // SET PCON.7=0 (SMOD=0)
+	SCON = 0x50; // SET RS232 MODE1, RX ENABLE
+	// IE.7(SET ALL INTERRUPT ENABLE);IE.1(ENABLE TIMER0 INTERRUPT); IE.4 (ENABLE USART INT)
+	//	IE   = 0x92; // 10010010B
+	IE   = 0x90; // 10010000B
+
+	// Initial value
+	P0 = 0x00; // observe SBUF
+	P1 = 0x33; // motor stop
+
+	// ... 
+} </code></pre><hr id="367a15e2-9005-80e3-9033-ff623a4cb505" dir="auto"/><details id="367a15e2-9005-8001-a972-fc3707479eaf" open="" class="toggle" dir="auto"><summary><code>TMOD</code> 計時/計數模式控制暫存器</summary><div class="indented"><pre id="367a15e2-9005-807c-9ec0-d6e15438d3e5" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">TMOD = 0x21; //	SET TIMER1 MODE 2 and TIMER0 MODE 1. (00100001B)
+//PT0 = 1; //IP.1 SET TIMER0 INTERRUPT HIGH PRIORITY
+//TF0 = 0; //TCON.5 CLEAR TIMER0 OVERFLOW
+//TH0 = (65536-20000)/256;
+//TL0 = (65536-20000)%256; // -20000 = 45536 = #B1E0H
+//TR0 = 1; //TCON.4 SET TIMER0 RUN</code></pre><p id="367a15e2-9005-80be-a816-ea9e5206a1be" class="" dir="auto"><code>TMOD</code> 是一個 8 位元的暫存器，高 4 位元控制 Timer 1，低 4 位元控制 Timer 0。是一個核心硬體暫存器，負責設定晶片計時器模式，寫入 <code>00100001</code> 。</p><figure id="367a15e2-9005-80ec-a1bf-d45e4d29335a" class="image" data-notion-image="Introduction%20to%20Embedded%20Systems/image%201.png" dir="ltr"><a href="Introduction%20to%20Embedded%20Systems/image%201.png"><img style="width:864px" src="Introduction%20to%20Embedded%20Systems/image%201.png"/></a></figure><ul id="45564e6a-e96d-4924-a071-b539dec55a37" class="bulleted-list" dir="auto"><li style="list-style-type:disc">GATE ：<aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="367a15e2-9005-8034-855d-f28da7bfa7fa" dir="ltr"><div style="width:100%"><p id="367a15e2-9005-806f-9b74-d6b7fb7ba1c1" class="" dir="auto">以 Timer 1為例，當 GATE = 0 且 TCON 的 TR1 = 1，啟動 Timer 1 此為內部啟動。<br/>當 GATE = 1 且 TCON 的 TR1 = 1 以及 INT1 為高電位時啟動 Timer 1 此為外部啟動。</p></div></aside><details id="367a15e2-9005-809c-baf2-e950114641c1" open="" class="toggle" dir="auto"><summary><code>TCON</code></summary><div class="indented"><figure id="367a15e2-9005-80f1-ba09-e149d016dff8" class="image" data-notion-image="Introduction%20to%20Embedded%20Systems/image%202.png" dir="ltr"><a href="Introduction%20to%20Embedded%20Systems/image%202.png"><img style="width:666.9625244140625px" src="Introduction%20to%20Embedded%20Systems/image%202.png"/></a></figure><p id="b0db5571-f77f-4f93-a2ca-07b8742e0db5" class="" dir="auto">TCON 暫存器高位四位元 TF1 ~ TR0 是計時 / 計數溢位旗標與啟動開關。低位四位元是外部中斷旗標與啟動開關。</p><ul id="2c957185-883c-42e0-95de-255cc4290819" class="bulleted-list" dir="auto"><li style="list-style-type:disc">TF1 ：TF1 中斷旗標。Timer 1 觸發中斷時自動設置 1，執行完中斷函式時自動清零。</li></ul><ul id="21649351-01d5-4353-ab4a-b181a96f7542" class="bulleted-list" dir="auto"><li style="list-style-type:disc">TR1 ：TR1 啟動開關。TR1 設置 1 時啟動 Timer 1 ， TR1 設置 0 時關閉 Timer 1。</li></ul><ul id="cc061c38-f3d8-449d-bff3-9f7c42425293" class="bulleted-list" dir="auto"><li style="list-style-type:disc">TF0 ：TF0 中斷旗標。Timer 0 觸發中斷時自動設置 1，執行完中斷函式時自動清零。</li></ul><ul id="eaa576cc-96f1-403c-a7c6-b56d538625e1" class="bulleted-list" dir="auto"><li style="list-style-type:disc">TR0 ：TR0 啟動開關。TR0 設置 0 時啟動 Timer 0 ， TR0設置 0 時關閉 Timer 0。</li></ul><ul id="e03f4451-6af6-48de-9c4a-97903f9a9db9" class="bulleted-list" dir="auto"><li style="list-style-type:disc">IE1 ：INT1 中斷旗標。發生 INT 1 中斷時自動設置 1，執行完中斷函式時自動清零。</li></ul><ul id="fb7dfd2f-9a67-40be-acd6-0c0b7ea9f2c6" class="bulleted-list" dir="auto"><li style="list-style-type:disc">IT1 ：INT1 中斷型態。INT1=1 負緣觸發，INT1=0 低準位觸發。</li></ul><ul id="0e3f5aad-2603-471e-9751-05c514bb82ed" class="bulleted-list" dir="auto"><li style="list-style-type:disc">IE0 ：INT0 中斷旗標。發生 INT 0 中斷時自動設置 1，執行完中斷函式時自動清零。</li></ul><ul id="e6367c19-d61e-433d-8082-23f8167e0126" class="bulleted-list" dir="auto"><li style="list-style-type:disc">IT0 ：INT1 中斷型態。INT0=1 負緣觸發，INT0=0 低準位觸發。</li></ul></div></details></li></ul><ul id="995797c7-72b4-406f-b8f4-9b3454dc83d4" class="bulleted-list" dir="auto"><li style="list-style-type:disc">C/T ： <p id="367a15e2-9005-80e1-8a13-d1cdbfc0f6df" class="" dir="auto">內部計時 / 外部計數開關。</p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="367a15e2-9005-80c7-8829-c0c3a19a3232" dir="ltr"><div style="width:100%"><p id="367a15e2-9005-806f-9be2-ff3182e921f8" class="" dir="auto">當 C/T = 0 時使用系統時脈。<br/>當 C/T = 1 時計數器的時脈由 T1 ( Timer 1 )或 T0 ( Timer 0 ) 輸入，此時稱為外部計數。</p></div></aside></li></ul><blockquote id="367a15e2-9005-80ec-9c39-da581586b584" class="" dir="auto"><ul id="943f1075-8b4f-452c-9fe0-cb0c2c996734" class="bulleted-list" dir="auto"><li style="list-style-type:disc">高 4 位元 <code>0010</code>：<ul id="367a15e2-9005-8094-8d2c-dc1d97b7d85f" class="bulleted-list" dir="auto"><li style="list-style-type:circle">0 ( <code>Gate = 0</code> ) 0 ( <code>C/T = 0</code> ) 10 ( <code>M1 = 1</code>, <code>M0 = 0</code> )</li></ul><ul id="367a15e2-9005-80ce-832b-f062127f5782" class="bulleted-list" dir="auto"><li style="list-style-type:circle"><code>00</code> 使用內部系統時脈進行計時。</li></ul><ul id="367a15e2-9005-80e2-bc78-fee171535b2f" class="bulleted-list" dir="auto"><li style="list-style-type:circle"><code>10</code> 設定 <strong>Timer 1</strong> 為 Mode 2<ul id="367a15e2-9005-80d8-9b7b-c52b491be800" class="bulleted-list" dir="auto"><li style="list-style-type:square">作為不佔用 CPU 資源的序列通訊波特率產生器（Baud Rate Generator）。</li></ul><ul id="367a15e2-9005-8068-b9e0-e388c1bd10a4" class="bulleted-list" dir="auto"><li style="list-style-type:square">自動重載(Reload)功能:<ul id="367a15e2-9005-8054-8931-f0e7f1b3e946" class="bulleted-list" dir="auto"><li style="list-style-type:disc">TL1先被初始化成TH1的內容</li></ul><ul id="367a15e2-9005-8061-93b6-e1ca151d8c21" class="bulleted-list" dir="auto"><li style="list-style-type:disc">TL1開始計數</li></ul><ul id="367a15e2-9005-8040-853c-d633a8fb7115" class="bulleted-list" dir="auto"><li style="list-style-type:disc">TL1 overflow</li></ul><ul id="367a15e2-9005-805b-8c40-dd48d8e25bac" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Reload TL1並將TH1的值存入TL1中</li></ul></li></ul></li></ul></li></ul><ul id="714545af-75c1-4f17-ae1e-21d907cad1fc" class="bulleted-list" dir="auto"><li style="list-style-type:disc">低 4 位元 <code>0001</code>：<ul id="367a15e2-9005-80c6-b545-e9ddd17909c4" class="bulleted-list" dir="auto"><li style="list-style-type:circle"><code>01</code> 設定 <strong>Timer 0</strong> 為 Mode 1<ul id="367a15e2-9005-80b0-b06a-d79cfe78dfa1" class="bulleted-list" dir="auto"><li style="list-style-type:square">雖然在此程式中被註解未啟用，但原設計通常用於超音波回波（Echo）的時間量測</li></ul></li></ul></li></ul></blockquote><figure id="367a15e2-9005-80b1-b620-e22e77d14d91" class="image" data-notion-image="Introduction%20to%20Embedded%20Systems/image%203.png" dir="ltr"><a href="Introduction%20to%20Embedded%20Systems/image%203.png"><img style="width:662.9874877929688px" src="Introduction%20to%20Embedded%20Systems/image%203.png"/></a></figure><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="367a15e2-9005-8042-97e4-e4cb35a88eb9" dir="ltr"><div style="width:100%"><p id="367a15e2-9005-80e1-838a-e49e5f3682cb" class="" dir="auto">Reference:  <a href="https://medium.com/%E9%96%B1%E7%9B%8A%E5%A6%82%E7%BE%8E/sdcc-for-8051-04-timer-fa455daf4720">https://medium.com/%E9%96%B1%E7%9B%8A%E5%A6%82%E7%BE%8E/sdcc-for-8051-04-timer-fa455daf4720</a></p></div></aside></div></details><details id="367a15e2-9005-807d-8b9e-d42149dbfb0c" open="" class="toggle" dir="auto"><summary><code>TH1</code>, <code>TR1</code>  counter register</summary><div class="indented"><pre id="367a15e2-9005-800a-80a6-fecea9203533" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">TH1 = 253; // baud rate 9600=11059000/(32x12x(256-253))
+TR1 = 1; //TCON.6 SET TIMER1 RUN</code></pre><p id="367a15e2-9005-80fa-a71d-fab4422fce47" class="" dir="auto">使用計時 / 計數器需要設定相關暫存器才能完成計數程序，TH1, TR1就是相關的暫存器。</p><figure id="367a15e2-9005-8080-92b5-c02c41335220" class="image" data-notion-image="Introduction%20to%20Embedded%20Systems/image%204.png" dir="ltr"><a href="Introduction%20to%20Embedded%20Systems/image%204.png"><img style="width:667px" src="Introduction%20to%20Embedded%20Systems/image%204.png"/></a></figure><p id="367a15e2-9005-80d6-8dc3-ebf471570e0c" class="" dir="auto"><strong>設計 </strong><code><strong>TH1 = 253</strong></code><strong> 原因</strong><div class="indented"><p id="367a15e2-9005-80c0-9552-f1a09ea7c9a4" class="" dir="auto">透過石英震盪器除頻，調教 9600bps 使藍芽模組能順利運作。<br/>由於PMOD的設定，除頻器並沒有額外受到參數影響(下節會詳細說明)，</p><p id="367a15e2-9005-8075-8f70-e2fd30409e7f" class="" dir="auto">石英晶體震盪器頻率為 <code>11.0592MHz</code> ，傳入8051晶片後會透過三個步驟除頻(使震盪頻率降低)。</p><ul id="367a15e2-9005-8092-b78f-e6759e88140e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">每12次震盪為一週期 → 11, 059, 200 / 12 = 921, 600 Hz</li></ul><ul id="367a15e2-9005-8015-bb3b-ca37d33ba6ac" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code>Timer</code> 設定 (此程式碼設定 counter 每3次就會因為 overflow 重新計數) → 921, 600 / 3 = 307, 200 Hz</li></ul><ul id="367a15e2-9005-80d6-8b00-f0619395f1f1" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code>SMOD</code> (在 <code>PMOD</code> 暫存器中的變數, <code>0</code> ⇒ 分流32; <code>1</code> ⇒ 分流16 ) → 307, 200 / 32 = 9600 Hz </li></ul><p id="367a15e2-9005-8067-9a21-fe15d813ed59" class="" dir="auto">剛好是藍芽模組需要的 9600 bps</p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="367a15e2-9005-8092-8b4c-ddf5e9456842" dir="ltr"><div style="width:100%"><blockquote id="367a15e2-9005-8080-a905-f4b7826d5b3e" class="" dir="auto"><strong>bps</strong> 與 <strong>Hz</strong> 的核心差異在於：<strong>bps</strong> 是「數位資料」的傳輸量（多少資料），而 <strong>Hz</strong> 是「物理波動與頻率」的單位（多快頻率）</blockquote></div></aside></div></p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="367a15e2-9005-80aa-8ab6-d7cb4aee0019" dir="ltr"><div style="width:100%"><p id="367a15e2-9005-80d7-8a30-edbbf93b0e9a" class="" dir="auto">Reference: <a href="http://www.formosaos.url.tw/dp8051/dp8051timer.html">http://www.formosaos.url.tw/dp8051/dp8051timer.html</a></p></div></aside></div></details><details id="367a15e2-9005-8081-9111-c6f12e1afc2e" open="" class="toggle" dir="auto"><summary><code>PCON</code>  電源控制暫存器</summary><div class="indented"><pre id="367a15e2-9005-8023-b877-dd6b3e71319d" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">PCON = 0x00;
+//	SMOD = 0; // SET PCON.7=0 (SMOD=0)</code></pre><figure id="367a15e2-9005-80bd-a180-d34aacf6e59e" class="image" data-notion-image="Introduction%20to%20Embedded%20Systems/image%205.png" dir="ltr"><a href="Introduction%20to%20Embedded%20Systems/image%205.png"><img style="width:654.9874877929688px" src="Introduction%20to%20Embedded%20Systems/image%205.png"/></a></figure><p id="367a15e2-9005-8017-80c3-f6da233c9d41" class="" dir="auto">SMOD： <div class="indented"><p id="00265810-aef7-4744-9e67-41916e371a54" class="" dir="auto">當 SMOD=0 需 16 * 2 的計時器溢位才會接收一個 bit。<br/>當 SMOD=1 需 16 的計時器溢位才會接收一個 bit。</p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="367a15e2-9005-8002-a032-eb01f8427cc9" dir="ltr"><div style="width:100%"><p id="367a15e2-9005-8026-930d-f13129e02fe7" class="" dir="auto">Reference: <a href="https://jyhshin3.blogspot.com/2009/03/8051-uart.html">https://jyhshin3.blogspot.com/2009/03/8051-uart.html</a></p></div></aside></div></p></div></details><details id="367a15e2-9005-801f-a33c-c468d07663ab" open="" class="toggle" dir="auto"><summary><code>SCON</code>  串列埠控制暫存器</summary><div class="indented"><pre id="367a15e2-9005-807b-bc34-c6d6b7f8374e" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">SCON = 0x50; // SET RS232 MODE1, RX ENABLE</code></pre><p id="367a15e2-9005-801c-a0b7-dba0f43b41ed" class="" dir="auto">設定 <code>SCON</code> 為 <code>0101 0000</code><div class="indented"><p id="367a15e2-9005-8083-8869-f826c6158297" class="" dir="auto">實驗將工作模式設定為模式1；使用8位元、UART傳輸。<br/>且REN設置為可接收資料型式。</p><figure id="367a15e2-9005-80da-8734-fe49ec436349" class="image" data-notion-image="Introduction%20to%20Embedded%20Systems/image%206.png" dir="ltr"><a href="Introduction%20to%20Embedded%20Systems/image%206.png"><img style="width:864px" src="Introduction%20to%20Embedded%20Systems/image%206.png"/></a></figure><details id="367a15e2-9005-8000-8301-cdafef6d719d" open="" class="toggle" dir="auto"><summary><code>SM0</code> , <code>SM1</code>  (實驗設定工作模式1)</summary><div class="indented"><p id="367a15e2-9005-80f3-ab7c-c8dea708cfc6" class="" dir="auto">通常使用模式 1進行 8 位元資料傳輸。</p><figure id="367a15e2-9005-80a1-a6b7-d4b725cdf162" class="image" data-notion-image="Introduction%20to%20Embedded%20Systems/image%207.png" dir="ltr"><a href="Introduction%20to%20Embedded%20Systems/image%207.png"><img style="width:816px" src="Introduction%20to%20Embedded%20Systems/image%207.png"/></a></figure></div></details><details id="576c1536-6fea-46d9-99dc-21f73b18fb3c" open="" class="toggle" dir="auto"><summary><code>SM2</code> </summary><div class="indented"><p id="367a15e2-9005-8079-b169-e017cd902f1f" class="" dir="auto">多重處理器通訊致能。</p><blockquote id="367a15e2-9005-80a2-a2d6-ff4be98308f7" class="" dir="auto">模式 0 :  SM2 設為 0，<br/><strong>模式 1</strong> : 若 SM2為 1 則收到正確的停止位元才會使 RI 設為 1，<br/>模式 2 、模式 3 : 若 SM2 為 1 則收到第 9 位元時 ( RB8 = 1 ) 才會使 RI 設為 1。</blockquote></div></details><details id="a7327edd-eb3b-4729-9134-96331f966301" open="" class="toggle" dir="auto"><summary><code>REN</code>  (實驗設定接受資料)</summary><div class="indented"><p id="367a15e2-9005-80cc-80f8-ebf24d486199" class="" dir="auto">Receive Enable 接收致能。REN 為 1 時可以接收資料，REN 為 0 時停止接收資料。</p></div></details><details id="0bbc36bd-b031-4b8a-b419-db9c53909c66" open="" class="toggle" dir="auto"><summary><code>TB8</code> </summary><div class="indented"><p id="367a15e2-9005-80e7-a3c7-c340f15850c4" class="" dir="auto">工作於模式 2 與模式 3 時，待傳送的資料第 9 位元存放此處。</p></div></details><details id="1e38a85c-91a8-46f3-9f10-43d5f4bb94a3" open="" class="toggle" dir="auto"><summary><code>RB8</code></summary><div class="indented"><p id="367a15e2-9005-808b-9923-da0a12a71a69" class="" dir="auto">工作於模式 2 與模式 3 時，接收的資料第 9 位元存放此處。</p></div></details><details id="26411fc1-5df7-44c2-a061-cc161ca9613e" open="" class="toggle" dir="auto"><summary><code>TI</code>  傳送完資料後，觸發中斷</summary><div class="indented"><p id="367a15e2-9005-809b-bd01-feb816ce6ff1" class="" dir="auto">傳送資料中斷旗標。完成傳送一筆 8 位元或 9 位元資料時該旗標設置 1 並觸發中斷，執行完中斷服務常式後該旗標需軟體設置 0 ，不會自動設置回 0。</p></div></details><details id="6fcdea2a-a96b-452e-b53e-a1e4b30acb83" open="" class="toggle" dir="auto"><summary><code>RI</code>  接收到資料後，觸發中斷</summary><div class="indented"><p id="367a15e2-9005-8009-a945-daeada23005e" class="" dir="auto">接收資料中斷旗標。完成接收一筆 8 位元或 9 位元資料時該旗標設置 1 並觸發中斷，執行完中斷服務常式後該旗標需軟體設置 0 ，不會自動設置回 0。</p></div></details></div></p></div></details><details id="367a15e2-9005-80d0-a8de-d5c737151f67" open="" class="toggle" dir="auto"><summary><code>IE</code>  中斷致能暫存器</summary><div class="indented"><pre id="367a15e2-9005-8021-b966-d83b03939209" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">// IE.7(SET ALL INTERRUPT ENABLE);IE.1(ENABLE TIMER0 INTERRUPT); IE.4 (ENABLE USART INT)
+//	IE   = 0x92; // 10010010B
+IE   = 0x90; // 10010000B</code></pre><p id="367a15e2-9005-800e-8cfc-e36fbcaf7304" class="" dir="auto">設定暫存器數值 <code>10010000</code> ，啟動<strong>中斷功能</strong>、<strong>串列埠中斷</strong>，且關閉 <code>timer</code> 中斷以及 <code>INT</code> 中斷。<div class="indented"><figure id="367a15e2-9005-80f5-8b68-c2c5f125ba1e" class="image" data-notion-image="Introduction%20to%20Embedded%20Systems/image%208.png" dir="ltr"><a href="Introduction%20to%20Embedded%20Systems/image%208.png"><img style="width:663.9500122070312px" src="Introduction%20to%20Embedded%20Systems/image%208.png"/></a></figure><ul id="141dde12-323b-4d6b-ba3a-410e8b6c321a" class="bulleted-list" dir="auto"><li style="list-style-type:disc">EA ： <strong>中斷總開關</strong>。EA=1 啟動中斷功能，EA=0 關閉中斷功能。</li></ul><ul id="04c216af-fec5-4fc5-b239-2aefdb03bfd4" class="bulleted-list" dir="auto"><li style="list-style-type:disc">ES ：<strong>串列埠中斷開關</strong>。打開藍牙（序列埠）的專用中斷通路。當藍牙接收到訊息，<code>SCON</code> 暫存器裡的 <code>RI</code> 旗標會變成 1。ES=1 啟動串列埠中斷，ES=0關閉串列埠中斷。</li></ul><ul id="71d7cdf7-d657-4cfd-b560-10ee49ca633e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">ET1 ：Timer 1 中斷開關。ET1 =1 啟動 Timer 1 中斷， ET1=0 關閉 Timer 1 中斷。</li></ul><ul id="6a96bad7-62d4-45ce-bb47-ec329bbe8ee5" class="bulleted-list" dir="auto"><li style="list-style-type:disc">EX1 ：INT 1外部中斷開關。EX1=1 啟動INT_1 外部中斷， EX1=0 關閉INT_1 外部中斷。</li></ul><ul id="7f562397-3c0a-4708-9913-ab3bd9883d0d" class="bulleted-list" dir="auto"><li style="list-style-type:disc">ET0 ：Timer 0 中斷開關。ET0 =1 啟動 Timer 0 中斷， ET0=0 關閉 Timer 0 中斷。</li></ul><ul id="7c67e285-4cb5-4271-894a-f0239fb99ddd" class="bulleted-list" dir="auto"><li style="list-style-type:disc">EX0 ：INT 0外部中斷開關。EX0=1 啟動INT_0 外部中斷， EX0=0 關閉INT_0 外部中斷。</li></ul></div></p></div></details><details id="367a15e2-9005-8022-b4db-e6c67ef1ad82" open="" class="toggle" dir="auto"><summary><code>P0</code> , <code>P1</code>  IO輸出暫存器</summary><div class="indented"><pre id="367a15e2-9005-8064-ad7a-c643a57d36d4" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">// Initial value
+P0 = 0x00; // observe SBUF
+P1 = 0x33; // motor stop</code></pre><p id="367a15e2-9005-804a-b6f0-cf3d51d4b50e" class="" dir="auto">把 P0 埠口的 8 隻接腳全部輸出低電位（0V）。初始狀態先讓外接的 LED 全滅。<br/>把 P1 埠口設為  <code>0011 0011</code> ，這是給馬達驅動器的初始訊號，使馬達靜止。<br/> ⇒ 步記馬達會根據給的訊號進行旋轉移動，因此只要持續給定同一個訊號就無法轉動。</p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="367a15e2-9005-80b3-b6cc-dc7026637f63" dir="ltr"><div style="width:100%"><p id="367a15e2-9005-8095-9880-c4217137bd07" class="" dir="auto">Reference: <a href="https://medium.com/%E9%96%B1%E7%9B%8A%E5%A6%82%E7%BE%8E/sdcc-for-8051-02-general-purpose-input-output-gpio-2ab76332be58">https://medium.com/%E9%96%B1%E7%9B%8A%E5%A6%82%E7%BE%8E/sdcc-for-8051-02-general-purpose-input-output-gpio-2ab76332be58</a>, <a href="https://blog.udn.com/PYANG/21261115">https://blog.udn.com/PYANG/21261115</a>, <a href="https://hackmd.io/I-6vyRedSE2SF2aQwsbZTg">https://hackmd.io/I-6vyRedSE2SF2aQwsbZTg</a>, <a href="https://emmanuel-studios.blogspot.com/2020/02/l298n-rototics-by-sam-arduino-20200205.html">https://emmanuel-studios.blogspot.com/2020/02/l298n-rototics-by-sam-arduino-20200205.html</a>, <a href="https://hackmd.io/@nthu-ditrobotics/Hkzdjtjao/%2Fs%2F6tfqAJeTTomgUPWlmTtjYQ">https://hackmd.io/@nthu-ditrobotics/Hkzdjtjao/%2Fs%2F6tfqAJeTTomgUPWlmTtjYQ</a>, <a href="https://www.ariat-tech.tw/blog/L298N-Motor-Driver-Module-Wiring-and-Control-Guide.html">https://www.ariat-tech.tw/blog/L298N-Motor-Driver-Module-Wiring-and-Control-Guide.html</a></p></div></aside></div></details><details id="367a15e2-9005-80c7-9b50-efe2cecdbab9" open="" class="toggle" dir="auto"><summary><code>while</code></summary><div class="indented"><pre id="367a15e2-9005-803e-b59f-c8911c2c886f" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">while(1){
+		if (SBUF_BUF == 0x31) // SBUF =&#x27;1&#x27; =#31H
+		{
+			for (n=0;n&lt;mtime[1];n++) { P1=0xAA; delay(mdelay[1]); P1=0x55; delay(mdelay[1]); }		
+		}
+		else if (SBUF_BUF == 0x32) // 如果收到 &#x27;2&#x27; (0x32)，跑 mtime[2] (73) 次，延遲 mdelay[2] (212)
+		{
+			for (n=0;n&lt;mtime[2];n++) { P1=0xAA; delay(mdelay[2]); P1=0x55; delay(mdelay[2]); }	
+		}
+		else if (SBUF_BUF == 0x33) // 如果收到 &#x27;3&#x27; (0x33)，跑 mtime[3] (82) 次，延遲 mdelay[3] (190)
+		{
+			for (n=0;n&lt;mtime[3];n++) { P1=0xAA; delay(mdelay[3]); P1=0x55; delay(mdelay[3]); }
+		}
+		else if (SBUF_BUF == 0x34) // 如果收到 &#x27;4&#x27; (0x34)，跑 mtime[4] (87) 次，延遲 mdelay[4] (179)
+		{
+			for (n=0;n&lt;mtime[4];n++) { P1=0xAA; delay(mdelay[4]); P1=0x55; delay(mdelay[4]); }
+		}
+		else if (SBUF_BUF == 0x35) // 如果收到 &#x27;5&#x27; (0x35)，跑 mtime[5] (98) 次，延遲 mdelay[5] (159)
+		{
+			for (n=0;n&lt;mtime[5];n++) { P1=0xAA; delay(mdelay[5]); P1=0x55; delay(mdelay[5]); }		
+		}
+		else if (SBUF_BUF == 0x36) // 如果收到 &#x27;6&#x27; (0x36)，跑 mtime[6] (110) 次，延遲 mdelay[6] (142)
+		{
+			for (n=0;n&lt;mtime[6];n++) { P1=0xAA; delay(mdelay[6]); P1=0x55; delay(mdelay[6]); }		
+		}
+		else if (SBUF_BUF == 0x37) // 如果收到 &#x27;7&#x27; (0x37)，跑 mtime[7] (123) 次，延遲 mdelay[7] (126)
+		{
+			for (n=0;n&lt;mtime[7];n++) { P1=0xAA; delay(mdelay[7]); P1=0x55; delay(mdelay[7]); }		
+		}
+		else if (SBUF_BUF == 0x38) // 如果收到 &#x27;8&#x27; (0x38)，跑 mtime[8] (131) 次，延遲 mdelay[8] (119)
+		{
+			for (n=0;n&lt;mtime[8];n++) { P1=0xAA; delay(mdelay[8]); P1=0x55; delay(mdelay[8]); }		
+		}
+} </code></pre><p id="367a15e2-9005-80a3-91a5-e6852acc6ab8" class="" dir="auto">
+</p></div></details></div></details><details id="367a15e2-9005-80f4-aa9f-e05c9b36bca1" open="" class="toggle" dir="auto"><summary><code>Serial</code></summary><div class="indented"><pre id="367a15e2-9005-8005-99bd-eec4846dd86f" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">void Serial (void) interrupt 4 using 3
+{
+	unsigned char x;
+	RI = 0; // clear RI Flag
+	x = SBUF; // save SBUF for motor control
+
+	if(x!=0x0A &amp;&amp; x!=0x0D){
+		SBUF_BUF = x;
+		P0 = ~x; // observe SBUF
+		SBUF = x +1;	
+		while (TI==0);
+		TI = 0;
+	}
+}</code></pre><p id="367a15e2-9005-80f5-abe8-c9f0fd125c0a" class="" dir="auto">
+</p></div></details><details id="367a15e2-9005-8052-86d7-d0f319a39062" open="" class="toggle" dir="auto"><summary><code>delay</code> </summary><div class="indented"><pre id="367a15e2-9005-8047-820c-caf7f8c18837" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">void delay(unsigned char s)
+{
+	unsigned char m;
+	for(m=0;m&lt;s;m++);
+}</code></pre></div></details></div></details></div></details><details id="35da15e2-9005-8084-8739-f73feab75030" open="" class="toggle" dir="auto"><summary><code> .c</code> (2026_4_9-Cont)</summary><div class="indented"><p id="35da15e2-9005-80e9-9653-e3f2a414013b" class="" dir="auto">中斷。 藍芽+LED+音樂。</p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="35da15e2-9005-80dc-be7b-c543c3e7d8c3" dir="ltr"><div style="width:100%"><figure id="367a15e2-9005-80f3-aeca-c5749103f82e" class="image" data-notion-image="Introduction%20to%20Embedded%20Systems/image%209.png" dir="ltr"><a href="Introduction%20to%20Embedded%20Systems/image%209.png"><img style="width:283.9875183105469px" src="Introduction%20to%20Embedded%20Systems/image%209.png"/></a></figure></div></aside><hr id="35da15e2-9005-802f-86fc-ef0aed218251" dir="auto"/><details id="35da15e2-9005-803f-be81-e57418e53e8c" open="" class="toggle" dir="auto"><summary>Code <code> .c</code></summary><div class="indented"><pre id="35da15e2-9005-80b7-8d0e-d6e78f498346" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">#include&quot;reg51.h&quot;
+void delay(unsigned char s);
+
+unsigned char SBUF_BUF;
+unsigned char x;
+
+void main()
+{
+	TMOD = 0x21; //	SET TIMER1 MODE 2 and TIMER0 MODE 1. (00100001B)
+	
+	TH1 = 253; // baud rate 9600=11059000/(32x12x(256-253))
+	TR1 = 1; //TCON.6 SET TIMER1 RUN
+	PCON = 0x00;
+
+	SCON = 0x50; // SET RS232 MODE1, RX ENABLE
+
+	IE   = 0x90; // 10010000B
+
+	P0 = 0x00; 
+	while(1){
+		delay(10);		
+	} 
+} 
+
+void delay(unsigned char s)
+{
+	unsigned char m;
+	for(m=0;m&lt;s;m++);
+}
+
+void Serial (void) interrupt 4 using 3
+{
+	RI = 0; 
+	SBUF_BUF = SBUF;
+	if(SBUF_BUF!=0x0A &amp;&amp; SBUF_BUF!=0x0D){
+		P0 = ~SBUF_BUF;
+
+		SBUF = 0x5B;	
+		while (TI==0);
+		TI = 0;
+		for(x=0;x&lt;=3;x++){
+			SBUF = SBUF_BUF + x;	
+			while (TI==0);
+			TI = 0;
+		}
+		SBUF = 0x5D;	
+		while (TI==0);
+		TI = 0;
+	}
+}</code></pre></div></details><details id="35da15e2-9005-80bf-923c-dc55ef41f571" open="" class="toggle" dir="auto"><summary>解析</summary><div class="indented"></div></details></div></details><details id="35da15e2-9005-80be-af8b-e0349a728609" open="" class="toggle" dir="auto"><summary><code> .c</code> (2026_4_16)</summary><div class="indented"><p id="367a15e2-9005-80e2-84b1-f77dfaa54203" class="" dir="auto">兩個中斷。藍芽+時間(timer) ⇒ 自走車。</p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="35da15e2-9005-8007-a757-d8ddded11961" dir="ltr"><div style="width:100%"><p id="35da15e2-9005-8002-8771-dfb53e68d0e7" class="" dir="auto">
+</p></div></aside><hr id="35da15e2-9005-80f4-aeba-ff7a5cff1a57" dir="auto"/><details id="35da15e2-9005-8070-9bfc-d94a44f3a715" open="" class="toggle" dir="auto"><summary>Code <code> .c</code></summary><div class="indented"><pre id="35da15e2-9005-8080-ae2d-e578296b5a71" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">/*
+;					8051                                        
+;	LSi 247 Hz 4048us/2=2024us=8usx253
+;1	Do	262 Hz 3817us/2=1908us=8usx238.5
+;2	Re	294 Hz 3401us/2=1700us=8usx212.5
+;3	Mi	329 Hz 3040us/2=1520us=8usx190
+;4	Fa	349 Hz 2865us/2=1432us=8usx179
+;5	So	392 Hz 2551us/2=1275us=8usx159.4
+;6	La	440 Hz 2273us/2=1136us=8usx142
+;7	Si	494 Hz 2024us/2=1012us=8usx126.5
+;8	HDo	524 Hz 1908us/2= 954us=8usx119.25
+;9	HRe 588 Hz 1700us/2= 850us=8usx106
+;10	HMi 658 Hz 1520us/2= 760us=8usx95
+;11	HFa	698 Hz 1432us/2= 716us=8usx89
+;12	HSo 784 Hz 1275us/2= 638us=8usx80
+;13	HLa 880 Hz 1136us/2= 568us=8usx71
+;14	HSi 988 Hz 1012us/2= 506us=8usx63
+*/
+
+#include&quot;reg51.h&quot;
+void delay(unsigned char s);
+void main()
+{
+	unsigned char code song[]={5,3,3,3,4,2,2,2,1,2,3,4,5,5,5,0,0,5,3,3,3,4,2,2,2,1,3,5,5,3,3,3,0,0};
+	unsigned char code mtime[]={61,65,73,82,87,98,110,123,131,147,164,174,196,220,247};
+	unsigned char code mdelay[]={253,238,212,190,179,159,142,126,119,106,95,89,80,71,63};
+	unsigned char count;
+	unsigned char n;
+
+	unsigned char code step[]={0x11, 0x22, 0x44, 0x88};
+	unsigned char LED;
+	unsigned char motor;
+	LED=0x01;
+	P0=0xfe;
+	motor = 0;
+	P2=step[motor];
+
+	while(1)
+	{
+		for (count=0;count&lt;sizeof(song)/sizeof(song[0]);count++)
+		{
+			if (song[count]==0)
+			{
+				for (n=0;n&lt;mtime[song[count]];n++)
+				{
+					P1=0x55;//nosound
+					delay(mdelay[song[count]]);
+					P1=0x55;//nosound
+					delay(mdelay[song[count]]);
+				}
+			}
+			else
+			{
+				for (n=0;n&lt;mtime[song[count]];n++)
+				{
+					P1=0xAA;
+					delay(mdelay[song[count]]);
+					P1=0x55;
+					delay(mdelay[song[count]]);
+				
+					//step for each waveform
+					motor = motor+1;
+					if (motor == 4)
+					{
+						motor = 0;
+					}
+					P2=step[motor];
+					//step
+				}
+
+				P1=0x55;//nosound
+				delay(25);
+
+				LED=LED&lt;&lt;1; // LED for 1/4 second
+				if (LED == 0)
+				{
+				 	LED = 0x01;
+				}
+				P0 = ~LED;
+			}
+		}
+	}
+}
+
+void delay(unsigned char s)
+{
+	unsigned char m;
+	for(m=0;m&lt;s;m++);
+}
+
+
+</code></pre></div></details><details id="35da15e2-9005-80d5-8cb6-c759e43bf93c" open="" class="toggle" dir="auto"><summary>解析</summary><div class="indented"></div></details></div></details><details id="35da15e2-9005-805a-94a9-f0a01ab3a0d5" open="" class="toggle" dir="auto"><summary><code> .c</code> (2026_4_23)</summary><div class="indented"><p id="367a15e2-9005-80b7-9f25-c96668eb7cd2" class="" dir="auto">超音波。</p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="35da15e2-9005-8085-9fdf-ed2592fa04dc" dir="ltr"><div style="width:100%"><p id="35da15e2-9005-8080-9ef6-d4a637c91131" class="" dir="auto">
+</p></div></aside><hr id="35da15e2-9005-8044-b130-d9649ae02a57" dir="auto"/><details id="35da15e2-9005-8073-9326-cb7b2a7566f7" open="" class="toggle" dir="auto"><summary>Code <code> .c</code></summary><div class="indented"><pre id="35da15e2-9005-8068-839e-ff1039f615d2" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">#include &quot;REG51.H&quot;
+unsigned char DIST; // ULTRASONIC DISTANCE
+unsigned char DIST1; // SAVE DIST
+sbit P32 = P3^2;
+
+void delay(unsigned int s);
+
+void main()
+{
+
+	unsigned char code song[]={0,1,2,3,4,5,6,7,8};
+	unsigned char code mtime[]={61,65,73,82,87,98,110,123,131};
+	unsigned char code mdelay[]={253,238,212,190,179,159,142,126,119};
+	unsigned char n;
+
+
+// Initial value
+	P0 = 0x00; // observe ULTRASONIC
+	DIST1 = 0;
+	while(1)
+	{
+		DIST = 0;
+		P2=0x00;
+		P2=0x80;
+		delay(1);
+		P2=0x00;
+		delay(45);
+		while(P32 == 0)
+		{
+			P2=0x00;
+			P2=0x80;
+			delay(1);
+			P2=0x00;
+			delay(45);
+		}
+		while(P32 == 1) // echo on
+		{
+			delay(5); // 5*12us = 60us approximately 58.8us
+			DIST = DIST + 1; // distance increases 1cm
+			if (DIST &gt; 250)
+			{
+				DIST = 250;
+			}
+		}
+
+		DIST1 = DIST/5; // echo off
+		P0 = DIST;
+		if (DIST1 &lt; 9)
+		{
+			for (n=0;n&lt;mtime[song[DIST1]];n++)
+			{
+				P1=0xAA;
+				delay(mdelay[song[DIST1]]);
+				P1=0x55;
+				delay(mdelay[song[DIST1]]);
+			}
+		}
+		else
+		{
+
+		}
+
+	} // Main-Flow *************************************
+} // Main
+
+void delay(unsigned int s)
+{
+	unsigned int m;
+	for(m=0;m&lt;s;m++);
+}</code></pre></div></details><details id="35da15e2-9005-8074-a6ae-e350a0983870" open="" class="toggle" dir="auto"><summary>解析</summary><div class="indented"></div></details></div></details><details id="35da15e2-9005-808c-9d10-d570eee823bd" open="" class="toggle" dir="auto"><summary><code> .c</code> (2026_4_30)</summary><div class="indented"><p id="367a15e2-9005-80c7-8a78-c6661e538c02" class="" dir="auto">直流馬達驅動( L298N )</p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="35da15e2-9005-80cf-bf55-d2e2eb15986a" dir="ltr"><div style="width:100%"><p id="35da15e2-9005-8033-97dc-c6d03bb85e9b" class="" dir="auto">
+</p></div></aside><hr id="35da15e2-9005-80b0-a6a1-ea1765d9dea2" dir="auto"/><details id="35da15e2-9005-80ac-b6d3-d88c43da2910" open="" class="toggle" dir="auto"><summary>Code <code> .c</code></summary><div class="indented"><pre id="35da15e2-9005-804d-bb80-ee3da00d9baa" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">#include&quot;reg51.h&quot;
+void delay(unsigned int s);
+sbit P27 = P2^7;
+sbit P32 = P3^2;
+//sbit SMOD= PCON^7;
+unsigned char PSW_BUF; // SAVE PSW in USART INT
+unsigned char SBUF_BUF; // SAVE SBUF for motor control
+unsigned char AUTO; // auto = 0x00 is manual car, auto = 0xff is auto car
+unsigned char DIST; // ULTRASONIC DISTANCE
+unsigned char DIST_BUF; // SAVE DIST
+
+unsigned char ATEMP,PSWTEMP,DPLTEMP,DPHTEMP;
+
+void main()
+{
+	TMOD = 0x21; //	SET TIMER1 MODE 2 and TIMER0 MODE 1. (00100001B)
+	PT0 = 1; //IP.1 SET TIMER0 INTERRUPT HIGH PRIORITY
+	TF0 = 0; //TCON.5 CLEAR TIMER0 OVERFLOW
+	TH0 = (65536-20000)/256;
+	TL0 = (65536-20000)%256; // -20000 = 45536 = #B1E0H
+	TR0 = 1; //TCON.4 SET TIMER0 RUN
+
+	TH1 = 253; // baud rate 9600=110592000/(32x12x(256-253))
+	TR1 = 1; //TCON.6 SET TIMER1 RUN
+	PCON = 0x00;
+//	SMOD = 0; // SET PCON.7=0 (SMOD=0)
+	SCON = 0x50; // SET RS232 MODE1, RX ENABLE
+// IE.7(SET ALL INTERRUPT ENABLE);IE.1(ENABLE TIMER0 INTERRUPT); IE.4 (ENABLE USART INT)
+	IE   = 0x92; // 10010010B
+
+// Initial value
+	P0 = 0x00; // observe SBUF
+	P1 = 0x00; // motor stop
+	P2 = 0x00; // ultrasonic stop
+	AUTO = 0x00; // auto = 0x00 is manual car, auto = 0xff is auto car
+	DIST_BUF = 0x00; // Reset DIST_BUF
+// Main-Flow ********************************************
+	while(1)
+	{
+		DIST = 0x00; // Reset DIST
+		P27 = 1; // Trig for ULTRASONIC
+		delay(1); // 12 us
+		P27 = 0; // Trig for ULTRASONIC		
+//-------------------------------------------------------
+//		while(P32 == 0) // echo wait
+		delay(45); // 540 us
+		while(P32 == 0) // echo wait 500us or 2300us, 2023/03/31
+		{
+			P27 = 1; // Trig for ULTRASONIC
+			delay(1); // 12 us
+			P27 = 0; // Trig for ULTRASONIC		
+			delay(45); // 540 us
+		}
+
+		while(P32 == 1) // echo on
+		{
+			delay(5); // 5*12us = 60us approximately 58.8us
+			DIST = DIST + 1; // distance increases 1cm
+			if (DIST &gt; 250)
+			{
+				DIST = 250;
+			}
+		}
+		//if (DIST &gt; 0)
+		//{
+			DIST_BUF = DIST; // echo off
+		//}
+//-------------------------------------------------------
+		if (AUTO == 0xFF) // auto = 0x00 is manual car, auto = 0xff is auto car
+		{
+			if (DIST_BUF &gt; 10)
+			{
+				P1 = 0x0A; // Forward run #00001010
+			}
+			else
+			{
+				P1 = 0x00; // motor stop
+				delay(8333); // 8333*12us = 0.1 sec
+				P1 = 0x06; // motor turn left #00000110
+				delay(41667); // 41667*12us = 0.5sec
+				P1 = 0x00; // motor stop
+			}
+
+		}
+
+	} // Main-Flow **
+} // Main
+
+void delay(unsigned int s)
+{
+	unsigned int m;
+	for(m=0;m&lt;s;m++);
+}
+
+void Serial (void) interrupt 4 using 3
+{
+	PSW_BUF = PSW; // save PSW
+	RI = 0; // clear RI Flag
+	P0 = SBUF; // observe SBUF
+	SBUF_BUF = SBUF; // save SBUF for motor control
+
+// &#x27;C&#x27; = #43H
+	if (SBUF_BUF == 0x43)
+	{
+		//AUTO = !AUTO; // error using 20180504 
+		AUTO = ~AUTO;// auto = 0x00 is manual car, auto = 0xff is auto car
+		P1 = 0x00; // motor stop
+	}
+
+	PSW = PSW_BUF; // get PSW
+}
+
+void Timer0(void) interrupt 1 using 1
+{
+	ATEMP  =ACC;
+	PSWTEMP=PSW;
+	DPLTEMP=DPL;
+	DPHTEMP=DPH;
+	TR0=0; // STOP TIMER
+	TH0  = (65536-20000)/256;
+	TL0  = (65536-20000)%256;
+	TR0=1; // TIMER0 TO BE CONTINUE
+
+	if (AUTO == 0x00) // auto = 0x00 is manual car, auto = 0xff is auto car
+	{
+		if (SBUF_BUF == 0x51) // stop, SBUF =&#x27;Q&#x27; =#51H
+		{
+			P1 = 0x00; // motor stop
+		}
+		else if (SBUF_BUF == 0x53) // back, SBUF =&#x27;S&#x27; =#53H
+		{
+			P1 = 0x05; // motor back, #00000101B	
+		}
+		else if (SBUF_BUF == 0x44) // right, SBUF =&#x27;D&#x27; =#44H
+		{
+			P1 = 0x09; // motor right, #00001001B
+		}
+		else if (SBUF_BUF == 0x41) // left, SBUF =&#x27;A&#x27; =#41H
+		{
+			P1 = 0x06; // motor left, #00000110B
+		}
+		else if (SBUF_BUF == 0x57) // forward, SBUF =&#x27;W&#x27; =#57H
+		{
+			if (DIST_BUF &gt; 10)
+			{
+				P1 = 0x0A; // motor forward, #00001010B
+			}
+			else
+			{
+				P1 = 0x00; // motor stop, short distance
+			}
+		}
+		else
+		{}
+	}
+
+// RETURN:
+	ACC=ATEMP;
+	PSW=PSWTEMP;
+	DPL=DPLTEMP;
+	DPH=DPHTEMP;
+}
+</code></pre></div></details><details id="35da15e2-9005-8034-91b9-e590624a2656" open="" class="toggle" dir="auto"><summary>解析</summary><div class="indented"></div></details></div></details><details id="35da15e2-9005-8046-aef3-d9cd4682d0cc" open="" class="toggle" dir="auto"><summary><code> .c</code> (2026_5_7)</summary><div class="indented"><p id="367a15e2-9005-80e7-b479-e94c088bbc37" class="" dir="auto">I^2C</p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="35da15e2-9005-80f3-b497-ef2d0061a596" dir="ltr"><div style="width:100%"><p id="35da15e2-9005-80f3-8634-d9ff6f6be815" class="" dir="auto">
+</p></div></aside><hr id="35da15e2-9005-8044-aed3-fea9cf3c5f0e" dir="auto"/><details id="35da15e2-9005-802a-aa44-db788674bc44" open="" class="toggle" dir="auto"><summary>Code <code> .c</code></summary><div class="indented"><details id="35da15e2-9005-809b-ba1e-f4590c5fbbd1" open="" class="toggle" dir="auto"><summary>Define &amp; Main</summary><div class="indented"><pre id="35da15e2-9005-80f2-9c5b-c2428fec797e" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">/*
+; 20210115 Chung-Chuan Hou (20260421)
+; DS18B20 Temperature Sensor Left 1:GND, 2:I/O, 3: VDD 3.0-5.5V, 12bit(750ms)
+; P0.0 out, P2.0 in
+
+; #include &quot;REG52352.h&quot;
+; /* DS18B20 programmable resolution 1-wire digital thermometer
+; Reset: CPU 1-&gt;0:480-960us(500us)      ,     0-&gt;1:15-60us(60us), DS18 o X s T  1-&gt;0:60-240us CPU   즨 \, CPU A  480us
+; Skip ROM [ccH]
+; Convert T [44H]: Temperature conversion takes up to 750ms (12bit)
+; Read T (0BEH : 0 LS byte, 1 MS byte)
+
+; write #CCH=1100 1100 skip ROM command
+; write #44H=0100 0100 convert Temperature 750ms
+; rwDS18 reset DS18B20 and wait DS18B20
+; write #CCH=1100 1100
+; write #BEH=1011 1110 read scratchpad
+; READTEMP:	 P1.0-&gt;P1.7 P3.0-&gt;P3.7
+; P3.0 is bit8(2^4=16), P1.4 is bit4(2^0=1), P1.3 is bit3(2^-1=0.5)
+
+RC 100K  
+*/
+#include&quot;reg51.h&quot;
+void delay(unsigned int s);
+void delay8u(unsigned char r);
+void writeCC();
+void write44();
+void rwDS18();
+void writeBE();
+void readTEMP();
+	sbit P00 = P0^0;
+	sbit P20 = P2^0;
+
+	sbit P10 = P1^0;
+	sbit P11 = P1^1;
+	sbit P12 = P1^2;
+	sbit P13 = P1^3;
+	sbit P14 = P1^4;
+	sbit P15 = P1^5;
+	sbit P16 = P1^6;
+	sbit P17 = P1^7;
+
+	sbit P30 = P3^0;
+	sbit P31 = P3^1;
+	sbit P32 = P3^2;
+	sbit P33 = P3^3;
+	sbit P34 = P3^4;
+	sbit P35 = P3^5;
+	sbit P36 = P3^6;
+	sbit P37 = P3^7;
+	
+	void main()
+{
+	P1 = 0xff;
+	P3 = 0xAA;	
+	while(1)
+	{
+//		P1 = 0;
+//		P3 = 0;
+		P00 = 1; // reset DS18B20
+		delay(42); // 500us
+		P00 = 0;
+		delay(42); // reset DS18B20
+
+		P00 = 1; // wait DS18
+		delay(7); // P0.0=1 60us wait DS18B20
+
+		if ( P20 == 0)	// if P20 = 0,OKDS18
+		{
+			delay(35); // P0.0=1 440us wait DS18B20
+			writeCC(); // write #CCH=1100 1100 skip ROM command
+			write44(); // write #44H=0100 0100 convert Temperature 750ms
+			rwDS18(); // reset DS18B20 and wait DS18B20
+			writeCC(); // write #CCH=1100 1100 skip ROM command
+			writeBE(); // write #BEH=1011 1110 read scratchpad
+			readTEMP(); // READTEMP:	 P1.0-&gt;P1.7 P3.0-&gt;P3.7
+		}
+		else
+		{
+			P37 = 0; // DS18 ERROR
+		}
+		delay(62500); // wait 0.75 sec
+	}
+}
+</code></pre></div></details><details id="35da15e2-9005-80d4-afbd-ffcf4da4387d" open="" class="toggle" dir="auto"><summary>Function</summary><div class="indented"><pre id="35da15e2-9005-8081-a686-ccb80b80381b" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">void delay(unsigned int s)
+{
+	unsigned int m;
+	for(m=0;m&lt;s;m++);
+}
+
+void delay8u(unsigned char r)
+{
+	unsigned char n;
+	for(n=0;n&lt;r;n++);
+}
+
+// write #CCH=1100 1100 skip ROM command
+void writeCC() // 11001100
+{
+	// bit0=0
+	P00 = 1;
+	P00 = 0;
+	P00 = 0; // bit0=0
+	delay8u(7); // P0.0=0 60us=56+4
+	// bit1=0
+	P00 = 1;
+	P00 = 0;
+	P00 = 0; // bit1=0
+	delay8u(7); // P0.0=0 60us=56+4
+	// bit2=1
+	P00 = 1;
+	P00 = 0;
+	P00 = 1; // bit2=1
+	delay8u(7); // P0.0=1 60us=56+4
+	// bit3=1
+	P00 = 1;
+	P00 = 0;
+	P00 = 1; // bit3=1
+	delay8u(7); // P0.0=1 60us=56+4
+	// bit4=0
+	P00 = 1;
+	P00 = 0;
+	P00 = 0; // bit4=0
+	delay8u(7); // P0.0=0 60us=56+4
+	// bit5=0
+	P00 = 1;
+	P00 = 0;
+	P00 = 0; // bit5=0
+	delay8u(7); // P0.0=0 60us=56+4
+	// bit6=1
+	P00 = 1;
+	P00 = 0;
+	P00 = 1; // bit6=1
+	delay8u(7); // P0.0=1 60us=56+4
+	// bit7=1
+	P00 = 1;
+	P00 = 0;
+	P00 = 1; // bit7=1
+	delay8u(7); // P0.0=1 60us=56+4
+}
+
+// write #44H=0100 0100 convert Temperature 750ms
+void write44()
+{
+	// bit0=0
+	P00 = 1;
+	P00 = 0;
+	P00 = 0; // bit0=0
+	delay8u(7); // P0.0=0 60us=56+4
+	// bit1=0
+	P00 = 1;
+	P00 = 0;
+	P00 = 0; // bit1=0
+	delay8u(7); // P0.0=0 60us=56+4
+	// bit2=1
+	P00 = 1;
+	P00 = 0;
+	P00 = 1; // bit2=1
+	delay8u(7); // P0.0=1 60us=56+4
+	// bit3=0
+	P00 = 1;
+	P00 = 0;
+	P00 = 0; // bit3=0
+	delay8u(7); // P0.0=0 60us=56+4
+	// bit4=0
+	P00 = 1;
+	P00 = 0;
+	P00 = 0; // bit4=0
+	delay8u(7); // P0.0=0 60us=56+4
+	// bit5=0
+	P00 = 1;
+	P00 = 0;
+	P00 = 0; // bit5=0
+	delay8u(7); // P0.0=0 60us=56+4
+	// bit6=1
+	P00 = 1;
+	P00 = 0;
+	P00 = 1; // bit6=1
+	delay8u(7); // P0.0=1 60us=56+4
+	// bit7=0
+	P00 = 1;
+	P00 = 0;
+	P00 = 0; // bit7=0
+	delay8u(7); // P0.0=0 60us=56+4
+}
+
+// reset DS18B20 and wait DS18B20
+// Reset: CPU 1-&gt;0:480-960us(500us)      ,     0-&gt;1:15-60us(60us), DS18 o X s T  1-&gt;0:60-240us CPU   즨 \, CPU A  480us
+void rwDS18()
+{
+	P00 = 1;
+	delay(5);
+	P00 = 0;
+	delay(42); // reset DS18B20
+
+	P00 = 1;
+	delay(42); // P0.0=1 500us wait DS18B20
+}
+
+// write #BEH=1011 1110 read scratchpad
+void writeBE()
+{
+	// bit0=0
+	P00 = 1;
+	P00 = 0;
+	P00 = 0; // bit0=0
+	delay8u(7); // P0.0=0 60us=56+4
+	// bit1=1
+	P00 = 1;
+	P00 = 0;
+	P00 = 1; // bit1=1
+	delay8u(7); // P0.0=0 60us=56+4
+	// bit2=1
+	P00 = 1;
+	P00 = 0;
+	P00 = 1; // bit2=1
+	delay8u(7); // P0.0=1 60us=56+4
+	// bit3=1
+	P00 = 1;
+	P00 = 0;
+	P00 = 1; // bit3=1
+	delay8u(7); // P0.0=1 60us=56+4
+	// bit4=1
+	P00 = 1;
+	P00 = 0;
+	P00 = 1; // bit4=1
+	delay8u(7); // P0.0=0 60us=56+4
+	// bit5=1
+	P00 = 1;
+	P00 = 0;
+	P00 = 1; // bit5=1
+	delay8u(7); // P0.0=0 60us=56+4
+	// bit6=0
+	P00 = 1;
+	P00 = 0;
+	P00 = 0; // bit6=0
+	delay8u(7); // P0.0=1 60us=56+4
+	// bit7=1
+	P00 = 1;
+	P00 = 0;
+	P00 = 1; // bit7=1
+	delay8u(7); // P0.0=1 60us=56+4
+}
+
+// READTEMP:	 P1.0-&gt;P1.7 P3.0-&gt;P3.7
+void readTEMP()
+{
+	//read Bit0
+	P00 = 1;
+	P00 = 0;
+	P00 = 1;
+	delay8u(1); // read wait 8us
+	if(P20 == 0)
+	{ P10 = 0; } // Bit0 = 0
+	else
+	{ P10 = 1; } // Bit0 = 1
+	delay(5); // read wait 60us
+
+	// read Bit1
+	P00 = 1;
+	P00 = 0;
+	P00 = 1;
+	delay8u(1); // read wait 8us
+	if(P20 == 0)
+	{ P11 = 0; } // Bit1 = 0
+	else
+	{ P11 = 1; } // Bit1 = 1
+	delay(5); // read wait 60us
+
+	//read Bit2
+	P00 = 1;
+	P00 = 0;
+	P00 = 1;
+	delay8u(1); // read wait 8us
+	if(P20 == 0)
+	{ P12 = 0; } // Bit2 = 0
+	else
+	{ P12 = 1; } // Bit2 = 1
+	delay(5); // read wait 60us
+
+	// read Bit3
+	P00 = 1;
+	P00 = 0;
+	P00 = 1;
+	delay8u(1); // read wait 8us
+	if(P20 == 0)
+	{ P13 = 0; } // Bit3 = 0
+	else
+	{ P13 = 1; } // Bit3 = 1
+	delay(5); // read wait 60us
+
+	//read Bit4
+	P00 = 1;
+	P00 = 0;
+	P00 = 1;
+	delay8u(1); // read wait 8us
+	if(P20 == 0)
+	{ P14 = 0; } // Bit4 = 0
+	else
+	{ P14 = 1; } // Bit4 = 1
+	delay(5); // read wait 60us
+
+	// read Bit5
+	P00 = 1;
+	P00 = 0;
+	P00 = 1;
+	delay8u(1); // read wait 8us
+	if(P20 == 0)
+	{ P15 = 0; } // Bit5 = 0
+	else
+	{ P15 = 1; } // Bit5 = 1
+	delay(5); // read wait 60us
+
+	//read Bit6
+	P00 = 1;
+	P00 = 0;
+	P00 = 1;
+	delay8u(1); // read wait 8us
+	if(P20 == 0)
+	{ P16 = 0; } // Bit6 = 0
+	else
+	{ P16 = 1; } // Bit6 = 1
+	delay(5); // read wait 60us
+
+	// read Bit7
+	P00 = 1;
+	P00 = 0;
+	P00 = 1;
+	delay8u(1); // read wait 8us
+	if(P20 == 0)
+	{ P17 = 0; } // Bit7 = 0
+	else
+	{ P17 = 1; } // Bit7 = 1
+	delay(5); // read wait 60us
+
+	//read HBit0
+	P00 = 1;
+	P00 = 0;
+	P00 = 1;
+	delay8u(1); // read wait 8us
+	if(P20 == 0)
+	{ P30 = 0; } // HBit0 = 0
+	else
+	{ P30 = 1; } // HBit0 = 1
+	delay(5); // read wait 60us
+
+	// read HBit1
+	P00 = 1;
+	P00 = 0;
+	P00 = 1;
+	delay8u(1); // read wait 8us
+	if(P20 == 0)
+	{ P31 = 0; } // HBit1 = 0
+	else
+	{ P31 = 1; } // HBit1 = 1
+	delay(5); // read wait 60us
+
+	//read HBit2
+	P00 = 1;
+	P00 = 0;
+	P00 = 1;
+	delay8u(1); // read wait 8us
+	if(P20 == 0)
+	{ P32 = 0; } // HBit2 = 0
+	else
+	{ P32 = 1; } // HBit2 = 1
+	delay(5); // read wait 60us
+
+	// read HBit3
+	P00 = 1;
+	P00 = 0;
+	P00 = 1;
+	delay8u(1); // read wait 8us
+	if(P20 == 0)
+	{ P33 = 0; } // HBit3 = 0
+	else
+	{ P33 = 1; } // HBit3 = 1
+	delay(5); // read wait 60us
+
+	//read HBit4
+	P00 = 1;
+	P00 = 0;
+	P00 = 1;
+	delay8u(1); // read wait 8us
+	if(P20 == 0)
+	{ P34 = 0; } // HBit4 = 0
+	else
+	{ P34 = 1; } // HBit4 = 1
+	delay(5); // read wait 60us
+
+	// read HBit5
+	P00 = 1;
+	P00 = 0;
+	P00 = 1;
+	delay8u(1); // read wait 8us
+	if(P20 == 0)
+	{ P35 = 0; } // HBit5 = 0
+	else
+	{ P35 = 1; } // HBit5 = 1
+	delay(5); // read wait 60us
+
+	//read HBit6
+	P00 = 1;
+	P00 = 0;
+	P00 = 1;
+	delay8u(1); // read wait 8us
+	if(P20 == 0)
+	{ P36 = 0; } // HBit6 = 0
+	else
+	{ P36 = 1; } // HBit6 = 1
+	delay(5); // read wait 60us
+
+	// read HBit7
+	P00 = 1;
+	P00 = 0;
+	P00 = 1;
+	delay8u(1); // read wait 8us
+	if(P20 == 0)
+	{ P37 = 0; } // HBit7 = 0
+	else
+	{ P37 = 1; } // HBit7 = 1
+	delay(5); // read wait 60us
+}</code></pre></div></details><details id="35da15e2-9005-8046-9c23-fb3c33f700a1" open="" class="toggle" dir="auto"><summary>Assembly Code</summary><div class="indented"><pre id="35da15e2-9005-80f7-98cb-d2d2b1d8e068" class="code code-wrap" data-notion-code-syntax="c"><code class="language-c" style="white-space:pre-wrap;word-break:break-all">/*
+	ORG		0000H
+	LJMP	START
+START:
+	MOV		P1,#0
+	MOV		P3,#0
+
+	SETB	P0.0
+	MOV		R6,#250
+	DJNZ	R6,$	; P0.0=1 500us 
+	CLR		P0.0
+	MOV		R6,#250
+	DJNZ	R6,$	; P0.0=0 500us reset DS18B20
+WAITDS18:
+	SETB	P0.0
+	MOV		R6,#30
+	DJNZ	R6,$	; P0.0=1 60us wait DS18B20
+	JNB		P2.0,OKDS18
+	MOV		R6,#10
+	DJNZ	R6,$	; P0.0=1 10us wait DS18B20
+	JNB		P2.0,OKDS18
+	SETB	P3.7
+ERROR:
+	CALL	DELAY	; wait 1s
+	LJMP	START
+
+
+ 60-240 us LOW DS18B20
+OKDS18:
+	MOV		R6,#220
+	DJNZ	R6,$	; P0.0=1 440us wait DS18B20
+
+; write #CCH=1100 1100 skip ROM command
+WR_CC:
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; bit0=0
+	MOV		R6,#28
+	DJNZ	R6,$	; P0.0=0 60us=56+4
+	;----------
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; bit1=0
+	MOV		R6,#28
+	DJNZ	R6,$	; P0.0=0 60us=56+4
+	;----------
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; P0.0=0
+	SETB	P0.0	; bit2=1
+	MOV		R6,#27
+	DJNZ	R6,$	; P0.0=1 60us=54+6
+	;----------
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; P0.0=0
+	SETB	P0.0	; bit3=1
+	MOV		R6,#27
+	DJNZ	R6,$	; P0.0=1 60us=54+6
+	;----------
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; bit4=0
+	MOV		R6,#28
+	DJNZ	R6,$	; P0.0=0 60us=56+4
+	;----------
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; bit5=0
+	MOV		R6,#28
+	DJNZ	R6,$	; P0.0=0 60us=56+4
+	;----------
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; P0.0=0
+	SETB	P0.0	; bit6=1
+	MOV		R6,#27
+	DJNZ	R6,$	; P0.0=1 60us=54+6
+	;----------
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; P0.0=0
+	SETB	P0.0	; bit7=1
+	MOV		R6,#27
+	DJNZ	R6,$	; P0.0=1 60us=54+6
+	;----------
+; write #44H=0100 0100 convert Temperature 750ms
+WR_44:
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; bit0=0
+	MOV		R6,#28
+	DJNZ	R6,$	; P0.0=0 60us=56+4
+	;----------
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; bit1=0
+	MOV		R6,#28
+	DJNZ	R6,$	; P0.0=0 60us=56+4
+	;----------
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; P0.0=0
+	SETB	P0.0	; bit2=1
+	MOV		R6,#27
+	DJNZ	R6,$	; P0.0=1 60us=54+6
+	;----------
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; bit3=0
+	MOV		R6,#28
+	DJNZ	R6,$	; P0.0=0 60us=56+4
+	;----------
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; bit4=0
+	MOV		R6,#28
+	DJNZ	R6,$	; P0.0=0 60us=56+4
+	;----------
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; bit5=0
+	MOV		R6,#28
+	DJNZ	R6,$	; P0.0=0 60us=56+4
+	;----------
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; P0.0=0
+	SETB	P0.0	; bit6=1
+	MOV		R6,#27
+	DJNZ	R6,$	; P0.0=1 60us=54+6
+	;----------
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; bit7=0
+	MOV		R6,#28
+	DJNZ	R6,$	; P0.0=0 60us=56+4
+	;----------
+; Reset: CPU 1-&gt;0:480-960us(500us)      ,     0-&gt;1:15-60us(60us), DS18 o X s T  1-&gt;0:60-240us CPU   즨 \, CPU A  480us
+RDS18:
+	SETB	P0.0
+	MOV		R6,#30
+	DJNZ	R6,$	; P0.0=1 60us
+	CLR		P0.0
+	MOV		R6,#250
+	DJNZ	R6,$	; P0.0=0 500us reset DS18B20
+WDS18:
+	SETB	P0.0
+	MOV		R6,#250
+	DJNZ	R6,$	; P0.0=1 60us wait DS18B20
+	;----------
+; write #CCH=1100 1100
+WRITE_CC:
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; bit0=0
+	MOV		R6,#28
+	DJNZ	R6,$	; P0.0=0 60us=56+4
+	;----------
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; bit1=0
+	MOV		R6,#28
+	DJNZ	R6,$	; P0.0=0 60us=56+4
+	;----------
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; P0.0=0
+	SETB	P0.0	; bit2=1
+	MOV		R6,#27
+	DJNZ	R6,$	; P0.0=1 60us=54+6
+	;----------
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; P0.0=0
+	SETB	P0.0	; bit3=1
+	MOV		R6,#27
+	DJNZ	R6,$	; P0.0=1 60us=54+6
+	;----------
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; bit4=0
+	MOV		R6,#28
+	DJNZ	R6,$	; P0.0=0 60us=56+4
+	;----------
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; bit5=0
+	MOV		R6,#28
+	DJNZ	R6,$	; P0.0=0 60us=56+4
+	;----------
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; P0.0=0
+	SETB	P0.0	; bit6=1
+	MOV		R6,#27
+	DJNZ	R6,$	; P0.0=1 60us=54+6
+	;----------
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; P0.0=0
+	SETB	P0.0	; bit7=1
+	MOV		R6,#27
+	DJNZ	R6,$	; P0.0=1 60us=54+6
+	;----------
+; write #BEH=1011 1110 read scratchpad
+WR_BE:
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; bit0=0
+	MOV		R6,#28
+	DJNZ	R6,$	; P0.0=0 60us=56+4
+	;----------
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; P0.0=0
+	SETB	P0.0	; bit1=1
+	MOV		R6,#27
+	DJNZ	R6,$	; P0.0=1 60us=54+6
+	;----------
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; P0.0=0
+	SETB	P0.0	; bit2=1
+	MOV		R6,#27
+	DJNZ	R6,$	; P0.0=1 60us=54+6
+	;----------
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; P0.0=0
+	SETB	P0.0	; bit3=1
+	MOV		R6,#27
+	DJNZ	R6,$	; P0.0=1 60us=54+6
+	;----------
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; P0.0=0
+	SETB	P0.0	; bit4=1
+	MOV		R6,#27
+	DJNZ	R6,$	; P0.0=1 60us=54+6
+	;----------
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; P0.0=0
+	SETB	P0.0	; bit5=1
+	MOV		R6,#27
+	DJNZ	R6,$	; P0.0=1 60us=54+6
+	;----------
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; bit6=0
+	MOV		R6,#28
+	DJNZ	R6,$	; P0.0=0 60us=56+4
+	;----------
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; P0.0=0
+	SETB	P0.0	; bit7=1
+	MOV		R6,#27
+	DJNZ	R6,$	; P0.0=1 60us=54+6
+	;----------
+	;CALL	DELAY
+	;LJMP	START
+	;----------
+;READTEMP:
+Bit0:
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; P0.0=0
+	SETB	P0.0	; P0.0=1
+	MOV		R6,#4
+	DJNZ	R6,$	; P0.0=1 16us=8+8
+	JNB		P2.0,Bit0_0
+Bit0_1:
+	SETB	P1.0
+	JMP		Bit0_wait
+Bit0_0:
+	CLR		P1.0
+Bit0_wait:
+	MOV		R6,#20
+	DJNZ	R6,$	; read 60us
+	;----------
+Bit1:
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; P0.0=0
+	SETB	P0.0	; P0.0=1
+	MOV		R6,#4
+	DJNZ	R6,$	; P0.0=1 16us=8+8
+	JNB		P2.0,Bit1_0
+Bit1_1:
+	SETB	P1.1
+	JMP		Bit1_wait
+Bit1_0:
+	CLR		P1.1
+Bit1_wait:
+	MOV		R6,#20
+	DJNZ	R6,$	; read 60us
+	;----------	
+Bit2:
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; P0.0=0
+	SETB	P0.0	; P0.0=1
+	MOV		R6,#4
+	DJNZ	R6,$	; P0.0=1 16us=8+8
+	JNB		P2.0,Bit2_0
+Bit2_1:
+	SETB	P1.2
+	JMP		Bit2_wait
+Bit2_0:
+	CLR		P1.2
+Bit2_wait:
+	MOV		R6,#20
+	DJNZ	R6,$	; read 60us
+	;----------
+Bit3:
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; P0.0=0
+	SETB	P0.0	; P0.0=1
+	MOV		R6,#4
+	DJNZ	R6,$	; P0.0=1 16us=8+8
+	JNB		P2.0,Bit3_0
+Bit3_1:
+	SETB	P1.3
+	JMP		Bit3_wait
+Bit3_0:
+	CLR		P1.3
+Bit3_wait:
+	MOV		R6,#20
+	DJNZ	R6,$	; read 60us
+	;----------
+Bit4:
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; P0.0=0
+	SETB	P0.0	; P0.0=1
+	MOV		R6,#4
+	DJNZ	R6,$	; P0.0=1 16us=8+8
+	JNB		P2.0,Bit4_0
+Bit4_1:
+	SETB	P1.4
+	JMP		Bit4_wait
+Bit4_0:
+	CLR		P1.4
+Bit4_wait:
+	MOV		R6,#20
+	DJNZ	R6,$	; read 60us
+	;----------
+Bit5:
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; P0.0=0
+	SETB	P0.0	; P0.0=1
+	MOV		R6,#4
+	DJNZ	R6,$	; P0.0=1 16us=8+8
+	JNB		P2.0,Bit5_0
+Bit5_1:
+	SETB	P1.5
+	JMP		Bit5_wait
+Bit5_0:
+	CLR		P1.5
+Bit5_wait:
+	MOV		R6,#20
+	DJNZ	R6,$	; read 60us
+	;----------
+Bit6:
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; P0.0=0
+	SETB	P0.0	; P0.0=1
+	MOV		R6,#4
+	DJNZ	R6,$	; P0.0=1 16us=8+8
+	JNB		P2.0,Bit6_0
+Bit6_1:
+	SETB	P1.6
+	JMP		Bit6_wait
+Bit6_0:
+	CLR		P1.6
+Bit6_wait:
+	MOV		R6,#20
+	DJNZ	R6,$	; read 60us
+	;----------
+Bit7:
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; P0.0=0
+	SETB	P0.0	; P0.0=1
+	MOV		R6,#4
+	DJNZ	R6,$	; P0.0=1 16us=8+8
+	JNB		P2.0,Bit7_0
+Bit7_1:
+	SETB	P1.7
+	JMP		Bit7_wait
+Bit7_0:
+	CLR		P1.7
+Bit7_wait:
+	MOV		R6,#20
+	DJNZ	R6,$	; read 60us
+	;----------
+HBit0:
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; P0.0=0
+	SETB	P0.0	; P0.0=1
+	MOV		R6,#4
+	DJNZ	R6,$	; P0.0=1 16us=8+8
+	JNB		P2.0,HBit0_0
+HBit0_1:
+	SETB	P3.0
+	JMP		HBit0_wait
+HBit0_0:
+	CLR		P3.0
+HBit0_wait:
+	MOV		R6,#20
+	DJNZ	R6,$	; read 60us
+	;----------
+HBit1:
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; P0.0=0
+	SETB	P0.0	; P0.0=1
+	MOV		R6,#4
+	DJNZ	R6,$	; P0.0=1 16us=8+8
+	JNB		P2.0,HBit1_0
+HBit1_1:
+	SETB	P3.1
+	JMP		HBit1_wait
+HBit1_0:
+	CLR		P3.1
+HBit1_wait:
+	MOV		R6,#20
+	DJNZ	R6,$	; read 60us
+	;----------	
+HBit2:
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; P0.0=0
+	SETB	P0.0	; P0.0=1
+	MOV		R6,#4
+	DJNZ	R6,$	; P0.0=1 16us=8+8
+	JNB		P2.0,HBit2_0
+HBit2_1:
+	SETB	P3.2
+	JMP		HBit2_wait
+HBit2_0:
+	CLR		P3.2
+HBit2_wait:
+	MOV		R6,#20
+	DJNZ	R6,$	; read 60us
+	;----------
+HBit3:
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; P0.0=0
+	SETB	P0.0	; P0.0=1
+	MOV		R6,#4
+	DJNZ	R6,$	; P0.0=1 16us=8+8
+	JNB		P2.0,HBit3_0
+HBit3_1:
+	SETB	P3.3
+	JMP		HBit3_wait
+HBit3_0:
+	CLR		P3.3
+HBit3_wait:
+	MOV		R6,#20
+	DJNZ	R6,$	; read 60us
+	;----------
+HBit4:
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; P0.0=0
+	SETB	P0.0	; P0.0=1
+	MOV		R6,#4
+	DJNZ	R6,$	; P0.0=1 16us=8+8
+	JNB		P2.0,HBit4_0
+HBit4_1:
+	SETB	P3.4
+	JMP		HBit4_wait
+HBit4_0:
+	CLR		P3.4
+HBit4_wait:
+	MOV		R6,#20
+	DJNZ	R6,$	; read 60us
+	;----------
+HBit5:
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; P0.0=0
+	SETB	P0.0	; P0.0=1
+	MOV		R6,#4
+	DJNZ	R6,$	; P0.0=1 16us=8+8
+	JNB		P2.0,HBit5_0
+HBit5_1:
+	SETB	P3.5
+	JMP		HBit5_wait
+HBit5_0:
+	CLR		P3.5
+HBit5_wait:
+	MOV		R6,#20
+	DJNZ	R6,$	; read 60us
+	;----------
+HBit6:
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; P0.0=0
+	SETB	P0.0	; P0.0=1
+	MOV		R6,#4
+	DJNZ	R6,$	; P0.0=1 16us=8+8
+	JNB		P2.0,HBit6_0
+HBit6_1:
+	SETB	P3.6
+	JMP		HBit6_wait
+HBit6_0:
+	CLR		P3.6
+HBit6_wait:
+	MOV		R6,#20
+	DJNZ	R6,$	; read 60us
+	;----------
+HBit7:
+	SETB	P0.0	; P0.0=1
+	CLR		P0.0	; P0.0=0
+	SETB	P0.0	; P0.0=1
+	MOV		R6,#4
+	DJNZ	R6,$	; P0.0=1 16us=8+8
+	JNB		P2.0,HBit7_0
+HBit7_1:
+	SETB	P3.7
+	JMP		HBit7_wait
+HBit7_0:
+	CLR		P3.7
+HBit7_wait:
+	MOV		R6,#20
+	DJNZ	R6,$	; read 60us
+	;----------
+
+;--------------------
+	CALL	DELAY
+	LJMP	START
+;--------------------
+
+; 750ms
+DELAY:	
+	MOV		R0,#10
+D1:	MOV		R1,#150
+D2:	MOV		R2,#250
+	DJNZ	R2,$
+	DJNZ	R1,D2
+	DJNZ	R0,D1
+	RET
+
+	END
+
+*/</code></pre></div></details></div></details><details id="35da15e2-9005-80f5-8d8c-d4400ab53faa" open="" class="toggle" dir="auto"><summary>解析</summary><div class="indented"></div></details></div></details></div></details><details open="" class="" dir="auto"><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0"><h3 id="367a15e2-9005-8041-a22f-f980b2815807" style="display:inline-block">Final Exam </h3></summary><div class="indented"><ol type="1" id="367a15e2-9005-8088-a4c6-d797bfa11f6f" class="numbered-list" start="1" dir="auto"><li>LED 直接定址</li></ol><ol type="1" id="367a15e2-9005-80cc-8213-cf855983a868" class="numbered-list" start="2" dir="auto"><li>LED + 7-Segment 間接定址(查表)</li></ol><ol type="1" id="367a15e2-9005-80b3-b9e2-d1019c7dbb35" class="numbered-list" start="3" dir="auto"><li>音樂 (查表&amp;查表)</li></ol><ol type="1" id="367a15e2-9005-8023-bbb1-cdd840d89ee2" class="numbered-list" start="4" dir="auto"><li>步進馬達</li></ol><ol type="1" id="367a15e2-9005-8095-90f5-d6f45d5232c5" class="numbered-list" start="5" dir="auto"><li>藍芽 (中斷) + 音樂 + LED</li></ol><ol type="1" id="367a15e2-9005-8015-8d5a-e2993fa474f5" class="numbered-list" start="6" dir="auto"><li>藍芽 (雙中斷) + Timer</li></ol><ol type="1" id="367a15e2-9005-802e-bec1-d34e0d9cdd75" class="numbered-list" start="7" dir="auto"><li>超音波</li></ol><ol type="1" id="367a15e2-9005-806f-898f-e24a3e8bd0be" class="numbered-list" start="8" dir="auto"><li>直流馬達驅動 L298N</li></ol><ol type="1" id="367a15e2-9005-8029-ae28-ebc90af09c33" class="numbered-list" start="9" dir="auto"><li>I2C</li></ol></div></details></div></div><hr id="328a15e2-9005-8003-a6e5-e8f90e974fe4" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="328a15e2-9005-8061-9541-cfc78cfb31fd" dir="ltr"><div style="width:100%"><p id="328a15e2-9005-8087-b3ef-c13676c99334" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Comment</mark></p></div></aside></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

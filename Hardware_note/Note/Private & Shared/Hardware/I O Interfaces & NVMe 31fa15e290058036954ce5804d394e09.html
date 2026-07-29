@@ -1,0 +1,770 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>I/O Interfaces &amp; NVMe</title><meta name="data-notion-page-icon" content="🧭"/><link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2290%22%3E%F0%9F%A7%AD%3C%2Ftext%3E%3C%2Fsvg%3E"/><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+/* Override strong tags inside headings to maintain consistent weight */
+h1 strong,
+h2 strong,
+h3 strong {
+	font-weight: 600;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 10px;
+	padding: 1rem;
+}
+
+/* For default-background callouts, render the border outline. */
+.callout.block-color-default_background {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+figure,
+aside,
+details {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+
+	table.collection-content {
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	table.collection-content th,
+	table.collection-content td {
+		overflow-wrap: anywhere;
+	}
+
+	table.collection-content td > .user,
+	table.collection-content td > time {
+		white-space: pre-wrap;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content-wrapper {
+	overflow-x: auto;
+}
+
+@media only print {
+	.collection-content-wrapper {
+		overflow-x: visible;
+	}
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.collection-content td {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.column-list {
+	display: flex;
+	gap: 46px;
+}
+
+.column {
+	min-width: 0;
+	overflow: hidden;
+}
+
+.column > *:first-child {
+	margin-top: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding-inline: 0.125rem;
+	padding-block: 0.375rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+table {
+	border-collapse: collapse;
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol.numbered-list.numbered-list-digits-2 {
+	padding-inline-start: 2em;
+}
+
+ol.numbered-list.numbered-list-digits-3plus {
+	padding-inline-start: 2.4em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+/*
+ * Render emoji icons using a ::before pseudo-element to keep the glyph
+ * out of the DOM textContent traversal. This avoids double-rendering icons
+ * in callouts and page titles.
+ * NOTE(slim/html-export-pseudo-icons): I can't tagref this because it will
+ * flag as a duplicate tag after codegen.
+ */
+.icon[data-emoji]::before {
+	content: attr(data-emoji);
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.callout img.notion-static-icon {
+	width: 1em;
+	height: 1em;
+}
+
+.callout p {
+	margin: 0;
+}
+
+.callout h1,
+.callout h2,
+.callout h3 {
+	margin: 0 0 0.6rem;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	margin-right: 0.4em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+blockquote.quote-large {
+	font-size: 1.25em;
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.tab {
+	margin: 1.25em 0;
+	padding-inline: 1rem;
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.highlight-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.highlight-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.highlight-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.highlight-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.highlight-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.highlight-default_background {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray_background {
+	background: rgba(42, 28, 0, 0.07);
+}
+.highlight-brown_background {
+	background: rgba(139, 46, 0, 0.086);
+}
+.highlight-orange_background {
+	background: rgba(224, 101, 1, 0.129);
+}
+.highlight-yellow_background {
+	background: rgba(211, 168, 0, 0.137);
+}
+.highlight-teal_background {
+	background: rgba(0, 100, 45, 0.09);
+}
+.highlight-blue_background {
+	background: rgba(0, 124, 215, 0.094);
+}
+.highlight-purple_background {
+	background: rgba(102, 0, 178, 0.078);
+}
+.highlight-pink_background {
+	background: rgba(197, 0, 93, 0.086);
+}
+.highlight-red_background {
+	background: rgba(223, 22, 0, 0.094);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.block-color-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.block-color-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.block-color-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.block-color-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.block-color-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(240, 239, 237, 1);
+}
+.block-color-brown_background {
+	background: rgba(245, 237, 233, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 235, 222, 1);
+}
+.block-color-yellow_background {
+	background: rgba(249, 243, 220, 1);
+}
+.block-color-teal_background {
+	background: rgba(232, 241, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(229, 242, 252, 1);
+}
+.block-color-purple_background {
+	background: rgba(243, 235, 249, 1);
+}
+.block-color-pink_background {
+	background: rgba(250, 233, 241, 1);
+}
+.block-color-red_background {
+	background: rgba(252, 233, 231, 1);
+}
+.select-value-color-default { background-color: rgba(42, 28, 0, 0.07); }
+.select-value-color-gray { background-color: rgba(28, 19, 1, 0.11); }
+.select-value-color-brown { background-color: rgba(127, 51, 0, 0.156); }
+.select-value-color-orange { background-color: rgba(196, 88, 0, 0.203); }
+.select-value-color-yellow { background-color: rgba(209, 156, 0, 0.282); }
+.select-value-color-green { background-color: rgba(0, 96, 38, 0.156); }
+.select-value-color-blue { background-color: rgba(0, 118, 217, 0.203); }
+.select-value-color-purple { background-color: rgba(92, 0, 163, 0.141); }
+.select-value-color-pink { background-color: rgba(183, 0, 78, 0.152); }
+.select-value-color-red { background-color: rgba(206, 24, 0, 0.164); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style><style>@import url('https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex-swap.min.css')</style></head><body><article id="31fa15e2-9005-8036-954c-e5804d394e09" class="page serif" data-notion-page-icon="🧭"><header><img class="page-cover-image" src="https://app.notion.com/images/page-cover/nasa_ibm_type_704.jpg" style="object-position:center 19.999999999999996%"/><div class="page-header-icon page-header-icon-with-cover"><span class="icon" data-emoji="🧭"></span></div><h1 class="page-title" dir="auto"><strong>I/O Interfaces &amp; NVMe</strong></h1><p class="page-description" dir="auto"></p></header><div class="page-body"><div id="33aa15e2-9005-8037-9a53-c62c18115bb3" class="column-list" data-notion-column-list="" dir="auto"><div id="33aa15e2-9005-802e-b388-e22e01a95653" style="width:25%" class="column" data-notion-column-ratio="0.25" dir="auto"><hr id="33aa15e2-9005-805e-9db6-cf30e714cff6" dir="auto"/><figure id="33aa15e2-9005-80e8-93c6-e409df694803" class="image" data-notion-image="I%20O%20Interfaces%20&amp;%20NVMe/f01f1b30-f45c-4ad3-9c7e-a0191ef1edf6.png" dir="ltr"><a href="I%20O%20Interfaces%20&amp;%20NVMe/f01f1b30-f45c-4ad3-9c7e-a0191ef1edf6.png"><img style="width:284.44444444444446px" src="I%20O%20Interfaces%20&amp;%20NVMe/f01f1b30-f45c-4ad3-9c7e-a0191ef1edf6.png"/></a></figure><hr id="33aa15e2-9005-804c-8c12-d9bf6a5b373b" dir="auto"/><p id="33aa15e2-9005-807e-9e69-fe1dbe8d7dea" class="" dir="auto"><strong>NOTE Outline</strong><div class="indented"><p id="33aa15e2-9005-809e-8d44-e7fc64d2f78c" class="" dir="auto"><mark class="highlight-blue" data-notion-highlight="blue"><strong>Basic</strong></mark><div class="indented"><p id="33aa15e2-9005-8088-b87a-c4d78a28897a" class="" dir="auto"><a href="I%20O%20Interfaces%20&amp;%20NVMe/NOTE-I%20O%20Interfaces%20&amp;%20NVMe/Block%20I%20O%20Fundamentals%2033aa15e29005803a847edaa06ed1d9cc.html">Block I/O Fundamentals</a></p><p id="33aa15e2-9005-8095-a50e-e396e907eb13" class="" dir="auto"><a href="I%20O%20Interfaces%20&amp;%20NVMe/NOTE-I%20O%20Interfaces%20&amp;%20NVMe/Direct%20Memory%20Access%2033aa15e29005806a904bec7a3fee36e7.html">Direct Memory Access</a></p><p id="33aa15e2-9005-80af-83ff-d3c9c953f68e" class="" dir="auto"><a href="I%20O%20Interfaces%20&amp;%20NVMe/NOTE-I%20O%20Interfaces%20&amp;%20NVMe/NVMe%20Protocol%2033aa15e290058082b84bf03afb7ec7bf.html">NVMe Protocol</a></p></div></p><p id="33aa15e2-9005-80ef-9bd4-f2b2acdd4ba0" class="" dir="auto"><mark class="highlight-red" data-notion-highlight="red"><strong>Advance</strong></mark><div class="indented"><p id="33aa15e2-9005-8098-9e00-f221fe2e7733" class="" dir="auto"><a href="I%20O%20Interfaces%20&amp;%20NVMe/NOTE-I%20O%20Interfaces%20&amp;%20NVMe/io_uring%2033aa15e2900580029bced36b1724b227.html">io_uring</a></p><p id="50656c92-18d7-4a13-b8ab-e8f393c49239" class="" dir="auto"><a href="I%20O%20Interfaces%20&amp;%20NVMe/NOTE-I%20O%20Interfaces%20&amp;%20NVMe/Kernel-Bypass%20I%20O%2033aa15e2900580aa9779c9549ac69bf6.html">Kernel-Bypass I/O</a></p></div></p></div></p><hr id="33aa15e2-9005-80dd-90cb-fc16e199db15" dir="auto"/><p id="33aa15e2-9005-801b-86b4-cb8e41ccfaf1" class="" dir="auto">
+</p></div><div id="33aa15e2-9005-8093-8324-f42b2f63668b" style="width:75%" class="column" data-notion-column-ratio="0.75" dir="auto"><h1 id="33aa15e2-9005-8050-95ab-d3bb3ade7c82" class="" dir="auto">Material</h1><h3 id="33aa15e2-9005-8081-b989-e9cd28a45f7a" class="" dir="auto"><mark class="highlight-blue" data-notion-highlight="blue">Block I/O Fundamentals</mark></h3><details id="33aa15e2-9005-80dc-af8f-c25707877a28" open="" class="toggle" dir="auto"><summary><strong>Intro</strong></summary><div class="indented"><aside class="block-color-default_background callout" data-notion-callout="" data-notion-callout-background="default_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8085-b47b-f77e499e06b7" dir="ltr"><div style="width:100%"><p id="9c61aaf3-4547-47f6-9d71-4b50f51d5eba" class="" dir="auto">在作業系統中，我們透過 block device abstraction 將底層儲存裝置抽象為固定大小的 block 來存取，這是所有儲存系統的基礎。我們需要理解兩個關鍵的效能指標：IOPS 衡量每秒能完成多少次 I/O 操作，而 bandwidth 衡量每秒能傳輸多少資料量，不同的工作負載會瓶頸在不同的指標上。在 I/O 模型方面，synchronous I/O 會讓呼叫的 thread 等待操作完成才返回，而 asynchronous I/O 允許我們發出請求後繼續做其他事情，等完成時再處理結果。此外，裝置完成 I/O 後通知 CPU 的方式也有兩種：interrupt 由裝置主動觸發通知，而 polling 則是由 CPU 不斷檢查完成狀態。理解這些基本概念，是我們後續學習 NVMe、io_uring 等現代高效能 I/O 技術的必要前提。</p></div></aside></div></details><details id="33aa15e2-9005-80d5-9cd0-c0db57f75d8e" open="" class="toggle" dir="auto"><summary><mark class="highlight-default_background" data-notion-highlight="default_background"><strong>Course Resource</strong></mark></summary><div class="indented"><details id="33aa15e2-9005-8040-be4d-dce9df92dba3" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue">Key words</mark><mark class="highlight-blue" data-notion-highlight="blue"><strong> </strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8064-8cfe-c212071a87d5" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80e5-a012-df3ccdfcd7e0" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Block I/O Fundamentals block device, IOPS, bandwidth, throughput, latency, synchronous I/O, asynchronous I/O, interrupt, polling</mark></p></div></aside></div></details><details id="33aa15e2-9005-808c-a004-f655504302c7" open="" class="toggle" dir="auto"><summary><mark class="highlight-red" data-notion-highlight="red">Recommended Resources</mark></summary><div class="indented"><p id="33aa15e2-9005-80c7-bade-c415c1e3388f" class="" dir="auto">None</p></div></details><details id="33aa15e2-9005-801f-8f5e-db0b10d261df" open="" class="toggle" dir="auto"><summary><mark class="highlight-brown" data-notion-highlight="brown">Related Papers</mark></summary><div class="indented"><p id="4ab3041e-2613-4f49-b215-4651c23c2840" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/ssd-iq">https://lego.sys-nthu.tw/papers/ssd-iq</a></p><p id="33aa15e2-9005-806e-a57d-c5abb1a950cd" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/modern-nvme">https://lego.sys-nthu.tw/papers/modern-nvme</a></p><p id="33aa15e2-9005-8081-8f99-c369cc4e6c05" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/duckdb-xnvme">https://lego.sys-nthu.tw/papers/duckdb-xnvme</a></p><p id="33aa15e2-9005-80b3-abb4-d9a982dca02b" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/wisckey">https://lego.sys-nthu.tw/papers/wisckey</a></p><p id="33aa15e2-9005-80cb-9edd-f4b11f129b87" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/fastcommit">https://lego.sys-nthu.tw/papers/fastcommit</a></p><p id="33aa15e2-9005-80e2-9931-f3ea88373f7a" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/erofs">https://lego.sys-nthu.tw/papers/erofs</a></p><p id="33aa15e2-9005-8008-b3d6-dc9f794ebf1a" class="" dir="auto">
+</p></div></details></div></details><details id="33aa15e2-9005-80a5-8968-c364039fe2b9" open="" class="toggle" dir="auto"><summary><strong>Note</strong></summary><div class="indented"><p id="33aa15e2-9005-8047-ade2-fce46f9a67f0" class="" dir="auto"><a href="I%20O%20Interfaces%20&amp;%20NVMe/NOTE-I%20O%20Interfaces%20&amp;%20NVMe/Block%20I%20O%20Fundamentals%2033aa15e29005803a847edaa06ed1d9cc.html" data-notion-page-id="33aa15e2-9005-803a-847e-daa06ed1d9cc" data-notion-space-id="e8ca15e2-9005-814c-9a7f-0003626048ef"><span class="icon" data-emoji="🧱"></span>Block I/O Fundamentals</a> </p></div></details><hr id="33aa15e2-9005-80b8-ac78-fd7f8409d95a" dir="auto"/><h3 id="33aa15e2-9005-80a6-ab06-df42952a82c7" class="" dir="auto"><mark class="highlight-blue" data-notion-highlight="blue">Direct Memory Access</mark></h3><details id="33aa15e2-9005-80c4-931e-fa88fb146a03" open="" class="toggle" dir="auto"><summary><strong>Intro</strong></summary><div class="indented"><aside class="block-color-default_background callout" data-notion-callout="" data-notion-callout-background="default_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-808f-b1d1-e6d69b1ba204" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-802a-8a60-edfaffedbece" class="" dir="auto">當 CPU 親自負責在記憶體與裝置之間搬運資料時，它就無法同時做其他運算，這在高速 I/O 場景下會成為嚴重瓶頸。DMA（Direct Memory Access）讓裝置可以直接存取主記憶體，不需要 CPU 介入每一筆資料的傳輸。為了支援 DMA，我們需要配置 physically contiguous 且 device-accessible 的 memory buffer，因為裝置通常使用 physical address 來定址。當資料分散在多個不連續的記憶體區段時，scatter-gather list 允許我們在一次 DMA 操作中描述多段記憶體位置，避免不必要的資料複製。這種機制也是 zero-copy I/O 的基礎：資料可以直接在裝置與應用程式的 buffer 之間傳輸，省去在 kernel buffer 中轉的開銷。理解 DMA 的運作方式，對於後續學習 NVMe 和 kernel-bypass I/O 如何達到極低延遲至關重要。</p></div></aside></div></details><details id="33aa15e2-9005-8081-aad6-eecf564470b7" open="" class="toggle" dir="auto"><summary><mark class="highlight-default_background" data-notion-highlight="default_background"><strong>Course Resource</strong></mark></summary><div class="indented"><details id="33aa15e2-9005-80c3-8ace-f67333c98eb0" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue">Key words</mark><mark class="highlight-blue" data-notion-highlight="blue"><strong> </strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80e3-a60a-ed7d6036cddd" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-800c-a8cb-e585519ce1b6" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Direct Memory Access DMA, physical address, scatter-gather list, zero-copy, bounce buffer, IOMMU, pinned memory</mark></p></div></aside></div></details><details id="33aa15e2-9005-8001-b8dc-f686fa76ddbc" open="" class="toggle" dir="auto"><summary><mark class="highlight-red" data-notion-highlight="red">Recommended Resources</mark></summary><div class="indented"><p id="33aa15e2-9005-8019-8f0c-f163cc9890fa" class="" dir="auto">None</p></div></details><details id="33aa15e2-9005-80ba-ab00-ed4d607be82b" open="" class="toggle" dir="auto"><summary><mark class="highlight-brown" data-notion-highlight="brown">Related Papers</mark></summary><div class="indented"><p id="33aa15e2-9005-80f6-84a4-c4334a959a36" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/modern-nvme">https://lego.sys-nthu.tw/papers/modern-nvme</a></p><p id="33aa15e2-9005-80d6-b5fd-d14de84497dd" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/duckdb-xnvme">https://lego.sys-nthu.tw/papers/duckdb-xnvme</a></p></div></details></div></details><details id="33aa15e2-9005-80c0-a96e-fa40910712d4" open="" class="toggle" dir="auto"><summary><strong>Note</strong></summary><div class="indented"><p id="33aa15e2-9005-8013-a974-f4e7dc197e1c" class="" dir="auto"><a href="I%20O%20Interfaces%20&amp;%20NVMe/NOTE-I%20O%20Interfaces%20&amp;%20NVMe/Direct%20Memory%20Access%2033aa15e29005806a904bec7a3fee36e7.html" data-notion-page-id="33aa15e2-9005-806a-904b-ec7a3fee36e7" data-notion-space-id="e8ca15e2-9005-814c-9a7f-0003626048ef"><span class="icon" data-emoji="🧱"></span>Direct Memory Access</a> </p></div></details><hr id="33aa15e2-9005-809c-9f7d-d7c6e346e7d0" dir="auto"/><h3 id="33aa15e2-9005-8028-b556-fdc07e490314" class="" dir="auto"><mark class="highlight-blue" data-notion-highlight="blue">NVMe Protocol</mark></h3><details id="33aa15e2-9005-8003-81c5-e40866f08734" open="" class="toggle" dir="auto"><summary><strong>Intro</strong></summary><div class="indented"><aside class="block-color-default_background callout" data-notion-callout="" data-notion-callout-background="default_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80a3-acd9-d940360a57f2" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8095-a1ab-f19ff4f7a736" class="" dir="auto">傳統的 AHCI 介面是為旋轉式硬碟設計的，只有單一 command queue 且深度有限，無法充分發揮 SSD 的平行處理能力。NVMe（Non-Volatile Memory Express）是專為 flash storage 設計的協定，直接運行在 PCIe bus 上，大幅降低了協定層的延遲。NVMe 的核心設計是多對 submission queue 與 completion queue，軟體將 I/O command 放入 submission queue 後，透過寫入 doorbell register 通知裝置處理，裝置完成後再將結果放入對應的 completion queue。這種多 queue 架構讓我們可以為每個 CPU core 各配一組 queue pair，避免多核心之間的鎖競爭。NVMe 也引入了 namespace 的概念來劃分裝置上的儲存空間，以及豐富的 command set 支援各種操作。這些設計使 NVMe 成為現代高效能儲存系統的標準介面，也是我們後續討論 io_uring 和 SPDK 等進階 I/O 框架的基礎。</p></div></aside></div></details><details id="33aa15e2-9005-805b-9349-cc99ea3e0585" open="" class="toggle" dir="auto"><summary><mark class="highlight-default_background" data-notion-highlight="default_background"><strong>Course Resource</strong></mark></summary><div class="indented"><details id="33aa15e2-9005-80b8-8aba-eb0651ae1ad6" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue">Key words</mark><mark class="highlight-blue" data-notion-highlight="blue"><strong> </strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8086-b3fd-f756590b1a18" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-808d-8bf7-f8049d769def" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">NVMe Protocol NVMe, PCIe, submission queue, completion queue, doorbell register, queue pair, namespace, AHCI, command set</mark></p></div></aside></div></details><details id="33aa15e2-9005-8057-9f97-c514d8ca6bb5" open="" class="toggle" dir="auto"><summary><mark class="highlight-red" data-notion-highlight="red">Recommended Resources</mark></summary><div class="indented"><p id="33aa15e2-9005-807b-98d2-ce80c877cd3a" class="" dir="auto">None</p></div></details><details id="33aa15e2-9005-809d-b13e-d5ea9a7539da" open="" class="toggle" dir="auto"><summary><mark class="highlight-brown" data-notion-highlight="brown">Related Papers</mark></summary><div class="indented"><p id="33aa15e2-9005-8052-a0ac-ea3c631b0c91" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/ssd-iq">https://lego.sys-nthu.tw/papers/ssd-iq</a></p><p id="33aa15e2-9005-800f-9cce-cd7e98dfc2f7" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/zns">https://lego.sys-nthu.tw/papers/zns</a></p><p id="8933bf04-90c5-45c1-9585-a17f3b24b55d" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/co-design-btree-zns">https://lego.sys-nthu.tw/papers/co-design-btree-zns</a></p><p id="33aa15e2-9005-8024-819e-cabefc291119" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/modern-nvme">https://lego.sys-nthu.tw/papers/modern-nvme</a></p><p id="33aa15e2-9005-8077-a9e6-d2b5700ad49d" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/duckdb-xnvme">https://lego.sys-nthu.tw/papers/duckdb-xnvme</a></p></div></details></div></details><details id="33aa15e2-9005-802d-b326-ff7f83614bde" open="" class="toggle" dir="auto"><summary><strong>Note</strong></summary><div class="indented"><p id="33aa15e2-9005-8093-972b-e90b1d339729" class="" dir="auto"><a href="I%20O%20Interfaces%20&amp;%20NVMe/NOTE-I%20O%20Interfaces%20&amp;%20NVMe/NVMe%20Protocol%2033aa15e290058082b84bf03afb7ec7bf.html" data-notion-page-id="33aa15e2-9005-8082-b84b-f03afb7ec7bf" data-notion-space-id="e8ca15e2-9005-814c-9a7f-0003626048ef"><span class="icon" data-emoji="🧱"></span>NVMe Protocol</a> </p></div></details><hr id="33aa15e2-9005-8032-ac4e-e9699dde1e2b" dir="auto"/><h3 id="33aa15e2-9005-800d-a2b9-fdb051cf2dd6" class="" dir="auto"><mark class="highlight-red" data-notion-highlight="red">io_uring</mark></h3><details id="33aa15e2-9005-806f-b9e0-c221e216df7b" open="" class="toggle" dir="auto"><summary><strong>Intro</strong></summary><div class="indented"><aside class="block-color-default_background callout" data-notion-callout="" data-notion-callout-background="default_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8065-a055-ca2c198c5b80" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8045-ab6a-d7f356227b32" class="" dir="auto">在前面我們學過 synchronous 與 asynchronous I/O 的差異，而 Linux 早期的 async I/O 機制（如 libaio）有諸多限制，例如只支援 direct I/O 且 syscall 開銷仍然顯著。io_uring 是 Linux 從 5.1 開始引入的高效能 async I/O 框架，我們將深入探討它如何透過 kernel 與 user space 之間共享的 submission queue 和 completion queue ring buffer，讓應用程式不需要頻繁呼叫 syscall 就能提交與收割 I/O 請求。課程中我們也會介紹 batched submission 如何攤平 syscall 成本、SQPOLL 模式如何讓 kernel thread 持續 polling submission queue 以完全省去 submit 端的 syscall，以及 IOPOLL 模式如何用 polling 取代 interrupt 來降低 completion 延遲。此外，io_uring_cmd 機制允許我們直接下達 NVMe passthrough command，繞過傳統 block layer 的抽象。這些技術結合了我們先前學到的 block I/O 與 NVMe 知識，是目前 Linux 上最重要的高效能 I/O 介面。</p></div></aside></div></details><details id="33aa15e2-9005-8041-8440-f9e43a39d249" open="" class="toggle" dir="auto"><summary><mark class="highlight-default_background" data-notion-highlight="default_background"><strong>Course Resource</strong></mark></summary><div class="indented"><details id="33aa15e2-9005-800f-a477-c6be709e53ea" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue">Key words</mark><mark class="highlight-blue" data-notion-highlight="blue"><strong> </strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80ff-9484-eaca767a1213" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-805c-8987-f902d0f4f238" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">io_uring, SQE, CQE, ring buffer, batched submission, SQPOLL, IOPOLL, io_uring_cmd, NVMe passthrough</mark></p></div></aside></div></details><details id="33aa15e2-9005-80f3-9c69-df912482de6c" open="" class="toggle" dir="auto"><summary><mark class="highlight-red" data-notion-highlight="red">Recommended Resources</mark></summary><div class="indented"><p id="33aa15e2-9005-8056-a1e1-d027c9619b8b" class="" dir="auto"><a href="https://instagram-engineering.com/under-the-hood-instagram-in-2015-8e8aff5ab7c2?gi=6270cb9d2561">https://instagram-engineering.com/under-the-hood-instagram-in-2015-8e8aff5ab7c2?gi=6270cb9d2561</a></p><p id="33aa15e2-9005-800e-b2cc-c39723169c62" class="" dir="auto"><a href="https://gsaw.org/wp-content/uploads/2024/03/2024-S13-1-GSAW_evolving_Telemetry_Storage_v6.pdf">https://gsaw.org/wp-content/uploads/2024/03/2024-S13-1-GSAW_evolving_Telemetry_Storage_v6.pdf</a></p></div></details><details id="33aa15e2-9005-803f-aea0-e2ad1784310d" open="" class="toggle" dir="auto"><summary><mark class="highlight-brown" data-notion-highlight="brown">Related Papers</mark></summary><div class="indented"><p id="33aa15e2-9005-80c2-a05c-c5c20e7152db" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/modern-nvme">https://lego.sys-nthu.tw/papers/modern-nvme</a></p><p id="33aa15e2-9005-8073-8407-eafb4452d3aa" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/duckdb-xnvme">https://lego.sys-nthu.tw/papers/duckdb-xnvme</a></p></div></details></div></details><details id="33aa15e2-9005-8097-95b2-f67e4ec6b350" open="" class="toggle" dir="auto"><summary><strong>Note</strong></summary><div class="indented"><p id="33aa15e2-9005-8052-b455-fbfc76ea3dce" class="" dir="auto"><a href="I%20O%20Interfaces%20&amp;%20NVMe/NOTE-I%20O%20Interfaces%20&amp;%20NVMe/io_uring%2033aa15e2900580029bced36b1724b227.html" data-notion-page-id="33aa15e2-9005-8002-9bce-d36b1724b227" data-notion-space-id="e8ca15e2-9005-814c-9a7f-0003626048ef"><span class="icon" data-emoji="🔧"></span>io_uring</a> </p></div></details><hr id="33aa15e2-9005-8097-a23a-cb3636a938a5" dir="auto"/><h3 id="33aa15e2-9005-802d-88f9-ee25dc9a8919" class="" dir="auto"><mark class="highlight-red" data-notion-highlight="red">Kernel-Bypass I/O</mark></h3><details id="33aa15e2-9005-8070-bc9a-c0f38c135a7d" open="" class="toggle" dir="auto"><summary><strong>Intro</strong></summary><div class="indented"><aside class="block-color-default_background callout" data-notion-callout="" data-notion-callout-background="default_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80db-94e8-cd7bad6f1b7f" dir="ltr"><div style="width:100%"><p id="0d659ae0-4931-4e4f-86b9-b504d5ef7877" class="" dir="auto">即使有了 io_uring，I/O 路徑仍然要經過 kernel 的 block layer 和 file system，這些軟體層在 NVMe SSD 延遲降到微秒等級後，已經成為不可忽視的瓶頸。 今天的課程分為兩大階段。第一階段我們要徹底檢視 Linux kernel 的 I/O stack，看看在高速 SSD 時代，kernel 原本提供的 I/O scheduling、page cache、cgroup 隔離等機制哪些已經成為效能瓶頸，接著深入介紹 SPDK 這個 kernel bypass 框架如何透過 user space driver、polling mode 與 share-nothing 架構來榨乾 NVMe SSD 的極限效能，同時也會探討 eBPF/XRP 與 xNVMe 這些不需要完全繞過 kernel 的中間路線方案。</p><p id="f2194eac-32b2-4d30-b81c-dd6e8f6064ca" class="" dir="auto">第二階段我們要探討 host 與 device 之間的控制權分配，以 CSAL 為 case study，了解如何用高速 SSD 搭配大容量 QLC SSD 的雙層架構來實現 write shaping、降低 write amplification，並透過 TCO 經濟學分析說明為什麼 QLC 正在取代 HDD。</p></div></aside></div></details><details id="33aa15e2-9005-806b-9d4d-cecbe62349c5" open="" class="toggle" dir="auto"><summary><mark class="highlight-default_background" data-notion-highlight="default_background"><strong>Course Resource</strong></mark></summary><div class="indented"><details id="33aa15e2-9005-806c-8664-fdbe8175760e" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue">Key words</mark><mark class="highlight-blue" data-notion-highlight="blue"><strong> </strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80bd-ba6a-ebd09f14c606" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-803f-9e00-ed10ff6fea02" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Kernel-Bypass I/O kernel bypass, SPDK, user-space driver, polling mode, thread-to-queue affinity, DPDK, lockless design</mark></p></div></aside></div></details><details id="33aa15e2-9005-8027-8239-e90f2215be89" open="" class="toggle" dir="auto"><summary><mark class="highlight-red" data-notion-highlight="red">Recommended Resources</mark></summary><div class="indented"><p id="33aa15e2-9005-803b-a9ed-c99c69ac537d" class="" dir="auto"><a href="https://www.postgresql.org/message-id/20210502201645.GB6136%40hjp.at">https://www.postgresql.org/message-id/20210502201645.GB6136%40hjp.at</a></p><p id="33aa15e2-9005-8028-97a6-d5286974b1b3" class="" dir="auto"><a href="https://www.solidigm.com/products/technology/platform-optimization-for-performance-and-endurance-qlc-csal.html">https://www.solidigm.com/products/technology/platform-optimization-for-performance-and-endurance-qlc-csal.html</a></p><p id="33aa15e2-9005-8003-8fdc-c9ac89918b54" class="" dir="auto"><a href="https://www.purestorage.com/au/knowledge/what-is-directflash-and-how-does-it-work.html">https://www.purestorage.com/au/knowledge/what-is-directflash-and-how-does-it-work.html</a></p><p id="33aa15e2-9005-8070-b1cd-db2921e4face" class="" dir="auto"><a href="https://udn.com/news/story/123296/9383998">https://udn.com/news/story/123296/9383998</a></p><p id="33aa15e2-9005-8026-85bc-d3474bcc836c" class="" dir="auto"><a href="https://www.gfc.com.tw/achievement/2">https://www.gfc.com.tw/achievement/2</a></p><p id="33aa15e2-9005-8011-9cf8-ec4c7196171a" class="" dir="auto"><a href="https://lego.sys-nthu.tw/contents/io/kernel-bypass-io/elevator-simulator.html">https://lego.sys-nthu.tw/contents/io/kernel-bypass-io/elevator-simulator.html</a></p><p id="33aa15e2-9005-804d-82e8-e47ae70e705b" class="" dir="auto"><a href="https://distributors.kone.com/en/Images/brochure-kone-destination_tcm90-18639.pdf">https://distributors.kone.com/en/Images/brochure-kone-destination_tcm90-18639.pdf</a></p><figure id="33aa15e2-9005-8096-b22a-d43ee079ac27" class="image" data-notion-image="I%20O%20Interfaces%20&amp;%20NVMe/image.png" dir="ltr"><a href="I%20O%20Interfaces%20&amp;%20NVMe/image.png"><img style="width:2338px" src="I%20O%20Interfaces%20&amp;%20NVMe/image.png"/></a></figure></div></details><details id="33aa15e2-9005-8048-b4af-fe230c9f6a78" open="" class="toggle" dir="auto"><summary><mark class="highlight-brown" data-notion-highlight="brown">Related Papers</mark></summary><div class="indented"><p id="33aa15e2-9005-8085-9fa3-ed149d29962d" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/modern-nvme">https://lego.sys-nthu.tw/papers/modern-nvme</a></p><p id="937d8511-afd7-4c13-b5c7-d745c2a7a1cb" class="" dir="auto"><a href="https://lego.sys-nthu.tw/papers/duckdb-xnvme">https://lego.sys-nthu.tw/papers/duckdb-xnvme</a></p></div></details></div></details><details id="33aa15e2-9005-8056-982c-d57c12dd5217" open="" class="toggle" dir="auto"><summary><strong>Note</strong></summary><div class="indented"><p id="33aa15e2-9005-806e-a2ca-e531376bd9b0" class="" dir="auto"><a href="I%20O%20Interfaces%20&amp;%20NVMe/NOTE-I%20O%20Interfaces%20&amp;%20NVMe/Kernel-Bypass%20I%20O%2033aa15e2900580aa9779c9549ac69bf6.html" data-notion-page-id="33aa15e2-9005-80aa-9779-c9549ac69bf6" data-notion-space-id="e8ca15e2-9005-814c-9a7f-0003626048ef"><span class="icon" data-emoji="🔧"></span>Kernel-Bypass I/O</a> </p></div></details></div></div><hr id="33aa15e2-9005-80f1-86ff-d8baea291fe0" dir="auto"/><figure id="33aa15e2-9005-80a3-9baa-dff30c9b8c47" class="link-to-page"><a href="I%20O%20Interfaces%20&amp;%20NVMe/NOTE-I%20O%20Interfaces%20&amp;%20NVMe%2033aa15e2900580a39baadff30c9b8c47.html" data-notion-page-id="33aa15e2-9005-80a3-9baa-dff30c9b8c47" data-notion-space-id="e8ca15e2-9005-814c-9a7f-0003626048ef">NOTE-I/O Interfaces &amp; NVMe</a></figure><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-802a-b277-c273cb25337a" dir="ltr"><div style="width:100%"></div></aside><p id="33aa15e2-9005-80cf-a9de-d31f6d48657b" class="" dir="auto">
+</p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

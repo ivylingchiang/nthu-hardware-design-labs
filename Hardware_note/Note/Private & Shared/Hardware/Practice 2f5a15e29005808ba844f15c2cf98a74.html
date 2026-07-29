@@ -1,0 +1,812 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Practice</title><meta name="data-notion-page-icon" content="🖤"/><link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2290%22%3E%F0%9F%96%A4%3C%2Ftext%3E%3C%2Fsvg%3E"/><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+/* Override strong tags inside headings to maintain consistent weight */
+h1 strong,
+h2 strong,
+h3 strong {
+	font-weight: 600;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 10px;
+	padding: 1rem;
+}
+
+/* For default-background callouts, render the border outline. */
+.callout.block-color-default_background {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+figure,
+aside,
+details {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+
+	table.collection-content {
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	table.collection-content th,
+	table.collection-content td {
+		overflow-wrap: anywhere;
+	}
+
+	table.collection-content td > .user,
+	table.collection-content td > time {
+		white-space: pre-wrap;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content-wrapper {
+	overflow-x: auto;
+}
+
+@media only print {
+	.collection-content-wrapper {
+		overflow-x: visible;
+	}
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.collection-content td {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.column-list {
+	display: flex;
+	gap: 46px;
+}
+
+.column {
+	min-width: 0;
+	overflow: hidden;
+}
+
+.column > *:first-child {
+	margin-top: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding-inline: 0.125rem;
+	padding-block: 0.375rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+table {
+	border-collapse: collapse;
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol.numbered-list.numbered-list-digits-2 {
+	padding-inline-start: 2em;
+}
+
+ol.numbered-list.numbered-list-digits-3plus {
+	padding-inline-start: 2.4em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+/*
+ * Render emoji icons using a ::before pseudo-element to keep the glyph
+ * out of the DOM textContent traversal. This avoids double-rendering icons
+ * in callouts and page titles.
+ * NOTE(slim/html-export-pseudo-icons): I can't tagref this because it will
+ * flag as a duplicate tag after codegen.
+ */
+.icon[data-emoji]::before {
+	content: attr(data-emoji);
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.callout img.notion-static-icon {
+	width: 1em;
+	height: 1em;
+}
+
+.callout p {
+	margin: 0;
+}
+
+.callout h1,
+.callout h2,
+.callout h3 {
+	margin: 0 0 0.6rem;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	margin-right: 0.4em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+blockquote.quote-large {
+	font-size: 1.25em;
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.tab {
+	margin: 1.25em 0;
+	padding-inline: 1rem;
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.highlight-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.highlight-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.highlight-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.highlight-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.highlight-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.highlight-default_background {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray_background {
+	background: rgba(42, 28, 0, 0.07);
+}
+.highlight-brown_background {
+	background: rgba(139, 46, 0, 0.086);
+}
+.highlight-orange_background {
+	background: rgba(224, 101, 1, 0.129);
+}
+.highlight-yellow_background {
+	background: rgba(211, 168, 0, 0.137);
+}
+.highlight-teal_background {
+	background: rgba(0, 100, 45, 0.09);
+}
+.highlight-blue_background {
+	background: rgba(0, 124, 215, 0.094);
+}
+.highlight-purple_background {
+	background: rgba(102, 0, 178, 0.078);
+}
+.highlight-pink_background {
+	background: rgba(197, 0, 93, 0.086);
+}
+.highlight-red_background {
+	background: rgba(223, 22, 0, 0.094);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.block-color-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.block-color-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.block-color-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.block-color-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.block-color-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(240, 239, 237, 1);
+}
+.block-color-brown_background {
+	background: rgba(245, 237, 233, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 235, 222, 1);
+}
+.block-color-yellow_background {
+	background: rgba(249, 243, 220, 1);
+}
+.block-color-teal_background {
+	background: rgba(232, 241, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(229, 242, 252, 1);
+}
+.block-color-purple_background {
+	background: rgba(243, 235, 249, 1);
+}
+.block-color-pink_background {
+	background: rgba(250, 233, 241, 1);
+}
+.block-color-red_background {
+	background: rgba(252, 233, 231, 1);
+}
+.select-value-color-default { background-color: rgba(42, 28, 0, 0.07); }
+.select-value-color-gray { background-color: rgba(28, 19, 1, 0.11); }
+.select-value-color-brown { background-color: rgba(127, 51, 0, 0.156); }
+.select-value-color-orange { background-color: rgba(196, 88, 0, 0.203); }
+.select-value-color-yellow { background-color: rgba(209, 156, 0, 0.282); }
+.select-value-color-green { background-color: rgba(0, 96, 38, 0.156); }
+.select-value-color-blue { background-color: rgba(0, 118, 217, 0.203); }
+.select-value-color-purple { background-color: rgba(92, 0, 163, 0.141); }
+.select-value-color-pink { background-color: rgba(183, 0, 78, 0.152); }
+.select-value-color-red { background-color: rgba(206, 24, 0, 0.164); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style><style>@import url('https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex-swap.min.css')</style></head><body><article id="2f5a15e2-9005-808b-a844-f15c2cf98a74" class="page serif" data-notion-page-icon="🖤"><header><img class="page-cover-image" src="https://app.notion.com/images/page-cover/gradients_10.jpg" style="object-position:center 40%"/><div class="page-header-icon page-header-icon-with-cover"><span class="icon" data-emoji="🖤"></span></div><h1 class="page-title" dir="auto">Practice</h1><p class="page-description" dir="auto"></p></header><div class="page-body"><div id="2f8a15e2-9005-8090-a338-f013f5dac126" class="column-list" data-notion-column-list="" dir="auto"><div id="2f8a15e2-9005-8056-ad2a-cd23e0579fd0" style="width:31.25%" class="column" data-notion-column-ratio="0.3125" dir="auto"><hr id="2f8a15e2-9005-80b5-8292-e99d2f5aed9d" dir="auto"/><figure id="2f8a15e2-9005-8080-b597-ceb3257a8fd9" class="image" data-notion-image="Practice/fab9f5b6ce20643cecc7477e92d3e351.jpg" dir="ltr"><a href="Practice/fab9f5b6ce20643cecc7477e92d3e351.jpg"><img style="width:288px" src="Practice/fab9f5b6ce20643cecc7477e92d3e351.jpg"/></a></figure><details id="2f8a15e2-9005-808a-8d0d-cd9d2a770a3e" open="" class="toggle" dir="auto"><summary>Source</summary><div class="indented"><details id="2f9a15e2-9005-80f9-8552-d49dd9f30a46" open="" class="toggle" dir="auto"><summary> Tutorial</summary><div class="indented"><figure id="2f9a15e2-9005-80bf-be89-fe1f4ca26368" dir="ltr"><a href="https://fpgatutorial.com/verilog/" class="bookmark source"><div class="bookmark-info"><div class="bookmark-text"><div class="bookmark-title">Complete Verilog tutorials for beginners - FPGA Tutorial</div><div class="bookmark-description">A complete set of Verilog tutorials for beginners that covers every aspect of the Verilog language with examples.</div></div><div class="bookmark-href"><img src="https://fpgatutorial.com/wp-content/uploads/2024/10/site-logo.svg" class="icon bookmark-icon"/>https://fpgatutorial.com/verilog/</div></div><img src="https://fpgatutorial.com/wp-content/uploads/2024/11/verilog_img.jpeg" class="bookmark-image"/></a></figure><figure id="2f9a15e2-9005-80aa-8891-eee61bf8a3f6" dir="ltr"><a href="https://blog.csdn.net/wuzhikaidetb/article/details/130048032?csdn_share_tail=%7B%22type%22%3A%22blog%22%2C%22rType%22%3A%22article%22%2C%22rId%22%3A%22130048032%22%2C%22source%22%3A%22wuzhikaidetb%22%7D" class="bookmark source"><div class="bookmark-info"><div class="bookmark-text"><div class="bookmark-title"></div></div><div class="bookmark-href">https://blog.csdn.net/wuzhikaidetb/article/details/130048032?csdn_share_tail=%7B%22type%22%3A%22blog%22%2C%22rType%22%3A%22article%22%2C%22rId%22%3A%22130048032%22%2C%22source%22%3A%22wuzhikaidetb%22%7D</div></div></a></figure></div></details><details id="2f9a15e2-9005-8054-a0c0-d7834e231a68" open="" class="toggle" dir="auto"><summary>File</summary><div class="indented"><figure id="2f8a15e2-9005-800d-8957-f194d0d3d6c0" dir="ltr"><a href="https://drive.google.com/drive/folders/1iDr_KK_gItxQwiKSBzsgqAHMwli7_tLz" class="bookmark source"><div class="bookmark-info"><div class="bookmark-text"><div class="bookmark-title">Assignment - Google Drive</div></div><div class="bookmark-href"><img src="https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png" class="icon bookmark-icon"/>https://drive.google.com/drive/folders/1iDr_KK_gItxQwiKSBzsgqAHMwli7_tLz</div></div></a></figure><figure id="2f8a15e2-9005-800c-95e7-d69b7360f690" dir="ltr"><a href="https://github.com/ivylingchiang/NTHU_HardwareDesign" class="bookmark source"><div class="bookmark-info"><div class="bookmark-text"><div class="bookmark-title">GitHub - ivylingchiang/NTHU_HardwareDesign</div><div class="bookmark-description">Contribute to ivylingchiang/NTHU_HardwareDesign development by creating an account on GitHub.</div></div><div class="bookmark-href"><img src="https://github.com/fluidicon.png" class="icon bookmark-icon"/>https://github.com/ivylingchiang/NTHU_HardwareDesign</div></div><img src="https://opengraph.githubassets.com/95429d68f3a90a50de285fec772a3cce363b8da9ea742882e34789524e628ae0/ivylingchiang/NTHU_HardwareDesign" class="bookmark-image"/></a></figure></div></details></div></details><p id="2fea15e2-9005-8049-bf0a-d3fdd6afccba" class="" dir="auto">
+</p></div><div id="2f8a15e2-9005-80e8-abc4-cb48b4f19db0" style="width:106.25%" class="column" data-notion-column-ratio="1.0625" dir="auto"><details open="" class="" dir="auto"><summary style="font-weight:600;font-size:1.5em;line-height:1.3;margin:0"><h2 id="2f8a15e2-9005-80de-b988-df2fdb5987c8" style="display:inline-block"><mark class="highlight-blue" data-notion-highlight="blue">Outline</mark></h2></summary><div class="indented"><div id="2f8a15e2-9005-80e5-82a1-fc7152a3b8e2" class="column-list" data-notion-column-list="" dir="auto"><div id="2f8a15e2-9005-801d-82ae-f05bf1014e90" style="width:50%" class="column" data-notion-column-ratio="0.5" dir="auto"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="2f8a15e2-9005-801a-9c58-ccfdcb979867" dir="ltr"><div style="width:100%"><p id="2f8a15e2-9005-8049-b4bd-cc4f5682d14d" class="" dir="auto">5 Assignment </p><p id="2f8a15e2-9005-8090-80b3-c06e675cdf5c" class="" dir="auto">6 Practice / Lab</p><p id="2f8a15e2-9005-8080-86c5-f47081c014ea" class="" dir="auto">2 Midterm</p></div></aside></div><div id="2f8a15e2-9005-8068-8c6d-eaeb821afa4f" style="width:150%" class="column" data-notion-column-ratio="1.5" dir="auto"><blockquote id="2f8a15e2-9005-8096-8d89-e3824d857ad2" class="" dir="auto">This note only contains assignments and selected lab code for practice. Other related files will be provided on GitHub if needed.</blockquote><p id="2f8a15e2-9005-80b7-9931-e4816a80bce8" class="" dir="auto">
+</p></div></div></div></details><details open="" class="" dir="auto"><summary style="font-weight:600;font-size:1.5em;line-height:1.3;margin:0"><h2 id="2f8a15e2-9005-80e6-9a90-e0d8e87b7dbf" style="display:inline-block"><mark class="highlight-blue" data-notion-highlight="blue">Lab</mark></h2></summary><div class="indented"><details open="" class="" dir="auto"><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0"><h3 id="2f8a15e2-9005-80c9-92fd-d78cb71615dd" style="display:inline-block">Lab 1</h3></summary><div class="indented"><hr id="2f8a15e2-9005-80aa-a907-f29071a32501" dir="auto"/><h3 id="2f8a15e2-9005-805c-9dbf-c358bc12585a" class="" dir="auto"><strong>Introduction</strong></h3><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="2f8a15e2-9005-8025-a0cb-d4d8c1e3b602" dir="ltr"><div style="width:100%"><p id="2f9a15e2-9005-8056-b997-efae4e38c563" class="" dir="auto">In this lab, we are focusing on gate-level Verilog modeling. We&#x27;ll also be designing our own testbenches to validate the design and observe signal behavior through waveforms.</p></div></aside><p id="2f9a15e2-9005-800e-bed6-dfd0de7dd93d" class="" dir="auto">|  Spec source : <a href="https://github.com/ivylingchiang/NTHU_HardwareDesign/blob/main/LabFile/Lab1/Lab/lab1_spec.pdf">GitHub/Lab1/Spec</a></p><p id="2f9a15e2-9005-80b4-bba2-dcfef43c7cdc" class="" dir="auto">|  Testbench sample : <a href="https://blog.csdn.net/wuzhikaidetb/article/details/129396009">Verilog Tutorial</a>, <a href="https://ithelp.ithome.com.tw/articles/10276024">Testbench 的撰寫技巧</a>, <a href="https://hackmd.io/@GjP3NF8qT0SXa2TjRxSKeQ/SyzYAhjSV">Testbench 介紹</a>, <a href="https://hackmd.io/@Yukimura0119/BkJAkEk5t?utm_source=preview-mode&amp;utm_medium=rec">實驗報告</a></p><hr id="2f8a15e2-9005-80fe-93bd-c47a66545a6b" dir="auto"/><h3 id="2f9a15e2-9005-80a9-866a-e423e5b4af21" class="" dir="auto"><strong>Recap</strong></h3><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="2f9a15e2-9005-80d2-be46-ef0b7f1a8238" dir="ltr"><div style="width:100%"><p id="2f9a15e2-9005-8077-b659-edae621b3279" class="" dir="auto">Before proceeding with the lab, it is essential to understand the fundamentals of HDL and EDA tools. We will utilize <a href="https://www.amd.com/content/dam/amd/en/documents/university/vivado-teaching/hdl-design/2015x/VHDL/docs-pdf/Vivado_Tutorial.pdf">Xilinx Vivado</a>(<a href="https://github.com/Xilinx/Vivado-Design-Tutorials">Design tutorial</a>) as our primary simulation environment to verify our gate-level designs.</p></div></aside><details id="2f9a15e2-9005-80a9-b116-fad230d3c631" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Testbench</strong></mark></summary><div class="indented"><div id="2f9a15e2-9005-80ef-a472-f5ab1ac3af38" class="column-list" data-notion-column-list="" dir="auto"><div id="2f9a15e2-9005-80a2-af37-c1f37e877b6c" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="2f9a15e2-9005-808f-95f3-eb098bedec43" dir="ltr"><div style="width:100%"><p id="2f9a15e2-9005-8040-8d47-d960642d642d" class="" dir="auto">Conceptualize the testbench as a top-level module that instantiates the Design Under Test (DUT). By applying specific stimulus data sets, we can verify the design&#x27;s logic and analyze its performance through waveform visualization.</p></div></aside><ul id="2f9a15e2-9005-80fe-89d4-fa6da6ab0258" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Input port</strong>: register</li></ul><ul id="2f9a15e2-9005-805f-9f6f-e43ec677cc41" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Output port</strong>: ware</li></ul></div><div id="2f9a15e2-9005-809b-826d-f6de8b43e2f2" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><figure id="2f9a15e2-9005-808f-8ca7-e178315e3647" class="image" data-notion-image="Practice/cfdf5e1b-720c-4bc0-b1c8-4d9d61bda87e.png" dir="ltr"><a href="Practice/cfdf5e1b-720c-4bc0-b1c8-4d9d61bda87e.png"><img style="width:384px" src="Practice/cfdf5e1b-720c-4bc0-b1c8-4d9d61bda87e.png"/></a></figure></div></div><hr id="2f9a15e2-9005-808a-ab97-c9cf2162f63c" dir="auto"/><details id="2f9a15e2-9005-806d-a33a-e52a62b9fa22" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Timescale and Delay</strong></mark></summary><div class="indented"><figure id="2f9a15e2-9005-80c9-acbb-dfc182c6848a" class="image" data-notion-image="Practice/image.png" dir="ltr"><a href="Practice/image.png"><img style="width:816px" src="Practice/image.png"/></a></figure><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="2f9a15e2-9005-8022-aa57-ca90dad14a9f" dir="ltr"><div style="width:100%"><p id="2f9a15e2-9005-805b-bae7-c6e187d703a7" class="" dir="auto">Simulation is inherently time-dependent. The <strong>time unit</strong> and the specific <strong>timing</strong> of signal transitions must be explicitly defined in the testbench. Therefore, setting the correct <code><strong>timescale</strong></code> and <strong>propagation delays</strong> is critical for accurate circuit verification.</p></div></aside><hr id="2f9a15e2-9005-8007-a096-efc4c2248651" dir="auto"/><div id="2f9a15e2-9005-80b4-ba93-f8f5e74ec882" class="column-list" data-notion-column-list="" dir="auto"><div id="2f9a15e2-9005-8016-8f07-fecb5e19f977" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><p id="2f9a15e2-9005-8002-aaa3-d1733c1501a7" class="" dir="auto"><strong>Timescale</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2f9a15e2-9005-80c0-8e0d-da8158a3c69f" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all">`timescale {time_unit}/ {time_precision} </code></pre><blockquote id="2f9a15e2-9005-8083-bb53-e4e8141378b8" class="" dir="auto">The <code><strong>timescale</strong></code> directive instructs EDA tools on how to interpret time units. For instance, a setting of <code><strong>1ns / 10ps</strong></code> defines 1ns as the <strong>time unit</strong> (for delays) and 10ps as the <strong>time precision</strong>, which determines the resolution for observing the circuit&#x27;s behavior.</blockquote><p id="2f9a15e2-9005-8004-8065-fa6b0abd3fe7" class="" dir="auto"><mark class="highlight-blue" data-notion-highlight="blue">NOTE</mark><div class="indented"><div data-notion-highlight="default" dir="auto"><ol type="1" id="2f9a15e2-9005-80c9-973f-ca0f3ea91d52" class="block-color-default numbered-list" data-notion-highlight="default" start="1"><li>In Verilog, the <strong>time unit</strong> and <strong>precision</strong> must be specified using a power-of-ten scale—specifically <strong>1, 10, or 100</strong>. Valid time measurements include <strong>s, ms, us, ns, ps, and fs</strong>. </li></ol></div><ol type="1" id="2f9a15e2-9005-805b-8cda-d6301730daea" class="numbered-list" start="2" dir="auto"><li>Furthermore, the <strong>precision</strong> must always be <strong>equal to or smaller than</strong> the time unit to ensure simulation accuracy.</li></ol><ol type="1" id="2f9a15e2-9005-8070-ae54-d6468d1c25df" class="numbered-list" start="3" dir="auto"><li>The simulation time is rounded based on the specified <strong>time precision</strong>. If a delay value is not a multiple of the precision, the EDA tool will <strong>round it to the nearest precision unit</strong>. For example, with a precision of 1ns, a delay of 1.4ns would be rounded to 1ns, while 1.6ns would become 2ns.</li></ol></div></p></div><div id="2f9a15e2-9005-80bc-b3c8-eff76c472bcb" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><p id="2f9a15e2-9005-80b8-b51d-dc7b556ed578" class="" dir="auto"><strong>Delay</strong></p><pre id="2f9a15e2-9005-801b-ad13-de70b7f65c31" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all">parameter delay = n;
+#delay</code></pre><blockquote id="2f9a15e2-9005-8065-96c0-f4d29a3077d4" class="" dir="auto">In a testbench, <strong>delays</strong> define the <strong>sequence of events</strong>. They act as timing triggers that instruct EDA tools exactly when to initiate or transition specific signals, allowing for a structured simulation of input stimuli.</blockquote><pre id="2f9a15e2-9005-8061-8925-d21aaeec4de2" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all">// Regular Delay
+#&lt;delay&gt; &lt;LHS&gt; = &lt;RHS&gt;
+
+// Intra-assignment Delay
+&lt;LHS&gt; = #&lt;delay&gt; &lt;RHS&gt;</code></pre><blockquote id="2f9a15e2-9005-8081-92f3-d77a93ca9066" class="" dir="auto"><strong>Regular Delay</strong> (<code>#delay LHS = RHS</code>) suspends the process before evaluating the RHS, which is ideal for sequencing test stimulus. Conversely, <strong>Intra-assignment Delay</strong> (<code>LHS = #delay RHS</code>) captures the RHS value immediately but defers the assignment, effectively modeling the <strong>propagation delay</strong> of physical gates.</blockquote></div></div><hr id="2f9a15e2-9005-80e8-8bca-e0ab72cf1041" dir="auto"/><aside class="block-color-gray callout" data-notion-callout="" data-notion-callout-background="gray" style="white-space:pre-wrap;display:flex" id="2f9a15e2-9005-80e9-b0df-e6f44384f843" dir="ltr"><div style="width:100%"><p id="2f9a15e2-9005-8053-b181-deaa8847368e" class="" dir="auto">Reference : <a href="https://ieeexplore.ieee.org/document/4796920">IEEE Draft Standard for System Verilog</a>, <a href="https://link.springer.com/article/10.1007/s10836-014-5449-5">Verilog HDL Simulator Technology</a>, <a href="https://blog.csdn.net/qq_45434284/article/details/136464076">Verilog Coding Styles For Improved Simulation Efficiency</a>, <a href="https://www.ece.ucdavis.edu/~bbaas/281/notes/Handout.verilog3.pdf">VLSI Digital Signal Processing</a>, <a href="https://www.runoob.com/w3cnote/verilog-time-delay.html">Delay Intro</a>, <a href="https://blog.csdn.net/Reborn_Lee/article/details/107888798">Design of delay setting</a></p></div></aside></div></details><details id="2f9a15e2-9005-80c2-9895-d904551aa177" open="" class="toggle" dir="auto"><summary><strong>Cycle</strong></summary><div class="indented"><pre id="2f9a15e2-9005-804f-99b1-c363ae132563" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all">always #(CYC/2) clk = ~clk; </code></pre></div></details><details id="2f9a15e2-9005-80c2-96fb-daf9590e717a" open="" class="toggle" dir="auto"><summary></summary><div class="indented"></div></details><aside class="block-color-gray callout" data-notion-callout="" data-notion-callout-background="gray" style="white-space:pre-wrap;display:flex" id="2f9a15e2-9005-80cd-bce2-f3f6d229acf1" dir="ltr"><div style="width:100%"><p id="2f9a15e2-9005-8065-8530-cc8f874d7e44" class="" dir="auto">Reference : <a href="https://hackmd.io/@GjP3NF8qT0SXa2TjRxSKeQ/SyzYAhjSV">Testbench 介紹</a>, <a href="https://ithelp.ithome.com.tw/articles/10276024">Testbench 的撰寫技巧</a>, <a href="https://blog.csdn.net/wuzhikaidetb/article/details/129396009">Testbench tutorial</a></p></div></aside></div></details><details id="2f9a15e2-9005-8037-819f-ebd37d03e1a8" open="" class="toggle" dir="auto"><summary><strong>Vivado Tutorial</strong></summary><div class="indented"><aside class="block-color-gray callout" data-notion-callout="" data-notion-callout-background="gray" style="white-space:pre-wrap;display:flex" id="2f9a15e2-9005-803d-9af3-c2dd9c0b2f23" dir="ltr"><div style="width:100%"><p id="2f9a15e2-9005-80ed-be8e-fc0f68c68be8" class="" dir="auto">Reference : <a href="https://blog.csdn.net/wuzhikaidetb/article/details/128295529">vivado Introduction</a>, <a href="https://www.reddit.com/r/Verilog/comments/26a9re/differences_between_synthesis_and_simulation/">Differences between synthesis and simulation</a></p></div></aside></div></details><hr id="2f9a15e2-9005-80a9-84ae-c47b5072023c" dir="auto"/><p id="2f8a15e2-9005-8030-b42e-fe0d81932e9b" class="" dir="auto"><strong>Trace Code</strong></p><div id="2f8a15e2-9005-80fe-88a7-fb7221ad69ac" class="column-list" data-notion-column-list="" dir="auto"><div id="2f8a15e2-9005-8029-9506-c9fc353c456e" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><pre id="2f8a15e2-9005-803d-82a6-f129d77fbfa5" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre><pre id="2f8a15e2-9005-80ad-9e06-f13599d8ec55" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre></div><div id="2f8a15e2-9005-8004-afc6-ca6ef5af85b9" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><blockquote id="2f8a15e2-9005-8062-8f1c-c4041f5b7dcb" class="" dir="auto"></blockquote><p id="2f8a15e2-9005-8066-88b3-f174dd9b6224" class="" dir="auto">
+</p><p id="2f8a15e2-9005-802e-b5d0-e76e1cd22fd4" class="" dir="auto">
+</p><blockquote id="2f8a15e2-9005-806f-b5ee-faf3cbd590b7" class="" dir="auto"></blockquote></div></div><hr id="2f8a15e2-9005-80ae-9c79-d48375511332" dir="auto"/><p id="2f8a15e2-9005-805f-a733-cc3f35fce7ae" class="" dir="auto"><strong>Submit Files</strong></p><div id="2f8a15e2-9005-80f2-9544-f5d6579559df" class="column-list" data-notion-column-list="" dir="auto"><div id="2f8a15e2-9005-8092-83d0-cb8cf85ba969" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><pre id="2f8a15e2-9005-80da-bfcd-d677135476e0" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre></div><div id="2f8a15e2-9005-803d-8926-c6b862630380" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><blockquote id="2f8a15e2-9005-80d4-ad62-dcd9844af86e" class="" dir="auto"></blockquote></div></div><p id="2f8a15e2-9005-802d-93e2-d80dde14957b" class="" dir="auto">
+</p></div></details><details open="" class="" dir="auto"><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0"><h3 id="2f9a15e2-9005-8078-a0ec-e3aecd971f5e" style="display:inline-block">Practice 1</h3></summary><div class="indented"><hr id="2f9a15e2-9005-80b6-885f-d6e8904611bb" dir="auto"/><p id="2f9a15e2-9005-8028-9b4c-f0c8d4c58e35" class="" dir="auto"><strong>Introduction</strong></p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="2f9a15e2-9005-80cf-8705-cf91455e8abc" dir="ltr"><div style="width:100%"><p id="2f9a15e2-9005-80ce-a195-e3b5c5dc3bbe" class="" dir="auto">
+</p></div></aside><hr id="2f9a15e2-9005-8011-85ce-d6f216e2373f" dir="auto"/><p id="2f9a15e2-9005-80b6-9f2b-cab998c271a8" class="" dir="auto"><strong>Trace Code </strong></p><div id="2f9a15e2-9005-8075-b33a-d9b006156bad" class="column-list" data-notion-column-list="" dir="auto"><div id="2f9a15e2-9005-804a-a0c8-ec74198bd160" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><pre id="2f9a15e2-9005-80b2-90a5-e0bfc5053e6b" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre><pre id="2f9a15e2-9005-805a-aab0-d40e5dbbc957" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre></div><div id="2f9a15e2-9005-808c-a340-ef1efb938122" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><blockquote id="2f9a15e2-9005-80a9-9c4a-de671002a4a0" class="" dir="auto"></blockquote><p id="2f9a15e2-9005-801e-a784-c28d9c0390b2" class="" dir="auto">
+</p><p id="2f9a15e2-9005-80ae-afc6-c48a35522376" class="" dir="auto">
+</p><blockquote id="2f9a15e2-9005-8035-8b46-e5813235be69" class="" dir="auto"></blockquote></div></div><hr id="2f9a15e2-9005-80ad-a1d5-db2a51b89e7f" dir="auto"/><p id="2f9a15e2-9005-808e-aede-c5ca5ce5429f" class="" dir="auto"><strong>Submit Files</strong></p><div id="2f9a15e2-9005-8048-81e8-d12aceff16ae" class="column-list" data-notion-column-list="" dir="auto"><div id="2f9a15e2-9005-8092-b54f-e3852c8f70e0" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><pre id="2f9a15e2-9005-802d-922c-f307681f7fdc" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre></div><div id="2f9a15e2-9005-80ae-9e9b-c14fafb77089" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><blockquote id="2f9a15e2-9005-80f1-85cd-e4a88c72a7fc" class="" dir="auto"></blockquote></div></div><p id="2f9a15e2-9005-80bf-a1b2-fc1f423e616a" class="" dir="auto">
+</p></div></details><details open="" class="" dir="auto"><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0"><h3 id="2f8a15e2-9005-80a5-b65a-ea2e8344405f" style="display:inline-block">Lab 2</h3></summary><div class="indented"><hr id="2f8a15e2-9005-8089-bfaa-f1240ef910f7" dir="auto"/><p id="2f8a15e2-9005-807f-aea0-f0361a86436d" class="" dir="auto"><strong>Introduction</strong></p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="2f8a15e2-9005-807c-afb4-cde075dbaaa2" dir="ltr"><div style="width:100%"></div></aside><hr id="2f8a15e2-9005-8084-a12f-d4b70651bc3f" dir="auto"/><p id="2f8a15e2-9005-8091-b358-cbfcafc9ea36" class="" dir="auto"><strong>Trace Code </strong></p><div id="2f8a15e2-9005-80d5-8aa4-d888ad437501" class="column-list" data-notion-column-list="" dir="auto"><div id="2f8a15e2-9005-80e5-ba0f-d5ba87efff9b" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><pre id="2f8a15e2-9005-80d7-af05-fd1892fd4dea" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre><pre id="2f8a15e2-9005-809c-bc13-e2de307aecf9" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre></div><div id="2f8a15e2-9005-8060-8a77-eb3c56cd3163" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><blockquote id="2f8a15e2-9005-80f8-a86b-ea9590b71a7f" class="" dir="auto"></blockquote><p id="2f8a15e2-9005-8028-ac59-c317ec2183a9" class="" dir="auto">
+</p><p id="2f8a15e2-9005-80cb-bdf4-c029daeebfdc" class="" dir="auto">
+</p><blockquote id="2f8a15e2-9005-80b3-84e6-cdfb3fce7d8b" class="" dir="auto"></blockquote></div></div><hr id="2f8a15e2-9005-80e4-a65f-d7e566e06265" dir="auto"/><p id="2f8a15e2-9005-8077-a5d1-f56a60ebfa52" class="" dir="auto"><strong>Submit Files</strong></p><div id="2f8a15e2-9005-80df-816e-fffc343873dc" class="column-list" data-notion-column-list="" dir="auto"><div id="2f8a15e2-9005-8063-a19f-f79d485a74c1" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><pre id="2f8a15e2-9005-80ed-8c96-ca0418223d3a" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre></div><div id="2f8a15e2-9005-8077-8d01-d586f4c42d7b" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><blockquote id="2f8a15e2-9005-80c8-b77a-c8891779d76a" class="" dir="auto"></blockquote></div></div><p id="2f8a15e2-9005-8010-93f8-f3a2e0d218bb" class="" dir="auto">
+</p></div></details><details open="" class="" dir="auto"><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0"><h3 id="2f8a15e2-9005-8002-88fa-e8790eb8feb2" style="display:inline-block">Lab 3</h3></summary><div class="indented"><hr id="2f8a15e2-9005-8070-8cc2-ccdbca06b0d6" dir="auto"/><p id="2f8a15e2-9005-8038-8eaf-caea9d1292be" class="" dir="auto"><strong>Introduction</strong></p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="2f8a15e2-9005-80cb-ae86-dd93be21cee3" dir="ltr"><div style="width:100%"></div></aside><hr id="2f8a15e2-9005-80bc-86a4-fbcad281a2d6" dir="auto"/><p id="2f8a15e2-9005-8044-95a4-c6f6c83641ac" class="" dir="auto"><strong>Trace Code </strong></p><div id="2f8a15e2-9005-806e-9c6c-d33ba3ce3238" class="column-list" data-notion-column-list="" dir="auto"><div id="2f8a15e2-9005-808a-b821-edf48f0c4a36" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><pre id="2f8a15e2-9005-80b7-b5cd-f421c268d043" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre><pre id="2f8a15e2-9005-8060-a0de-e7893586b91b" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre></div><div id="2f8a15e2-9005-8099-9b5b-c8f2be69c80d" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><blockquote id="2f8a15e2-9005-8063-8efd-f9bf48fb731d" class="" dir="auto"></blockquote><p id="2f8a15e2-9005-8077-969b-f3cd332012f2" class="" dir="auto">
+</p><p id="2f8a15e2-9005-808c-ac5f-dbea8e95370e" class="" dir="auto">
+</p><blockquote id="2f8a15e2-9005-8081-b8ab-f5cd0666ab0b" class="" dir="auto"></blockquote></div></div><hr id="2f8a15e2-9005-8079-baaf-ea221e4dd2d1" dir="auto"/><p id="2f8a15e2-9005-8020-bca3-c5e9dc995106" class="" dir="auto"><strong>Submit Files</strong></p><div id="2f8a15e2-9005-8090-ad32-c581b1a8a1c7" class="column-list" data-notion-column-list="" dir="auto"><div id="2f8a15e2-9005-807e-adcc-d69183d2da96" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><pre id="2f8a15e2-9005-8071-8bd9-c7ca90c7073a" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre></div><div id="2f8a15e2-9005-80b6-b78c-c6bc837c811a" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><blockquote id="2f8a15e2-9005-80ca-ad2b-f0000333506d" class="" dir="auto"></blockquote></div></div><p id="2f8a15e2-9005-802b-8479-ff3a57b52e95" class="" dir="auto">
+</p></div></details><details open="" class="" dir="auto"><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0"><h3 id="2f8a15e2-9005-8070-a244-d148c3a9d5a6" style="display:inline-block">Lab 4</h3></summary><div class="indented"><hr id="2f8a15e2-9005-80d5-b589-c3f9aa6ea5c3" dir="auto"/><p id="2f8a15e2-9005-809c-a694-f3f5b37f1d90" class="" dir="auto"><strong>Introduction</strong></p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="2f8a15e2-9005-801e-b9d3-dcb2c369c747" dir="ltr"><div style="width:100%"></div></aside><hr id="2f8a15e2-9005-80d7-a6ac-cc0335c06c31" dir="auto"/><p id="2f8a15e2-9005-80dd-9e78-ffd4487c5bab" class="" dir="auto"><strong>Trace Code </strong></p><div id="2f8a15e2-9005-80ae-8b9c-c458f014883c" class="column-list" data-notion-column-list="" dir="auto"><div id="2f8a15e2-9005-80c0-86a3-c905773546a8" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><pre id="2f8a15e2-9005-80cc-8c24-f31ac4481f15" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre><pre id="2f8a15e2-9005-8045-abf6-fd4f931890d2" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre></div><div id="2f8a15e2-9005-8062-81ed-e6f714ba0885" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><blockquote id="2f8a15e2-9005-80fb-a3f5-e25233319af4" class="" dir="auto"></blockquote><p id="2f8a15e2-9005-803a-b8b6-debaf607f615" class="" dir="auto">
+</p><p id="2f8a15e2-9005-80a4-912e-d461d6145a51" class="" dir="auto">
+</p><blockquote id="2f8a15e2-9005-808b-b18a-f54696db518d" class="" dir="auto"></blockquote></div></div><hr id="2f8a15e2-9005-80a5-a9a4-c3d6dccde3a4" dir="auto"/><p id="2f8a15e2-9005-809b-9e4b-c61517a8532a" class="" dir="auto"><strong>Submit Files</strong></p><div id="2f8a15e2-9005-8045-87d5-e63f9b50362d" class="column-list" data-notion-column-list="" dir="auto"><div id="2f8a15e2-9005-8089-8d7c-f6c4659d6ace" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><pre id="2f8a15e2-9005-8083-b28d-c890ebcd1a70" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre></div><div id="2f8a15e2-9005-8099-bcf0-ee6647c1479f" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><blockquote id="2f8a15e2-9005-805b-943c-cb3fe6ddc264" class="" dir="auto"></blockquote></div></div><p id="2f8a15e2-9005-8087-94b9-cd380b9621d6" class="" dir="auto">
+</p></div></details><details open="" class="" dir="auto"><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0"><h3 id="2f8a15e2-9005-80d3-9a2d-d89e5644a6ea" style="display:inline-block">Lab 5</h3></summary><div class="indented"><hr id="2f8a15e2-9005-8061-83b1-f91265e40d37" dir="auto"/><p id="2f8a15e2-9005-80a7-ad4b-e5971ed7c210" class="" dir="auto"><strong>Introduction</strong></p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="2f8a15e2-9005-805a-920f-f9fe988268b3" dir="ltr"><div style="width:100%"></div></aside><hr id="2f8a15e2-9005-803a-8cfc-d8840c4627a6" dir="auto"/><p id="2f8a15e2-9005-8087-8669-c81b13e40790" class="" dir="auto"><strong>Trace Code </strong></p><div id="2f8a15e2-9005-80b4-9361-c8f1140f34fe" class="column-list" data-notion-column-list="" dir="auto"><div id="2f8a15e2-9005-804b-b774-ef88358520e0" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><pre id="2f8a15e2-9005-8077-bcef-e094acac37c8" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre><pre id="2f8a15e2-9005-803f-a96b-f1df13ee184e" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre></div><div id="2f8a15e2-9005-80e5-a296-f29a8bb5a19b" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><blockquote id="2f8a15e2-9005-8013-a61c-f9f6cb8fb13b" class="" dir="auto"></blockquote><p id="2f8a15e2-9005-8001-bcb8-e5b04c515f75" class="" dir="auto">
+</p><p id="2f8a15e2-9005-80f6-b198-ec822781a6bf" class="" dir="auto">
+</p><blockquote id="2f8a15e2-9005-8067-96a2-c4703bff7541" class="" dir="auto"></blockquote></div></div><hr id="2f8a15e2-9005-8021-99af-da1784ff626e" dir="auto"/><p id="2f8a15e2-9005-805e-9e74-d9adffa75234" class="" dir="auto"><strong>Submit Files</strong></p><div id="2f8a15e2-9005-80da-af2c-f534f6a1f312" class="column-list" data-notion-column-list="" dir="auto"><div id="2f8a15e2-9005-80f9-86cf-ffdf7b415c94" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><pre id="2f8a15e2-9005-80ea-b742-d3442d6c0dd3" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre></div><div id="2f8a15e2-9005-809a-a06d-fbc41947156e" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><blockquote id="2f8a15e2-9005-80f3-950a-cabdcadffae2" class="" dir="auto"></blockquote></div></div><p id="2f8a15e2-9005-8091-b122-c27edab76295" class="" dir="auto">
+</p></div></details><details open="" class="" dir="auto"><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0"><h3 id="2f8a15e2-9005-8034-9841-dd386076eb24" style="display:inline-block">Lab 6</h3></summary><div class="indented"><hr id="2f8a15e2-9005-8058-a861-f08aff2882ea" dir="auto"/><p id="2f8a15e2-9005-8061-8efa-ebef1059f8c1" class="" dir="auto"><strong>Introduction</strong></p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="2f8a15e2-9005-80db-aadd-ead0f6150f47" dir="ltr"><div style="width:100%"></div></aside><hr id="2f8a15e2-9005-8063-bf81-fe6cb3d9d55e" dir="auto"/><p id="2f8a15e2-9005-809f-8cfd-f0abbf982b41" class="" dir="auto"><strong>Trace Code </strong></p><div id="2f8a15e2-9005-805e-bdd7-d5bc10764c12" class="column-list" data-notion-column-list="" dir="auto"><div id="2f8a15e2-9005-807f-adec-c74cc2b45458" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><pre id="2f8a15e2-9005-8002-90d5-ce3799951e38" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre><pre id="2f8a15e2-9005-804a-884d-e8c45bbbbb04" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre></div><div id="2f8a15e2-9005-8041-95d6-f3e00c89a822" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><blockquote id="2f8a15e2-9005-807b-b956-f1158033add1" class="" dir="auto"></blockquote><p id="2f8a15e2-9005-8006-a4fc-c673aaf6dee3" class="" dir="auto">
+</p><p id="2f8a15e2-9005-8062-aaa3-f12bfed6fe23" class="" dir="auto">
+</p><blockquote id="2f8a15e2-9005-80b2-8cb0-d0a902d171a7" class="" dir="auto"></blockquote></div></div><hr id="2f8a15e2-9005-80f7-9e5b-fc158ee96b8e" dir="auto"/><p id="2f8a15e2-9005-8039-b8ab-e0640972fc05" class="" dir="auto"><strong>Submit Files</strong></p><div id="2f8a15e2-9005-80ec-88c7-fe7b96c6523d" class="column-list" data-notion-column-list="" dir="auto"><div id="2f8a15e2-9005-8021-ad02-cd83280b36c4" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><pre id="2f8a15e2-9005-8039-bc34-d61f35049117" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre></div><div id="2f8a15e2-9005-80e3-a5a7-d36a7ae16eec" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><blockquote id="2f8a15e2-9005-803d-bbaf-d5cd05ec6ae6" class="" dir="auto"></blockquote></div></div><p id="2f8a15e2-9005-80dc-ab10-c924d29e969a" class="" dir="auto">
+</p></div></details></div></details><details open="" class="" dir="auto"><summary style="font-weight:600;font-size:1.5em;line-height:1.3;margin:0"><h2 id="2f8a15e2-9005-803a-ba9c-d687933b163b" style="display:inline-block"><mark class="highlight-blue" data-notion-highlight="blue">Assignment</mark></h2></summary><div class="indented"><details open="" class="" dir="auto"><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0"><h3 id="2f8a15e2-9005-8043-81d8-c351578accfb" style="display:inline-block">Advance 1</h3></summary><div class="indented"><hr id="2f8a15e2-9005-808f-aef7-d4f1b6a1fd6a" dir="auto"/><p id="2f8a15e2-9005-80a0-aba7-ce57852b19d2" class="" dir="auto"><strong>Introduction</strong></p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="2f8a15e2-9005-8063-a869-fd53fc76c302" dir="ltr"><div style="width:100%"></div></aside><hr id="2f8a15e2-9005-8001-8590-d89cabbbe315" dir="auto"/><p id="2f8a15e2-9005-808a-863c-d9a767975bb0" class="" dir="auto"><strong>Trace Code </strong></p><div id="2f8a15e2-9005-8067-b221-c939569c8a5a" class="column-list" data-notion-column-list="" dir="auto"><div id="2f8a15e2-9005-80b2-b191-ebfb2bd2e5c2" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><pre id="2f8a15e2-9005-80ec-bb6e-cb59619d4315" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre><pre id="2f8a15e2-9005-80b6-9b82-cec1cf67d91c" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre></div><div id="2f8a15e2-9005-8027-85db-ce41839e3eb3" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><blockquote id="2f8a15e2-9005-8054-ba68-cb600cb032a4" class="" dir="auto"></blockquote><p id="2f8a15e2-9005-8031-983a-f2e0385e47cc" class="" dir="auto">
+</p><p id="2f8a15e2-9005-802c-80a2-dc5fb2ac4693" class="" dir="auto">
+</p><blockquote id="2f8a15e2-9005-80d8-aef0-f8e6a7f3f934" class="" dir="auto"></blockquote></div></div><hr id="2f8a15e2-9005-8030-befc-e5f4b9fe55b0" dir="auto"/><p id="2f8a15e2-9005-8072-adbc-f411c5d7a6e4" class="" dir="auto"><strong>Submit Files</strong></p><div id="2f8a15e2-9005-804d-868b-ff647ab553d9" class="column-list" data-notion-column-list="" dir="auto"><div id="2f8a15e2-9005-8073-9808-eebe4da62025" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><pre id="2f8a15e2-9005-808e-95f1-d4ee0e8a91d8" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre></div><div id="2f8a15e2-9005-80ad-97e9-e323fe529846" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><blockquote id="2f8a15e2-9005-8044-bb84-d877dc9fb6b6" class="" dir="auto"></blockquote></div></div><p id="2f8a15e2-9005-8067-9970-cfe912488465" class="" dir="auto">
+</p></div></details><details open="" class="" dir="auto"><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0"><h3 id="2f8a15e2-9005-806d-be1b-ea46f6ce9373" style="display:inline-block">Advance 2</h3></summary><div class="indented"><hr id="2f8a15e2-9005-8009-ab2e-ead65bb299ae" dir="auto"/><p id="2f8a15e2-9005-80c5-a26d-c36650f34506" class="" dir="auto"><strong>Introduction</strong></p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="2f8a15e2-9005-8085-a38b-ffd68cfac5c5" dir="ltr"><div style="width:100%"></div></aside><hr id="2f8a15e2-9005-808b-b17c-d96d713b94ac" dir="auto"/><p id="2f8a15e2-9005-8061-b2d7-dcaecc6bc2bf" class="" dir="auto"><strong>Trace Code </strong></p><div id="2f8a15e2-9005-8024-961a-e06b3e745d0f" class="column-list" data-notion-column-list="" dir="auto"><div id="2f8a15e2-9005-8033-a015-e980f62e2c6a" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><pre id="2f8a15e2-9005-80bd-a09a-f1fae42c76ab" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre><pre id="2f8a15e2-9005-8097-872f-d63895cc8c10" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre></div><div id="2f8a15e2-9005-80a1-8bb6-c37ddc5f45ac" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><blockquote id="2f8a15e2-9005-804e-9e39-d37895acc7b5" class="" dir="auto"></blockquote><p id="2f8a15e2-9005-8074-9f0f-f4b3ec3c7eea" class="" dir="auto">
+</p><p id="2f8a15e2-9005-800b-b72a-e52d29cfc9e8" class="" dir="auto">
+</p><blockquote id="2f8a15e2-9005-8093-aeb0-d24d252a90a6" class="" dir="auto"></blockquote></div></div><hr id="2f8a15e2-9005-8009-8d70-f3dd1b159fbe" dir="auto"/><p id="2f8a15e2-9005-8006-80c0-eedc6e623d86" class="" dir="auto"><strong>Submit Files</strong></p><div id="2f8a15e2-9005-80cd-9da5-ed0b6ae7f042" class="column-list" data-notion-column-list="" dir="auto"><div id="2f8a15e2-9005-8098-b655-d1e6e950f952" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><pre id="2f8a15e2-9005-80bd-be12-d1ff9fc0a5cd" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre></div><div id="2f8a15e2-9005-80b6-b3c3-e8365af3d363" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><blockquote id="2f8a15e2-9005-806a-9224-cc72c4fdd62e" class="" dir="auto"></blockquote></div></div><p id="2f8a15e2-9005-80df-b15d-c54060d1629f" class="" dir="auto">
+</p></div></details><details open="" class="" dir="auto"><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0"><h3 id="2f8a15e2-9005-80ba-aaf8-e01e11042640" style="display:inline-block">Advance 3</h3></summary><div class="indented"><hr id="2f8a15e2-9005-80a6-b3b9-da6ec16080ad" dir="auto"/><p id="2f8a15e2-9005-8037-b444-c00750e4bfd6" class="" dir="auto"><strong>Introduction</strong></p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="2f8a15e2-9005-8021-bc1b-d9315fdd858f" dir="ltr"><div style="width:100%"></div></aside><hr id="2f8a15e2-9005-8012-8a92-c45e93d012f5" dir="auto"/><p id="2f8a15e2-9005-80c1-ac67-ea2d7effd0ed" class="" dir="auto"><strong>Trace Code </strong></p><div id="2f8a15e2-9005-8042-a468-f8849d9a603b" class="column-list" data-notion-column-list="" dir="auto"><div id="2f8a15e2-9005-80fa-8189-d4bb0ed2f473" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><pre id="2f8a15e2-9005-80eb-ac5f-fc30dc84a2ba" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre><pre id="2f8a15e2-9005-808e-9e77-e70ca61903aa" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre></div><div id="2f8a15e2-9005-8083-b7b5-f34d578ddeb7" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><blockquote id="2f8a15e2-9005-80a1-8716-faf16e755fb9" class="" dir="auto"></blockquote><p id="2f8a15e2-9005-8094-acfc-fe833ee580ef" class="" dir="auto">
+</p><p id="2f8a15e2-9005-8084-a467-fabcb9f48883" class="" dir="auto">
+</p><blockquote id="2f8a15e2-9005-80dd-8372-d7f2b74f6624" class="" dir="auto"></blockquote></div></div><hr id="2f8a15e2-9005-80bc-8023-e00252077107" dir="auto"/><p id="2f8a15e2-9005-8068-853a-fa70248ff90c" class="" dir="auto"><strong>Submit Files</strong></p><div id="2f8a15e2-9005-8001-b531-f4b0c7cd087f" class="column-list" data-notion-column-list="" dir="auto"><div id="2f8a15e2-9005-80fe-bf0d-dfaa816a76cb" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><pre id="2f8a15e2-9005-80c9-a3e9-f4ea5a6ebcb1" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre></div><div id="2f8a15e2-9005-807e-a2dd-f527d01f70ee" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><blockquote id="2f8a15e2-9005-808f-bf70-eb7532c32ec1" class="" dir="auto"></blockquote></div></div><p id="2f8a15e2-9005-80fb-9295-c1a35c7a807e" class="" dir="auto">
+</p></div></details><details open="" class="" dir="auto"><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0"><h3 id="2f8a15e2-9005-80a3-9d57-de3aba210481" style="display:inline-block">Advance 4</h3></summary><div class="indented"><hr id="2f8a15e2-9005-8066-8a38-c2049c16630a" dir="auto"/><p id="2f8a15e2-9005-80cd-b170-d473f4d15b9e" class="" dir="auto"><strong>Introduction</strong></p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="2f8a15e2-9005-8034-a16a-fba44c2f38e6" dir="ltr"><div style="width:100%"></div></aside><hr id="2f8a15e2-9005-8083-aab8-ec4da56a1c80" dir="auto"/><p id="2f8a15e2-9005-805d-93d4-d177464f1b38" class="" dir="auto"><strong>Trace Code </strong></p><div id="2f8a15e2-9005-80b5-be3c-cfa1da6c8b9e" class="column-list" data-notion-column-list="" dir="auto"><div id="2f8a15e2-9005-801f-9bad-f61df73f1d5a" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><pre id="2f8a15e2-9005-807d-b859-f01efaf18f98" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre><pre id="2f8a15e2-9005-80ce-8e1f-f945558ae779" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre></div><div id="2f8a15e2-9005-8027-a554-c659be241ac6" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><blockquote id="2f8a15e2-9005-806b-9743-d3b915a0f3de" class="" dir="auto"></blockquote><p id="2f8a15e2-9005-803e-bf60-c840ef2c7ab6" class="" dir="auto">
+</p><p id="2f8a15e2-9005-80dc-806e-decde9f36b11" class="" dir="auto">
+</p><blockquote id="2f8a15e2-9005-80be-ac85-c7446031e1a5" class="" dir="auto"></blockquote></div></div><hr id="2f8a15e2-9005-8060-ac97-f6ae6dd53297" dir="auto"/><p id="2f8a15e2-9005-8096-b796-e9e6bd93cbb1" class="" dir="auto"><strong>Submit Files</strong></p><div id="2f8a15e2-9005-80fa-a2ad-dd00086f47a4" class="column-list" data-notion-column-list="" dir="auto"><div id="2f8a15e2-9005-80ed-ba3d-f3455c23a3d1" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><pre id="2f8a15e2-9005-80dd-8766-c1628d3b603b" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre></div><div id="2f8a15e2-9005-8068-860f-e8dce30c812b" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><blockquote id="2f8a15e2-9005-80ea-9ab8-cdf08ddd2888" class="" dir="auto"></blockquote></div></div><p id="2f8a15e2-9005-801c-9779-eb4c294dcab4" class="" dir="auto">
+</p></div></details><details open="" class="" dir="auto"><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0"><h3 id="2f8a15e2-9005-80bd-b837-c68edbea488b" style="display:inline-block">Advance 5</h3></summary><div class="indented"><hr id="2f8a15e2-9005-8007-86b0-fd0a8cd3671f" dir="auto"/><p id="2f8a15e2-9005-8060-8847-fe8c8ac681f2" class="" dir="auto"><strong>Introduction</strong></p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="2f8a15e2-9005-80e6-b00b-f6410e8bfb1e" dir="ltr"><div style="width:100%"></div></aside><hr id="2f8a15e2-9005-80ae-b71d-fcb206dff719" dir="auto"/><p id="2f8a15e2-9005-80cb-a97e-c3a4f32ac68d" class="" dir="auto"><strong>Trace Code </strong></p><div id="2f8a15e2-9005-809f-b239-c91cbaeca257" class="column-list" data-notion-column-list="" dir="auto"><div id="2f8a15e2-9005-8001-9030-dbfb159cb749" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><pre id="2f8a15e2-9005-808e-b3c3-e99c0200206d" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre><pre id="2f8a15e2-9005-8069-ac9b-dd17cf46ed7f" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre></div><div id="2f8a15e2-9005-80f5-a5c0-d3dcd3b80892" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><blockquote id="2f8a15e2-9005-80e1-afd3-da4e95c2cd06" class="" dir="auto"></blockquote><p id="2f8a15e2-9005-80aa-bbd3-efc48522a5e5" class="" dir="auto">
+</p><p id="2f8a15e2-9005-8005-906f-f1f5948ac0e7" class="" dir="auto">
+</p><blockquote id="2f8a15e2-9005-80ec-82e3-cab19ae38f70" class="" dir="auto"></blockquote></div></div><hr id="2f8a15e2-9005-80a5-bba7-f99c13327286" dir="auto"/><p id="2f8a15e2-9005-80cf-b7df-c8efd088f3d1" class="" dir="auto"><strong>Submit Files</strong></p><div id="2f8a15e2-9005-80b8-ac4b-c6c9131691c5" class="column-list" data-notion-column-list="" dir="auto"><div id="2f8a15e2-9005-806e-9f81-ef44e306f4b2" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><pre id="2f8a15e2-9005-8084-8a50-e0697cc6754c" class="code code-wrap" data-notion-code-syntax="verilog"><code class="language-verilog" style="white-space:pre-wrap;word-break:break-all"></code></pre></div><div id="2f8a15e2-9005-80ef-af56-ed88be9c9604" style="width:100%" class="column" data-notion-column-ratio="1" dir="auto"><blockquote id="2f8a15e2-9005-80a0-a4e9-f004a3931a1b" class="" dir="auto"></blockquote></div></div><p id="2f8a15e2-9005-8002-b99e-f84d079f9b41" class="" dir="auto">
+</p></div></details><p id="2f8a15e2-9005-8042-90a0-faad5ef0f32d" class="" dir="auto">
+</p></div></details></div></div><hr id="2f8a15e2-9005-80cb-a7c1-db499dca02c8" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="2f8a15e2-9005-801b-89a5-dc80530aec9b" dir="ltr"><div style="width:100%"><p id="2f8a15e2-9005-8029-acaf-f6d4e976face" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Comment</mark></p></div></aside></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

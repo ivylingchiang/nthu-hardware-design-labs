@@ -1,0 +1,774 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Slotted Page Layout</title><meta name="data-notion-page-icon" content="🧱"/><link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2290%22%3E%F0%9F%A7%B1%3C%2Ftext%3E%3C%2Fsvg%3E"/><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+/* Override strong tags inside headings to maintain consistent weight */
+h1 strong,
+h2 strong,
+h3 strong {
+	font-weight: 600;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 10px;
+	padding: 1rem;
+}
+
+/* For default-background callouts, render the border outline. */
+.callout.block-color-default_background {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+figure,
+aside,
+details {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+
+	table.collection-content {
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	table.collection-content th,
+	table.collection-content td {
+		overflow-wrap: anywhere;
+	}
+
+	table.collection-content td > .user,
+	table.collection-content td > time {
+		white-space: pre-wrap;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content-wrapper {
+	overflow-x: auto;
+}
+
+@media only print {
+	.collection-content-wrapper {
+		overflow-x: visible;
+	}
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.collection-content td {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.column-list {
+	display: flex;
+	gap: 46px;
+}
+
+.column {
+	min-width: 0;
+	overflow: hidden;
+}
+
+.column > *:first-child {
+	margin-top: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding-inline: 0.125rem;
+	padding-block: 0.375rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+table {
+	border-collapse: collapse;
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol.numbered-list.numbered-list-digits-2 {
+	padding-inline-start: 2em;
+}
+
+ol.numbered-list.numbered-list-digits-3plus {
+	padding-inline-start: 2.4em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+/*
+ * Render emoji icons using a ::before pseudo-element to keep the glyph
+ * out of the DOM textContent traversal. This avoids double-rendering icons
+ * in callouts and page titles.
+ * NOTE(slim/html-export-pseudo-icons): I can't tagref this because it will
+ * flag as a duplicate tag after codegen.
+ */
+.icon[data-emoji]::before {
+	content: attr(data-emoji);
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.callout img.notion-static-icon {
+	width: 1em;
+	height: 1em;
+}
+
+.callout p {
+	margin: 0;
+}
+
+.callout h1,
+.callout h2,
+.callout h3 {
+	margin: 0 0 0.6rem;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	margin-right: 0.4em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+blockquote.quote-large {
+	font-size: 1.25em;
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.tab {
+	margin: 1.25em 0;
+	padding-inline: 1rem;
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.highlight-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.highlight-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.highlight-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.highlight-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.highlight-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.highlight-default_background {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray_background {
+	background: rgba(42, 28, 0, 0.07);
+}
+.highlight-brown_background {
+	background: rgba(139, 46, 0, 0.086);
+}
+.highlight-orange_background {
+	background: rgba(224, 101, 1, 0.129);
+}
+.highlight-yellow_background {
+	background: rgba(211, 168, 0, 0.137);
+}
+.highlight-teal_background {
+	background: rgba(0, 100, 45, 0.09);
+}
+.highlight-blue_background {
+	background: rgba(0, 124, 215, 0.094);
+}
+.highlight-purple_background {
+	background: rgba(102, 0, 178, 0.078);
+}
+.highlight-pink_background {
+	background: rgba(197, 0, 93, 0.086);
+}
+.highlight-red_background {
+	background: rgba(223, 22, 0, 0.094);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.block-color-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.block-color-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.block-color-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.block-color-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.block-color-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(240, 239, 237, 1);
+}
+.block-color-brown_background {
+	background: rgba(245, 237, 233, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 235, 222, 1);
+}
+.block-color-yellow_background {
+	background: rgba(249, 243, 220, 1);
+}
+.block-color-teal_background {
+	background: rgba(232, 241, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(229, 242, 252, 1);
+}
+.block-color-purple_background {
+	background: rgba(243, 235, 249, 1);
+}
+.block-color-pink_background {
+	background: rgba(250, 233, 241, 1);
+}
+.block-color-red_background {
+	background: rgba(252, 233, 231, 1);
+}
+.select-value-color-default { background-color: rgba(42, 28, 0, 0.07); }
+.select-value-color-gray { background-color: rgba(28, 19, 1, 0.11); }
+.select-value-color-brown { background-color: rgba(127, 51, 0, 0.156); }
+.select-value-color-orange { background-color: rgba(196, 88, 0, 0.203); }
+.select-value-color-yellow { background-color: rgba(209, 156, 0, 0.282); }
+.select-value-color-green { background-color: rgba(0, 96, 38, 0.156); }
+.select-value-color-blue { background-color: rgba(0, 118, 217, 0.203); }
+.select-value-color-purple { background-color: rgba(92, 0, 163, 0.141); }
+.select-value-color-pink { background-color: rgba(183, 0, 78, 0.152); }
+.select-value-color-red { background-color: rgba(206, 24, 0, 0.164); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style><style>@import url('https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex-swap.min.css')</style></head><body><article id="33aa15e2-9005-8117-8a8f-de29bedbed99" class="page serif" data-notion-page-icon="🧱"><header><img class="page-cover-image" src="https://app.notion.com/images/page-cover/met_william_morris_1877_willow.jpg" style="object-position:center 90%"/><div class="page-header-icon page-header-icon-with-cover"><span class="icon" data-emoji="🧱"></span></div><h1 class="page-title" dir="auto"><strong>Slotted Page Layout</strong></h1><p class="page-description" dir="auto"></p><table class="properties"><tbody></tbody></table></header><div class="page-body"><div id="33aa15e2-9005-80e3-b1bb-f76c1eb8ed97" class="column-list" data-notion-column-list="" dir="auto"><div id="33aa15e2-9005-80f3-8e51-c92c627a2910" style="width:18.75%" class="column" data-notion-column-ratio="0.1875" dir="auto"><hr id="33aa15e2-9005-80ff-b461-fed9b3ee6587" dir="auto"/><figure id="33aa15e2-9005-80b5-a675-fbcfbe9d83fb" class="image" data-notion-image="../../Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg" dir="ltr"><a href="../../Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg"><img style="width:548.375px" src="../../Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg"/></a></figure><p id="33aa15e2-9005-80c7-9e66-c9f78bebcaec" class="" dir="auto">
+</p></div><div id="33aa15e2-9005-807b-bf5b-dd24d9a57fba" style="width:81.25%" class="column" data-notion-column-ratio="0.8125" dir="auto"><h3 id="33aa15e2-9005-8020-899e-e3dc6d66e08c" class="" dir="auto">Slotted Page Layout</h3><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8079-86a0-dbd1fa4468ce" dir="ltr"><div style="width:100%"><p id="55cd51ee-8b52-4fe2-915d-17c899d49e04" class="" dir="auto">在 Indexing 單元中，我們要理解 B+Tree 與 LSM-Tree 等 indexing 結構如何在磁碟上高效地組織資料。但在討論這些巨觀結構之前，我們需要先瞭解單一 disk page 內部的資料是怎麼擺放的。</p><p id="01caacee-1dce-4963-9fcb-d7438f80bc9a" class="" dir="auto">Given 一個固定大小（例如 8 KB）的空白 page。我們要往裡面塞入多筆長度不一的 record，同時滿足三個需求：</p><ol type="1" id="2a54fcbe-af75-4a1c-8dc8-a1ebc843aea8" class="numbered-list" start="1" dir="auto"><li>能快速找到任一筆 record</li></ol><ol type="1" id="2a82dbb9-7240-4f4c-bb8a-14000465a0bf" class="numbered-list" start="2" dir="auto"><li>刪除或更新 record 後能回收空間</li></ol><ol type="1" id="88c78820-0b75-4f8f-96fc-80dcbc9e839e" class="numbered-list" start="3" dir="auto"><li>外部持有的 record 參照不會因為 page 內部的搬移而失效。</li></ol><p id="516c6a37-c124-4f7b-9de0-071a842c23f1" class="" dir="auto">Slotted page 用一個三層結構同時解決了這三個問題：<strong>page header</strong> 記錄 page-level metadata（如 free-space offset、slot count），<strong>slot array</strong> 從 page 前端往後成長，每個 slot 是一組 (offset, length) 指向對應 record 的位置，而 <strong>record 資料</strong>（heap area）則從 page 尾端往前堆疊。一個向後長，一個向前長，中間的空隙就是可用空間。</p><p id="461d533c-0e5e-408c-a7da-5c793b22befd" class="" dir="auto">這種資料結構，讓外部只需要記住「page ID + slot number」就能找到一筆 record，而 page 內部可以自由搬移 record（例如做 compaction 來消除 fragmentation），只要更新 slot array 中的 offset 即可。瞭解這個機制後，你會發現它在後續的 B+Tree leaf node、heap file、甚至 WAL record 中反覆出現。</p></div></aside><blockquote id="33aa15e2-9005-80bc-b0e4-e9cff31ed967" class="" dir="auto">Reference: </blockquote><hr id="33aa15e2-9005-80ff-913f-da9174f4fa87" dir="auto"/><details id="33aa15e2-9005-805e-be2b-d8d85e96cd9d" open="" class="toggle" dir="auto"><summary><strong>Classification</strong></summary><div class="indented"><p id="33aa15e2-9005-808d-940e-f265754ec7ea" class="" dir="auto">
+</p><hr id="33aa15e2-9005-80a9-bf5c-f1c12523c4ce" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80ec-b5df-f5f2af3f54b1" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80f6-9599-da68aaa02ca6" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Extra Component</mark></p><hr id="33aa15e2-9005-80c6-bb18-fd02c88b40a4" dir="auto"/><p id="33aa15e2-9005-8086-9c04-dab17b92f19f" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Reference:</mark></p></div></aside><hr id="33aa15e2-9005-8082-96b0-fb39d01d9fc4" dir="auto"/></div></details><details id="33aa15e2-9005-807d-a1c5-eae2d66fd19c" open="" class="toggle" dir="auto"><summary><strong>Key Word Definition/ Discussion</strong></summary><div class="indented"><details id="33aa15e2-9005-8018-ac94-d6de933716ef" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Slotted page</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80e8-b8ec-d87fd2cd869a" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8075-b2a9-d5afaf859e0f" class="" dir="auto">在磁盤數據庫（Disk-based DB）中，數據是以 <strong>Page（頁）</strong> 為最小單位進行管理的（通常為 8 KB）。當資料列（Record/Tuple）長度不固定時，如何高效地在 Page 內定位、插入、刪除並保持外部引用的穩定，是 Slotted Page 設計的核心目標。<br/>Slotted Page 是為了妥協 <strong>Variable-length（變長資料）</strong> 與 <strong>Performance（性能）</strong> 的最優解。</p></div></aside><hr id="33aa15e2-9005-80bf-84b8-e50d008af7b4" dir="auto"/><p id="15e2b2df-44c0-43e8-9dd7-c1a6e1149f78" class="" dir="auto">假設你在 PostgreSQL 裡面有一張學生資料表：</p><div id="33da15e2-9005-805f-813b-cfd6342f11a6" class="column-list" data-notion-column-list="" dir="auto"><div id="33da15e2-9005-80bc-9ce0-e7a940dca042" style="width:62.5%" class="column" data-notion-column-ratio="0.625" dir="auto"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js" integrity="sha512-sijCOJblSCXYYmXdwvqV0tak8QJW5iy2yLB1wAbbLc3OOIueqymizRFWUS/mwKctnzPKpNdPJV3aK1zlDMJmXQ==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><pre id="996c49ca-83c3-426e-a8f0-3b6624366cda" class="code code-wrap" data-notion-code-syntax="sql"><code class="language-sql" style="white-space:pre-wrap;word-break:break-all">CREATE TABLE students (
+    student_id  CHAR(7),        -- 固定 7 字元，如 &#x27;1131456&#x27;
+    name        VARCHAR(50),    -- 最長 50 字元，實際長度不定
+    department  VARCHAR(30)     -- 最長 30 字元，實際長度不定
+);</code></pre></div><div id="33da15e2-9005-804e-9927-e92cf9618c24" style="width:37.49999999999999%" class="column" data-notion-column-ratio="0.37499999999999994" dir="auto"><figure id="33da15e2-9005-80be-ada4-f6c51e95cfee" class="image" data-notion-image="Slotted%20Page%20Layout/3b8917db-c69d-45eb-ac63-9f212ae379bd.png" dir="ltr"><a href="Slotted%20Page%20Layout/3b8917db-c69d-45eb-ac63-9f212ae379bd.png"><img style="width:482.3880597014925px" src="Slotted%20Page%20Layout/3b8917db-c69d-45eb-ac63-9f212ae379bd.png"/></a></figure></div></div><hr id="33da15e2-9005-809d-afa7-e559e83e9663" dir="auto"/><p id="be659c70-b5ce-4999-a95a-2036043f22ba" class="" dir="auto"><code>student_id</code> 是 <code>CHAR(7)</code>，固定長度。如果整張 table 的每個欄位都是固定長度，事情就很簡單：每筆 record 大小一樣，你只要把一個 page 切成等大的格子，像 array 一樣用 index 乘以 record size 就能算出任何一筆 record 的位置。</p><p id="fa41ce74-9c2a-481a-8ad3-cfb9cee3d22f" class="" dir="auto">但 <code>name</code> 和 <code>department</code> 是 <code>VARCHAR</code>，長度不固定。&#x27;Nini&#x27; 佔 4 bytes，&#x27;Capoo&#x27; 佔 5 bytes，&#x27;CS&#x27; 佔 2 bytes，&#x27;PHYS&#x27; 佔 4 bytes。每筆 record 大小不同，你沒辦法用簡單的 array indexing 來定位了。更麻煩的是，這些 record 要塞進一個固定大小（例如 8 KB）的 disk page 裡面，而且你還需要能刪除、更新、回收空間，外部持有的 pointer 不能因為 page 內部搬移而失效。</p><p id="3d1e3197-9350-406b-a933-49c8509bd1bd" class="" dir="auto">這就是 slotted page layout 要解決的問題。它是幾乎所有 disk-based database 在 page 層級的標準做法，從教科書到 PostgreSQL、MySQL InnoDB、SQLite，都是同一個核心思路。<a href="https://btrfs.readthedocs.io/en/latest/dev/dev-btrfs-design.html">連檔案系統 (btrfs) 也是這樣設計!!</a></p><hr id="33da15e2-9005-8006-bbbf-f682ef70f54c" dir="auto"/><p id="33da15e2-9005-807a-8208-fd30180b6ad0" class="" dir="auto"><strong>Insert、Delete、Update 怎麼運作</strong></p><p id="33da15e2-9005-8018-9acf-f4605d47f708" class="" dir="auto"><strong>Insert</strong>：在 slot array 末端新增一個 slot（<code>pd_lower</code> 往後推 4 bytes），在 heap area 前端放入 record 資料（<code>pd_upper</code> 往前推 record 長度）。如果 <code>pd_lower</code> 和 <code>pd_upper</code> 之間剩餘空間不夠，這個 page 就放不下了，需要去找別的 page 或申請新 page。</p><p id="33da15e2-9005-800d-ac8e-c9f4bd6e3c79" class="" dir="auto"><strong>Delete</strong>：把對應 slot 標記為 &quot;unused&quot;（PostgreSQL 的做法是把 <code>ItemIdData</code> 的 length 設為 0），但 record 的資料不會立刻被清除，heap area 裡會留下一個 hole。這是因為立刻回收的成本太高，你得把後面的 record 往前搬，還要更新所有受影響的 slot。</p><p id="33da15e2-9005-8021-a5c6-eadf1a5aeb69" class="" dir="auto"><strong>Update</strong>：對 variable-length record 來說，update 可能改變 record 的大小。如果新的 record 比原來的大，原位放不下。所以很多系統的做法是把 update 當成 delete + insert：舊 record 標記刪除，新 record 插入到 heap area 的新位置，更新 slot 裡的 offset。PostgreSQL 更進一步，舊 record 不會立刻被刪掉。為什麼？因為可能有其他使用者正在讀取這筆資料的舊版本，如果馬上清掉，別人讀到一半就斷了。所以 PostgreSQL 會先留著舊 record，等到確定沒有人再需要它的時候，再由背景的清理程序（叫 VACUUM）統一回收空間。</p><figure id="33da15e2-9005-807e-a99e-f8d8e8173c35" class="image" data-notion-image="Slotted%20Page%20Layout/image.png" dir="ltr"><a href="Slotted%20Page%20Layout/image.png"><img style="width:950.25px" src="Slotted%20Page%20Layout/image.png"/></a></figure><p id="33da15e2-9005-8062-ae01-f8ef78ee4890" class="" dir="auto"><strong>MVCC 關聯：</strong> 在 PostgreSQL 中，Update 產生的舊版本 Record 不會被立即覆蓋，是為了支援多版本並行控制（MVCC），讓讀取者能讀到舊快照。</p><hr id="33da15e2-9005-80c3-ad0b-d14f3632298a" dir="auto"/><p id="33da15e2-9005-8054-8314-c10cd20daf74" class="" dir="auto"><strong>Fixed-length (固定長度):</strong> 像 Array。定位第 $i$ 筆 Record 只需要 $Base + i \times Size$。不需要 Slot Array，速度極快。<strong>Variable-length (變長長度):</strong> 包含 <code>VARCHAR</code>、<code>TEXT</code>、<code>NULL</code> 值（不佔空間）。由於每筆大小不同，必須有「地圖」（Slot Array）引導。</p><hr id="33da15e2-9005-80a7-90d1-e32db9981f30" dir="auto"/><p id="179c0731-e4c9-47c1-a974-880fc7a0ac2c" class="" dir="auto"><strong>PostgreSQL 的實作細節</strong></p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8011-85ea-fba88485f70e" dir="ltr"><div style="width:100%"><ol type="1" id="21caf09e-86b4-42e1-ac84-2d8de20bac54" class="numbered-list" start="1" dir="auto"><li><strong>PageHeaderData</strong>（24 bytes）：<code>pd_lsn</code>、<code>pd_checksum</code>、<code>pd_lower</code>、<code>pd_upper</code>、<code>pd_special</code> 等</li></ol><ol type="1" id="8a9d82f5-31fa-4231-aa2c-869bd4e4722d" class="numbered-list" start="2" dir="auto"><li><strong>ItemIdData array</strong>：每個 4 bytes，從 byte 24 開始往後長</li></ol><ol type="1" id="bafd3b40-9726-49bd-942b-3cc8ecba9efc" class="numbered-list" start="3" dir="auto"><li><strong>Free space</strong>：<code>pd_lower</code> 到 <code>pd_upper</code> 之間</li></ol><ol type="1" id="15622d06-c797-4c5a-8b82-b7e2df5abbe1" class="numbered-list" start="4" dir="auto"><li><strong>Heap records</strong>：從 page 尾端往前長，每筆 record 包含 23 bytes header + null bitmap + user data</li></ol><ol type="1" id="6e588b2f-4a88-4577-a518-435569ef21d6" class="numbered-list" start="5" dir="auto"><li><strong>Special space</strong>：B-Tree index page 會用到（存 sibling page link），普通 heap page 不使用</li></ol></div></aside><p id="37756b18-9f25-4ea7-a860-8dd6f60ddd72" class="" dir="auto">一個具體的數字感受：假設平均 record 大小是 100 bytes（含 header），一個 8 KB page 扣掉 24 bytes page header，剩 8168 bytes。每筆 record 需要 100 bytes data + 4 bytes slot = 104 bytes。大約能放 8168 / 104 = 78 筆 record。如果 record 更大（例如 500 bytes），一個 page 只能放 8168 / 504 = 16 筆。</p><p id="87a48f21-9bc4-40cd-a027-37f6847015e0" class="" dir="auto">PostgreSQL 的 <code>ItemIdData</code> 一旦分配了 slot number，即使 record 被刪除，這個 slot 位置也不會被其他 record 搶走（除非做完整的 page 重建）。這是因為外部可能還有 index entry 或其他 record 的 CTID 指向這個 slot number，貿然重用會導致 dangling pointer。</p><hr id="33aa15e2-9005-8061-bce6-ff2a4c8a3062" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8001-bf93-d76e36ac4001" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80c0-a60e-ecb30c641555" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p><p id="33da15e2-9005-800e-842f-d0ca485cfdf1" class="" dir="auto"><strong>空間碎片化：</strong> 即使 <code>pd_lower</code> 到 <code>pd_upper</code> 之間有 500B，但若中間夾雜了已刪除的「洞」，物理上可能不連續，導致無法直接插入 400B 的 Record。這需要靠 <strong>Compaction</strong> 解決。</p><p id="33da15e2-9005-80bc-9c6a-f82e048de01e" class="" dir="auto"><strong>Update 失敗：</strong> 即使 Table 還有空間，但若該 Page 的 Free Space 不足以容納 Update 後變大的 Record，該 Record 可能會觸發「跨頁搬移」，這會產生複雜的鏈接問題。</p><p id="33da15e2-9005-8074-88cf-e9624e8e4212" class="" dir="auto"><strong>Overhead:</strong> 對於純整數（Integer）構成的表，Slotted Page 的 Slot Array 和 Record Header 其實佔用了近 30% 的空間開銷。這也是為什麼一些專門處理數字的 OLAP（分析型）數據庫會採用不同的 <strong>Columnar Storage（列式存儲）</strong>。</p></div></aside><hr id="33aa15e2-9005-80c8-89e2-c3e7900373e3" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80ae-ba53-d6816f4b58b1" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80e0-8b87-d86867244016" class="" dir="auto">Reference: </p></div></aside><hr id="33aa15e2-9005-80ed-adcb-ffb63373c440" dir="auto"/></div></details><details id="33da15e2-9005-8086-81be-e7bb5f34f489" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Page header &amp; Slot array &amp; Heap area</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-80fe-bfd9-c1948926069d" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8032-86f4-d14d23425a76" class="" dir="auto">Slotted Page 是一種將固定大小的 Page 劃分為三個主要區域的佈局方式：<strong>Page Header</strong>、<strong>Slot Array（Line Pointers）</strong>、以及 <strong>Heap Area</strong>。其特徵是 Slot Array 與 Heap Area 從兩端向中間「對沖」成長。</p></div></aside><hr id="33da15e2-9005-8023-b52e-f1e290f81e27" dir="auto"/><p id="f289d544-28c8-49da-afcd-248af9554d3c" class="" dir="auto"><strong>三層結構：Header、Slot Array、Heap Area</strong><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-80ff-9e3a-d7234f0e490d" dir="ltr"><div style="width:100%"><ul id="815d1ac9-1f43-4298-8fe4-f35715cf89eb" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Page Header (頁標頭):</strong> 存放 Metadata。包含 LSN（日誌序列號）、Checksum（校驗和）、以及最重要的兩個指針：<ul id="4594f2fb-c4d9-4a41-a5e5-8c98a4ec499e" class="bulleted-list" dir="auto"><li style="list-style-type:circle"><code>pd_lower</code>: 指向 Slot Array 的末端（下一個 Slot 要放的位置）。</li></ul><ul id="345aafdd-687f-4ec0-ab91-e214982c4000" class="bulleted-list" dir="auto"><li style="list-style-type:circle"><code>pd_upper</code>: 指向 Heap Area 的前端（下一筆 Record 要放的位置）。</li></ul></li></ul><ul id="33da15e2-9005-80e4-a64b-eeb83e9c2107" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Slot Array (槽位數組):</strong> 由固定大小的單元組成（如 Postgres 為 4 bytes）。記錄每筆 Record 在頁內的 <strong>Offset（偏移量）</strong> 和 <strong>Length（長度）</strong>。</li></ul><ul id="b874718e-698d-4ea7-9b5d-aee92cf55ecf" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Heap Area (堆積區):</strong> 實際存放 Data Record 的地方。從頁尾（Page Bottom）開始往前堆疊。</li></ul><ul id="cbe2105f-172d-4d38-b4d0-a7e9fbda64db" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Free Space:</strong> <code>pd_lower</code> 與 <code>pd_upper</code> 之間的間隙。當兩者相撞時，代表 Page 已滿。</li></ul></div></aside></div></p><figure id="33da15e2-9005-806c-b2eb-c12b4b4b42fe" class="image" data-notion-image="Slotted%20Page%20Layout/3972abf0-41ba-45b5-81d4-8a5c4558c69b.png" dir="ltr"><a href="Slotted%20Page%20Layout/3972abf0-41ba-45b5-81d4-8a5c4558c69b.png"><img style="width:807.7323420074349px" src="Slotted%20Page%20Layout/3972abf0-41ba-45b5-81d4-8a5c4558c69b.png"/></a></figure><p id="e40d8668-ed0c-4305-848f-ec5feb1cc73a" class="" dir="auto">Header 裡面最重要的兩個欄位是 free-space pointer：一個指向 slot array 的末端（下一個 slot 要放的位置），另一個指向 heap area 的前端（下一筆 record 要放的位置）。當這兩個 pointer 撞在一起，page 就滿了。</p><p id="14ae5b69-67ca-4477-91ef-0f9f949000b9" class="" dir="auto"><a href="https://www.postgresql.org/docs/current/storage-page-layout.html">以 PostgreSQL 為例</a> (就一個栗子而已，不用背喔！)，它的 page header（叫 <code>PageHeaderData</code>）佔 24 bytes，裡面裝：</p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-806e-b915-c2578158b207" dir="ltr"><div style="width:100%"><ul id="d773740e-9952-40ef-87a9-5c7809e214b8" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code>pd_lsn</code>（8 bytes）：最後一筆修改這個 page 的 WAL record 的 LSN，用於 crash recovery</li></ul><ul id="2f2a1438-a3ae-48e5-b79b-db285ed743c3" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code>pd_checksum</code>（2 bytes）：page 層級的 checksum，防止 bit rot</li></ul><ul id="e0ece42b-d304-4bb2-9cf1-86acd9aa9e2f" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code>pd_lower</code>（2 bytes）：指向 free space 的起始位置（slot array 末端）</li></ul><ul id="bc697177-145d-4351-b36a-f54bf4907875" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code>pd_upper</code>（2 bytes）：指向 free space 的結束位置（heap area 前端）</li></ul><ul id="22c6aa10-1af6-42e8-b569-d0710566032d" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code>pd_special</code>（2 bytes）：指向 special space 的起始位置，給 index page 用的（普通 heap page 沒有 special space）</li></ul><ul id="42547f3d-780d-4fbd-931a-50619ae62c06" class="bulleted-list" dir="auto"><li style="list-style-type:disc">其餘欄位記錄 page size、版本、flags 等</li></ul></div></aside><p id="3a1ee296-428e-4dd0-be6d-ddf1ba2d5d5b" class="" dir="auto">每個 slot（PostgreSQL 叫 <code>ItemIdData</code>）佔 4 bytes，記錄對應 record 的 byte offset 和長度。所以一個 8192 bytes 的 page，扣掉 24 bytes header，理論上最多能放 <code>(8192 - 24) / 4 = 2042</code> 個 slot，當然實際上 record 本身也要佔空間，所以不可能到這個上限。</p><hr id="33da15e2-9005-802b-8ada-e7a70bbaa2b2" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-80b7-9b42-dfcd1bffa0c4" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-80e0-b454-d70eb5493a07" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p></div></aside><hr id="33da15e2-9005-80ec-8617-f75089c4aa70" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-80ad-8d22-d6ae6a5cde79" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8047-bf6d-e525454fb644" class="" dir="auto">Reference: </p></div></aside><hr id="33da15e2-9005-8023-9f04-e1ade01f280e" dir="auto"/></div></details><details id="33da15e2-9005-806e-be2a-e78918bde988" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>free-space pointer</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-801b-b1d2-e32e88e5ea52" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-80be-bef4-e0ba73156ea2" class="" dir="auto">Free-space Pointer 是 Page Header 中的兩個關鍵偏移量（Offset），在 PostgreSQL 中分別稱為 <code>pd_lower</code> 和 <code>pd_upper</code>。它們劃定了 Page 中間那塊<strong>連續的、尚未分配過</strong>的空間邊界。</p></div></aside><hr id="33da15e2-9005-8018-b633-c9b0a5c79d7e" dir="auto"/><p id="33da15e2-9005-808e-b0cb-dc8b2b2092a7" class="" dir="auto">這是一對「對沖」的指針：<br/>• <strong>pd_lower (下界指針)：</strong> 指向 <strong>Slot Array (Line Pointers)</strong> 的末端。當有新的 Record 插入時，會在這裡新增一個 Slot，<code>pd_lower</code> 隨之向後（增大）移動。<br/>• <strong>pd_upper (上界指針)：</strong> 指向 <strong>Heap Area (Data)</strong> 的前端。當有新的 Record 插入時，數據會寫入此處，<code>pd_upper</code> 隨之向前（減小）移動。<br/>• <strong>Free Space 計算：</strong> 該 Page 物理上剩餘的連續空間大小 = <span data-notion-inline-equation="pd\_upper - pd\_lower" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0044em;vertical-align:-0.31em;"></span><span class="mord mathnormal">p</span><span class="mord mathnormal">d</span><span class="mord" style="margin-right:0.02778em;">_</span><span class="mord mathnormal">u</span><span class="mord mathnormal">pp</span><span class="mord mathnormal" style="margin-right:0.02778em;">er</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.0044em;vertical-align:-0.31em;"></span><span class="mord mathnormal">p</span><span class="mord mathnormal">d</span><span class="mord" style="margin-right:0.02778em;">_</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">o</span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mord mathnormal" style="margin-right:0.02778em;">er</span></span></span></span></span>。</p><hr id="33da15e2-9005-80e2-b2d5-f1da57ab594b" dir="auto"/><p id="33da15e2-9005-8001-9dbb-fe0252476dff" class="" dir="auto">數據庫透過這兩個指針的距離，來判斷該頁是否還有能力承載新的數據。</p><p id="33da15e2-9005-80a2-af2e-d2619f00658f" class="" dir="auto"><strong>插入時 (Insert)：</strong> 系統檢查 <span data-notion-inline-equation="pd\_upper - pd\_lower" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0044em;vertical-align:-0.31em;"></span><span class="mord mathnormal">p</span><span class="mord mathnormal">d</span><span class="mord" style="margin-right:0.02778em;">_</span><span class="mord mathnormal">u</span><span class="mord mathnormal">pp</span><span class="mord mathnormal" style="margin-right:0.02778em;">er</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.0044em;vertical-align:-0.31em;"></span><span class="mord mathnormal">p</span><span class="mord mathnormal">d</span><span class="mord" style="margin-right:0.02778em;">_</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">o</span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mord mathnormal" style="margin-right:0.02778em;">er</span></span></span></span></span> 是否大於 <code>(新 Record 大小 + 新 Slot 大小)</code>。<strong>空間分配：</strong> 若空間足夠，Slot 從 <code>pd_lower</code> 往後長，Data 從 <code>pd_upper</code> 往前長。</p><p id="33da15e2-9005-80d9-8d38-c025f14beb31" class="" dir="auto"><strong>碰撞 (Collision)：</strong> 當兩者相遇，代表「物理連續空間」已耗盡。即使 Page 內部有因為 Delete 產生的「洞（Holes）」，只要這兩個指針撞在一起，就無法直接進行簡單插入。</p><hr id="33da15e2-9005-80fd-baf3-e24ffd139eed" dir="auto"/><p id="33da15e2-9005-8075-b38a-cfbdf427e943" class="" dir="auto">Free-space 指針只負責標示「中間那塊大空地」，它們<strong>不記錄</strong>因為 Delete 或 Update 產生的內部碎片（Holes）。</p><p id="e778f11b-2c93-4642-925d-078257607211" class="" dir="auto">當一筆 Record 被刪除時：</p><ul id="cef41edd-f752-423c-9438-653d8e9bda41" class="bulleted-list" dir="auto"><li style="list-style-type:disc">對應的 Slot 會被標記為 Dead。</li></ul><ul id="7b5f0436-bb1d-42d0-b096-752ad9cb3e55" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>pd_upper 不會往回退</strong>（因為往回退會弄亂其他 Record 的位置）。</li></ul><ul id="3543d0b6-3691-4386-9f8b-3219b1da8a4f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">此時，Page 會出現「有效空間」大於「指針定義的 Free Space」的情況。</li></ul><hr id="33da15e2-9005-80b9-be66-c4a7fc70d4b8" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-80b7-a3d2-f5a5c53fb019" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8019-b270-d0de5d18d778" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p><p id="33da15e2-9005-804e-b631-fbb286e8f9b4" class="" dir="auto"><strong>虛假全滿 (False Full)：</strong> 有時候 <span data-notion-inline-equation="pd\_upper - pd\_lower" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0044em;vertical-align:-0.31em;"></span><span class="mord mathnormal">p</span><span class="mord mathnormal">d</span><span class="mord" style="margin-right:0.02778em;">_</span><span class="mord mathnormal">u</span><span class="mord mathnormal">pp</span><span class="mord mathnormal" style="margin-right:0.02778em;">er</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.0044em;vertical-align:-0.31em;"></span><span class="mord mathnormal">p</span><span class="mord mathnormal">d</span><span class="mord" style="margin-right:0.02778em;">_</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">o</span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mord mathnormal" style="margin-right:0.02778em;">er</span></span></span></span></span> 很小，看似 Page 滿了，但其實 Page 內部可能有一半的空間都是刪除後的「洞」。</p><p id="33da15e2-9005-803c-a998-d5dab8affe57" class="" dir="auto"><strong>解決方案：</strong> 這時需要觸發 <strong>Page Compaction</strong>。系統會把所有活著的 Record 重新往後推，重置 <code>pd_upper</code>，讓 <code>pd_upper</code> 與 <code>pd_lower</code> 之間重新出現一大塊連續空間。</p></div></aside><hr id="33da15e2-9005-80f7-bd6d-efcfc8530a61" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8078-9a67-e00fccd72b98" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-80ae-8b30-c5627636db40" class="" dir="auto">Reference: </p></div></aside><hr id="33da15e2-9005-8049-8a97-cdde91dfffff" dir="auto"/></div></details><details id="33da15e2-9005-80ad-a3c2-e601310c85bb" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Record indirection</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8085-ab4a-ed90c89fcfa2" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-805a-a310-d92ebdad5991" class="" dir="auto">外部索引（Index）或指針不直接指向 Record 的物理地址，而是指向 <strong>(Page ID, Slot Number)</strong>。Slot Number 就像一個房間號碼，而 Record 是裡面的住客。</p></div></aside><hr id="33da15e2-9005-800d-8ae8-f2fb662862c5" dir="auto"/><p id="9940cc4a-8987-4fb4-86ec-4382b9618143" class="" dir="auto"><strong>Slot Indirection：穩定的 Record 地址</strong></p><p id="f98c8994-6d75-42af-b06c-fe31fc4fa200" class="" dir="auto">這層 slot array 的存在不只是為了「找到 record 在哪」，更重要的是提供一層 <strong>indirection</strong>。</p><p id="079b4bf4-ae16-4b12-8bf4-2a7bceed8b2b" class="" dir="auto">外部要引用某筆 record 的時候，用的是 <strong>(page ID, slot number)</strong> 這個組合。PostgreSQL 把它叫做 <strong>CTID</strong>（Current Tuple ID），格式是 <code>(blockNumber, itemIndex)</code>。這個 identifier 是穩定的：只要 record 還在同一個 page 裡，不管它在 page 內部被搬到哪個位置，slot number 都不會變，只是 slot 裡面記錄的 offset 會更新。</p><p id="91b438d4-bb0e-4c14-9c3f-d391469c2f58" class="" dir="auto">這很重要喔！因為 B+Tree 的 leaf node 裡存的就是這種 (page ID, slot number) 的 pointer。如果沒有 slot indirection，page 內部做任何 record 搬移（例如 compaction），都要回去更新所有指向這些 record 的 index entry，成本極高。有了 indirection，page 內部搬移 record 只需要更新自己的 slot array，外部的 pointer 完全不受影響。</p><hr id="33da15e2-9005-8074-94ac-c7013795a8f0" dir="auto"/><ul id="b40086af-c076-4d18-8d29-504c6232f07f" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>CTID (PostgreSQL 術語):</strong> 格式為 <code>(blockNumber, itemIndex)</code>。</li></ul><ul id="422c4f1a-14e4-4c21-885a-24acdd54e35c" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>穩定性：</strong> 即使 Record 在 Page 內部因為空間清理而搬移了位置（Offset 改變），它的 Slot Number 依然保持不變。</li></ul><ul id="33da15e2-9005-80b5-adf9-efe560e75667" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>解耦（Decoupling）：</strong> 這是數據庫物理獨立性的關鍵。如果沒有這層 Indirection，每次 Page 內部整理碎片，所有的 B+Tree 索引都要跟著更新地址，這會導致系統崩潰（Write Amplification）。</li></ul><hr id="33da15e2-9005-8039-a7ce-ffe28466ac27" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-80e8-9a70-e96ba40d719c" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-80d2-b5df-e92f98b93b83" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p><p id="33da15e2-9005-8072-851b-e7b069e94969" class="" dir="auto"><strong>Slot 重用危機：</strong> 在 Postgres 中，一旦 Slot 被分配，除非執行 <code>VACUUM FULL</code>，否則該 Slot Number 不會被回收給全新的 Record 使用，以避免 <strong>Dangling Pointer（懸空指針）</strong> 指向錯誤的資料。</p></div></aside><hr id="33da15e2-9005-8072-b9d4-d4799f0e16ec" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8082-84e3-de4ea0ee0a47" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-80b1-bb43-cc3cff1daa81" class="" dir="auto">Reference: </p></div></aside><hr id="33da15e2-9005-80ea-846a-e6512215374c" dir="auto"/></div></details><details id="33da15e2-9005-8023-92c7-e0de80d8a7c0" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>variable-length record</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-80c0-8cfa-da8ce7aa075b" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8098-95bb-f82dc1080e53" class="" dir="auto">define</p></div></aside><hr id="33da15e2-9005-80ff-bbab-fb1686e47c5e" dir="auto"/><p id="e1e5a277-049f-44fc-8bf0-a8dc343c37ba" class="" dir="auto"><strong>超適合 Variable-Length Record</strong></p><p id="585421dd-81de-4e28-9d46-80c7ccbf64a2" class="" dir="auto">如果所有 record 長度都一樣（fixed-length），其實不需要 slotted page 這麼複雜的設計。你只要把 page 切成等大的 slot，用 slot number 乘以固定大小就能直接算出 offset，連 slot array 都省了。</p><p id="fd9b4ed6-cd30-4963-a0dc-eee97fc2b81a" class="" dir="auto">但真實世界的資料幾乎都是 variable-length 的：<code>VARCHAR</code> 欄位、<code>TEXT</code> 欄位、nullable column（null 不佔空間 vs. 佔空間的差異）、甚至一張 table 經過 <code>ALTER TABLE ADD COLUMN</code> 之後新舊 row 的長度都不同。</p><p id="13336c60-86d3-4978-b083-1bc4b31aa7bc" class="" dir="auto">Slotted page 不預設 record 有固定大小。代價是每筆 record 需要額外 4 bytes 的 slot 空間，而且存取 record 要先查 slot array 才能拿到實際位置（多一次 memory access）。對於 fixed-length record 的 workload，這個 overhead 是浪費，但對於 variable-length 的一般場景，這個設計的彈性遠超過 overhead 的代價。</p><p id="803a389e-6f86-4c81-988e-b0b6c9bbe217" class="" dir="auto">PostgreSQL 的 heap record 本身就是 variable-length 的：每筆 record 有 23 bytes 的 header，接著是 null bitmap（每個 column 1 bit），最後才是實際的 user data。不同 record 的 column 數量和 null pattern 都可能不同，長度自然也不同。</p><figure id="33da15e2-9005-807f-88cb-dd96ab8932ae" class="image" data-notion-image="Slotted%20Page%20Layout/image%201.png" dir="ltr"><a href="Slotted%20Page%20Layout/image%201.png"><img style="width:950.25px" src="Slotted%20Page%20Layout/image%201.png"/></a></figure><hr id="33da15e2-9005-804d-adba-d74c77be350d" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-809b-a171-c1e977afd594" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-807f-8dd1-d2f4d66eaa34" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p></div></aside><hr id="33da15e2-9005-8021-bae1-ef26bea91c02" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-80f0-b85f-fd36d242057d" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8030-9521-fb7f430fc32e" class="" dir="auto">Reference: </p></div></aside><hr id="33da15e2-9005-8075-a59e-e7c66f8f5ee3" dir="auto"/></div></details><details id="33da15e2-9005-80cc-9f83-cf1ecb66adb9" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Page compaction</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8053-8c4d-f428ef69cc9a" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-807f-a39d-ebf840d833cf" class="" dir="auto">當 Page 內部「洞」太多導致空間不連續時，重新排列 Heap Area 的過程。</p></div></aside><hr id="33da15e2-9005-8021-b815-fd733bfa801a" dir="auto"/><p id="2354a322-39e6-4b39-87b0-dcfb3aefea1f" class="" dir="auto"><strong>Compaction：釋放洞洞</strong></p><p id="b01547fb-60b8-431e-bf07-b0891865f618" class="" dir="auto">經過多次 delete 和 update 之後，heap area 裡面會出現很多 hole。總剩餘空間可能還很多，但沒有一段連續的空間夠大到塞得下新 record。這時候就需要 <strong>compaction</strong>（有些系統叫 defragmentation）：把 heap area 裡所有存活的 record 重新排列壓緊，把洞洞填滿、整併成一整塊連續的 free space。</p><p id="80541979-6f12-4627-8a6e-ce36f60d0f0e" class="" dir="auto">Compaction 的好處在於：record 被搬移了，但 slot number 不變。Compaction 只需要更新每個 slot 裡面的 offset 值。所有外部用 (page ID, slot number) 引用這些 record 的 pointer 完全不受影響。這就是 slot indirection 設計最大的好處。</p><p id="bfbf16ca-0d8f-49e5-9ac2-62c0b89e8c6a" class="" dir="auto">PostgreSQL 在什麼時候做 compaction 呢？當一個 page 的 free space 不夠放新的 record，但 page 裡有已經沒人需要的舊 record 時，PostgreSQL 會順手做一次 <strong>page pruning</strong>：把這些廢棄 record 清掉並壓縮 heap area，騰出空間給新 record。這個動作是在 INSERT 或 UPDATE 的時候順便觸發的，不用額外等背景清理。</p><hr id="33da15e2-9005-8060-a80e-d6834f38f586" dir="auto"/><ul id="9eb2ad2a-8e29-4e86-b8bd-b779a835e92c" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>運作流程：</strong> 將所有存活的 Record 重新推向頁尾排整齊，合併所有碎片空間，並更新 Slot Array 中對應的 Offset。</li></ul><ul id="a793ab98-9284-45ff-9581-99e0fca1e16a" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>觸發時機：</strong> 通常在 Insert 空間不足，但計算發現「總剩餘空間（含洞）」足夠時，自動觸發 <strong>In-place Compaction</strong>。</li></ul><ul id="33da15e2-9005-802b-987d-ebc928fe9810" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Compaction vs. Vacuum:</strong> <ul id="33da15e2-9005-8076-a074-e8e449ee3d2e" class="bulleted-list" dir="auto"><li style="list-style-type:circle"><strong>Compaction:</strong> 頁內整理，不改變 Slot Number。</li></ul><ul id="b264fa0f-741b-4972-a1ff-13d7ff9b2499" class="bulleted-list" dir="auto"><li style="list-style-type:circle"><strong>Vacuum:</strong> 掃描全表，標記哪些 Slot 真的沒人用了，回收空間給 OS 或後續使用。</li></ul></li></ul><hr id="33da15e2-9005-803a-aa54-f6863804f25c" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8009-87dc-cb8fcd4991dc" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8080-b32e-da714b5967d6" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p><p id="33da15e2-9005-80e4-9fad-dee48e386619" class="" dir="auto"><strong>性能損耗：</strong> 頻繁的 Compaction 會消耗 CPU 並鎖定 Page。如果資料頻繁變動且長度落差大，容易造成 IO 瓶頸。</p></div></aside><hr id="33da15e2-9005-80fa-a533-d5c02a6d6aee" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-804e-92a9-e57b1524f59d" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-803c-922a-d6508874f717" class="" dir="auto">Reference: </p></div></aside><hr id="33da15e2-9005-8091-a16c-f5bf12aabb39" dir="auto"/></div></details></div></details><details id="33aa15e2-9005-80f5-aee8-f0cf0ba2e63f" open="" class="toggle" dir="auto"><summary><strong>Test</strong></summary><div class="indented"><details id="33aa15e2-9005-8077-9d32-cafa4684de6b" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Key Concepts</strong></mark></summary><div class="indented"><details id="33aa15e2-9005-8015-9728-dd430732e4f2" open="" class="toggle" dir="auto"><summary>理解 slotted page 的三層結構（header -&gt; slot array -&gt; heap area）以及兩個區域相向成長的空間配置方式</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-801e-b242-dabecf1e8144" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80e7-a010-dc0815dd8b35" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-801f-a7ef-d2afa01ba40d" class="" dir="auto">Slotted page 包含頂部中繼資料 (Header)、由上往下長的指針陣列 (Slot Array)，以及由下往上長的資料區 (Heap Area)。</p></div></p><hr id="33aa15e2-9005-801f-9139-cb065342a2d1" dir="auto"/><p id="33aa15e2-9005-806a-9c5d-fcbd263a53c2" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-8022-9329-ca9066542dd7" class="" dir="auto">Page Header, Slot Array (Line Pointers), Heap Area, Bi-directional Growth。</p></div></p><hr id="33aa15e2-9005-805c-99c7-c7a872c118e8" dir="auto"/><p id="33aa15e2-9005-8071-bba3-c4b0f9695a17" class="" dir="auto">Detail<div class="indented"><p id="06fa88a9-3776-43f6-92d6-e63193cb8494" class="" dir="auto">這種配置是為了在固定大小的 Page（如 8192 bytes）內提供最大的彈性。因為我們無法預知會有多少筆紀錄（Slot 數量），也無法預知每筆紀錄多長（Heap 大小）。讓 Slot Array 和 Heap Area 從兩端向中間的 Free Space 推進，只要中間還有連續空間，就能動態適應「數量多但資料短」或「數量少但資料長」的極端情況，避免空間浪費。</p></div></p></div></aside><hr id="33aa15e2-9005-802c-b181-eccfcce1b5f7" dir="auto"/></div></details><details id="33aa15e2-9005-80bf-b39e-e6d2167c3467" open="" class="toggle" dir="auto"><summary>理解 slot indirection 的設計動機：外部用 (page ID, slot number) 作為穩定的 record identifier，page 內部可以自由搬移 record 而不影響外部參照</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80bb-80c0-cd0819db9e5f" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80c8-bd26-eea577591108" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-80b8-adac-dfcc42ae972a" class="" dir="auto">利用 Slot 作為中間層，將對外的「邏輯識別碼」與內部的「實體記憶體位置」解耦。</p></div></p><hr id="33aa15e2-9005-80c5-8260-df90abb7d04c" dir="auto"/><p id="33aa15e2-9005-80c7-bf87-fda314097c85" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-80e9-99e1-c100726fcaf5" class="" dir="auto">Indirection, Decoupling, Record Identifier (RID), Physical Offset。</p></div></p><hr id="33aa15e2-9005-80e4-a7b8-f92bea7e4cc8" dir="auto"/><p id="33aa15e2-9005-80a8-b818-f2a9785560d0" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-8058-ae72-c78b07e31e5d" class="" dir="auto">外部索引（如 B+ Tree）是透過 RID = <code>(Page ID, Slot Number)</code> 來尋找紀錄。當 Page 內部因為空間碎片化需要進行整理（Compaction）而移動了紀錄的實體位置時，系統只需要更新 Slot 內儲存的 Offset（偏移量），外部的 <code>Slot Number</code> 維持不變。這樣就避免了「牽一髮而動全身」，不需要去更新龐大的外部索引樹。</p></div></p></div></aside><hr id="33aa15e2-9005-8036-9faf-e49bbc48dfa5" dir="auto"/></div></details><details id="33aa15e2-9005-8001-84f4-d2e5bee00482" open="" class="toggle" dir="auto"><summary>解釋 insert、delete、update 三種操作如何改變 page 內部的狀態，以及為什麼 delete 不會立刻回收空間（留下 hole），需要 compaction 來整理</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-802a-bdf9-da4edf806584" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8063-9649-d750125ba5bc" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-80a5-a617-f099003e37de" class="" dir="auto">Insert 消耗中間的 Free Space；</p><p id="33da15e2-9005-80a5-bf63-f6b05dbf50b6" class="" dir="auto">Delete 只標記 Slot 無效並留下資料空洞 (Hole)；</p><p id="33da15e2-9005-8055-a603-e7ffbd42797d" class="" dir="auto">Update 通常是 Delete 舊版並 Insert 新版。空洞需透過 Compaction 整理才能回收利用。</p></div></p><hr id="33aa15e2-9005-80ec-9741-e9bc8af3d933" dir="auto"/><p id="33aa15e2-9005-80a7-acad-c3f2613a78b1" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-8080-86f2-d2fff8f8c407" class="" dir="auto">Lazy Deletion, Fragmentation (Hole), Dead Tuple, Compaction (Defragmentation)。</p></div></p><hr id="33aa15e2-9005-80b1-9b37-d2fd7c2dc638" dir="auto"/><p id="33aa15e2-9005-8069-ba9e-eed00d758069" class="" dir="auto">Detail<div class="indented"><p id="b5f030e6-c1d4-4d3f-ba48-70a102672024" class="" dir="auto">為了效能，Delete 不會立刻挪動其他資料來填補空隙（因為搬移資料的 I/O 與 CPU 成本極高），這會導致 Heap Area 中出現無法立即使用的「碎片/空洞」。當 Page 剩餘的連續 Free Space 不足以容納新的 Insert，但「空洞總和」其實足夠時，系統就會觸發 Compaction，將所有存活的紀錄重新往底部壓緊，合併出連續的 Free Space 供新資料使用。</p></div></p></div></aside><hr id="33aa15e2-9005-80b5-ae88-cc3c3bd76b38" dir="auto"/></div></details><details id="33aa15e2-9005-80d0-978c-e0c043fad06c" open="" class="toggle" dir="auto"><summary>說明這個 page layout 為什麼天然適合 variable-length record，以及它與 fixed-length record 的 page layout 相比，在空間利用與存取效率上有什麼取捨</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-808e-800b-e1013c1d289a" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80b1-9feb-fdc0182e2830" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-80f8-b2c0-faf2cf84fbe6" class="" dir="auto">Slotted Page 能精確儲存變長資料不留白，但有 Slot 開銷；</p><p id="33da15e2-9005-805e-a334-d66f9daba51f" class="" dir="auto">Fixed-length 存取極快無碎片，但處理變長資料會嚴重浪費空間。</p></div></p><hr id="33aa15e2-9005-8096-8d88-da6670daac32" dir="auto"/><p id="33aa15e2-9005-806d-8ba1-deb4f25fa407" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-8037-84d1-d62be80a27f3" class="" dir="auto">Variable-length Record, Fixed-length Record, Internal Fragmentation, Overhead vs. Speed。</p></div></p><hr id="33aa15e2-9005-8048-9f6b-e6d4e61952af" dir="auto"/><p id="33aa15e2-9005-80cb-b959-f05d5a1e7ced" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-80c8-be20-d6abc247b0b4" class="" dir="auto"><strong>空間利用</strong>：如果資料包含 <code>VARCHAR</code>，Slotted Page 依實際長度儲存，完美契合；Fixed-length 則必須以最大可能長度預留空間，產生嚴重的「內部碎片」。</p><p id="33da15e2-9005-809c-8f37-c374b12a3e7f" class="" dir="auto"><strong>存取效率</strong>：Fixed-length 像陣列一樣，位址可透過公式 <code>$Base + (i \times RecordSize)$</code> 在 $O(1)$ 時間內直接算出；Slotted Page 則必須先讀取 Header，再讀取 Slot 取得 Offset，多了一層記憶體跳轉開銷（Overhead）。</p></div></p></div></aside><hr id="33aa15e2-9005-80eb-9cc6-fcb0ffd80220" dir="auto"/></div></details><details id="33aa15e2-9005-80be-aea6-d56bbcc366d8" open="" class="toggle" dir="auto"><summary>我知道 PostgreSQL 的 heap page 採用類似的 slotted page 設計，能將課堂概念對應到真實系統的實作</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80e5-931e-fe7050ba7fdb" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80f4-b236-c23ec4a29dac" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-8023-bebb-ffecb5ef9a42" class="" dir="auto">PostgreSQL 完全採用此設計，其 Header 為 <code>PageHeaderData</code>，Slot 稱為 <code>ItemId</code>，中段的可用空間由 <code>pd_lower</code> 和 <code>pd_upper</code> 界定。</p></div></p><hr id="33aa15e2-9005-8032-bfd2-c6dde0e715ca" dir="auto"/><p id="33aa15e2-9005-80d3-aea1-ce9760770054" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-801f-b7c2-db9670573866" class="" dir="auto"><code>PageHeaderData</code>, <code>ItemIdData</code>, <code>pd_lower</code> / <code>pd_upper</code>.</p></div></p><hr id="33aa15e2-9005-80c1-bd7d-c81d2d989197" dir="auto"/><p id="33aa15e2-9005-8093-811b-ec98abf428e9" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-80d7-aff2-f409ecf955f1" class="" dir="auto">在 Postgres 原始碼中，<code>pd_lower</code> 指針標記了 Slot Array 的尾端（往下長），<code>pd_upper</code> 標記了 Heap Tuple 的頂端（往上長）。兩者之間的空間就是未分配的 Free Space。這個經典架構是支撐 Postgres 實作 MVCC（多版本並行控制）與變長欄位（TOAST）的重要基石。</p></div></p></div></aside><hr id="33aa15e2-9005-806d-95ce-c0342d17a5e2" dir="auto"/></div></details></div></details><details id="33aa15e2-9005-808d-8d5f-cf7182793ec0" open="" class="toggle" dir="auto"><summary><mark class="highlight-teal" data-notion-highlight="teal"><strong>Test your understanding</strong></mark></summary><div class="indented"><details id="33aa15e2-9005-808a-9280-e1e57c26d005" open="" class="toggle" dir="auto"><summary>為什麼 slotted page 要讓 slot array 和 heap area 從 page 的兩端相向成長，而不是把 slot array 和 record 資料放在一起、依序往同一個方向成長？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8085-84dc-e965d5d5698d" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8006-8cbf-f429f1def06d" class="" dir="auto">Answer<div class="indented"><p id="75766358-9f89-4c9a-a443-501c0f7a1b2e" class="" dir="auto">同向成長會導致新增資料時，必須挪動後方所有資料才能擴充 Slot 陣列，缺乏動態彈性。</p></div></p><hr id="33aa15e2-9005-80c5-8c98-e3708d7beaea" dir="auto"/><p id="33aa15e2-9005-8045-a806-ed4fb1096b3f" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-804d-af4a-c6b9a5065468" class="" dir="auto">Dynamic Memory Allocation, Array Resizing Penalty。</p></div></p><hr id="33aa15e2-9005-8099-87ca-eee2d05cc74d" dir="auto"/><p id="33aa15e2-9005-803a-9f02-f6ced7a2ee79" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-803d-ad42-d44306a9274a" class="" dir="auto">假設 Slot Array 和 Record 連續存放在一起並同向生長（如：Slot1, Slot2, Data1, Data2）。當你要插入 Data3 時，為了在陣列區新增 Slot3，你必須把 Data1 和 Data2 的實體位置全部往後推移。這種設計的搬移成本是災難性的。相向成長讓陣列與資料各安其位，互不干擾，完美解決了這個問題。</p></div></p></div></aside><hr id="33aa15e2-9005-800b-b859-f7882acc4f54" dir="auto"/></div></details><details id="33aa15e2-9005-807f-8bf9-f089a0b9ced3" open="" class="toggle" dir="auto"><summary>假設一個 PostgreSQL 8 KB heap page，page header 佔 24 bytes，每個 slot 佔 4 bytes，平均 record 大小（含 record header）是 200 bytes。這個 page 最多能放幾筆 record？<br/>如果其中 20% 的 record 被 delete 但還沒被背景清理程序回收，實際可用的 free space 剩多少？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80ff-a45d-f3265cc08990" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8042-bf41-fcd55ec0f010" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-80c3-8d30-eda9d384553e" class="" dir="auto">此 Page 最多能放 39 筆。若 20% 被刪除但未回收，可用的「連續 Free Space」約為 8 bytes，刪除產生的空間暫時無法供新紀錄分配。</p></div></p><hr id="33aa15e2-9005-80ff-ad49-d261da8b0a61" dir="auto"/><p id="33aa15e2-9005-80eb-a8d9-f4aa74fa2ea2" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-800e-9cad-f4ed473a7d85" class="" dir="auto">8192 Bytes Alignment, Tuple Overhead, Usable Free Space vs. Dead Space。</p></div></p><hr id="33aa15e2-9005-8017-8617-fc9adff9e9de" dir="auto"/><p id="33aa15e2-9005-80e7-a283-e98dbb74aadc" class="" dir="auto">Detail<div class="indented"><ul id="ffd44d9e-34d1-4c4b-8b4b-957166dea3d0" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>總容量</strong>：8 KB = 8192 bytes。扣除 Header (24 bytes) = 8168 bytes 可用。</li></ul><ul id="8517187f-2bf5-437b-87d6-ea160d93c351" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>單筆開銷</strong>：200 (Record) + 4 (Slot) = 204 bytes。</li></ul><ul id="4c434d1d-7ba8-40e0-b196-86eab079336c" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>最多筆數</strong>：8168 / 204 = 40.03。考量到記憶體對齊，實務上最多容納 39 或 40 筆（以 40 筆計，佔用 8160 bytes，剩 8 bytes 真正連續的 Free Space）。</li></ul><ul id="ddeef07e-b97c-43c2-b81d-67e4b8026945" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>刪除 20%</strong>：刪除 8 筆紀錄。這會在 Heap Area 產生 1600 bytes 的「空洞 (Dead Space)」。但在背景程序（VACUUM）或 Compaction 介入前，這些空間是不連續且未被標記為可重用的。因此系統眼中的「可立即分配的連續 Free Space」依舊只有那 8 bytes。</li></ul></div></p></div></aside><hr id="33aa15e2-9005-80a1-a0c6-d87ebd81d697" dir="auto"/></div></details><details id="33aa15e2-9005-805d-82ae-d2d1998af7d7" open="" class="toggle" dir="auto"><summary>一個 B+Tree leaf node 裡存了指向 heap page 的 CTID <code>(42, 7)</code>。如果 page 42 做了 compaction，把所有 record 重新排列壓緊，這個 CTID 還能正確找到目標 record 嗎？為什麼？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80ef-a352-f34dcc9e932a" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-803f-a4d5-f50fd1c70e98" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-8063-b59f-d0e8975e35c8" class="" dir="auto">能正確找到。因為 Compaction 只改變資料的實體位置，不會改變 Slot 的序號。</p></div></p><hr id="33aa15e2-9005-8047-b0d3-db8faf553abd" dir="auto"/><p id="33aa15e2-9005-80e0-a5f6-f88590eb605f" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-8013-8899-c9d1855e4ba3" class="" dir="auto">Stable Reference, Indirection Layer。</p></div></p><hr id="33aa15e2-9005-802b-a8d7-db9931ed39fb" dir="auto"/><p id="33aa15e2-9005-803b-a48e-e00cf2874bc5" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-809f-a4dc-f7e8398893bd" class="" dir="auto">CTID (42, 7) 代表第 42 頁的第 7 個 Slot。Compaction 的運作邏輯是把 Heap 裡的資料重新排緊，然後把新的位址（Offset）更新回第 7 個 Slot 裡面。從外部透過 CTID (42, 7) 存取時，依然會先讀取第 7 個 Slot，進而拿到最新的正確實體位址。這正是 Slot Indirection 設計的精髓。</p></div></p></div></aside><hr id="33aa15e2-9005-8098-8a11-cd61d9551e7d" dir="auto"/></div></details><details id="33aa15e2-9005-8028-9bec-f70ecf463001" open="" class="toggle" dir="auto"><summary>PostgreSQL 在 UPDATE 時不會立刻刪掉舊版本 record（因為可能有其他人還在讀）。從 slotted page 的角度，這對 page 內部的空間利用有什麼影響？為什麼需要一個背景清理程序來回收這些空間？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8079-bd27-fd5555a5a23b" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80af-a1e2-ea0dd252b890" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-8091-8042-c65a9167ff0e" class="" dir="auto">會導致 Page 快速累積無效的舊資料（Bloat/膨脹），因此需要 VACUUM 掃描並回收這些空間。</p></div></p><hr id="33aa15e2-9005-8013-8968-c0cc9e744314" dir="auto"/><p id="33aa15e2-9005-809f-8766-ecd69bf86d31" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-8013-8fbf-f428f1d0e0c0" class="" dir="auto">MVCC (Multi-Version Concurrency Control), Page Bloat, VACUUM, Dead Tuple。</p></div></p><hr id="33aa15e2-9005-8017-b172-d6711f3278b7" dir="auto"/><p id="33aa15e2-9005-80a5-81d7-d96780dfd8a8" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-80d9-bfb5-e0f527eefc38" class="" dir="auto">Postgres 的 UPDATE 實質上是「標記舊版本失效，並 INSERT 新版本」。如果某筆資料被頻繁更新，同一個 Page 內就會堆滿這筆資料的歷史版本（Dead Tuples）。這會嚴重浪費空間，並拖慢循序掃描的效能（Page Bloat）。因此必須依賴 <code>VACUUM</code> 背景程序，定期識別出已經沒有活躍 Transaction 會看見的舊版本，並將其 Slot 標記為可用，讓新資料能夠覆蓋上去。</p></div></p></div></aside><hr id="33aa15e2-9005-808d-8585-dc2f1aa060b9" dir="auto"/></div></details><details id="33aa15e2-9005-8088-a1d4-c99813d7f854" open="" class="toggle" dir="auto"><summary>在什麼樣的 workload 下，fixed-length record 的簡單 page layout 會比 slotted page 更有優勢？請從空間利用率和存取效率兩個角度分析。</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80cf-bf71-d02b2c3f51ad" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80fc-8168-ca41e19a2495" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-802d-bd13-d59c13633d40" class="" dir="auto">資料長度完全固定，且需要極高吞吐量的循序/隨機讀寫場景下更有優勢（例如感測器時序數據、金融 Log）。</p></div></p><hr id="33aa15e2-9005-8017-8b79-de88d2cbd96d" dir="auto"/><p id="33aa15e2-9005-80e6-9660-cba76d110d8a" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-806d-802e-cf36b9311388" class="" dir="auto">Predictable Offset, O(1) Direct Access, Zero Indirection Overhead。</p></div></p><hr id="33aa15e2-9005-809b-9c0f-fa7fdcf13fb3" dir="auto"/><p id="33aa15e2-9005-80fd-a878-d68a41e7bb7f" class="" dir="auto">Detail<div class="indented"><ul id="7816109c-702f-4278-808e-bfbbdc8bfcce" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>空間利用率</strong>：如果所有紀錄都是固定的 64 bytes，那就不需要 Slot Array 來記錄動態 Offset。每筆紀錄省下 4 bytes 的 Slot 空間，在海量資料下能省下極大儲存成本。</li></ul><ul id="3f099306-fb2d-435b-ac12-4b9c4e76a9c6" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>存取效率</strong>：CPU 可以透過簡單的指標運算直接跳轉到目標紀錄，避開了讀取 Slot 陣列所帶來的記憶體存取延遲（Cache Miss 風險）。這在需要極限效能且結構單純的系統中（如部分 In-Memory DB 或特定時序資料庫）是非常大的優勢。</li></ul></div></p></div></aside><hr id="33aa15e2-9005-801a-abc5-e566c3f00f3a" dir="auto"/></div></details></div></details><details id="33aa15e2-9005-80ae-a228-c4d213c5968c" open="" class="toggle" dir="auto"><summary><mark class="highlight-red" data-notion-highlight="red"><strong>Quiz Pool</strong></mark></summary><div class="indented"><ol type="1" id="33aa15e2-9005-8022-9d62-ceeb9c4b1812" class="numbered-list" start="1" dir="auto"><li>某個資料庫系統使用 8 KB slotted page 來存放 heap records。page header 為 24 bytes， 每個 slot 為 4 bytes。某個 page 已經插入多筆 variable-length records。之後發生以下事件：<aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-806e-9837-dc32073d6c49" dir="ltr"><div style="width:100%"><ol type="1" id="33aa15e2-9005-8066-87ce-c3766fdb1120" class="numbered-list" start="1" dir="auto"><li>slot 3 與 slot 6 的 record 被 DELETE，但尚未被 VACUUM 或 page pruning 回收</li></ol><ol type="1" id="33aa15e2-9005-806a-a5c3-fea655019b29" class="numbered-list" start="2" dir="auto"><li>slot 5 的 record 被 UPDATE，新的版本因為變大，無法原地覆寫，所以新版本被搬到 page 內另一個位置， 而 slot 5 改為指向新位置</li></ol><ol type="1" id="33aa15e2-9005-80ed-80c8-ddeec02d0c07" class="numbered-list" start="3" dir="auto"><li>接著系統想插入一筆新的 300-byte record，卻發現雖然 page 裡有不少刪除後留下的洞洞，仍然可能插不進去</li></ol></div></aside><p id="33aa15e2-9005-80d0-97e0-c372883f377d" class="" dir="auto">問：下列哪一個敘述最正確？</p><blockquote id="33aa15e2-9005-8089-bcc6-f4c9581cae94" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80f4-83ea-c866ba175bde" class="numbered-list" start="1" dir="auto"><li>Slotted page 的主要目的只是讓 variable-length record 比 fixed-length record 更省空間，與 pointer 穩定性無關。</li></ol><ol type="1" id="33aa15e2-9005-80c1-a748-d33541a0b6e3" class="numbered-list" start="2" dir="auto"><li>DELETE 掉 slot 3 和 slot 6 後，這兩個 slot 會立刻消失，因此 slot array 變短，free space 直接增加。</li></ol><ol type="1" id="33aa15e2-9005-80d7-9eea-c5ccdbe1f0e1" class="numbered-list" start="3" dir="auto"><li>即使 page 內總空間看起來夠大，只要 free space 被切成不連續的碎片，新 record 仍可能插入失敗；這正是 compaction 或 pruning 要處理的問題。</li></ol><ol type="1" id="33aa15e2-9005-808c-b2c3-cb86d6444b24" class="numbered-list" start="4" dir="auto"><li>UPDATE slot 5 後，因為 record 搬家了，所以所有指向該 record 的 CTID 都必須更新，否則 index 會失效。</li></ol></blockquote><details id="33aa15e2-9005-8052-8b9b-dbaf5989a699" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80cb-9d43-e2c1ff5faf83" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-801f-aefc-eeb2fc296402" class="" dir="auto">即使 page 內總空間看起來夠大，只要 free space 被切成不連續的碎片，新 record 仍可能插入失敗；這正是 compaction 或 pruning 要處理的問題。</p><hr id="33aa15e2-9005-805d-b96a-eed8feca9d7b" dir="auto"/><p id="33aa15e2-9005-805a-84d8-c7f681af42cd" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-80af-ac49-d108a05112a4" class="" dir="auto">對。這題考的是 fragmented free space 和 contiguous free space 的差別。 洞洞很多，不代表有一塊夠大的連續空間可放新 record。</p></div></p><hr id="33da15e2-9005-803a-97d0-f122091659ec" dir="auto"/><p id="33da15e2-9005-80ed-9c69-f1b037681b7a" class="" dir="auto">(1) 錯。Slotted page 的核心價值之一就是 slot indirection，讓 page 內部搬動 record 時，外部的 (page id, slot number) 仍然穩定。</p><p id="33da15e2-9005-807b-ae21-e02c850a5cca" class="" dir="auto">(2) 錯。DELETE 通常只會把 slot 標成 unused 或 dead，slot 本身不會立刻移除， slot array 也不會直接縮短。</p><p id="33da15e2-9005-8092-86f4-f64e82c61b42" class="" dir="auto">(4) 錯。外部通常存的是 (page id, slot number)。只要 slot 5 還在， 更新 slot 裡的 offset 即可，不需要改所有外部引用。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-809d-9137-ed6d9a3a82db" dir="auto"/><ol type="1" id="33aa15e2-9005-80c3-b5b0-f65e070867a9" class="numbered-list" start="2" dir="auto"><li>在高效能資料庫引擎（如 PostgreSQL 或 MySQL InnoDB）中，關於 Slotted Page Layout 處理 Variable-length records 與頁面維護的細節，下列敘述何者正確？<blockquote id="33aa15e2-9005-805e-8bcd-dcf2b19508d1" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80ec-a8f3-f6d0a5e386d3" class="numbered-list" start="1" dir="auto"><li>在執行頁面重組（Page compaction）時，為了保證外部指標的有效性，Slot Array 的大小與其在 Page Header 中的索引位置必須保持不變，即便中間存在因刪除而產生的空槽（Empty slots）</li></ol><ol type="1" id="33aa15e2-9005-8004-831a-ff3ee99e9833" class="numbered-list" start="2" dir="auto"><li>當 Slot Array 空間不足以容納新的 Slot 指標時，系統會動態調整 Page Header 的起始位址或縮小 Header 固定欄位，以騰出空間給 Slot Array 使用。</li></ol><ol type="1" id="33aa15e2-9005-8096-b755-de52baf277f9" class="numbered-list" start="3" dir="auto"><li>Free-space pointer 始終指向 Slot Array 結束位置與 Heap Area 開始位置之間的「絕對中點（Absolute Midpoint）」，以平衡兩端增長的壓力。</li></ol><ol type="1" id="33aa15e2-9005-806d-9b90-cf25fd2e06fa" class="numbered-list" start="4" dir="auto"><li>當頁面內的一條 record 被刪除後，為了防止 External Fragmentation，Free-space pointer 會立即更新並觸發該 record 後方所有數據的位移，以確保剩餘空間始終是物理連續的。</li></ol></blockquote><details id="33aa15e2-9005-806e-881b-e6c801ba0ddc" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8000-a7e7-ee35b5486d4d" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8035-a1a4-dadaf95a3bc2" class="" dir="auto">在執行頁面重組（Page compaction）時，為了保證外部指標的有效性，Slot Array 的大小與其在 Page Header 中的索引位置必須保持不變，即便中間存在因刪除而產生的空槽（Empty slots）</p><hr id="33aa15e2-9005-8040-83d5-f3d23a0e3859" dir="auto"/><p id="33aa15e2-9005-8088-8861-e14c119a5789" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8027-b800-f834770aa3eb" class="" dir="auto">如果 Compaction 時移動了 Slot Array 的順序，所有外部索引都會失效。因此，Compaction 僅在 Heap Area 進行物理碎片的整理，並更新 Slot Array 中對應的 Offset 值。被刪除的 Slot 會被標記為「可重用」，但在該 Slot 被新紀錄覆蓋前，它的位置必須保留。</p></div></p><hr id="33da15e2-9005-80cf-8350-eb8068d12be3" dir="auto"/><p id="33da15e2-9005-807b-a319-f69b358b8cf9" class="" dir="auto">(2) Page Header 的大小在分頁初始化時是固定的。 Slot Array 緊接在 Header 之後向後增長，而資料紀錄（Heap）從頁尾向前增長。當兩者相撞時，代表頁面已滿。Header 本身其位置與大小不可變動，否則硬體對齊與解析會出錯。</p><p id="33da15e2-9005-80de-81be-f5566bf3c680" class="" dir="auto">(3) 這是一個錯誤的假設。Free-space pointer 通常指向 Heap Area 的頂端（最新寫入紀錄的邊界）。Slot Array 與 Heap Area 並非對稱增長：Slot Array 每次增加一個固定大小的指標，而 Heap Area 每次增加一塊變長的資料。指針的作用是標註「下一次寫入資料的起始點」，而非維持中點。</p><p id="33da15e2-9005-807c-8383-efeb3838d733" class="" dir="auto">(4) 即時重組（Immediate Compaction）會導致極高的 CPU 與 I/O 成本，因為每刪除一筆資料都要移動大量記憶體。實際操作中，系統僅將該 Slot 標記為空，並更新 Page Header 中的 Space Counting。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-804b-9b63-fe9ab7c005ce" dir="auto"/><ol type="1" id="33aa15e2-9005-8067-991b-d29f8bb1ac6a" class="numbered-list" start="3" dir="auto"><li>某個 workload 的特性如下：table 的每個欄位都是 <code>CHAR</code> 固定長度，所有 record 大小完全相同（128 bytes），且幾乎沒有 <code>DELETE</code> 或 <code>UPDATE</code>，以 sequential scan 為主。<p id="33aa15e2-9005-80c1-aa78-e88fee095ad7" class="" dir="auto">工程師 A 主張繼續用 slotted page，工程師 B 主張換成 fixed-length page（直接用 slot number * record size 計算 offset，不需要 slot array）。</p><p id="33aa15e2-9005-8091-ae5c-d20787040910" class="" dir="auto">請分析：在此 workload 下，fixed-length page 相比 slotted page 的優勢為何？同時指出 fixed-length page 在哪種常見的 schema 變化下會立刻失去優勢。</p><blockquote id="33aa15e2-9005-80d7-b3c0-ca784db2e08e" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80ab-9465-ef58a1b002fb" class="numbered-list" start="1" dir="auto"><li>Fixed-length page 的優勢是省去省去每筆 record 4 bytes 的 slot entry（記錄 offset 與 length），以及存取時的間接定址成本；一旦加入 variable-length 欄位導致 row length 變動，fixed-length page 的機制就會失效。</li></ol><ol type="1" id="33aa15e2-9005-8004-9d62-e3a7aed848c7" class="numbered-list" start="2" dir="auto"><li>Fixed-length page 的優勢是省去 page header 的固定開銷；一旦有任何 <code>DELETE</code> 操作，因為 fixed-length page 無法標記洞洞，整個 page 需要立刻 compaction。</li></ol><ol type="1" id="33aa15e2-9005-809c-9ff9-c314454ff6f2" class="numbered-list" start="3" dir="auto"><li>Fixed-length page 的優勢是省去在 Page Header 維護 Slot Array 末端指標與 heap area 前端指標的運算開銷；一旦有 Record 被刪除，Fixed-length page 會因為沒有 Slot Array 記錄位移，導致該 Page 無法回收剩餘空間</li></ol><ol type="1" id="33aa15e2-9005-80f3-aa5f-ff2bcfb25b21" class="numbered-list" start="4" dir="auto"><li>Fixed-length page 的優勢是 sequential scan 時可以平行讀多個 record；一旦 workload 出現任何 index 查詢，因為 fixed-length page 沒有 CTID，index 無法定址到 record。</li></ol></blockquote><details id="33aa15e2-9005-807a-8a35-de60396cd238" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8031-ae3d-cda57b2e104e" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-808d-853d-f388454cb299" class="" dir="auto">Fixed-length page 的優勢是省去省去每筆 record 4 bytes 的 slot entry（記錄 offset 與 length），以及存取時的間接定址成本；一旦加入 variable-length 欄位導致 row length 變動，fixed-length page 的機制就會失效。</p><hr id="33aa15e2-9005-801e-875f-e7d184313706" dir="auto"/><p id="33aa15e2-9005-80c2-9525-cdb9ed5cb98e" class="" dir="auto">解析: <div class="indented"><p id="46d71fa9-1808-44ea-95eb-e1f992c33ec8" class="" dir="auto">省去每筆 record 4 bytes slot entry，以及存取時不需要先查 slot array 再跳到實際位置的間接成本</p><p id="991d125d-98cb-4353-8a5f-33bb11a12c6d" class="" dir="auto">舊 row 在 heap 裡沒有新欄位的實際資料，新舊 row 長度不同，用 slot number * 128 計算 offset 會得到錯誤位置。</p></div></p><hr id="33da15e2-9005-801a-bd53-e5345242cd8b" dir="auto"/><p id="33da15e2-9005-809a-94a1-fca6482111ba" class="" dir="auto">(2) Page header 是 page 層級的固定開銷，slotted page 和 fixed-length page 都需要某種形式的 metadata，並不是換成 fixed-length page 就能省掉多餘開銷。失效情境的描述也有問題：fixed-length page 處理 DELETE 的方式是用一個 bitmap 標記哪些 slot 是空的，不需要立刻 compaction，這與 slotted page 的洞洞問題性質不同。</p><p id="33da15e2-9005-802c-9674-d63f3820debb" class="" dir="auto">(3) Fixed-length 的回收機制只要直接計算 offset 覆蓋即可。</p><p id="33da15e2-9005-8017-9e3a-e02410796166" class="" dir="auto">(4) Sequential scan 平行讀多個 record 的能力來自 page 是連續的磁碟區塊，這與 slotted page 或 fixed-length page 無關，兩種 layout 都可以做 sequential scan。CTID 是 slotted page 的定址方式，fixed-length page 有自己的定址機制（page ID + slot number * record size），index 一樣可以用 (page ID, slot number) 來定址，不存在沒有 CTID 就無法建 index 的問題。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8096-a4c3-ebb98da39380" dir="auto"/><ol type="1" id="33aa15e2-9005-806a-b6df-fc08f8e3b9c4" class="numbered-list" start="4" dir="auto"><li>某資料庫系統採用 <strong>slotted page</strong> 設計。外部模組使用 <code>( page_id, slot_id )</code> 作為 record 的唯一識別（ RID ）。目前 page 狀態如下：<aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-806a-9776-c823a3f23a97" dir="ltr"><div style="width:100%"><ul id="33aa15e2-9005-80de-bcb5-e9377a3a84f1" class="bulleted-list" dir="auto"><li style="list-style-type:disc">slot array： slot 0～4 都已使用</li></ul><ul id="33aa15e2-9005-8078-abca-d4ac7eb9fe5f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">page 內存在碎片（ fragmentation ）</li></ul><ul id="33aa15e2-9005-8041-8e24-df819aa383db" class="bulleted-list" dir="auto"><li style="list-style-type:disc">系統準備執行 compaction，將 records 重新排列以消除空洞</li></ul><ul id="33aa15e2-9005-802a-9507-d07dbdc9d7c7" class="bulleted-list" dir="auto"><li style="list-style-type:disc">compaction 過程中， <strong>records 的實際位置（ offset ）會改變</strong></li></ul></div></aside><p id="33aa15e2-9005-8075-83ff-e10917270225" class="" dir="auto">在 compaction 完成後，下列哪一個敘述 <strong>必然正確</strong>？</p><blockquote id="33aa15e2-9005-8045-bcd0-c2889ac99968" class="" dir="auto"><ol type="1" id="33aa15e2-9005-804f-b312-d06f9570a93f" class="numbered-list" start="1" dir="auto"><li>只要更新 slot array 中的 offset，外部 reference（RID）不需要改變，仍然能正確存取資料。</li></ol><ol type="1" id="33aa15e2-9005-802f-bf27-c84ae84202b0" class="numbered-list" start="2" dir="auto"><li>為了避免更新 slot array，系統應避免移動 records，而只在 free space 中重新分配空間。</li></ol><ol type="1" id="33aa15e2-9005-8043-9fde-da04608347b2" class="numbered-list" start="3" dir="auto"><li>所有指向該 page 的外部 reference （ RID ）都必須更新，因為 record 的 offset 改變了。</li></ol><ol type="1" id="33aa15e2-9005-807d-af66-e82566719b9e" class="numbered-list" start="4" dir="auto"><li>compaction 之後，slot 的順序（ slot_id ）通常會重新排序，以對應新的 record 位置，提升存取效率。</li></ol></blockquote><details id="33aa15e2-9005-8083-ba47-cfbce2b74218" open="" class="toggle" dir="auto"><summary>Answer </summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-803a-abce-f2ad135446c1" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8073-8d8d-fa0ab1f968db" class="" dir="auto">只要更新 slot array 中的 offset，外部 reference（RID）不需要改變，仍然能正確存取資料。</p><hr id="33aa15e2-9005-8040-8a78-cc112e3901db" dir="auto"/><p id="33aa15e2-9005-8050-80a2-feaec26d7787" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-80aa-a658-c764c31f6737" class="" dir="auto">這是 Slotted page 的標準行為。外部模組持有的 RID 是 <code>(page_id, slot_id)</code>。當 Page 進行 compaction 時，資料在頁內的實際位置（ offset ）會變動，但系統只需更新該 <code>slot_id</code> 在 Slot Array 中對應的指標。外部模組依然使用同一個 <code>slot_id</code> 進入，並透過更新後的指標找到資料。</p></div></p><hr id="33da15e2-9005-803b-948a-e893dcc661c6" dir="auto"/><p id="33da15e2-9005-8092-be9f-d86c8c42444a" class="" dir="auto">(2) Compaction 正是為了處理頁面內的 external fragmentation 而移動 Record 。如果不移動 Record，空間就無法連續化，這會導致即使總剩餘空間足夠，也無法插入較大的 Record 。</p><p id="33da15e2-9005-809b-a05f-d92330c8cff7" class="" dir="auto">(3) 外部 reference <strong>不依賴 offset</strong> ，依賴的是 slot_id 。即使實體 offset 改變，只要 slot array 沒變，外部引用就不需更新。</p><p id="33da15e2-9005-802a-b0ed-e6fae9a40844" class="" dir="auto">(4) 如果重新排序 Slot ID，就會破壞所有 RID ，導致所有外部索引（ Indexes ）都需要更新，代價極大。 </p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80a0-aaeb-dae1bb81c2f2" dir="auto"/><ol type="1" id="33aa15e2-9005-8047-90f7-ebe81f8a8739" class="numbered-list" start="5" dir="auto"><li>某資料庫考慮把一個 table 的 page layout 從 slotted page 改成 fixed-length page。 <p id="33da15e2-9005-8077-93b7-ef106c4b3711" class="" dir="auto">已知條件如下： </p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-80bf-a5dd-e9714a85dc05" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-804a-b379-d49f30b669fe" class="" dir="auto">page 大小為 8 KB ，page header 為 24 B。 <br/>在 slotted page layout 下， 每筆 record 需要 4 bytes 的 slot。<br/>額外的 slot 讀取成本可視為 5 ns / record。 <br/>而在 fixed-length page layout 下每筆 record 不需要額外的 slot。 <br/>每讀一個 page 到 CPU 可見層級的成本，視為 800 ns / page。</p></div></aside><p id="33aa15e2-9005-8011-bd8b-c3dcb5dc0dcd" class="" dir="auto">這個 table 的 schema 如下：</p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-80e4-8ee3-cc2b71f52a30" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8031-b9a7-e1e66e726664" class="" dir="auto">固定部分為 48 B。 <br/>另外有一個 comment 欄位，固定大小為 80 B。 <br/>但是只有 5% 的 record 真的有 comment。 <br/>其餘 95% 的 record，comment = NULL。 </p></div></aside><p id="33da15e2-9005-800c-beac-ff64f6358aaf" class="" dir="auto">現在有 1,000,000 筆 record，要做一次 sequential scan。 <br/>請問改成 fixed-length page 之後，哪一個選項最正確地描述總讀取時間的變化與原因。</p><blockquote id="33aa15e2-9005-80a3-b60a-fc5a97de5c01" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80c1-8404-f2c241f1eba3" class="numbered-list" start="1" dir="auto"><li>改成 fixed-length page 之後一定比較快，因為 NULL 欄位本來就不佔空間，所以 fixed-length page 不會真的浪費容量。</li></ol><ol type="1" id="33aa15e2-9005-800e-9bbe-c0a0027a4336" class="numbered-list" start="2" dir="auto"><li>改成 fixed-length page 之後反而比較慢，因為雖然少了 slot 讀取，但每筆 record 都必須預留 80 B 的 comment 空間，導致每個 page 能放的 record 大幅減少；增加的 page 讀取成本超過省下的 slot 成本</li></ol><ol type="1" id="33aa15e2-9005-8098-b42f-d7806bae36de" class="numbered-list" start="3" dir="auto"><li>兩者速度幾乎相同，因為只有 5% 的 record 有 comment，大多數 record 都不受 layout 影響。</li></ol><ol type="1" id="33aa15e2-9005-8050-a7d7-fa94c7a5529e" class="numbered-list" start="4" dir="auto"><li>改成 fixed-length page 之後一定比較快，因為每筆 record 都少讀一次 slot。</li></ol></blockquote><details id="33aa15e2-9005-80c1-b73e-ebf6e75ebb2b" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8091-81e0-fb9ea44e68f1" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8037-a6bd-d8b7d94d4a8d" class="" dir="auto">改成 fixed-length page 之後反而比較慢，因為雖然少了 slot 讀取，但每筆 record 都必須預留 80 B 的 comment 空間，導致每個 page 能放的 record 大幅減少；增加的 page 讀取成本超過省下的 slot 成本</p><hr id="33aa15e2-9005-80bf-bab3-ed887f27f408" dir="auto"/><p id="33aa15e2-9005-809a-b630-d526223868b3" class="" dir="auto">解析: <div class="indented"><p id="472247ba-f1a2-4216-8f62-bc390e60031f" class="" dir="auto">這個選項正確指出 fixed-length 雖然少了 slot 讀取，但為稀疏的 variable-length 欄位預留固定空間，導致 page utilization 下降，最後整體更慢。<br/>詳細的計算如下: 在 slotted page 中，平均每筆 record 的資料大小為 48 + 0.05 × 80 = 52 B 再加上 slot 之後，每筆 record 平均佔用 52 + 4 = 56 B 每個 page 可用空間為 8192 - 24 = 8168 B，因此 slotted page 每頁可放 floor(8168 / 56) = 145 筆 需要的 page 數為 ceil(1,000,000 / 145) = 6897 頁。 總 page 讀取成本為 6897 × 800 ns = 5,517,600 ns 總 slot 讀取成本為 1,000,000 × 5 ns = 5,000,000 ns 總成本為 5,517,600 + 5,000,000 = 10,517,600 ns，約為 10.52 ms。 在 fixed-length page 中，每筆 record 的資料大小為 48 + 80 = 128 B 每個page的可用空間仍為 8168 B，因此每頁可放 floor(8168 / 128) = 63 筆 需要的 page 數為 ceil(1,000,000 / 63) = 15874 頁。 總 page 讀取成本為 15874 × 800 ns = 12,699,200 ns 不需要 slot 讀取成本，因此總成本為 12,699,200 ns，約為 12.70 ms。 如此可以得出 fixed-length page 的總成本比 slotted page 還高，改成 fixed-length page 反而比較慢。</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8045-91e9-c598bd3e13d2" dir="auto"/><ol type="1" id="33aa15e2-9005-80ca-bcd3-eace269af9bc" class="numbered-list" start="6" dir="auto"><li>某資料庫系統使用 slotted page 管理 heap records，並採用 <code>( page_id, slot_id )</code> 作為外部 record identifier（RID）。<p id="33aa15e2-9005-807d-ba6b-cea14fea96d7" class="" dir="auto">現在考慮以下操作序列：</p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8042-9238-f90857753d44" dir="ltr"><div style="width:100%"><ol type="1" id="33aa15e2-9005-8087-84be-d53cc6b8957f" class="numbered-list" start="1" dir="auto"><li>page 中已有多筆 variable-length records，slot array 持續增長</li></ol><ol type="1" id="33aa15e2-9005-8064-8524-e6688570a8c0" class="numbered-list" start="2" dir="auto"><li>多次 INSERT 後，slot array 已經接近 heap area（<code>pd_lower</code> 接近 <code>pd_upper</code>）</li></ol><ol type="1" id="33aa15e2-9005-8058-af63-e1727d519c04" class="numbered-list" start="3" dir="auto"><li>此時執行多筆 DELETE，但系統僅將對應 slot 標記為 unused，未進行 compaction</li></ol><ol type="1" id="33aa15e2-9005-80f6-b896-e24b977ace08" class="numbered-list" start="4" dir="auto"><li>接著嘗試 INSERT 一筆小型 record（例如 20 bytes）</li></ol></div></aside><p id="33aa15e2-9005-803c-a558-c995c47ae1bd" class="" dir="auto">已知 heap area 中存在大量因 DELETE 留下的 holes，且這些 holes 的總大小遠大於 20 bytes</p><p id="33aa15e2-9005-8035-8067-e3ba6581368c" class="" dir="auto">在這種情況下，INSERT 仍然可能失敗。請問最合理的解釋是什麼？</p><blockquote id="33aa15e2-9005-8088-8a9c-cbfbd3ad8235" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80b0-b1f5-f6dd85e9cb25" class="numbered-list" start="1" dir="auto"><li>因為 INSERT 需要同時在 heap area 放資料與在 slot array 新增 slot，如果 slot array 已經沒有連續空間，即使 heap area 有空間也無法插入。</li></ol><ol type="1" id="33aa15e2-9005-801e-97ba-f81f13f5401c" class="numbered-list" start="2" dir="auto"><li>因為 DELETE 之後 slot array 會自動縮小，導致 <code>pd_lower</code> 回退，覆蓋掉原本的 free space，使 INSERT 無法進行。</li></ol><ol type="1" id="33aa15e2-9005-8042-bff0-fdfe293aa2ee" class="numbered-list" start="3" dir="auto"><li>因為 slot_id 必須保持連續（0,1,2,...），當中間存在 unused slot 時，系統禁止插入新 record 以避免破壞 slot ordering。</li></ol><ol type="1" id="33aa15e2-9005-80f9-bf89-d4ee68bef398" class="numbered-list" start="4" dir="auto"><li>因為 heap area 的 free space 是 fragmented（不連續），即使總空間足夠，也可能沒有一段連續空間同時滿足 record 存放需求，因此需要 compaction 才能成功 INSERT。</li></ol></blockquote><details id="33aa15e2-9005-8036-80a4-d0679cf5a1af" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8067-a297-c1d9ea2fa2b1" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80ab-8596-e4d74499eb5b" class="" dir="auto">因為 heap area 的 free space 是 fragmented（不連續），即使總空間足夠，也可能沒有一段連續空間同時滿足 record 存放需求，因此需要 compaction 才能成功 INSERT。</p><hr id="33aa15e2-9005-80d5-8784-e4bea520b53e" dir="auto"/><p id="33aa15e2-9005-80c6-a1c5-d59c96b5691a" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8007-aca6-e5f453673368" class="" dir="auto">slotted page 的新 record 是放在 pd_upper 的位置往前長的，所以 INSERT 能用的空間是 pd_lower 和 pd_upper 之間的連續間隙。 DELETE 留下的 holes 散落在 heap area 內部，並不在這個間隙中，所以即使 holes 的總量遠大於 20 bytes， pd_lower 和 pd_upper 之間的間隙太小就是放不下。 Compaction 把存活的 records 壓緊後，消除中間的 holes， pd_upper 才會往後退，騰出大塊連續空間。才能支援後續 INSERT。</p></div></p><hr id="33da15e2-9005-80cf-ba8f-cdc86c40e11e" dir="auto"/><p id="33da15e2-9005-80c4-9dcf-e53460f93cc6" class="" dir="auto">(1) slot Array 位於頁面頂端，透過 pd_lower 指標線性增長，本身不存在碎片化或不連續的問題。 此外，即使系統能重用 unused slot，INSERT 失敗的原因也不在 slot array，而在於 DELETE 留下的 holes 散落在 heap area 內部，但 INSERT 能用的空間是 pd_lower 和 pd_upper 之間的連續間隙。 所以即使 holes 的總量遠大於 20 bytes， pd_lower 和 pd_upper 之間的間隙太小就是放不下。</p><p id="33da15e2-9005-8016-943b-d3ee1c8d983c" class="" dir="auto">(2) DELETE 並不會讓 slot array 自動縮小。slot 通常只是被標記為 unused， <code>pd_lower</code> 不會回退，因此不會發生覆蓋 free space 的情況。 這個選項混淆了 slot 管理與空間回收機制。</p><p id="33da15e2-9005-8039-9d66-c98fd504dcb3" class="" dir="auto">(3) slot_id 不需要保持連續對應有效 record。 slotted page 允許中間存在 unused slots，甚至可以重用這些 slot。 slot ordering 並不是 INSERT 的限制條件，這個選項誤解了 slot array 的設計目的。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-802e-85da-d0caf049585e" dir="auto"/><ol type="1" id="33aa15e2-9005-80c5-b71c-c68c5057f2cc" class="numbered-list" start="7" dir="auto"><li><mark class="highlight-red" data-notion-highlight="red">假設某資料庫設計將 slot 與 record 資料交錯存放，並往同一方向成長：</mark><p id="33aa15e2-9005-80bd-86b2-f3b6177512e8" class="" dir="auto"><mark class="highlight-red" data-notion-highlight="red">[slot][record][slot][record][slot][record]</mark></p><p id="33aa15e2-9005-809b-9714-fbfa1821b82f" class="" dir="auto"><mark class="highlight-red" data-notion-highlight="red">相較於 slotted page layout，該設計在處理 variable-length record 時可能產生一些問題。 下列何者最不可能為此設計所造成的問題？</mark></p><blockquote id="33aa15e2-9005-805d-994b-f0adfd56857c" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80d0-9ea0-dd4af65158e9" class="numbered-list" start="1" dir="auto"><li>compaction 時需要同時搬動 slot 與 record，增加實作複雜度</li></ol><ol type="1" id="33aa15e2-9005-8002-abb4-d16815998e38" class="numbered-list" start="2" dir="auto"><li>插入新 record 時可能需要搬移大量既有資料</li></ol><ol type="1" id="33aa15e2-9005-8084-bb94-fd14e39f9c55" class="numbered-list" start="3" dir="auto"><li>會導致該 page 無法被 B+Tree 的 leaf node 正確引用</li></ol><ol type="1" id="33aa15e2-9005-8032-86cd-ff2e07497f63" class="numbered-list" start="4" dir="auto"><li>page 內空間容易產生 fragmentation，且難以有效利用</li></ol></blockquote><details id="33aa15e2-9005-80d1-8869-c703bd63ef69" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80f4-9648-cc711dba247a" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8007-9925-d1bcd86116df" class="" dir="auto">會導致該 page 無法被 B+Tree 的 leaf node 正確引用</p><hr id="33aa15e2-9005-80fc-9ada-f4b9173a137c" dir="auto"/><p id="33aa15e2-9005-807c-be96-c59ae3bf02d7" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8006-9fec-e2159a12c61b" class="" dir="auto">B+Tree leaf node 透過 (page_id, slot_number) 來引用 record，只要求 page 內能根據 slot number 找到對應資料。 這與 slot 與 record 的實際排列方式無關，即使採用交錯設計，仍可透過線性掃描找到 slot，因此不會影響外部索引結構的正確性。</p></div></p><hr id="33da15e2-9005-80a8-baff-d91f8cd345ee" dir="auto"/><p id="33da15e2-9005-80bc-8d9a-dc91ecd59ab3" class="" dir="auto">(1) 由於 slot 與 record 沒有分離，搬移 record 時通常也需要同步調整 slot，增加實作成本。</p><p id="33da15e2-9005-8003-8b6c-e5c9a18a7eed" class="" dir="auto">(2) 由於 record 長度不固定且交錯排列，插入時可能需要將後方資料整體移動，造成 O(n) 的成本。</p><p id="33da15e2-9005-8008-ae02-d87c46ca2f53" class="" dir="auto">(4) DELETE 或 UPDATE 後會留下零碎空間，且 slot 與 record 混在一起，使空間較難整理成連續區域。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8008-84c0-c4fe6f65b683" dir="auto"/><ol type="1" id="33aa15e2-9005-8033-9eb0-ce80e253d173" class="numbered-list" start="8" dir="auto"><li>在設計資料庫的 page layout 時，工程師需要根據資料特性選擇合適的儲存結構。Slotted Page 是一種常見的頁面內資料管理方式。請問在以下情境中，哪一種最適合使用 Slotted Page？<blockquote id="33aa15e2-9005-802e-bd1c-ff17896d7534" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80ea-918a-f2c435b00ad1" class="numbered-list" start="1" dir="auto"><li>報表分析資料，不經常寫入，但需要高效的 sequential scan 存取，通常以連續儲存方式來提升讀取效能。</li></ol><ol type="1" id="33aa15e2-9005-8064-af1f-fec5e2ce327b" class="numbered-list" start="2" dir="auto"><li>商品描述或使用者備註，通常是可變長文字欄位。</li></ol><ol type="1" id="33aa15e2-9005-80fe-9074-e39508b4b4b5" class="numbered-list" start="3" dir="auto"><li>系統操作日誌，資料以 append-only 方式持續寫入，幾乎不會進行刪除或更新，例如使用者行為紀錄。</li></ol><ol type="1" id="33aa15e2-9005-80f4-b3f4-e29355de67c5" class="numbered-list" start="4" dir="auto"><li>訂單編號或會員 ID，固定長度整數欄位。</li></ol></blockquote><details id="33aa15e2-9005-8052-8251-cbac1608e5fd" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80ac-a558-c56171eaa7ef" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8067-873c-eae200cb616e" class="" dir="auto">商品描述或使用者備註，通常是可變長文字欄位。</p><hr id="33aa15e2-9005-80b0-a77c-d5612bde0815" dir="auto"/><p id="33aa15e2-9005-800c-80a6-f970e739922f" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8026-a984-d3b87b8aa3d1" class="" dir="auto">Slotted Page 透過 slot table 管理每個記錄的起始位置與長度，非常適合這類變長欄位資料。它能有效利用頁面空間，避免 fixed-length layout 為每筆 record 預留最大空間造成的空間浪費，並方便在頁面內進行插入、刪除或更新操作。</p></div></p><hr id="33da15e2-9005-8026-8ef3-dd1111493a6d" dir="auto"/><p id="33da15e2-9005-804d-94cd-daddf8b06f89" class="" dir="auto">(1) 這類 workload 以大量連續讀取為主，重視 cache locality 與資料連續性。Slotted Page 的 indirection（slot → record）提供的彈性（如 variable-length 支援、record 搬移）在此場景下派不上用場，額外的 slot table 只增加空間開銷而沒有帶來好處。</p><p id="33da15e2-9005-806e-8ed4-db26fc8bcbec" class="" dir="auto">(3) 這類資料主要為連續新增，幾乎沒有刪除或更新操作。Slotted Page 提供的彈性（如 record relocation）無法發揮，反而增加 slot table 與 indirection 的額外負擔， LSM-tree 更適合此種情境。</p><p id="33da15e2-9005-80b8-b8db-e7dd55ba8e2c" class="" dir="auto">(4) 這類固定長度欄位資料的每筆記錄大小相同，因此可以直接以連續陣列的方式儲存，透過 index 計算即可快速定位資料位置，不需要額外的 slot table 來記錄 offset。 Slotted Page 需要額外維護 slot table，並在存取時多一層 indirection（slot → record），反而會增加空間開銷與存取成本。在沒有變長欄位或記錄搬移需求的情況下，這些機制無法帶來實質好處，因此使用 Slotted Page 的效益不大。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80b6-8af8-d4a41bc8d480" dir="auto"/><ol type="1" id="33aa15e2-9005-80fe-99df-e06040abd315" class="numbered-list" start="9" dir="auto"><li><mark class="highlight-red" data-notion-highlight="red">某個資料庫系統採用 slotted page，並以 </mark><mark class="highlight-red" data-notion-highlight="red"><code>(page_id, slot_id)</code></mark><mark class="highlight-red" data-notion-highlight="red"> 作為 record 的外部識別（RID）。 B+Tree index 的 leaf node 直接儲存這些 RID 作為指向 heap record 的 pointer。</mark><p id="33aa15e2-9005-80b5-8d2d-de564098ef7f" class="" dir="auto">現在考慮以下操作序列：</p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8066-9380-e8534b48328a" dir="ltr"><div style="width:100%"><ol type="1" id="33aa15e2-9005-8081-9268-ec7dfe3294fd" class="numbered-list" start="1" dir="auto"><li>某個 page 中已有 6 筆 records，分別對應 slot 0～5，且該 table 上有一個 B+Tree index。</li></ol><ol type="1" id="33aa15e2-9005-80d1-989e-d944356d3bac" class="numbered-list" start="2" dir="auto"><li>DELETE slot 2 的 record；系統將該 slot 標記為 unused，heap area 留下一個洞洞。</li></ol><ol type="1" id="33aa15e2-9005-808a-8de9-f76a0f3c9c3a" class="numbered-list" start="3" dir="auto"><li>緊接著，INSERT 一筆新 record。</li></ol></div></aside><p id="33da15e2-9005-8013-b07d-dd183b1336bc" class="" dir="auto">工程師甲說：「slot 2 已經是 unused，直接把新 record 分配到 slot 2 就好，這樣不用讓 slot array 再往後長。」</p><p id="33da15e2-9005-800b-ac13-cbb26153d710" class="" dir="auto">工程師乙說：「不行，即使 slot 2 是 unused，立刻重用這個 slot 仍然有問題。」</p><p id="33aa15e2-9005-8043-a2ab-e1f85a0bd5a7" class="" dir="auto">工程師乙的說法正確嗎？原因最接近下列哪一個描述？</p><blockquote id="33aa15e2-9005-804a-b94e-c11a7506bcad" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8068-9b20-cbf343eb72f9" class="numbered-list" start="1" dir="auto"><li>工程師甲正確。DELETE 已經把 slot 2 標記為 unused，代表任何人都無法再透過正常查詢存取它。此時重用 slot 2 完全安全，也能省下 slot array 不必要的增長。</li></ol><ol type="1" id="33aa15e2-9005-8008-8ee6-ef4bf576fece" class="numbered-list" start="2" dir="auto"><li>工程師乙正確。因為 slot array 只能往後增長，slotted page 在結構上根本不允許重用中間的 unused slot，否則 <code>pd_lower</code> 指標的語義會被破壞。</li></ol><ol type="1" id="33aa15e2-9005-8082-95de-cc02a9027753" class="numbered-list" start="3" dir="auto"><li>工程師乙正確。因為 B+Tree index 的 leaf node 可能仍然持有指向 <code>(page_id, 2)</code> 的 pointer；若把新 record 放到 slot 2，這個 index entry 就會變成 dangling pointer，指向完全不同的 record。</li></ol><ol type="1" id="33aa15e2-9005-8012-b3cc-eb28fd008a1e" class="numbered-list" start="4" dir="auto"><li>工程師甲正確。Slot indirection 的設計目的就是讓 slot 可以自由重用，只要更新 slot array 裡的 (offset, length) 即可，外部 pointer 透過 slot array 查詢時自然會讀到新位置。</li></ol></blockquote><details id="33aa15e2-9005-8000-9e74-fa0d73aa33f0" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80f7-bebc-e9f3bc3261e3" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-800f-8b66-f9b365bcb167" class="" dir="auto">工程師乙正確。因為 B+Tree index 的 leaf node 可能仍然持有指向 <code>(page_id, 2)</code> 的 pointer；若把新 record 放到 slot 2，這個 index entry 就會變成 dangling pointer，指向完全不同的 record。</p><hr id="33aa15e2-9005-80f5-ac38-d5f7493fd065" dir="auto"/><p id="33aa15e2-9005-8066-bd8a-d9b1b09c7fe8" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-805b-aae9-dff0136f86f3" class="" dir="auto">Slot indirection 保護的是「同一筆 record 在 page 內搬移」，前提是 slot 的身份不變。 重用 slot 給另一筆 record 會讓舊 index entry <code>(page_id, 2)</code> 成為 dangling pointer， 刪除 heap record 並不會自動清除 index entry，兩者生命週期獨立。</p></div></p><hr id="33da15e2-9005-80bc-9e01-c0b0a58d1ae4" dir="auto"/><p id="33da15e2-9005-80c4-92ee-d3281317e21c" class="" dir="auto">(1) Unused 標記只代表對新查詢不可見，B+Tree index entry 不會因此自動消失。 外部仍可能持有指向 slot 2 的 pointer，重用會造成 dangling pointer。</p><p id="33da15e2-9005-8098-8310-e6d6d6236931" class="" dir="auto">(2) 重用 unused slot 不需要動 <code>pd_lower</code>，<code>pd_lower</code> 只追蹤 slot array 的末端。 結構上完全允許，問題在於「安不安全」，而非「能不能」。</p><p id="33da15e2-9005-801a-94d6-e3dda9d25ef9" class="" dir="auto">(4) Indirection 保護的是「同一個 slot 的 offset 改變」，不是「slot 換了主人」。 外部 pointer 透過 slot_id 找到的永遠是同一個邏輯身份，重用後身份已被替換，indirection 無法修正這個問題。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8031-a3aa-d0b5f6af30e8" dir="auto"/><ol type="1" id="33aa15e2-9005-80ff-9dee-fe78fa7ffc94" class="numbered-list numbered-list-digits-2" start="10" dir="auto"><li>一張 PostgreSQL 資料表有 800 筆 live rows，workload 是對每筆 row 反覆執行 UPDATE， 沒有任何 INSERT 或 DELETE。執行一段時間後，資料表佔用的磁碟空間遠超過 800 筆 row 實際所需，但 VACUUM 在這段期間完全沒有執行過。<p id="33aa15e2-9005-80f8-8e77-c662e9869a84" class="" dir="auto">從 slotted page layout 的角度，直接原因是什麼？</p><blockquote id="33aa15e2-9005-8020-ae5a-dd0f7ddd9d26" class="" dir="auto"><ol type="1" id="33aa15e2-9005-803c-8e2b-ecb6de425ef1" class="numbered-list" start="1" dir="auto"><li>每次 UPDATE 在 heap 寫入新版本 tuple，舊版本以 dead tuple 留在 heap 裡， 兩者共存直到 VACUUM 回收。反覆 UPDATE 累積大量 dead tuple，導致實體空間遠超邏輯資料量。</li></ol><ol type="1" id="33aa15e2-9005-80c9-b83a-dd3ddae9d5c7" class="numbered-list" start="2" dir="auto"><li>UPDATE 只修改 slot entry 的 (offset, length) 指向新位置，每個 slot entry 只有 4 bytes，即使累積大量 UPDATE 也不太可能造成顯著的空間膨脹。</li></ol><ol type="1" id="33aa15e2-9005-807c-a174-fb30ba1d7dc7" class="numbered-list" start="3" dir="auto"><li>UPDATE 直接在原位覆寫 record 資料，slot 的 (offset, length) 更新後即完成。 不會產生額外的空間消耗，空間膨脹應該是其他因素造成的。</li></ol><ol type="1" id="33aa15e2-9005-80db-8d63-dc5ee261f91d" class="numbered-list" start="4" dir="auto"><li>UPDATE 後舊 tuple 的空間會立刻歸還到 <code>pd_lower</code> 與 <code>pd_upper</code> 之間的 free space，因此 UPDATE 本身不太會造成空間膨脹，問題主要出在 slot array 的成長。</li></ol></blockquote><details id="33aa15e2-9005-809c-853e-db1fe5a5cfce" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80e5-a28d-f9429639f90b" dir="ltr"><div style="width:100%"><p id="8edaeabc-54c2-46d1-88e3-fb9c823a8cfc" class="" dir="auto">每次 UPDATE 在 heap 寫入新版本 tuple，舊版本以 dead tuple 留在 heap 裡， 兩者共存直到 VACUUM 回收。反覆 UPDATE 累積大量 dead tuple，導致實體空間遠超邏輯資料量。</p><hr id="33aa15e2-9005-8090-966d-d8eb677e46b9" dir="auto"/><p id="33aa15e2-9005-8051-93c6-df7cfcc60e57" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-80d1-bde0-c6d5657c2bba" class="" dir="auto">PostgreSQL 把 UPDATE 實作為 delete + insert：舊 tuple 標記 dead，新版本寫入 heap 並分配新 slot。舊版本保留是因為其他 transaction 可能仍需讀取。 VACUUM 確認無人需要後才回收，反覆 UPDATE 因此累積 dead tuple 造成 table bloat。</p></div></p><hr id="33da15e2-9005-807f-ab14-c0643c23f0ef" dir="auto"/><p id="33da15e2-9005-8074-8795-d5a360e3144b" class="" dir="auto">(2) UPDATE 不只是修改 slot entry，它會在 heap area 寫入一筆完整的新 tuple （含 23-byte header + null bitmap + 所有欄位資料）。舊 tuple 仍佔用 heap 空間， 主要的空間膨脹來自 heap 裡的 dead tuple 資料，而非 4-byte slot entry。</p><p id="33da15e2-9005-80a5-932c-d44dedf6b288" class="" dir="auto">(3) 對 variable-length record，UPDATE 後新 record 大小可能改變，原位放不下。 即使大小不變，PostgreSQL 也不會覆寫舊版本，而是寫入新 tuple 並保留舊版本，因為其他 transaction 可能仍需讀取舊版本。</p><p id="33da15e2-9005-80b8-8578-e572d7974eb7" class="" dir="auto">(4) DELETE 或 UPDATE 標記舊 tuple 為 dead 時，heap area 裡只會留下 hole， 該空間不會自動歸還到 <code>pd_lower</code> 與 <code>pd_upper</code> 之間的連續 free space。 需要 compaction 或 page pruning 才能整併這些 hole。</p></div></aside></div></details></li></ol></div></details></div></details></div></div><hr id="33aa15e2-9005-80f3-8fd6-dea84487d90f" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80fb-bff7-e11916a02189" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8026-9f76-d4a33f416fef" class="" dir="auto">
+</p></div></aside></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

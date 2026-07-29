@@ -1,0 +1,771 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Write Amplification</title><meta name="data-notion-page-icon" content="🧱"/><link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2290%22%3E%F0%9F%A7%B1%3C%2Ftext%3E%3C%2Fsvg%3E"/><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+/* Override strong tags inside headings to maintain consistent weight */
+h1 strong,
+h2 strong,
+h3 strong {
+	font-weight: 600;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 10px;
+	padding: 1rem;
+}
+
+/* For default-background callouts, render the border outline. */
+.callout.block-color-default_background {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+figure,
+aside,
+details {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+
+	table.collection-content {
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	table.collection-content th,
+	table.collection-content td {
+		overflow-wrap: anywhere;
+	}
+
+	table.collection-content td > .user,
+	table.collection-content td > time {
+		white-space: pre-wrap;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content-wrapper {
+	overflow-x: auto;
+}
+
+@media only print {
+	.collection-content-wrapper {
+		overflow-x: visible;
+	}
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.collection-content td {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.column-list {
+	display: flex;
+	gap: 46px;
+}
+
+.column {
+	min-width: 0;
+	overflow: hidden;
+}
+
+.column > *:first-child {
+	margin-top: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding-inline: 0.125rem;
+	padding-block: 0.375rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+table {
+	border-collapse: collapse;
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol.numbered-list.numbered-list-digits-2 {
+	padding-inline-start: 2em;
+}
+
+ol.numbered-list.numbered-list-digits-3plus {
+	padding-inline-start: 2.4em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+/*
+ * Render emoji icons using a ::before pseudo-element to keep the glyph
+ * out of the DOM textContent traversal. This avoids double-rendering icons
+ * in callouts and page titles.
+ * NOTE(slim/html-export-pseudo-icons): I can't tagref this because it will
+ * flag as a duplicate tag after codegen.
+ */
+.icon[data-emoji]::before {
+	content: attr(data-emoji);
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.callout img.notion-static-icon {
+	width: 1em;
+	height: 1em;
+}
+
+.callout p {
+	margin: 0;
+}
+
+.callout h1,
+.callout h2,
+.callout h3 {
+	margin: 0 0 0.6rem;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	margin-right: 0.4em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+blockquote.quote-large {
+	font-size: 1.25em;
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.tab {
+	margin: 1.25em 0;
+	padding-inline: 1rem;
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.highlight-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.highlight-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.highlight-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.highlight-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.highlight-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.highlight-default_background {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray_background {
+	background: rgba(42, 28, 0, 0.07);
+}
+.highlight-brown_background {
+	background: rgba(139, 46, 0, 0.086);
+}
+.highlight-orange_background {
+	background: rgba(224, 101, 1, 0.129);
+}
+.highlight-yellow_background {
+	background: rgba(211, 168, 0, 0.137);
+}
+.highlight-teal_background {
+	background: rgba(0, 100, 45, 0.09);
+}
+.highlight-blue_background {
+	background: rgba(0, 124, 215, 0.094);
+}
+.highlight-purple_background {
+	background: rgba(102, 0, 178, 0.078);
+}
+.highlight-pink_background {
+	background: rgba(197, 0, 93, 0.086);
+}
+.highlight-red_background {
+	background: rgba(223, 22, 0, 0.094);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.block-color-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.block-color-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.block-color-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.block-color-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.block-color-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(240, 239, 237, 1);
+}
+.block-color-brown_background {
+	background: rgba(245, 237, 233, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 235, 222, 1);
+}
+.block-color-yellow_background {
+	background: rgba(249, 243, 220, 1);
+}
+.block-color-teal_background {
+	background: rgba(232, 241, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(229, 242, 252, 1);
+}
+.block-color-purple_background {
+	background: rgba(243, 235, 249, 1);
+}
+.block-color-pink_background {
+	background: rgba(250, 233, 241, 1);
+}
+.block-color-red_background {
+	background: rgba(252, 233, 231, 1);
+}
+.select-value-color-default { background-color: rgba(42, 28, 0, 0.07); }
+.select-value-color-gray { background-color: rgba(28, 19, 1, 0.11); }
+.select-value-color-brown { background-color: rgba(127, 51, 0, 0.156); }
+.select-value-color-orange { background-color: rgba(196, 88, 0, 0.203); }
+.select-value-color-yellow { background-color: rgba(209, 156, 0, 0.282); }
+.select-value-color-green { background-color: rgba(0, 96, 38, 0.156); }
+.select-value-color-blue { background-color: rgba(0, 118, 217, 0.203); }
+.select-value-color-purple { background-color: rgba(92, 0, 163, 0.141); }
+.select-value-color-pink { background-color: rgba(183, 0, 78, 0.152); }
+.select-value-color-red { background-color: rgba(206, 24, 0, 0.164); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style><style>@import url('https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex-swap.min.css')</style></head><body><article id="339a15e2-9005-805d-a13e-d973609ecb8f" class="page serif" data-notion-page-icon="🧱"><header><img class="page-cover-image" src="https://app.notion.com/images/page-cover/met_william_morris_1877_willow.jpg" style="object-position:center 90%"/><div class="page-header-icon page-header-icon-with-cover"><span class="icon" data-emoji="🧱"></span></div><h1 class="page-title" dir="auto"><mark class="highlight-blue" data-notion-highlight="blue">Write Amplification</mark></h1><p class="page-description" dir="auto"></p><table class="properties"><tbody></tbody></table></header><div class="page-body"><div id="339a15e2-9005-800a-a46f-fc912aaff493" class="column-list" data-notion-column-list="" dir="auto"><div id="339a15e2-9005-805e-a887-c2cd59000a6a" style="width:18.75%" class="column" data-notion-column-ratio="0.1875" dir="auto"><hr id="339a15e2-9005-8039-96de-f7169ea22a48" dir="auto"/><figure id="339a15e2-9005-8081-b4a4-e9272e5f6f55" class="image" data-notion-image="Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg" dir="ltr"><a href="Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg"><img style="width:548.375px" src="Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg"/></a></figure><p id="339a15e2-9005-80db-9c2f-df07b0b6fb8c" class="" dir="auto">
+</p></div><div id="339a15e2-9005-801c-b91e-f16acd1fb5c5" style="width:81.25%" class="column" data-notion-column-ratio="0.8125" dir="auto"><h3 id="339a15e2-9005-8063-8d9f-ec4df1d6f92f" class="" dir="auto"><mark class="highlight-default" data-notion-highlight="default">Write Amplification</mark></h3><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8029-854a-dc59c059f72f" dir="ltr"><div style="width:100%"><p id="98534896-4c4c-4a2b-bbde-6798dab7e8f2" class="" dir="auto">SSD 的規格表上寫著「600 TBW」（Total Bytes Written）。如果你每天寫入 50 GB，算一下大約可以用 33 年，聽起來完全不用擔心。但這個計算有個致命的盲點：你以為你寫了 50 GB，NAND flash 實際承受的寫入量可能是 150 GB 甚至 500 GB。差距的來源就是 write amplification。</p><p id="322dfe39-1fcd-481a-aedf-e9edc1be3d42" class="" dir="auto">Write amplification factor（WAF）直接告訴你 SSD 的韌體和上層軟體一共浪費了多少額外的寫入。WAF 越高，SSD 的壽命越短、效能越差。問題在於，write amplification 不只來自 SSD 內部的 garbage collection，整個 storage stack 從應用層到韌體層都在製造額外的寫入。理解 WAF 的全貌，才能做出正確的系統設計決策。</p></div></aside><blockquote id="339a15e2-9005-806b-8a22-dfa1b6e2fed3" class="" dir="auto">Reference: </blockquote><hr id="339a15e2-9005-80c7-a458-ebb4bba3fa27" dir="auto"/><details id="339a15e2-9005-80e1-b960-e6af0a3d43a0" open="" class="toggle" dir="auto"><summary><strong>Classification</strong></summary><div class="indented"><p id="339a15e2-9005-802a-8bcc-f835c9a5ba75" class="" dir="auto">
+</p><hr id="339a15e2-9005-8068-915d-c6f091e49c09" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8041-a4b1-c42a373cc077" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80f1-8a15-dd5ffd23d962" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Extra Component</mark></p><hr id="339a15e2-9005-8060-80cd-cc499f370ac6" dir="auto"/><p id="339a15e2-9005-80f4-b5ec-ddaac2417f8f" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Reference:</mark></p></div></aside><hr id="339a15e2-9005-80d1-8632-e42eb6b7cc9e" dir="auto"/></div></details><details id="339a15e2-9005-808b-a025-d79134c9bf2d" open="" class="toggle" dir="auto"><summary><strong>Key Word Definition/ Discussion</strong></summary><div class="indented"><details id="33aa15e2-9005-8053-ab3d-d560a3662504" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>WAF(Write Amplification Factor)</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-804f-b098-cea3c036e1f4" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80e1-b81f-e47012e50859" class="" dir="auto">Write Amplification Factor (寫入放大率) 是衡量固態硬碟（SSD）或儲存系統寫入效率的關鍵指標。</p><p id="33aa15e2-9005-80fc-b053-dc910a9bf4f5" class="" dir="auto"><code>WAF = 實際寫入 NAND flash 的資料量 / 應用程式要求寫入的資料量</code></p><p id="7e35d1f2-5410-41a8-91c9-244a5305f5ac" class="" dir="auto"><strong>理想</strong>：WAF = 1（Host 寫入 1 MB，NAND 實際只寫入 1 MB）。</p><p id="36f4d0f3-2c40-402f-b2e5-f7dce7a73308" class="" dir="auto"><strong>實際</strong>：WAF 幾乎總是大於 1（典型值為 2 到 10，極端未最佳化情況可 &gt; 20）。</p></div></aside><hr id="33aa15e2-9005-80c1-8428-cb06c325aa46" dir="auto"/><p id="33aa15e2-9005-8012-88aa-ec9d9ca481fd" class="" dir="auto">理想情況下 WAF = 1，代表應用程式寫 1 MB，NAND flash 上恰好只寫了 1 MB。但實際上 WAF 幾乎總是大於 1，典型值在 2 到 10 之間，極端情況下可以超過 20。</p><p id="33aa15e2-9005-803f-95d8-c3e9d2d3611f" class="" dir="auto">需要注意的是，WAF 可以在不同層級來定義。有時我們只看 SSD 內部的 WAF（NAND writes / host writes to SSD），有時我們看整個 stack 的 WAF（NAND writes / application logical writes）。後者通常更大，因為中間的軟體層也會製造額外寫入。</p><figure id="33aa15e2-9005-80ad-b27a-e9844df77de4" class="image" data-notion-image="Write%20Amplification/image.png" dir="ltr"><a href="Write%20Amplification/image.png"><img style="width:950.25px" src="Write%20Amplification/image.png"/></a></figure><p id="c603b5ae-f7cd-413f-a03c-0eb9c0987775" class="" dir="auto"><strong>整個系統 WAF 的計算</strong></p><p id="cc3c4e99-a9ae-4aa2-8f18-b140490222e7" class="" dir="auto">當我們要估算整個系統的 WAF 時，各層的放大效果是<strong>相乘</strong>的，不是相加的。例如：</p><table id="c49cf8c0-252e-4c4a-bd22-6bf9d0e776bc" class="simple-table" dir="ltr"><tbody><tr id="cabe002a-d463-4334-80db-b271d36dbdb3" dir="ltr"><td id="LJoU" class="" style="width:272.8000030517578px"><strong>系統層級</strong></td><td id="Vkf}" class="" style="width:392px"><strong>寫入放大來源 (Sources)</strong></td><td id="hEo|" class="" style="width:215.8000030517578px"><strong>WAF 貢獻 (Typical)</strong></td></tr><tr id="97419677-bdd1-4c9d-b2ae-cb97f9421573" dir="ltr"><td id="LJoU" class="" style="width:272.8000030517578px"><strong>Application Layer</strong></td><td id="Vkf}" class="" style="width:392px">LSM-Tree compaction (e.g., RocksDB, Cassandra)</td><td id="hEo|" class="" style="width:215.8000030517578px">10 ~30+</td></tr><tr id="877e30a9-07d5-457b-8f5b-3081b140f626" dir="ltr"><td id="LJoU" class="" style="width:272.8000030517578px"><strong>File System Layer</strong></td><td id="Vkf}" class="" style="width:392px">File system journaling (e.g., ext4, XFS metadata)</td><td id="hEo|" class="" style="width:215.8000030517578px">1.5 ~ 2.0</td></tr><tr id="b6798be5-87d0-4932-a56f-5f8d72516c6d" dir="ltr"><td id="LJoU" class="" style="width:272.8000030517578px"><strong>Hardware Layer</strong></td><td id="Vkf}" class="" style="width:392px">SSD Garbage Collection (GC) &amp; Wear Leveling</td><td id="hEo|" class="" style="width:215.8000030517578px">2.0 ~ 5.0</td></tr></tbody></table><p id="52611c61-2be1-473e-888b-c70e510e9558" class="" dir="auto">這代表應用程式每寫入 1 MB 的邏輯資料，NAND flash 上實際寫了 30 MB。這個數字聽起來很誇張，但在未經最佳化的 LSM-Tree workload 上並不罕見。這也是為什麼資料庫管理員會對寫入模式斤斤計較：選錯 compaction 策略、用錯 journaling 模式，一顆原本能撐三年的 SSD 可能一年就接近壽命上限。在大規模部署中，WAF 差 2 倍代表每年要多換數百顆 SSD，成本差異以百萬計。</p><hr id="33aa15e2-9005-800d-8d3e-de17ae5a487c" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8079-b79f-dba51b589602" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8053-89ed-d451d2bf6fb5" class="" dir="auto">Reference: </p></div></aside><hr id="33aa15e2-9005-803f-b8e3-c7302806265b" dir="auto"/></div></details><details id="33aa15e2-9005-8085-b4a6-c488871ea66d" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>GC overhead</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-801f-97ce-c51c43948512" dir="ltr"><div style="width:100%"><p id="351c12af-e16d-499c-84e4-84e613378c39" class="" dir="auto">GC 是 SSD 內部 WAF 最主要的來源。NAND flash 具有「Out-of-place write」（無法直接覆寫）的特性，必須先 Erase (抹除) 整個 Block 才能寫入新的 Page。當 SSD 空間不足時，GC 會介入：<div class="indented"><ol type="1" id="27b4a24b-02c0-4192-b1b6-e58f7458043d" class="numbered-list" start="1" dir="auto"><li>讀出舊 Block 中仍然有效的資料 (Valid Pages)。</li></ol><ol type="1" id="7ead8538-ab9d-4cee-afeb-7ec4457d32e6" class="numbered-list" start="2" dir="auto"><li>將這些資料搬移（寫入）到新的空白 Block。</li></ol><ol type="1" id="92e3688e-37be-4fd6-80c0-47abbc9f8b39" class="numbered-list" start="3" dir="auto"><li>抹除舊的 Block 以釋放空間。</li></ol></div></p><p id="33aa15e2-9005-8098-9b65-c3388db16155" class="" dir="auto">這些搬移產生的寫入量完全是「額外」的，應用程式並沒有要求這些寫入。</p></div></aside><hr id="33aa15e2-9005-80c7-a08a-ffba33476ff1" dir="auto"/><p id="c2a546c5-6c31-43d1-80c2-9f70572c3a4a" class="" dir="auto">GC 造成的 WAF 與 block 的 <strong>valid page ratio</strong> 直接相關。假設一個 block 有 256 個 page：</p><ul id="9f2b1f35-0f65-4fde-add1-469ba8f1342b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">如果只有 10 個 valid page（96% invalid）：搬移 10 個 page，回收 256 個 page 的空間。GC 的效率很高。</li></ul><ul id="11265291-f0a0-46d0-b48c-b54878fa3be7" class="bulleted-list" dir="auto"><li style="list-style-type:disc">如果有 200 個 valid page（22% invalid）：搬移 200 個 page，回收 256 個 page 的空間。GC 的效率極差，幾乎是 1:1 的搬移。</li></ul><p id="48655ab0-7596-4186-90d2-9b6954518643" class="" dir="auto">一個簡化的 GC WAF 估算公式是：<code>WAF_gc = 1 / (1 - valid_ratio)</code></p><p id="33aa15e2-9005-80ab-a3c8-c19a0fd5d87c" class="" dir="auto">如果平均每個被回收的 block 有 50% 的 valid page（valid_ratio = 0.5），WAF_gc = 2。也就是說應用程式每寫 1 MB，GC 額外搬移的資料量也約為 1 MB，NAND flash 實際寫了 2 MB。</p><hr id="33aa15e2-9005-80d9-ab47-cee6ef7f95ba" dir="auto"/><p id="fc6f4b6c-88c6-46a1-bb0c-868d5674868d" class="" dir="auto">影響 Valid Ratio 的兩大因素：</p><ol type="1" id="12c3fa54-3759-4866-8a0d-89631ec4b5b7" class="numbered-list" start="1" dir="auto"><li><strong>Over-provisioning 比例</strong>：OP 越大，SSD 有更多 free block 可以用，GC 不需要回收那些 valid page 比例高的 block，平均 valid ratio 較低，WAF 較小。</li></ol><ol type="1" id="5aef09fb-440a-4de7-8125-863d4faff1c1" class="numbered-list" start="2" dir="auto"><li><strong>Workload pattern</strong>：<ul id="1131b364-9818-499f-9956-ac51437a6b23" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Random Write (隨機寫入)：Invalid pages 均勻散佈，導致每個 Block 的 Valid ratio 都偏高，GC 效率極差。</li></ul><ul id="61250421-b2e1-4516-be5e-7d35aa65a669" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Sequential Write (循序寫入) / Locality：集中更新特定 LBA，使特定 Block 快速累積 Invalid pages，大幅提升 GC 效率。</li></ul></li></ol><hr id="33aa15e2-9005-8087-9b38-c9ea0c5d23da" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8071-9aed-f5bfbf086a7d" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8028-8df6-f08728a40f2e" class="" dir="auto">Reference: </p></div></aside><hr id="33aa15e2-9005-809a-85eb-efab1f7840b3" dir="auto"/></div></details><details id="33aa15e2-9005-802c-a40b-faf68aca275f" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Journaling overhead</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8075-812d-f8d32dbe0829" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8000-8126-e24908ffdfcb" class="" dir="auto">軟體層的 write amplification，在 SSD 之上，各種軟體層也會產生額外寫入。<br/>為了保證斷電或崩潰時資料不損毀，軟體層通常會採用「寫兩次」的策略。</p></div></aside><hr id="33aa15e2-9005-8047-90d1-cf84242c1867" dir="auto"/><p id="af7eea10-990c-410d-ae15-4b9b20ad1a64" class="" dir="auto"><strong>File System Journaling</strong>：<div class="indented"><p id="33aa15e2-9005-8016-b052-e39aa526e7cd" class="" dir="auto">如 ext4 為了確保 crash consistency，會把每筆 metadata 修改（有時包括 data）先寫到 journal area，確認成功後再寫到正式位置。</p><ul id="15fb5d76-f393-4d90-be8c-2f5dde487e87" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code>data=journal</code> 模式：Metadata 與 Data 都寫入 Journal，WAF ≥ 2。</li></ul><ul id="0dfa1a97-3ca9-4fcb-88dc-b50bb0c7b58a" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code>data=ordered</code> 模式（通常是預設）：只將 Metadata 寫入 Journal，WAF 較小，但仍大於 1。</li></ul></div></p><hr id="33aa15e2-9005-8005-8141-f755d004cfaa" dir="auto"/><p id="33aa15e2-9005-8064-ac23-db5b4918a92e" class="" dir="auto"><strong>Database WAL（Write-Ahead Log）</strong>：</p><p id="33aa15e2-9005-8095-95f1-fc47605a07d5" class="" dir="auto">與 journaling 類似，資料庫的 WAL 先把每筆 transaction 的修改寫入 log file，之後再寫入實際的 data page。這也是一種 write amplification。<br/>Ex. 關聯式資料庫 (RDBMS) 必須先將 Transaction 的修改 Append 到 Log file，隨後才 Flush 到實際的 Data page。</p><hr id="33aa15e2-9005-8091-8c6d-cc4c3ac76c3d" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-804f-ac1b-e6aa506a847e" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8042-b438-c4d43a810327" class="" dir="auto">Reference: </p></div></aside><hr id="33aa15e2-9005-8027-8022-cf71ceecfb58" dir="auto"/></div></details><details id="33aa15e2-9005-805a-93b6-e87714550772" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Compaction</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80b8-b5ae-e831295ebd3d" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8061-a898-d2a1102aa347" class="" dir="auto">現代 Key-Value Store (如 RocksDB, LevelDB, Cassandra) 廣泛採用 LSM-Tree 以優化寫入速度（將 Random write 轉為 Sequential write），但代價是極高的背景 WAF。</p></div></aside><hr id="33aa15e2-9005-804d-9902-f993328e11ae" dir="auto"/><p id="33aa15e2-9005-80c1-ae27-caefa62be087" class="" dir="auto"><strong>LSM-Tree compaction</strong>：<div class="indented"><p id="33aa15e2-9005-80b7-8f7e-dc18aee291dd" class="" dir="auto">RocksDB、LevelDB 等 key-value store 使用 LSM-Tree 結構。資料先寫入 memory 的 memtable，flush 到 disk 成為 Level-0 SSTable，然後經過多次 compaction 從 Level-0 合併到 Level-1、Level-2、...。每次 compaction 都需要讀出舊的 SSTable、合併、寫入新的 SSTable。一筆資料從被寫入到穩定存放在最底層，可能被 compaction 搬移 10-30 次。LSM-Tree 本身的 WAF 就可能高達 10-30 倍。</p></div></p><figure id="33aa15e2-9005-8019-8606-c77083edb677" class="image" data-notion-image="Write%20Amplification/image%201.png" dir="ltr"><a href="Write%20Amplification/image%201.png"><img style="width:950.25px" src="Write%20Amplification/image%201.png"/></a></figure><hr id="33aa15e2-9005-80d7-b7ef-febe93b1409e" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8064-a5db-d3d44f6601ca" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80c3-b1fa-cf2b75cef963" class="" dir="auto">Reference: </p></div></aside><hr id="33aa15e2-9005-80ac-96c6-e370c4aeca44" dir="auto"/></div></details><details id="33aa15e2-9005-80f0-8011-f06c22f0f0f6" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Partial-stripe write</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80a0-bccd-d4a6c41d3c76" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80cd-ac1f-d70cd2f1edf9" class="" dir="auto">來自陣列層的 WAF：RAID Partial-Stripe Write</p></div></aside><hr id="33aa15e2-9005-80fd-a999-c5bc661627ff" dir="auto"/><p id="33aa15e2-9005-80db-ae0e-f8fe688ff72f" class="" dir="auto"><strong>RAID partial-stripe write</strong>：<div class="indented"><p id="4ba67e31-159b-4193-bc08-7f69faaf8d97" class="" dir="auto">在 RAID-5 或 RAID-6 中，資料與 Parity (同位元檢查碼) 是以 Stripe 為單位橫跨多顆硬碟分布的。</p><p id="0e033f37-aabf-47c8-b1f6-ac0e3ca6831c" class="" dir="auto"><strong>Read-Modify-Write (RMW)</strong>：如果你的小檔寫入（如 4KB）不足以填滿一個完整的 Stripe，陣列控制器必須：<div class="indented"><ol type="1" id="1a8bebe1-f958-4783-91bb-20f613037317" class="numbered-list" start="1" dir="auto"><li><strong>Read</strong> 出舊的 Data。</li></ol><ol type="1" id="7c0c4854-ce1e-46e0-8b79-974feb6da273" class="numbered-list" start="2" dir="auto"><li><strong>Read</strong> 出舊的 Parity。</li></ol><ol type="1" id="c525e85b-b8fb-4935-917d-5b1d10a5fcd6" class="numbered-list" start="3" dir="auto"><li>計算新的 Parity。</li></ol><ol type="1" id="1b5cb5ed-8a4e-428b-8f9f-95b3c1300d2c" class="numbered-list" start="4" dir="auto"><li><strong>Write</strong> 入新的 Data。</li></ol><ol type="1" id="80893f90-2038-4d78-8337-91d2f91e143e" class="numbered-list" start="5" dir="auto"><li><strong>Write</strong> 入新的 Parity。</li></ol></div></p><p id="70074638-2f15-4d53-8d80-45785842d326" class="" dir="auto">這被稱為 RAID 5 Write Penalty，一個小寫入動作會放大成底層硬碟的 4 次 I/O（2 讀 2 寫），大幅增加整體系統的 WAF 與 Latency。</p></div></p><hr id="33aa15e2-9005-809c-96e3-fed08661c9b3" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-808f-88ad-d162f26ac52d" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8054-b49b-cdd98845c588" class="" dir="auto">Reference: </p></div></aside><hr id="33aa15e2-9005-80ed-b97d-f40c6ff684bc" dir="auto"/></div></details><details id="33aa15e2-9005-8021-8af8-d2aa257ed4a2" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>SSD lifetime</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8095-ab5e-c7270d6f0903" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80a5-8dda-dd8bd16b7f50" class="" dir="auto">NAND Flash 顆粒的壽命由 <strong>P/E Cycle (Program/Erase Cycle)</strong> 決定。隨著製程從 SLC、MLC 演進到 TLC 與 QLC，P/E Cycle 上限正在急遽下降（例如 TLC 通常在 1,000 到 3,000 次之間）。<br/>廠商標示的 TBW (Total Bytes Written) 或 DWPD (Drive Writes Per Day) 是基於 <strong>Host 端寫入量</strong>，前提是廠商內部預設了一個平均 WAF 假設值。<strong>如果你的 Workload WAF 遠高於廠商的假設，SSD 會提早陣亡。</strong></p></div></aside><hr id="33aa15e2-9005-806c-b9d0-e49ec33bc7f6" dir="auto"/><p id="e7eb94cf-e3db-47a9-ad46-514874747daf" class="" dir="auto"><strong>WAF 對 SSD 壽命的影響</strong></p><p id="debeb1b9-36c8-4e04-806e-bf963db20337" class="" dir="auto">SSD 壽命通常用 TBW（Total Bytes Written）或 DWPD（Drive Writes Per Day）來衡量。這些規格是基於寫入到 SSD interface 的資料量，但 NAND flash cell 真正承受的寫入量是這個數字乘以 WAF。</p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8021-a80e-e18f3f45bc9e" dir="ltr"><div style="width:100%"><p id="407f64e8-eeb7-4fba-baf2-dc638bf31b25" class="" dir="auto">壽命計算範例：1 TB TLC SSD (假設極限為 3,000 P/E Cycles)</p><ul id="fc7e1594-4cf8-473e-a353-4ebd5bff7308" class="bulleted-list" dir="auto"><li style="list-style-type:disc">NAND flash P/E cycle 上限：3,000 次</li></ul><ul id="9a4ce7a2-f58f-44bc-9e35-8d60b0f038e1" class="bulleted-list" dir="auto"><li style="list-style-type:disc">理論上 NAND flash 能承受的總寫入量：1 TB x 3,000 = 3,000 TB</li></ul><blockquote id="2d5091e3-7454-4243-8004-9f1d6f4342d1" class="" dir="auto"><strong>情境 A (一般負載，WAF = 3)</strong>：<ul id="3da8be91-894d-46aa-98ba-12775775511a" class="bulleted-list" dir="auto"><li style="list-style-type:disc">使用者實際可寫入量 = 3,000 TB / 3 = <strong>1,000 TB (1 PB)</strong></li></ul></blockquote><blockquote id="0dd03adf-74b9-478e-8861-57d5cc3ea174" class="" dir="auto"><strong>情境 B (LSM-Tree 資料庫負載，WAF = 6)</strong>：<ul id="e5623390-d6f4-424b-b11c-a04129ad94e6" class="bulleted-list" dir="auto"><li style="list-style-type:disc">使用者實際可寫入量 = 3,000 TB / 6 = <strong>500 TB</strong></li></ul></blockquote></div></aside><figure id="33aa15e2-9005-80b8-8637-cbed897c19ff" class="image" data-notion-image="Write%20Amplification/image%202.png" dir="ltr"><a href="Write%20Amplification/image%202.png"><img style="width:950.25px" src="Write%20Amplification/image%202.png"/></a></figure><p id="f5e1d00e-a3c0-4ef5-8581-986878bafb46" class="" dir="auto">這就是為什麼在選擇 SSD 和設計 storage stack 時，必須把 WAF 當成一個系統層級的指標來考量。你不能只看 SSD 的 TBW 規格就假設它能撐多久，還必須估算你的 workload 在整個 stack 中會產生多少 write amplification。</p><p id="384766ef-3a8d-4d9c-be43-14278867d977" class="" dir="auto">一個常見的最佳化思路是：在 host 端減少不必要的寫入。例如：</p><ul id="58fc2f27-176f-487a-a036-6764750ed04f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">使用 log-structured file system 減少 random write 造成的 GC 壓力</li></ul><ul id="85b9c91a-1f1e-49e3-9418-9658a387968b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">調整 LSM-Tree 的 compaction 策略（例如 tiered compaction vs leveled compaction）</li></ul><ul id="7dad4840-0153-4657-8c34-04299f527755" class="bulleted-list" dir="auto"><li style="list-style-type:disc">對冷熱資料做分離，讓熱資料集中在少數 block 中，提高 GC 回收效率</li></ul><ul id="9ac39028-1b04-4511-b1aa-46e479380104" class="bulleted-list" dir="auto"><li style="list-style-type:disc">使用 TRIM/UNMAP 命令告知 SSD 哪些 LBA 已不再使用，讓 SSD 提前回收空間</li></ul><hr id="33aa15e2-9005-80dd-a882-c65167b08715" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80bd-b817-d84db6c06320" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8037-a873-e05cdfd02086" class="" dir="auto">要延長 SSD 壽命，必須從整個 Storage Stack 著手「減少不必要的寫入」與「提高 GC 效率」：</p><p id="3bc5090e-c74a-43dd-9053-b6278f6c37ca" class="" dir="auto"><strong>基礎建設層</strong><div class="indented"><ul id="33aa15e2-9005-8034-9c9f-e01df77ef875" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>善用 TRIM / UNMAP 指令</strong>：<p id="33aa15e2-9005-80a1-a759-f186ee97aa30" class="" dir="auto">作業系統刪除檔案時，發送 TRIM 指令通知 SSD 該 LBA 已失效，讓 SSD 提前回收空間，增加 Free Blocks，降低 GC WAF。</p></li></ul><ul id="33aa15e2-9005-80f5-ab5c-c74560e9f57e" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>增加 Over-Provisioning (OP)</strong>：<p id="33aa15e2-9005-805d-8b07-d7821038002d" class="" dir="auto">在硬碟分割時故意留下一部分不格式化的空間（例如 10%-20%），讓 SSD 控制器有更多餘裕執行高效的 GC。</p></li></ul></div></p><p id="52a6984d-2083-47ef-9384-40bf1854e2c9" class="" dir="auto"><strong>軟體與檔案系統層</strong><div class="indented"><ul id="7eb339b4-9ce2-45c2-98ed-5f83a94703c5" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Bypass File System Journaling</strong><p id="33aa15e2-9005-803c-a93c-d92a80227ea4" class="" dir="auto">對於已經有 WAL 機制的資料庫（如 MySQL 的 InnoDB），可以考慮關閉檔案系統的 Journaling，或使用 Direct I/O (<code>O_DIRECT</code>) 繞過 Page Cache，避免 Double Write。</p></li></ul><ul id="33aa15e2-9005-809e-9ddd-fa0de5b37c4d" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Log-Structured File System (LFS)</strong><p id="33aa15e2-9005-80f0-a9d2-f0dc562e7436" class="" dir="auto">例如 F2FS (Flash-Friendly File System)，設計理念是將所有隨機寫入在記憶體中整合成循序寫入再落盤，完美契合 NAND flash 特性，大幅降低 GC 壓力。</p></li></ul></div></p><p id="70c17d0b-57cb-4380-af50-c3e9c6df572b" class="" dir="auto"><strong>應用與資料庫層</strong><div class="indented"><ul id="33aa15e2-9005-80de-bd8a-ef4eb03fbeae" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>調整 LSM-Tree Compaction 策略</strong>：<ul id="bdbd13a7-3de9-46ab-af6a-de61fd2d8312" class="bulleted-list" dir="auto"><li style="list-style-type:circle">Leveled Compaction：讀取快、空間放大低，但 WAF 極高。</li></ul><ul id="95d4ac96-8c45-4503-9ace-0750e9b07584" class="bulleted-list" dir="auto"><li style="list-style-type:circle">Tiered/Universal Compaction：WAF 較低（適合高寫入負載），但代價是較高的 Read Amplification (讀取放大) 與 Space Amplification (空間放大)。這是一個標準的架構 Trade-off。</li></ul></li></ul><ul id="42c96298-dcd2-4bc3-a109-2511956fc283" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>冷熱資料分離 (Cold/Hot Data Separation)</strong>：<p id="33aa15e2-9005-803d-b466-d5e2cd7c6a04" class="" dir="auto">將頻繁更新的「熱資料」與幾乎不變的「冷資料」分開儲存，確保熱資料的 Block 可以快速累積 Invalid pages，最大化 GC 回收效率。</p></li></ul></div></p></div></aside><hr id="33aa15e2-9005-8002-b479-eaf461ce389c" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80cc-936c-cd2008dee70f" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8021-90c5-d8bd70683ff5" class="" dir="auto">Reference: </p></div></aside><hr id="33aa15e2-9005-804f-ad6b-e46162aebe13" dir="auto"/></div></details></div></details><details id="339a15e2-9005-80a0-bc85-fad920813253" open="" class="toggle" dir="auto"><summary><strong>Test</strong></summary><div class="indented"><details id="339a15e2-9005-80f3-9ef7-d656e2aeb3e9" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Key Concepts</strong></mark></summary><div class="indented"><details id="339a15e2-9005-8005-9094-d724ed6d098a" open="" class="toggle" dir="auto"><summary>理解 write amplification factor（WAF）的定義：實際寫入 NAND flash 的資料量除以應用程式要求寫入的資料量</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-805b-a53f-ff16c1b58db1" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-804b-94e6-ddc0b85dbf85" class="" dir="auto">Answer<div class="indented"><p id="339a15e2-9005-8020-91ba-dff5891cceea" class="" dir="auto">WAF = 實際寫入 NAND / Host 寫入量</p></div></p><hr id="339a15e2-9005-804c-aceb-ef476ecbe559" dir="auto"/><p id="339a15e2-9005-8042-bbeb-d490166266bc" class="" dir="auto">Key Concept<div class="indented"><p id="339a15e2-9005-804b-9006-ec4813e6340c" class="" dir="auto">physical writes, logical writes, ratio, ≥1, efficiency metric</p></div></p><hr id="339a15e2-9005-801e-8bdc-e29e3717571e" dir="auto"/><p id="339a15e2-9005-80f8-b288-c49690648248" class="" dir="auto">Detail<div class="indented"><p id="339a15e2-9005-802e-b6ab-c81368c5a60f" class="" dir="auto">由於 SSD 的異地寫入（Out-of-place write）特性，更新資料時舊資料會變成無效（Invalid）。當空間不足啟動垃圾回收（GC）時，控制器必須搬移有效的資料到新區塊，這產生了額外的寫入。計算公式為：</p><p id="33aa15e2-9005-8080-93c0-fe9ca0407db6" class="" dir="auto"><span data-notion-inline-equation="WAF = \frac{\text{Physical Writes to NAND}}{\text{Logical Writes from Host}}" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.13889em;">F</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.4133em;vertical-align:-0.4811em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9322em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">Logical Writes from Host</span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.4461em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">Physical Writes to NAND</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.4811em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p></div></p></div></aside><hr id="339a15e2-9005-80bc-b7af-f429a0624a09" dir="auto"/></div></details><details id="33aa15e2-9005-80be-8f83-e4a735655285" open="" class="toggle" dir="auto"><summary>了解 GC 搬移 valid page 是 write amplification 的主要來源之一，並知道如何從 GC 行為推算其對 WAF 的貢獻</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80c0-bc84-ebaad6d03268" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80a5-9ba6-fd2356c6415a" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-8063-a12c-d09cc0f4e3d2" class="" dir="auto">GC 過程中搬移的 Valid Pages 越多，產生的內部寫入就越多，WAF 越高。</p></div></p><hr id="33aa15e2-9005-8045-8943-fa9faa56f777" dir="auto"/><p id="33aa15e2-9005-801b-9b80-f5dcbfd04d21" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-8081-850a-d95f92b768df" class="" dir="auto">WAF 與區塊內有效資料比例（valid_ratio）成正比。</p></div></p><hr id="33aa15e2-9005-80aa-a6b1-dd6832f3136f" dir="auto"/><p id="33aa15e2-9005-80a8-9f13-e43489253429" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-8025-b310-d4660711f0fb" class="" dir="auto">當一個 Block 被選為回收對象（Victim），若裡面有 80%是有效資料，為了清空這個 Block，韌體必須先將這 80% 的資料寫到別處。這意味著為了獲得 20%的空閒空間，額外付出了 80% 的寫入代價。</p><p id="33aa15e2-9005-809f-bbeb-c165cd54f8bf" class="" dir="auto"><span data-notion-inline-equation="WAF_{GC} = \frac{1}{1 - valid\_ratio}" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mord mathnormal">A</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.07153em;">GC</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.4071em;vertical-align:-0.562em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mbin mtight">−</span><span class="mord mathnormal mtight" style="margin-right:0.03588em;">v</span><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span><span class="mord mathnormal mtight">i</span><span class="mord mathnormal mtight">d</span><span class="mord mtight" style="margin-right:0.02778em;">_</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight">t</span><span class="mord mathnormal mtight">i</span><span class="mord mathnormal mtight">o</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.562em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p></div></p></div></aside><hr id="33aa15e2-9005-80b8-b2af-f50136e1f22c" dir="auto"/></div></details><details id="33aa15e2-9005-80d2-8667-f3fede06493e" open="" class="toggle" dir="auto"><summary>知道 journaling、LSM-Tree compaction、以及 RAID partial-stripe write 等軟體層機制也會造成額外的寫入放大</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80f1-a579-def4cf94eaa2" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80f2-811b-e10d89be14fb" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-801d-bdb7-dfd4884ae2af" class="" dir="auto">資料庫（LSM-Tree）、檔案系統（Journaling）與 RAID 運算都會在抵達 SSD 前先放大寫入量。</p></div></p><hr id="33aa15e2-9005-8063-8773-fcbdd61870f3" dir="auto"/><p id="33aa15e2-9005-80cb-8443-e9a8e6ace543" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-80de-aec0-e48cfeb13f64" class="" dir="auto"><strong>多層放大效應</strong>。<br/>總 WAF = 應用層 WAF × 檔案系統 WAF × SSD 內部 WAF</p></div></p><hr id="33aa15e2-9005-80bc-bfae-c2bb07f14141" dir="auto"/><p id="33aa15e2-9005-808b-abae-da3e90db79d5" class="" dir="auto">Detail<div class="indented"><p id="38b9825b-661d-4692-8382-cc8581ce1e3f" class="" dir="auto"><strong>LSM-Tree</strong>: 為了讀取最佳化而不斷進行 Compaction（合併檔案），造成大量重寫。<br/><strong>Journaling</strong>: 為了崩潰恢復，同一份資料可能先寫入日誌再寫入數據區（雙倍寫入）。<strong>RAID Partial-stripe write</strong>: 修改小部分資料卻需要讀取、計算校驗碼並重寫整個條帶。</p></div></p></div></aside><hr id="33aa15e2-9005-805e-8a64-d4e598fbda2b" dir="auto"/></div></details><details id="33aa15e2-9005-806a-95e1-d2c561e525ba" open="" class="toggle" dir="auto"><summary>理解 WAF 如何影響 SSD lifetime：WAF 越高，P/E cycle 消耗越快，SSD 的可用壽命就越短</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80ad-88ad-d7320549ef54" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80fd-aee2-de23f8f46922" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-80e3-bb7b-d6ad51539959" class="" dir="auto">WAF 越高，消耗 P/E Cycle 的速度越快，導致 SSD 提前達到設計壽命上限。</p></div></p><hr id="33aa15e2-9005-805c-b137-c57df99db509" dir="auto"/><p id="33aa15e2-9005-8069-b410-d5838b566971" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-80f7-868a-c1272810320e" class="" dir="auto">壽命與 WAF 成反比</p></div></p><hr id="33aa15e2-9005-80cc-9180-fa504be7c3f3" dir="auto"/><p id="33aa15e2-9005-808a-85b5-db208cb73c82" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-80eb-b1ff-daf35a225d07" class="" dir="auto">NAND Flash 的每個儲存單元都有抹寫次數（P/E Cycle）限制。SSD 的總可寫入量（TBW）固定。如果 WAF 從 1 變成 2，意味著對同一個應用程式來說，SSD 的實體壽命直接減半。</p><p id="33aa15e2-9005-8056-ab7e-ed12cd8f0e5a" class="" dir="auto"><span data-notion-inline-equation="\text{Actual Logical Life} = \frac{\text{Physical NAND Budget (Capacity} \times \text{P/E)}}{\text{WAF}}" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord text"><span class="mord">Actual Logical Life</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.355em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.01em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">WAF</span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.485em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">Physical NAND Budget (Capacity</span></span><span class="mbin mtight">×</span><span class="mord text mtight"><span class="mord mtight">P/E)</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p></div></p></div></aside><hr id="33aa15e2-9005-80c6-9af9-dea7ee218568" dir="auto"/></div></details></div></details><details id="339a15e2-9005-8013-89d6-e5795fddd5fb" open="" class="toggle" dir="auto"><summary><mark class="highlight-teal" data-notion-highlight="teal"><strong>Test your understanding</strong></mark></summary><div class="indented"><details id="339a15e2-9005-8077-9392-d36d38dc4982" open="" class="toggle" dir="auto"><summary>一顆 SSD 的 NAND 總寫入預算為 2,400 TB（800 GB QLC，P/E cycle 上限 3,000）。如果整體 WAF 為 4，使用者實際能寫入多少 TB 的資料？如果透過最佳化把 WAF 降到 2，壽命延長多少？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-801a-980b-c52e0a8ba69e" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8063-8887-f111d2fe34a0" class="" dir="auto">Answer<div class="indented"><p id="339a15e2-9005-80fe-89ea-f5028e110b77" class="" dir="auto">WAF=4 時可寫 600 TB；<br/>WAF=2 時可寫 1,200 TB；</p><p id="33aa15e2-9005-8064-b140-da89995c6f70" class="" dir="auto">壽命延長一倍（100%）</p></div></p><hr id="339a15e2-9005-805b-8432-cf9c35d6ff3c" dir="auto"/><p id="339a15e2-9005-8005-9910-ffbb0361fafd" class="" dir="auto">Key Concept<div class="indented"><p id="339a15e2-9005-80c1-ab0f-f8224d2cef96" class="" dir="auto">寫入放大 (WAF) 與邏輯壽命的線性反比關係</p></div></p><hr id="339a15e2-9005-80b2-99cc-c391fbf08cef" dir="auto"/><p id="339a15e2-9005-806b-9356-e599f083e279" class="" dir="auto">Detail<div class="indented"><p id="339a15e2-9005-80b6-ae67-f549527b3e81" class="" dir="auto">物理寫入總預算為 2400 TB。<br/>當 WAF = 4 時，代表你每寫入 1 單位的資料，SSD 會磨損 4 單位，所以實際寫入量 = 2400 / 4 = 600 TB。<br/>當 WAF 降到 2，實際寫入量 = 2400 / 2 = 1200 TB。<br/>可寫入量從 600 變成 1200，等於壽命增加了 (1200 - 600) / 600 = 100%。</p></div></p></div></aside><hr id="339a15e2-9005-8038-9817-c12ba2d16906" dir="auto"/></div></details><details id="33aa15e2-9005-80e9-91b1-cb9f3527fe86" open="" class="toggle" dir="auto"><summary>為什麼 random write workload 比 sequential write workload 造成更高的 GC WAF？請從 block 內 valid page 分佈的角度解釋。</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-801f-9026-c11da5c56dc1" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8093-a6cb-d29f8272a092" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-80bc-b2aa-e83d87a82400" class="" dir="auto">隨機寫入會讓各個區塊內的無效資料分布零散，回收時須搬移大量有效資料；循序寫入通常能讓整塊區塊同時失效，不需搬移。</p></div></p><hr id="33aa15e2-9005-80a6-b2a5-c37ec35ee068" dir="auto"/><p id="33aa15e2-9005-8007-9893-e3f7def2ac95" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-80da-bbf9-d71b791d93b0" class="" dir="auto">區塊內的有效頁面比例 (valid_ratio) 決定搬移成本。</p></div></p><hr id="33aa15e2-9005-80b5-8923-e9a1ce50c49a" dir="auto"/><p id="33aa15e2-9005-8019-bcb6-f14e580ac3a8" class="" dir="auto">Detail<div class="indented"><p id="bf71f90e-2627-4280-bf89-2ae14b5872bc" class="" dir="auto">循序寫入會按順序寫滿整個 Block，當這批資料被覆蓋時，往往一整塊 Block 會同時變成無效，GC 幾乎不需搬移資料就能回收。反觀隨機寫入，會在 SSD 的各個 Block 留下零星的有效資料碎片。當 GC 要回收空間時，被迫要把這些散落的有效頁面讀出並重寫到新區塊，產生大量額外寫入，推高 WAF。</p></div></p></div></aside><hr id="33aa15e2-9005-80dc-900f-e5f72139cc4d" dir="auto"/></div></details><details id="33aa15e2-9005-803e-8421-d20421b5bcce" open="" class="toggle" dir="auto"><summary>一個系統同時使用 RocksDB（LSM-Tree WAF 約 15）和 ext4 data=journal 模式（WAF 約 2），跑在一顆 GC WAF 約 2 的 SSD 上。整體 WAF 大約是多少？如果把 ext4 改為 data=ordered 模式（WAF 約 1.2），整體 WAF 能降低多少？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80b6-bd99-d3e9d7b32365" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8070-a3d3-fb6d84de0f02" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-80a4-89e5-c985167964ee" class="" dir="auto">初始總 WAF 為 60，改為 ordered 模式後總 WAF 為 36。<br/>整體 WAF 降低了 24。</p></div></p><hr id="33aa15e2-9005-80b1-81dc-de8ef8867335" dir="auto"/><p id="33aa15e2-9005-801a-85c3-f31ae9012f0f" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-8001-a2cb-cdaa54ccbb81" class="" dir="auto">跨層級寫入放大的乘法效應。</p></div></p><hr id="33aa15e2-9005-80f6-a328-defbda4a6460" dir="auto"/><p id="33aa15e2-9005-800b-ab3a-f8afa1d2f372" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-80d7-b027-e304d6073e25" class="" dir="auto">系統的總體寫入放大是各層級 WAF 的乘積。<br/>初始狀態總 WAF = 15 (RocksDB) x 2 (ext4 journal) x 2 (GC) = 60。<br/>若將檔案系統改為 ordered 模式，總 WAF = 15 x 1.2 x 2 = 36。<br/>因此，總體寫入放大數值降低了 60 - 36 = 24。</p></div></p></div></aside><hr id="33aa15e2-9005-800d-800b-c7c418e20cff" dir="auto"/></div></details><details id="33aa15e2-9005-8029-ad33-fe2af6503166" open="" class="toggle" dir="auto"><summary>為什麼 TRIM/UNMAP 命令能降低 SSD 的 write amplification？它如何影響 GC 在選擇 victim block 時的效率？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-806c-ba42-db1de89d4574" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-808d-8d60-fd5039a6a463" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-801a-be64-f77171b0e721" class="" dir="auto">TRIM 讓作業系統主動告知 SSD 哪些空間已刪除，SSD 可提前將這些頁面標記為無效，GC 就不必再浪費力氣搬移它們。</p></div></p><hr id="33aa15e2-9005-80bb-b91d-c5943325c347" dir="auto"/><p id="33aa15e2-9005-804d-bf10-ddabd7e315e5" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-809a-8ac3-dca4af317546" class="" dir="auto">減少無謂的有效頁面搬移 (Valid Page Copy)</p></div></p><hr id="33aa15e2-9005-809e-beba-cb5dbc2a22b2" dir="auto"/><p id="33aa15e2-9005-804d-9309-c056b48b0f27" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-80a0-b06a-c81c15982e23" class="" dir="auto">作業系統刪除檔案通常只是刪除索引，若沒有 TRIM，SSD 控制器仍會將這些實際上已作廢的資料視為「有效」。啟動 GC 時，SSD 會浪費寫入壽命去搬移這些垃圾。有了 TRIM，SSD 能精準識別無效頁面，讓 GC 選擇的 victim block 裡面的有效比例 (valid_ratio) 更低，大幅減少搬移成本並降低 WAF。</p></div></p></div></aside><hr id="33aa15e2-9005-8085-94df-cdfc18b9a2c1" dir="auto"/></div></details><details id="33aa15e2-9005-804e-b627-ce0ec13cee77" open="" class="toggle" dir="auto"><summary>有人說「買大容量的 SSD 不只是多了空間，也延長了壽命」。從 over-provisioning 和 WAF 的角度解釋這句話為什麼成立。</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8074-866e-d7a9223fdfa3" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-801a-a127-cd2353032e59" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-80e1-b8de-d3877c77039b" class="" dir="auto">大容量不僅提供了更多的實體抹寫總量，閒置的剩餘空間也變相增加了超額配置 (OP)，降低了 GC 的搬移負擔。</p></div></p><hr id="33aa15e2-9005-80d7-b8ff-d03f093d8f63" dir="auto"/><p id="33aa15e2-9005-80f8-9eee-f040854ed01b" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-80cb-9525-f4419ccf341c" class="" dir="auto">隱形超額配置 (Over-provisioning) 帶來的低 WAF 優勢。</p></div></p><hr id="33aa15e2-9005-806a-9414-e3e4d81b1a25" dir="auto"/><p id="33aa15e2-9005-80f2-a933-ca754c315fb1" class="" dir="auto">Detail<div class="indented"><p id="26152908-771a-436f-a40b-fe3f65bdf581" class="" dir="auto">首先，大容量代表總 NAND 顆粒多，(容量 * P/E cycle) 的物理總預算更大。其次，假設同樣存放 500 GB 的資料，在 2 TB SSD 上的有效資料佔比會遠低於 1 TB SSD。根據公式 WAF = 1 / (1 - valid_ratio)，較低的有效比例會讓 GC 非常容易找到接近空白的區塊來回收，WAF 會大幅下降。寫入放大降低加上總預算變大，壽命自然顯著延長。</p></div></p></div></aside><hr id="33aa15e2-9005-80a9-aa26-c6de3daecf01" dir="auto"/></div></details></div></details><details id="339a15e2-9005-8067-ad20-c390c51f03ad" open="" class="toggle" dir="auto"><summary><mark class="highlight-red" data-notion-highlight="red"><strong>Quiz Pool</strong></mark></summary><div class="indented"><ol type="1" id="339a15e2-9005-80d2-b45d-dade56abcffc" class="numbered-list" start="1" dir="auto"><li>一位 SSD 韌體工程師正在針對<strong>高度偏斜 (Highly Skewed)</strong> 的存取負載（即少數熱資料頻繁覆寫，大量冷資料長期靜止）進行底層架構的最佳化。 下列何種機制雖然有其系統貢獻，但必然會產生額外的內部寫入，導致 WAF 增加？<blockquote id="339a15e2-9005-80e4-82af-d3fb572ade5a" class="" dir="auto"><ol type="1" id="339a15e2-9005-8056-9a5a-faf8ab702df5" class="numbered-list" start="1" dir="auto"><li>在執行常規 GC 時，搭配 Dynamic Wear Leveling，將搬移出的有效資料集中寫入 P/E cycle 較低的閒置 Block 作為目的地。</li></ol><ol type="1" id="33aa15e2-9005-80d2-a3e9-db3f9ee4ded8" class="numbered-list" start="2" dir="auto"><li>導入積極的 Static Wear Leveling 機制，主動將佔據年輕 Block 的冷資料搬移至老舊 Block。</li></ol><ol type="1" id="33aa15e2-9005-8026-a3fb-ce2e8d92836e" class="numbered-list" start="3" dir="auto"><li>在 FTL 實作嚴格的冷熱資料分離機制，確保頻繁更新的熱資料被集中寫入特定的 Block，而不與冷資料混雜。</li></ol><ol type="1" id="33aa15e2-9005-80ff-b271-ed4986a42e1e" class="numbered-list" start="4" dir="auto"><li>在存取範圍遠大於 SRAM 緩存容量的隨機寫入負載下，增加硬體成本配置較大的 SRAM，捨棄 Demand-based FTL (DFTL)，改採完整的純 Page-level mapping 架構。</li></ol></blockquote><details id="339a15e2-9005-8084-bce2-e43983e650d0" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80d2-9921-e3a9bb29de7f" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80a1-85c3-ed045833531c" class="" dir="auto">導入積極的 Static Wear Leveling 機制，主動將佔據年輕 Block 的冷資料搬移至老舊 Block。</p><hr id="339a15e2-9005-8072-851e-e2e69a20a62f" dir="auto"/><p id="339a15e2-9005-80b3-bd4a-ee3312cb1e61" class="" dir="auto">解析: <div class="indented"><p id="339a15e2-9005-800d-9124-de74b3447ffc" class="" dir="auto">Static Wear Leveling 會主動把存放在低 P/E cycle block 上的冷資料搬到高 P/E cycle 的 block 上。這些額外的搬移操作雖然能讓所有 block 的磨損更加均勻，進而延長整體壽命，但代價就是必然會產生額外的內部寫入，直接推升 WAF。</p></div></p><hr id="33aa15e2-9005-8089-843d-d08d3f331dae" dir="auto"/><p id="33aa15e2-9005-80f4-a13f-f6d633ec9a5e" class="" dir="auto">(1) 這個機制<strong>不會增加</strong> WAF。Dynamic Wear Leveling 僅是在 GC 選擇 victim block 並搬移資料時，優先選擇 P/E cycle 較低的 block 作為目的地。這只是在「原本就必須執行 GC 寫入」的當下改變寫入位置，它不像 static Wear Leveling 會去搬移本來不需要動的資料 ，因此不會在物理層面上產生額外的內部寫入開銷。</p><p id="33aa15e2-9005-805c-b6d5-c6b848f3db5a" class="" dir="auto">(3) 這個機制會<strong>大幅降低</strong> WAF。若冷熱資料混雜，GC 為了回收極少數失效的熱資料，會被迫搬移大量同 Block 內的冷資料。若實作冷熱分離，裝滿熱資料的 Block 很快就會整塊自然失效（Invalid page 比例高），GC 在回收這些 Block 時幾乎不需要搬移任何 Valid pages，能有效降低 WAF。</p><p id="33aa15e2-9005-80a5-984e-cdcc4dd5cc78" class="" dir="auto">(4) 這個改變會<strong>降低</strong> WAF。DFTL 雖然節省了 SRAM，在存取範圍遠大於 SRAM 緩存容量的隨機寫入負載下，會導致 Cached Mapping Table (CMT) 頻繁發生 Miss。這迫使控制器必須不斷將 Dirty Mapping Entry 寫回 NAND Flash (Eviction)，產生大量的 metadata 內部寫入。改用完整的 Page-level mapping 能徹底消除這部分的額外 WA。</p></div></aside></div></details></li></ol><hr id="339a15e2-9005-80ce-b86c-fa0c4e0a663d" dir="auto"/><ol type="1" id="339a15e2-9005-8008-a52b-de08524134ab" class="numbered-list" start="2" dir="auto"><li>一顆 TLC SSD（標示容量 480 GB，實際 NAND 512 GB）在穩態隨機寫入測試中測得 WAF ≈ 3.5。工程師希望降低 <strong>device-level WAF</strong> 以延長 SSD 壽命。下列哪一項措施對此目標<strong>最沒有幫助</strong>？<blockquote id="33aa15e2-9005-80db-981e-e53325e41bfe" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80ec-bf6c-da031e7cdea8" class="numbered-list" start="1" dir="auto"><li>確認作業系統的 TRIM 功能已啟用，使 SSD 能即時得知哪些 LBA 已被檔案系統釋放。</li></ol><ol type="1" id="33aa15e2-9005-8029-a1e1-e00069905642" class="numbered-list" start="2" dir="auto"><li>將檔案系統從 ext4 data=journal 模式切換為 data=ordered 模式，僅對 metadata 做 journaling。</li></ol><ol type="1" id="33aa15e2-9005-806a-b392-c235ff347e34" class="numbered-list" start="3" dir="auto"><li>將 GC 的 victim block selection 從 greedy 改為 cost-benefit 策略，選擇回收對象時同時考慮資料冷熱程度。</li></ol><ol type="1" id="33aa15e2-9005-809f-847c-c4a9244fbbb6" class="numbered-list" start="4" dir="auto"><li>透過廠商工具將 over-provisioning 從 7% 提高至 28%，犧牲可用容量以增加 GC 緩衝空間。</li></ol></blockquote><details id="339a15e2-9005-809c-882a-c81b32de86eb" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8037-99bc-faa081a8dfaa" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8058-9ae3-e9082b104e79" class="" dir="auto">將檔案系統從 ext4 data=journal 模式切換為 data=ordered 模式，僅對 metadata 做 journaling。</p><hr id="339a15e2-9005-80f9-9268-cd19276957d9" dir="auto"/><p id="339a15e2-9005-8014-9c38-cf94893ed687" class="" dir="auto">解析: <div class="indented"><p id="339a15e2-9005-8050-90b0-e01c87eca80e" class="" dir="auto">此措施<strong>對 device-level WAF 幫助最小</strong>。<code>data=journal</code> 會讓 host 將資料先寫入 journal、再寫入最終位置，造成 host-level 寫入放大（約 2×）。切換至 <code>data=ordered</code> 確實減少了 host 送給 SSD 的寫入量，但 device-level WAF 的定義是 <strong>NAND 實際寫入量 ÷ host 寫入量</strong>，其分母雖然縮小，GC 的內部搬移效率 （由 OP 空間、invalid page 分佈、victim 選擇策略等決定）並未改變。 這是 host-level 的優化，不直接影響 SSD 內部的 GC 行為與 device-level WAF。</p></div></p><hr id="33aa15e2-9005-805f-8ca3-dc7e73279e04" dir="auto"/><p id="33aa15e2-9005-805e-9259-ce63f7b6b26d" class="" dir="auto">(1) 此措施<strong>有效降低</strong> device-level WAF。未啟用 TRIM 時，SSD 無從分辨哪些 page 在檔案系統層已失效，GC 會將這些「邏輯上已死」的 page 當作 valid data 搬移， 白白增加內部寫入。TRIM 讓 SSD 能即時標記 invalid page，GC 直接跳過，WAF 下降。</p><p id="33aa15e2-9005-8063-bc65-f88d8889acc1" class="" dir="auto">(3) 此措施<strong>有效降低</strong> device-level WAF。Greedy 策略只選 invalid page 最多的 block， 但若該 block 內仍有大量頻繁更新的熱資料，搬移成本依然高昂。Cost-benefit 策略 同時評估「可回收空間（benefit）」與「需搬移的 valid page 數（cost）」， 傾向選擇冷資料多、不太可能自然失效的 block，減少不必要的內部搬移，直接降低 WAF。</p><p id="33aa15e2-9005-804f-9c13-dbe7dd5d937c" class="" dir="auto">(4) 此措施<strong>有效降低</strong> device-level WAF。更大的 OP 區域代表 GC 可用的空閒 Block 更多， Victim block 中平均 valid page 比例因此降低，每次 GC 需搬移的有效資料更少， 內部寫入量隨之下降，WAF 明顯改善。</p></div></aside></div></details></li></ol><hr id="339a15e2-9005-8038-8221-fb2bd51651e6" dir="auto"/><ol type="1" id="339a15e2-9005-8040-b653-dff8c433dadf" class="numbered-list" start="3" dir="auto"><li>一位工程師正在改良一台資料庫的伺服器。為了延長 SSD 的使用壽命，他考慮調整檔案系統配置與資料庫的合併策略。目前系統參數如下：<ol type="a" id="33aa15e2-9005-8008-976d-d92d47034aac" class="numbered-list" start="1" dir="auto"><li>應用層 (LSM-Tree) WAF：12</li></ol><ol type="a" id="33aa15e2-9005-80ba-b708-fd603156ed0d" class="numbered-list" start="2" dir="auto"><li>檔案系統層 (Journaling) WAF：2</li></ol><ol type="a" id="33aa15e2-9005-804a-8e51-df41a7142635" class="numbered-list" start="3" dir="auto"><li>SSD 內部 (GC) WAF：2</li></ol><p id="33aa15e2-9005-80e0-bccb-ce3dd89997fc" class="" dir="auto">工程師提出了以下改良方案：</p><ul id="33aa15e2-9005-8028-8ee4-d7c8ba285a37" class="bulleted-list" dir="auto"><li style="list-style-type:disc">改良資料庫合併策略，將應用層 WAF 從 12 降至 5。</li></ul><ul id="33aa15e2-9005-80fd-86c5-c6b3860a9397" class="bulleted-list" dir="auto"><li style="list-style-type:disc">將檔案系統改為 <code>data=ordered</code> 模式，將其 WAF 從 2 降至 1.2。</li></ul><ul id="33aa15e2-9005-8033-ab07-dae7627954c3" class="bulleted-list" dir="auto"><li style="list-style-type:disc">SSD 內部的 GC WAF 保持為 2（假設工作負載仍為隨機寫入）。</li></ul><p id="33aa15e2-9005-80d9-b395-d1438ec8f13a" class="" dir="auto">下列哪一項最能準確描述此改良後的結果？</p><blockquote id="339a15e2-9005-8061-9aef-f8edfc91e3a5" class="" dir="auto"><ol type="1" id="339a15e2-9005-807f-a9c7-f4c3e7bbea0f" class="numbered-list" start="1" dir="auto"><li>系統總體 WAF 從 48 降至 12 ，因此此 SSD 的 TBW 規格將提升為原本的四倍。</li></ol><ol type="1" id="33aa15e2-9005-80c8-a135-e10502d66d3d" class="numbered-list" start="2" dir="auto"><li>系統總體 WAF 從 48 降至 12 ，這意味著在寫入相同邏輯資料量時，NAND 承受的物理損耗減少了 75%。</li></ol><ol type="1" id="33aa15e2-9005-803a-bce9-e5541677c466" class="numbered-list" start="3" dir="auto"><li>系統總體 WAF 減少了 7.8 ((12+2+2)−(5+1.2+2))，這將導致 SSD 壽命呈線性提升。</li></ol><ol type="1" id="33aa15e2-9005-80a4-88cf-edde4d5f5e6a" class="numbered-list" start="4" dir="auto"><li>總體 WAF 僅由最高層 (LSM-Tree) 決定；因此，檔案系統層的變動對於 SSD 實際受到的總寫入量 (TBW) 沒有影響</li></ol></blockquote><details id="339a15e2-9005-809f-ad47-ec131fc4590e" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80ce-83ce-e60b742de0d7" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8061-87d8-dd018f9d046a" class="" dir="auto">系統總體 WAF 從 48 降至 12 ，這意味著在寫入相同邏輯資料量時，NAND 承受的物理損耗減少了 75%。</p><hr id="339a15e2-9005-803c-912c-fec30665a8f4" dir="auto"/><p id="339a15e2-9005-804c-82b5-da2c1c1325be" class="" dir="auto">解析: <div class="indented"><p id="f44d2765-6e51-40ba-9028-be55d1ef7f7b" class="" dir="auto">初始 WAF 為12×2×2=48；改良後的 WAF 為5×1.2×2=12。 <br/>總體 WAF 降至原本的 25%，實體磨損減少了 75%，有效將硬碟壽命延長為原本的四倍。</p></div></p><hr id="33aa15e2-9005-808f-bc1b-f97a2d827b5e" dir="auto"/><p id="33aa15e2-9005-8071-94e4-e71b0bff6be3" class="" dir="auto">(1) TBW 是由 NAND 的實體特性所決定的固定值。WAF 數值降低，使得相同的 NAND 能承載更多的邏輯寫入量，而非 TBW 規格本身提升。</p><p id="33aa15e2-9005-80b8-87ef-c59224279df9" class="" dir="auto">(3) 由於每一層的輸出會成為下一層的輸入，所以 WAF 的放大效果是相乘的。</p><p id="33aa15e2-9005-8018-b45b-d3fcead02033" class="" dir="auto">(4) 每一層對於 WAF 都至關重要。以本題為例，檔案系統層的 WAF 從2 降至1.2 ，在其他條件不變的情況下，總體 WAF 即 從48 (12×2×2) 降至28.8 (12×1.2×2)，每寫入 1 MB 邏輯資料便少損耗 19.2 MB 的 NAND，影響不可忽視。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80e3-b564-ce1b6acfcef6" dir="auto"/><ol type="1" id="33aa15e2-9005-80b2-a2cf-f80648f9caa8" class="numbered-list" start="4" dir="auto"><li>某企業儲存系統同時處理頻繁更新的交易紀錄 (<strong>Hot data</strong>) 與幾乎不修改的歷史封存檔案 (<strong>Cold data</strong>)。最初，這兩種資料被混合寫入 SSD 的同一個 Erase Block 中，導致系統的 GC 寫入放大 (WAF) 居高不下。<p id="33aa15e2-9005-806d-91c6-e39e42d104cc" class="" dir="auto">工程師隨後在應用層實作了「冷熱分離 (Hot/cold data Separation)」，強制將這兩類資料分開寫入不同的 Block。根據講義中 GC 寫入放大的估算公式 <span data-notion-inline-equation="WAF_{gc} = 1 / (1 - valid\_ratio)" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mord mathnormal">A</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">g</span><span class="mord mathnormal mtight">c</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1/</span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.06em;vertical-align:-0.31em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mord mathnormal">a</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">i</span><span class="mord mathnormal">d</span><span class="mord" style="margin-right:0.02778em;">_</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal">a</span><span class="mord mathnormal">t</span><span class="mord mathnormal">i</span><span class="mord mathnormal">o</span><span class="mclose">)</span></span></span></span></span>，為什麼這個架構改動能大幅降低整體的 WAF？</p><blockquote id="33aa15e2-9005-801a-9ae5-c2bbbe1cf258" class="" dir="auto"><ol type="1" id="33aa15e2-9005-808c-bf50-d519877a8ec2" class="numbered-list" start="1" dir="auto"><li>冷熱分離讓 SSD 控制器能提早對 Cold data 區塊發送 <strong>TRIM</strong> 指令，從而釋放出更多額外的 <strong>Over-Provisioning (OP)</strong> 空間給 Hot data 使用。OP 空間一旦變大，GC 就完全不需要再執行資料搬運 (Copy-forward) 操作。</li></ol><ol type="1" id="33aa15e2-9005-8014-9deb-eb856becdc0b" class="numbered-list" start="2" dir="auto"><li>集中存放的 Hot block 內的資料會迅速被多次覆寫而失效，導致該 Block 的 <code>valid_ratio</code>（有效頁面比例）極低。當 GC 挑選這些 Block 作為回收對象時，幾乎不需要搬移 (Copy-forward) 任何有效資料即可回收一整塊空間。由於被回收的 Block 其 <code>valid_ratio</code> 趨近於 0，根據公式計算，<code>WAF_{gc}</code> 就會自然逼近於理想值 1。</li></ol><ol type="1" id="33aa15e2-9005-803e-88f6-ff7f2fb13811" class="numbered-list" start="3" dir="auto"><li>冷熱交替的混合寫入會迫使 SSD 控制器放棄高效率的 <strong>Page-level mapping</strong>，動態降級使用 <strong>Block-level mapping</strong>。冷熱分離能讓 SSD 恢復 Page-level mapping，從而將 WAF 從 <em>O</em>(<em>N</em>) 降回 <em>O</em>(1)。</li></ol><ol type="1" id="33aa15e2-9005-8008-9350-f74f93ccb646" class="numbered-list" start="4" dir="auto"><li>將冷資料獨立出來後，Cold block 會長期保持極高的 <code>valid_ratio</code>（接近 100%）。根據公式 <br/><span data-notion-inline-equation="WAF_{gc} = 1 / (1 - valid ratio)" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mord mathnormal">A</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">g</span><span class="mord mathnormal mtight">c</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1/</span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mord mathnormal">a</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">i</span><span class="mord mathnormal">d</span><span class="mord"> </span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal">a</span><span class="mord mathnormal">t</span><span class="mord mathnormal">i</span><span class="mord mathnormal">o</span><span class="mclose">)</span></span></span></span></span>，當 <code>valid_ratio</code> 數值越高時，分母越小，計算出來的 WAF 值就會越低，從而成功拉低了系統整體的平均寫入放大。</li></ol></blockquote><details id="33aa15e2-9005-80ac-9089-d4c6a62018a0" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8039-acc6-cb4063d1e9b1" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-808f-8f0f-fccb80ab816b" class="" dir="auto">集中存放的 Hot block 內的資料會迅速被多次覆寫而失效，導致該 Block 的 <code>valid_ratio</code>（有效頁面比例）極低。當 GC 挑選這些 Block 作為回收對象時，幾乎不需要搬移 (Copy-forward) 任何有效資料即可回收一整塊空間。由於被回收的 Block 其 <code>valid_ratio</code> 趨近於 0，根據公式計算，<code>WAF_{gc}</code> 就會自然逼近於理想值 1。</p><hr id="33aa15e2-9005-8078-89d1-d6869f795537" dir="auto"/><p id="33aa15e2-9005-802c-b44a-e0ae4c6bd3c7" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-80bd-9b86-ea886c02eb45" class="" dir="auto">這是正確的。根據講義，GC 造成的 WAF 與 Victim block 的 <strong>valid page ratio</strong> 直接相關。如果冷熱資料混寫，Block 內總是會殘留那些「不會被更新的 Cold data」，導致 <code>valid_ratio</code> 卡在中間（例如 0.5），計算出的 <code>WAF_{gc} = 2</code>。實施冷熱分離後，Hot block 會迅速充滿 invalid pages（<code>valid_ratio</code> 降至接近 0）；而 Cold block 則充滿 Valid pages 且不會被 GC 挑中。GC 專挑 Hot block 下手，搬運成本極低，大幅降低了整體的寫入放大。</p></div></p><hr id="33aa15e2-9005-80b8-8f97-c155182dfc11" dir="auto"/><p id="33aa15e2-9005-8081-9549-d086c37f2299" class="" dir="auto">(1) 這混淆了多個名詞的定義。首先，<strong>TRIM</strong> 是作業系統用來通知 SSD「刪除無效資料」的指令；Cold data 是「有效但少更新」的歷史檔案，作業系統絕不會對其發送 TRIM 刪除。再者，冷熱分離本身並不會無中生有地增加硬體的實體 OP 空間總量。</p><p id="33aa15e2-9005-80e9-98ff-dc1af8bb96cb" class="" dir="auto">(3) 這是對 FTL 架構的錯誤認知。現代 SSD 的 FTL 映射層級（如混合式的 DFTL）是硬體/韌體出廠時就決定好的，<strong>不會</strong>因為資料冷熱混寫就「動態降級」成純 Block-level mapping。WAF 的改善純粹來自 GC 挑選 Victim block 時的有效頁面比例 (valid ratio) 改變，與映射架構切換無關。</p><p id="33aa15e2-9005-80d3-84e3-fa4fb4697c59" class="" dir="auto">(4) 這是一個嚴重的數學與邏輯迷思。根據公式 <code>WAF_{gc} = 1 / (1 - valid\_ratio)</code>，當 <code>valid_ratio</code> 越高（例如接近 0.99 時），分母會變成 0.01，計算出的 WAF 會飆升至 100（極度惡化）。實際上，GC 演算法會<strong>刻意避開</strong>去回收高 <code>valid_ratio</code> 的 Cold block，而是專攻低 <code>valid_ratio</code> 的 Hot block 來降低搬運成本。 </p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8076-9ab9-cf8dd6e95ffb" dir="auto"/><ol type="1" id="33aa15e2-9005-8056-a311-d5303621d283" class="numbered-list" start="5" dir="auto"><li>若為了延長 SSD 壽命將系統從 <strong>B+ Tree</strong> 結構改為 <strong>Append-only</strong> （如 LSM-Tree） ，並採用 Tiered Compaction 策略來最小化資料合併的頻率。 雖然優化後 WAF 大幅下降，但測試發現讀取效能明顯變差了。為什麼降低 WAF 的操作會導致讀取效能降低？<blockquote id="33aa15e2-9005-80c4-8502-e439d20bd81b" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8034-9214-cbe2c1602a80" class="numbered-list" start="1" dir="auto"><li>因為為了降低寫入時的合併次數（低 WAF），系統允許資料的不同版本存在於更多個不相干的檔案中，導致讀取時必須掃描更多位置。</li></ol><ol type="1" id="33aa15e2-9005-80fd-8585-de80daa78458" class="numbered-list" start="2" dir="auto"><li>因為低 WAF 策略減少資料遷移，導致 NAND Flash 儲存單元的電壓偏移增加，使得讀取時必須多次重試。</li></ol><ol type="1" id="33aa15e2-9005-80d3-9286-cd59b3f3668f" class="numbered-list" start="3" dir="auto"><li>因為 LSM-Tree 的追加寫入會導致檔案系統產生的 Metadata 過多，進而阻塞了原本屬於資料讀取的頻寬。</li></ol><ol type="1" id="33aa15e2-9005-80ee-803d-ff0d13be5a01" class="numbered-list" start="4" dir="auto"><li>因為追加寫入會導致 SSD 內部的 Block 產生更多碎片，使搜尋資料時必須頻繁移動讀取頭。</li></ol></blockquote><details id="33aa15e2-9005-80d0-82b4-d3848ca13bee" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80fb-8e50-fd7b619dd723" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80c2-a011-ebeb7ea0cd34" class="" dir="auto">因為為了降低寫入時的合併次數（低 WAF），系統允許資料的不同版本存在於更多個不相干的檔案中，導致讀取時必須掃描更多位置。</p><hr id="33aa15e2-9005-80f5-8233-c5b24a892ac9" dir="auto"/><p id="33aa15e2-9005-8065-9d76-ca354aef126e" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8027-b22d-ff1ae8c0f22c" class="" dir="auto">用 B+ Tree 的結構在隨機寫入時會造成物理 block 碎片化，造成高 WAF 但讀取時可以直接透過 virtual address 定位。 但改為 Append-only 的結構，資料的不同版本可能分散在多個檔案中，讀取時需要掃描更多的檔案來找到最新版本，這會增加讀取延遲。</p></div></p><hr id="33aa15e2-9005-80fc-b16c-eb426b9ca6a9" dir="auto"/><p id="33aa15e2-9005-80df-9274-dbde1f447128" class="" dir="auto">(2) 降低 WAF 時資料會在原位放比較久，理論上會增加 read disturb 或電荷流失的風險。但在正常運行的資料庫中，這種硬體級的延遲（微秒級）與 LSM-Tree 架構層級的讀取延遲相比影響極低。</p><p id="33aa15e2-9005-8002-869d-e7f8db79ff2e" class="" dir="auto">(3) 雖然 Metadata 確實會增加，但 OS 通常會把 Metadata 存在快取中，在讀取檔案時，查詢 RAM 的開銷通常只有幾微秒，對於總體的讀取延遲影響極低，且硬體 IO 次數才是主要瓶頸。</p><p id="33aa15e2-9005-80cf-a6e5-c084044c6f4d" class="" dir="auto">(4) SD 沒有讀取頭，雖然 SSD 的隨機讀取跟順序讀取效能有差，但不是因為物理移動。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-803c-bd8f-d1c0684f9735" dir="auto"/><ol type="1" id="33aa15e2-9005-80b7-a30e-e19c1f9cf9a0" class="numbered-list" start="6" dir="auto"><li>在缺乏大量超額配置 (Over-provisioning) 空間的消費級 SSD 中， 哪一種 I/O 工作負載模式會導致最嚴重的寫入放大 (write amplification) 現象？<blockquote id="33aa15e2-9005-800c-a3ab-c82df161e528" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8056-8563-f33c3d34ecf1" class="numbered-list" start="1" dir="auto"><li>針對全碟可用空間進行高頻率、小區塊的隨機寫入。</li></ol><ol type="1" id="33aa15e2-9005-80c9-b663-fa9f11dbe3c1" class="numbered-list" start="2" dir="auto"><li>長時間進行大量的純讀取操作，偶爾穿插小檔案的寫入。</li></ol><ol type="1" id="33aa15e2-9005-80ca-b68d-f1c7966287f9" class="numbered-list" start="3" dir="auto"><li>定期寫入大型的日誌檔案，寫滿後直接將整個檔案刪除。</li></ol><ol type="1" id="33aa15e2-9005-8001-82e5-d4ad9ea3acad" class="numbered-list" start="4" dir="auto"><li>針對大檔案進行持續且密集的循序寫入。</li></ol></blockquote><details id="33aa15e2-9005-8017-945f-f111b1bff1d3" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8038-9608-c9fc33416298" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80d0-a4e7-f6834eb4fd52" class="" dir="auto">針對全碟可用空間進行高頻率、小區塊的隨機寫入。</p><hr id="33aa15e2-9005-8050-84b7-f8dd5375298c" dir="auto"/><p id="33aa15e2-9005-80c9-af31-e374168395ea" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-802b-aadb-c1d8cff4916b" class="" dir="auto">當系統不斷在全碟各處寫入極小區塊 (例如 4KB) 的資料時， 這些新資料會被寫入新的空白頁面，而舊的資料頁面會被標記為無效。 久而久之，每一個物理區塊內都變成大部分仍為有效資料，但夾雜少部分無效資料。</p></div></p><hr id="33aa15e2-9005-8094-9074-df233c2f4087" dir="auto"/><p id="33aa15e2-9005-8078-9766-c4608d3de125" class="" dir="auto">(2) 讀取不會消耗可用的空白區塊。寫入頻率極低，SSD 有非常充裕的時間與空白空間來處理這些零星的小檔案寫入。</p><p id="33aa15e2-9005-8074-9bdb-d6cb04995cc3" class="" dir="auto">(3) 這本質上是選項 (A) 的變體。 寫入日誌檔案通常是一種「循序附加 (Sequential Append)」的操作，它會非常有效率且連續地填滿物理區塊。</p><p id="33aa15e2-9005-8032-a035-c123056b508a" class="" dir="auto">(4) 當這個大檔案未來被使用者修改或刪除時，通常是整批資料一起過期。 因此，這個物理區塊內的所有 Pages 會同時變成無效 (Invalid) 狀態。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8093-8740-f8e6c0a244b7" dir="auto"/><ol type="1" id="33aa15e2-9005-80c4-828c-e8418ae6b5ac" class="numbered-list" start="7" dir="auto"><li>假設 Host 在持續寫入一 SSD，該 SSD 正在執行 garbage collection。且在一個待回收的 Block 中，總共有 256 個 Pages，其中 Valid Pages 的數量為<em>V</em>，其餘為 invalid pages。若僅考慮 Host Writes 以及 garbage collection 所造成的 write amplification，分析回收該 Block 時其內部的<em>V</em>與<em>WAF</em>的關聯何者較為合理？<blockquote id="33aa15e2-9005-80a0-89be-cc18e3bfa2d3" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8016-865d-d6f165731db5" class="numbered-list" start="1" dir="auto"><li>執行 GC 時，SSD 產生的 internal write cost 在數值上等於 256−<em>V</em>，即該區塊中因 Invalid 資料而浪費的空間</li></ol><ol type="1" id="33aa15e2-9005-80f5-a0ea-c1ce9912f2e2" class="numbered-list" start="2" dir="auto"><li>若該區塊的 <em>V</em>=128，則該次操作所產生的 <em>WAF</em> 數值應為 1.5</li></ol><ol type="1" id="33aa15e2-9005-8028-923b-dc660d76e55c" class="numbered-list" start="3" dir="auto"><li>若此 GC 採用的是 Greedy 策略，則 Controller 會優先選擇<em>V</em> 較大的區塊進行回收，因為這代表該區塊內部的資料存活率高，回收後能顯著提升資料的完整性</li></ol><ol type="1" id="33aa15e2-9005-80b9-96d6-d4ada81f939d" class="numbered-list" start="4" dir="auto"><li>當 <em>V</em> 趨近於 0 時，代表該區塊幾乎全是無效資料，此時 GC 搬移量極小，使得 <em>WAF</em> 會趨近於 1.0</li></ol></blockquote><details id="33aa15e2-9005-804e-9bbf-f7cc7989eabd" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8012-a58f-c057f48327b1" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8066-a88d-e28854a6c4ee" class="" dir="auto">當 <em>V</em> 趨近於 0 時，代表該區塊幾乎全是無效資料，此時 GC 搬移量極小，使得 <em>WAF</em> 會趨近於 1.0</p><hr id="33aa15e2-9005-809b-9272-cea2fcde9793" dir="auto"/><p id="33aa15e2-9005-80aa-b036-dc335f83b6a7" class="" dir="auto">解析: <div class="indented"><p id="89c44513-d91c-4af9-ba68-acb7a3d359e1" class="" dir="auto">GC 回收區塊的代價，完全取決於裡面還有多少「活著」的資料 (V)。如果 V 趨近於 0，代表這個 Block 裡都是垃圾，GC 可以直接將其抹除，不需要執行搬移動作。沒有額外的搬移寫入，實體寫入量就完全等於 Host 的邏輯寫入量，WAF 自然降至最理想的 1.0。</p></div></p><hr id="33aa15e2-9005-8053-8d8f-d9c5eaff863d" dir="auto"/><p id="33aa15e2-9005-8036-a61f-e7f0489a2186" class="" dir="auto">(1) 需要額外寫入的應該等於<em>V</em>（搬移的量），而不是256−<em>V</em>。需要搬移的應該是 Valid 的資料，而不是 Invalid 的資料。</p><p id="33aa15e2-9005-805a-bce7-c0b1d2ccacc1" class="" dir="auto">(2)  <span data-notion-inline-equation="WAF = \frac{1}{1 - \frac{128}{256}} = \frac{1}{1 - 0.5} = \frac{1}{0.5} = 2.0 " class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.13889em;">F</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.4869em;vertical-align:-0.6418em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.599em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mbin mtight">−</span><span class="mord mtight"><span class="mopen nulldelimiter sizing reset-size3 size6"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8443em;"><span style="top:-2.656em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mtight">256</span></span></span></span><span style="top:-3.2255em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line mtight" style="border-bottom-width:0.049em;"></span></span><span style="top:-3.384em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mtight">128</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.344em;"><span></span></span></span></span></span><span class="mclose nulldelimiter sizing reset-size3 size6"></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.6418em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.2484em;vertical-align:-0.4033em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mbin mtight">−</span><span class="mord mtight">0.5</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.4033em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">0.5</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2.0</span></span></span></span></span>（非 1.5）</p><p id="33aa15e2-9005-8040-98b1-db84c83b898a" class="" dir="auto">(3) Greedy 策略是要找 Invalid 最多（<em>V</em>最小）」的區塊。回收<em>V</em>大的區塊會導致搬移量上升，讓<em>WAF</em>變得極差</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80b7-a2b2-fed1e7886231" dir="auto"/><ol type="1" id="33aa15e2-9005-8077-ac33-e0df856477bc" class="numbered-list" start="8" dir="auto"><li>某分散式資料庫使用 LSM-Tree 儲存引擎，其應用層產生的 Compaction WAF 為 12。該資料庫運行在預設 data=ordered 模式的 ext4 檔案系統（假設 Journaling WAF 為 1.1）之上。底層使用的 1 TB TLC SSD 規格如下：<ul id="33aa15e2-9005-8072-b4ee-f17d88071864" class="bulleted-list" dir="auto"><li style="list-style-type:disc">NAND flash P/E cycle 上限：3000 次。</li></ul><ul id="33aa15e2-9005-8094-896b-f2498fced410" class="bulleted-list" dir="auto"><li style="list-style-type:disc">沒有 over provisioning （OP）。</li></ul><ul id="33aa15e2-9005-8005-81db-d956f2584204" class="bulleted-list" dir="auto"><li style="list-style-type:disc">被 GC 回收的 victim block 平均 valid ratio： 80％。</li></ul><p id="33aa15e2-9005-80a7-acc6-f9dca8bcfb41" class="" dir="auto">根據大抄裡面的簡化公式 <span data-notion-inline-equation="WAF_{GC} = \frac{1}{1 - \text{valid\_ratio}}" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mord mathnormal">A</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.07153em;">GC</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.4071em;vertical-align:-0.562em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mbin mtight">−</span><span class="mord text mtight"><span class="mord mtight">valid_ratio</span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.562em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span>，假設 SSD 內部的寫入放大僅由 GC 機制產生，在不考慮 TRIM 與其他硬體損耗的極端情況下，該系統應用層（Application）實際能寫入的邏輯資料量上限最接近下列何者？</p><blockquote id="33aa15e2-9005-8000-a755-ca0d3c9be400" class="" dir="auto"><ol type="1" id="33aa15e2-9005-804f-8701-d6c856362c15" class="numbered-list" start="1" dir="auto"><li>181TB</li></ol><ol type="1" id="33aa15e2-9005-8037-8545-d776b1557d69" class="numbered-list" start="2" dir="auto"><li>165TB</li></ol><ol type="1" id="33aa15e2-9005-8050-853a-cff7a07b9b5b" class="numbered-list" start="3" dir="auto"><li>45TB</li></ol><ol type="1" id="33aa15e2-9005-8018-859a-cd364ebc73fb" class="numbered-list" start="4" dir="auto"><li>600TB</li></ol></blockquote><details id="33aa15e2-9005-80cd-8da0-ca9c49a3366c" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80ca-b2e0-c734f85da46e" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8006-aad8-f354971a7657" class="" dir="auto">45TB</p><hr id="33aa15e2-9005-8057-913c-c19e1791fd17" dir="auto"/><p id="33aa15e2-9005-8040-b503-e1ce3194584b" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-80a6-bb2f-df22501d34e3" class="" dir="auto"><span data-notion-inline-equation="WAF_{gc} = \frac{1}{1 - 0.8} = 5" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mord mathnormal">A</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">g</span><span class="mord mathnormal mtight">c</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.2484em;vertical-align:-0.4033em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mbin mtight">−</span><span class="mord mtight">0.8</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.4033em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">5</span></span></span></span></span></p><p id="33aa15e2-9005-808b-a986-e3bdd4ce4900" class="" dir="auto"> Total WAF = <span data-notion-inline-equation="12 \times 1.1 \times 5 = 66" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">12</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1.1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">5</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">66</span></span></span></span></span></p><p id="33aa15e2-9005-80c6-99aa-c8f7571d155c" class="" dir="auto">Physical Write Limit = 1 <span data-notion-inline-equation="\times 3000 = 3000" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">×</span><span class="mord">3000</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">3000</span></span></span></span></span>  TB</p><p id="33aa15e2-9005-80c3-b0dd-f58fc6390d18" class="" dir="auto">Logical Write Limit =  <span data-notion-inline-equation="\frac{3000}{66} \approx 45.45" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">66</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3000</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">45.45</span></span></span></span></span> TB</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8032-96c4-de83ac41e06d" dir="auto"/><ol type="1" id="33aa15e2-9005-8077-a5b9-f3bd76394bcf" class="numbered-list" start="9" dir="auto"><li>某顆 SSD 在官網標示「耐久性：600 TBW」。已知 TBW 的計公式為：<p id="33aa15e2-9005-800f-a8a4-ecf691512185" class="" dir="auto"><span data-notion-inline-equation="TBW = \frac{\text{SSD Capacity} \times \text{NAND P/E Cycles}}{WAF}" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05017em;">TB</span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.355em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.01em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">W</span><span class="mord mathnormal mtight">A</span><span class="mord mathnormal mtight" style="margin-right:0.13889em;">F</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.485em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">SSD Capacity</span></span><span class="mbin mtight">×</span><span class="mord text mtight"><span class="mord mtight">NAND P/E Cycles</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span><br/>根據這個公式與標示值，下列何者最能正確解讀 TBW 的意義？</p><blockquote id="33aa15e2-9005-8024-8298-e6ee7b018f24" class="" dir="auto"><ol type="1" id="33aa15e2-9005-807a-8b00-f1da8ddb7608" class="numbered-list" start="1" dir="auto"><li>公式中的 Write Amplification Factor 是 NAND flash 的固定物理常數，因此 600 TBW 的限制對所有使用情境都相同。</li></ol><ol type="1" id="33aa15e2-9005-800d-b2ac-dfc372c03685" class="numbered-list" start="2" dir="auto"><li>這個 600 TBW 是廠商在特定測試條件（含特定 Write Amplification Factor）下得出的標示值。實際使用中，不同 workload 會產生不同的 Write Amplification Factor，因此實際可寫入量可能與標示值有顯著差異。</li></ol><ol type="1" id="33aa15e2-9005-80cb-a20c-ed20a4699c18" class="numbered-list" start="3" dir="auto"><li>這顆 SSD 在 host 端累計寫入恰好 600 TB 之後就會故障，無法再使用。</li></ol><ol type="1" id="33aa15e2-9005-8096-9578-d8bc83c9a228" class="numbered-list" start="4" dir="auto"><li>公式中包含 NAND P/E Cycles，因此 TBW 代表的是最終寫入 NAND flash cell 的總實體資料量，而非 host 端寫入的資料量。</li></ol></blockquote><details id="33aa15e2-9005-80b2-8765-f16cebaa9e4c" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8015-9d87-c0771bf3d9f7" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80c2-aa77-dcb7ffbccd78" class="" dir="auto">這個 600 TBW 是廠商在特定測試條件（含特定 Write Amplification Factor）下得出的標示值。實際使用中，不同 workload 會產生不同的 Write Amplification Factor，因此實際可寫入量可能與標示值有顯著差異。</p><hr id="33aa15e2-9005-8084-aebe-fe277c74be12" dir="auto"/><p id="33aa15e2-9005-8079-90de-d7f6f2fcbcc1" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8042-bce6-f61efe0b98bb" class="" dir="auto">正確。從公式可知 Write Amplification Factor 位於分母，直接影響 TBW 的大小。廠商依據標準測試工作負載測出特定的 Write Amplification Factor 再算出 TBW。但使用者的實際 workload 可能產生不同的 Write Amplification Factor，導致實際可寫入量與標示值有差異。</p></div></p><hr id="33aa15e2-9005-809b-bee3-c0ee2246932c" dir="auto"/><p id="33aa15e2-9005-8019-abb3-dd976fb7458d" class="" dir="auto">(1) Write Amplification Factor 並非固定常數，它受到寫入模式、OP 比例、GC 策略、是否啟用 TRIM 等多種因素影響，不同 workload 可以產生截然不同的數值。</p><p id="33aa15e2-9005-807d-b6cc-f4eb1a6be987" class="" dir="auto">(3) TBW 是廠商在特定測試條件下的保固耐久規格，不是精確的死亡線。許多 SSD 在超過標示 TBW 後仍可繼續運作，也可能因其他因素在未達 TBW 前就發生問題。</p><p id="33aa15e2-9005-8014-82d7-f15e651201af" class="" dir="auto">(4) 恰好相反。公式的分子是 NAND 能承受的總實體寫入量，但除以 Write Amplification Factor 後，得到的 TBW 是 host 端能寫入的邏輯資料量。因此 600 TBW 指的是 host 端的寫入上限估計值。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-801b-819e-f47f76f2d685" dir="auto"/><ol type="1" id="33aa15e2-9005-8048-b13b-c621c4f82551" class="numbered-list numbered-list-digits-2" start="10" dir="auto"><li>在一顆廠商預設 7% over-provisioning 的消費級 SSD 上，使用者將可用空間近乎寫滿並進入 steady state 後，陸續刪除了約 30% 的檔案。然而 host 端並未對這顆 SSD 發送任何 TRIM 指令。在這種情況下，若使用者繼續對該 SSD 進行寫入，最可能觀察到什麼現象？<blockquote id="33aa15e2-9005-8054-b9f7-fc0932ad3dca" class="" dir="auto"><ol type="1" id="33aa15e2-9005-805e-aa55-d3a44c8e12be" class="numbered-list" start="1" dir="auto"><li>沒有 TRIM 只會影響讀取效能，因為 SSD 需要額外查詢 mapping table 確認哪些 page 已被刪除，但對寫入效能和 WAF 沒有影響。</li></ol><ol type="1" id="33aa15e2-9005-80f7-b668-c17af42fd6f8" class="numbered-list" start="2" dir="auto"><li>沒有 TRIM 的影響僅限於安全性層面（已刪除的資料仍可被還原），對 SSD 的效能和壽命沒有任何影響。</li></ol><ol type="1" id="33aa15e2-9005-808a-b1ee-cd6ae3c355e9" class="numbered-list" start="3" dir="auto"><li>SSD 的 GC 在回收 block 時，仍然會搬移那些已被 host 刪除但 SSD 仍視為 valid 的 page，導致 WAF 相較有發送 TRIM 的情況顯著上升。</li></ol><ol type="1" id="33aa15e2-9005-80ea-b641-fb146f3c1386" class="numbered-list" start="4" dir="auto"><li>沒有 TRIM 不影響 GC 的效率，因為 GC 的 victim block selection 只取決於 block 內的 invalid page 比例，而刪除檔案後這些 page 會自動變成 invalid。</li></ol></blockquote><details id="33aa15e2-9005-8049-9d73-ea19e1300a29" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80b2-bfdd-fd1a61063eb1" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80a8-b7bd-ddfbd6ff5fc6" class="" dir="auto">SSD 的 GC 在回收 block 時，仍然會搬移那些已被 host 刪除但 SSD 仍視為 valid 的 page，導致 WAF 相較有發送 TRIM 的情況顯著上升。</p><hr id="33aa15e2-9005-8007-972f-d425f4fd7c33" dir="auto"/><p id="33aa15e2-9005-80d6-9a64-dcbff4baa49d" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-806d-956f-e4829e033df7" class="" dir="auto">正確。當檔案被刪除時，host 端只在自身層面處理了刪除操作，但不一定會通知 SSD。在本題的情境中 host 未發送 TRIM，因此 SSD 的 controller 無從得知哪些 page 上的資料已不再被需要，仍將其視為 valid data。GC 在回收 block 時會將這些「在 host 端已不存在但 SSD 仍認為有效」的 page 搬移到新的 block，產生無意義的額外寫入，推高 WAF。在低 over-provisioning 且高空間利用率的條件下，這個效應尤其嚴重，因為 GC 被迫更頻繁啟動，且每個 block 的 valid page ratio 被這些不必要的資料墊高。</p></div></p><hr id="33aa15e2-9005-804b-a53b-c2378211338f" dir="auto"/><p id="33aa15e2-9005-808f-b50a-db44297b764e" class="" dir="auto">(1) SSD 的 mapping table 記錄的是 LBA 到 physical page 的對應關係，不具備判斷資料是否仍被 host 需要的能力。沒有 TRIM 時，SSD 根本不知道哪些資料已被刪除，不存在「額外查詢」的問題。TRIM 的主要影響在於寫入端：它讓 GC 能跳過已刪除的 page，減少不必要的搬移，從而降低 WAF。</p><p id="33aa15e2-9005-80bf-8395-cdfa9af27eee" class="" dir="auto">(2) TRIM 確實與資料安全性有關：未經 TRIM 處理的已刪除資料在 NAND 中仍然完整存在，可能被還原。但這不是 TRIM 唯一的作用。TRIM 對效能和壽命有直接影響：它讓 SSD 提前知道哪些 page 不再需要，使 GC 在回收 block 時能跳過這些 page，降低搬移量與 WAF，進而減少 NAND 的實體磨損並提升寫入效能。</p><p id="33aa15e2-9005-807c-87d7-d3dc42b549dc" class="" dir="auto">(4) 刪除檔案後，對應的 physical page 不會自動變成 invalid。在 SSD 的視角中，一個 page 變成 invalid 只有兩種途徑：該 LBA 被新資料覆寫（out-of-place write 使舊 page 失效），或收到 TRIM 指令。單純的檔案刪除只發生在 host 端，SSD 完全不知情，因此這些 page 仍被視為 valid。</p></div></aside></div></details></li></ol><hr id="339a15e2-9005-8059-ae02-eb5de4337012" dir="auto"/></div></details><p id="33aa15e2-9005-80ab-a8c6-c5be9cf07aff" class="" dir="auto">
+</p></div></details></div></div><hr id="339a15e2-9005-80b4-9da8-cb550d9ed227" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80c6-9b3e-c45187b190bc" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80b6-9b10-cc42d676ff2d" class="" dir="auto">
+</p></div></aside></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

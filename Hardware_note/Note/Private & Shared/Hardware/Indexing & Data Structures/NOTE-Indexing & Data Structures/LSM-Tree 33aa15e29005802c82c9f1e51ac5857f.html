@@ -1,0 +1,804 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>LSM-Tree</title><meta name="data-notion-page-icon" content="🔧"/><link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2290%22%3E%F0%9F%94%A7%3C%2Ftext%3E%3C%2Fsvg%3E"/><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+/* Override strong tags inside headings to maintain consistent weight */
+h1 strong,
+h2 strong,
+h3 strong {
+	font-weight: 600;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 10px;
+	padding: 1rem;
+}
+
+/* For default-background callouts, render the border outline. */
+.callout.block-color-default_background {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+figure,
+aside,
+details {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+
+	table.collection-content {
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	table.collection-content th,
+	table.collection-content td {
+		overflow-wrap: anywhere;
+	}
+
+	table.collection-content td > .user,
+	table.collection-content td > time {
+		white-space: pre-wrap;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content-wrapper {
+	overflow-x: auto;
+}
+
+@media only print {
+	.collection-content-wrapper {
+		overflow-x: visible;
+	}
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.collection-content td {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.column-list {
+	display: flex;
+	gap: 46px;
+}
+
+.column {
+	min-width: 0;
+	overflow: hidden;
+}
+
+.column > *:first-child {
+	margin-top: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding-inline: 0.125rem;
+	padding-block: 0.375rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+table {
+	border-collapse: collapse;
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol.numbered-list.numbered-list-digits-2 {
+	padding-inline-start: 2em;
+}
+
+ol.numbered-list.numbered-list-digits-3plus {
+	padding-inline-start: 2.4em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+/*
+ * Render emoji icons using a ::before pseudo-element to keep the glyph
+ * out of the DOM textContent traversal. This avoids double-rendering icons
+ * in callouts and page titles.
+ * NOTE(slim/html-export-pseudo-icons): I can't tagref this because it will
+ * flag as a duplicate tag after codegen.
+ */
+.icon[data-emoji]::before {
+	content: attr(data-emoji);
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.callout img.notion-static-icon {
+	width: 1em;
+	height: 1em;
+}
+
+.callout p {
+	margin: 0;
+}
+
+.callout h1,
+.callout h2,
+.callout h3 {
+	margin: 0 0 0.6rem;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	margin-right: 0.4em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+blockquote.quote-large {
+	font-size: 1.25em;
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.tab {
+	margin: 1.25em 0;
+	padding-inline: 1rem;
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.highlight-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.highlight-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.highlight-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.highlight-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.highlight-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.highlight-default_background {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray_background {
+	background: rgba(42, 28, 0, 0.07);
+}
+.highlight-brown_background {
+	background: rgba(139, 46, 0, 0.086);
+}
+.highlight-orange_background {
+	background: rgba(224, 101, 1, 0.129);
+}
+.highlight-yellow_background {
+	background: rgba(211, 168, 0, 0.137);
+}
+.highlight-teal_background {
+	background: rgba(0, 100, 45, 0.09);
+}
+.highlight-blue_background {
+	background: rgba(0, 124, 215, 0.094);
+}
+.highlight-purple_background {
+	background: rgba(102, 0, 178, 0.078);
+}
+.highlight-pink_background {
+	background: rgba(197, 0, 93, 0.086);
+}
+.highlight-red_background {
+	background: rgba(223, 22, 0, 0.094);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.block-color-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.block-color-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.block-color-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.block-color-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.block-color-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(240, 239, 237, 1);
+}
+.block-color-brown_background {
+	background: rgba(245, 237, 233, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 235, 222, 1);
+}
+.block-color-yellow_background {
+	background: rgba(249, 243, 220, 1);
+}
+.block-color-teal_background {
+	background: rgba(232, 241, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(229, 242, 252, 1);
+}
+.block-color-purple_background {
+	background: rgba(243, 235, 249, 1);
+}
+.block-color-pink_background {
+	background: rgba(250, 233, 241, 1);
+}
+.block-color-red_background {
+	background: rgba(252, 233, 231, 1);
+}
+.select-value-color-default { background-color: rgba(42, 28, 0, 0.07); }
+.select-value-color-gray { background-color: rgba(28, 19, 1, 0.11); }
+.select-value-color-brown { background-color: rgba(127, 51, 0, 0.156); }
+.select-value-color-orange { background-color: rgba(196, 88, 0, 0.203); }
+.select-value-color-yellow { background-color: rgba(209, 156, 0, 0.282); }
+.select-value-color-green { background-color: rgba(0, 96, 38, 0.156); }
+.select-value-color-blue { background-color: rgba(0, 118, 217, 0.203); }
+.select-value-color-purple { background-color: rgba(92, 0, 163, 0.141); }
+.select-value-color-pink { background-color: rgba(183, 0, 78, 0.152); }
+.select-value-color-red { background-color: rgba(206, 24, 0, 0.164); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style><style>@import url('https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex-swap.min.css')</style></head><body><article id="33aa15e2-9005-802c-82c9-f1e51ac5857f" class="page serif" data-notion-page-icon="🔧"><header><img class="page-cover-image" src="https://app.notion.com/images/page-cover/met_william_morris_1877_willow.jpg" style="object-position:center 90%"/><div class="page-header-icon page-header-icon-with-cover"><span class="icon" data-emoji="🔧"></span></div><h1 class="page-title" dir="auto">LSM-Tree</h1><p class="page-description" dir="auto"></p><table class="properties"><tbody></tbody></table></header><div class="page-body"><div id="33aa15e2-9005-8073-8115-dd0dfb03d98f" class="column-list" data-notion-column-list="" dir="auto"><div id="33aa15e2-9005-800a-9c11-cdd2b8aae6da" style="width:18.75%" class="column" data-notion-column-ratio="0.1875" dir="auto"><hr id="33aa15e2-9005-804b-b6f5-c15b02ecf6ca" dir="auto"/><figure id="33aa15e2-9005-80ba-9b08-d47483520f57" class="image" data-notion-image="../../Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg" dir="ltr"><a href="../../Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg"><img style="width:548.375px" src="../../Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg"/></a></figure><p id="33aa15e2-9005-809b-9375-cdda18a95b7d" class="" dir="auto">
+</p></div><div id="33aa15e2-9005-80e4-ac49-df1a16a39e88" style="width:81.25%" class="column" data-notion-column-ratio="0.8125" dir="auto"><h3 id="33aa15e2-9005-80de-b7d7-ead794a9ea59" class="" dir="auto">LSM-Tree</h3><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8097-b3de-ea33f7a7c81b" dir="ltr"><div style="width:100%"><p id="4b9131f5-7d12-4843-bbe1-42f61d6a602d" class="" dir="auto">B+Tree 扛不住爆寫啦！</p><p id="3a69461d-16fa-49ca-a8a3-314add089224" class="" dir="auto">假設你是 LINE 的 backend engineer，每天早上要處理多少早安圖 request？假設早安圖好發年紀在 60 歲，該年紀人口平均起床時間為早上 6:30。如果 LINE 底層的資料庫用 B+Tree，每筆早安 Put request 都要先 search 到正確的 leaf node，然後 in-place update。一筆寫入可能觸發 leaf split，造成多次 random disk I/O。你還記得我們之前學 SSD 的 garbage collection 嗎？大量 random write 會讓 FTL 很難把 valid page 集中在一起，GC 就得搬更多資料。有沒有一種 index 結構針對 write-heavy workload 優化的？ LSM-Tree 出場～</p></div></aside><blockquote id="33aa15e2-9005-8048-a8b0-dc994ec3a369" class="" dir="auto">Reference: </blockquote><hr id="33aa15e2-9005-80b0-a35d-cb2deb34a776" dir="auto"/><details id="33aa15e2-9005-805a-b191-f194ce3ad4cb" open="" class="toggle" dir="auto"><summary><strong>Classification</strong></summary><div class="indented"><p id="33aa15e2-9005-80f8-96a2-ee1c1526725e" class="" dir="auto">
+</p><hr id="33aa15e2-9005-809a-bcd1-e43942345899" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8059-bd47-d6893931b1de" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-803b-8a6f-dc320338d096" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Extra Component</mark></p><hr id="33aa15e2-9005-8048-9170-ef6194e13d1b" dir="auto"/><p id="33aa15e2-9005-8027-8111-fc0e82de7aa3" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Reference:</mark></p></div></aside><hr id="33aa15e2-9005-80e1-8b51-d16e1b3fc8ba" dir="auto"/></div></details><details id="33aa15e2-9005-802b-a1af-db35de23f3ba" open="" class="toggle" dir="auto"><summary><strong>Key Word Definition/ Discussion</strong></summary><div class="indented"><details id="33aa15e2-9005-80a0-ba43-ef7f2a51b380" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>LSM-Tree</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-808f-acc3-ec26ed458084" dir="ltr"><div style="width:100%"><p id="99e90352-d60f-4ba6-a759-f3c717e7f493" class="" dir="auto">LSM-Tree 是一種為了優化寫入效能而設計的資料結構。它不直接在磁碟的原地（in-place）修改資料，而是將所有寫入先暫存在記憶體中，再以追加（Append-only）與順序寫入（Sequential Write）的方式批次寫入磁碟。</p></div></aside><hr id="33aa15e2-9005-8050-b290-fb0e6bad8e2c" dir="auto"/><ul id="fc5e0f96-c5b9-4b91-b0e6-fb4f4267949e" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>核心哲學</strong>：磁碟（無論是 HDD 還是 SSD）的順序寫入吞吐量遠高於隨機寫入。LSM-Tree 透過延遲寫入與歸併排序（Merge Sort）來換取極高的寫入頻寬。</li></ul><ul id="33626f8c-3a03-4d7e-b84f-4e0dc5f7ceef" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>層級結構</strong>：通常分為記憶體層（Memtable）與磁碟多層級（SSTables）。</li></ul><ul id="01adcf11-b779-415c-9276-5f48c4782fa6" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>與 SSD 的契合度</strong>：其「不原地更新」的特性與 SSD 內部 FTL（Flash Translation Layer）的運作邏輯高度一致，能減少 SSD 的磨損並提升壽命。</li></ul><hr id="33da15e2-9005-80b2-9c17-c92766752ff1" dir="auto"/><figure id="33da15e2-9005-8096-9db2-cdafc3db6a7c" class="image" data-notion-image="LSM-Tree/image.png" dir="ltr"><a href="LSM-Tree/image.png"><img style="width:2076px" src="LSM-Tree/image.png"/></a></figure><hr id="33da15e2-9005-8088-a97b-e4f7296ac1fa" dir="auto"/><p id="6ef07a87-0b8e-4195-a678-3b960d2be592" class="" dir="auto"><strong>三個放大鏡</strong><br/>Write amp、read amp、space amp 三者無法同時最小化。<br/>ScyllaDB 的工程師做了一個很有意思的實驗：對同一組 1.2 GB 的資料反覆 overwrite 15 次，比較兩種策略：</p><figure id="33da15e2-9005-805c-8244-e86fa847ba66" class="image" data-notion-image="LSM-Tree/image%201.png" dir="ltr"><a href="LSM-Tree/image%201.png"><img style="width:950.25px" src="LSM-Tree/image%201.png"/></a></figure><p id="33da15e2-9005-8056-bc28-ce764977a897" class="" dir="auto">Tiered 的 space amplification 膨脹到了將近 8 倍，因為舊版本散落在多個 SSTable 裡遲遲沒被清掉。Leveled 則控制在 2 倍以內。 但 write amplification 剛好反過來。寫入 8.8 GB 資料，tiered 實際寫了 50 GB（<strong>write amp ~5x</strong>），leveled 實際寫了 111 GB（<strong>write amp ~13x</strong>）。<strong>Leveled 的 write amp 是 tiered 的 2 倍以上。</strong></p><figure id="33da15e2-9005-80ff-a232-c5f00354916b" class="image" data-notion-image="LSM-Tree/Screenshot_2026-04-09_233920.png" dir="ltr"><a href="LSM-Tree/Screenshot_2026-04-09_233920.png"><img style="width:950.1749877929688px" src="LSM-Tree/Screenshot_2026-04-09_233920.png"/></a></figure><p id="12d81750-14b7-4420-a6a1-014e33506bc8" class="" dir="auto">選哪種取決於你的 workload。Write-intensive 用 tiered。Read-intensive 或 space-sensitive 用 leveled。</p><p id="1cfb14cf-1747-47a1-800b-cf5b4bf100bd" class="" dir="auto">補充資料：ScyllaDB: Leveled Compaction（重點看 space amp 和 write amp 的實測圖表），以及 mini-lsm tutorial（有完整的 tiered 和 leveled 觸發條件和程式碼）。</p><hr id="33aa15e2-9005-806b-b3f6-f4d751bb18ea" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80fe-b3e1-eb7588af3018" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8070-b4f0-ea292b91ac84" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p><ul id="7a2f4a70-3a03-4f36-b310-9a020f589766" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>讀取延遲的不確定性</strong>：由於資料可能散落在多個 SSTable，讀取路徑比 B+Tree 複雜。</li></ul><ul id="5ad1d8a9-698d-4632-a789-fe924eca6b44" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>資源爭搶</strong>：背景執行的 Compaction 會消耗大量的 CPU 與 I/O，若沒調教好，可能會造成前端請求的延遲劇烈抖動（Latency Spike）。</li></ul></div></aside><hr id="33aa15e2-9005-8034-a674-d34fec3cbd85" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80b4-9cd5-d72a6799988d" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-806a-9e46-c7ea1f59708c" class="" dir="auto">Reference: </p></div></aside><hr id="33aa15e2-9005-8057-8d2c-d3f50c24e495" dir="auto"/></div></details><details id="33da15e2-9005-8032-9f83-f40802d6b1f4" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Memtable</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-80db-92a8-ef5a846c82d0" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-802b-9fa3-f43031b6dfc5" class="" dir="auto">LSM-Tree 在記憶體中的緩衝區，負責接收所有的寫入操作。它通常以有序的資料結構實作。</p></div></aside><hr id="33da15e2-9005-8031-bac2-eb4859e28bc0" dir="auto"/><p id="33da15e2-9005-80e2-bf55-e792aaf9e503" class="" dir="auto"><strong>實作方式</strong>：為了兼顧插入效率與排序，常見實作包括<strong>Skip List</strong>（如 LevelDB/RocksDB）或 <strong>Red-Black Tree</strong>。</p><p id="33da15e2-9005-8093-97f6-e780d20a27d2" class="" dir="auto"><strong>WAL 配合</strong>：為了防止當機導致記憶體資料遺失，寫入 Memtable 的同時會先 append 到磁碟的 <strong>Write-Ahead Log (WAL)</strong>。</p><p id="33da15e2-9005-8082-be6e-ca4f17d1407d" class="" dir="auto"><strong>操作複雜度</strong>：寫入與查詢的時間複雜度均為 O(log n)。</p><hr id="33da15e2-9005-801a-a77a-de2eea4ce533" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8067-8042-c937115e2b92" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-800c-ba41-f6dbfaa91511" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p><p id="33da15e2-9005-801f-801a-f592d2711372" class="" dir="auto"><strong>記憶體壓力</strong>：如果寫入速度過快，Memtable 來不及 Flush，可能會阻塞（Stall）前端的寫入請求。</p></div></aside><hr id="33da15e2-9005-800d-9e9c-e57212397185" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8067-9f97-facbe1cf6a7e" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-801c-bdc8-d07586ac2a90" class="" dir="auto">Reference: </p></div></aside><hr id="33da15e2-9005-8002-8e90-deccb9abf603" dir="auto"/></div></details><details id="33da15e2-9005-8022-80ba-f61cf71cc40d" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>SSTable</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8006-bd7d-f9fc4f39b6d2" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8027-8621-ee6e03326b6f" class="" dir="auto">LSM-Tree 在磁碟上的主要儲存格式。它是一個<strong>不可變（Immutable）</strong>、按 Key 排序的檔案。</p></div></aside><hr id="33da15e2-9005-8059-bb1b-f5dfb84dd8a4" dir="auto"/><ul id="ef3d6711-5447-4330-86c6-c2b270cac35f" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>內部結構</strong>：通常包含 Data Block（存放資料）、Index Block（存放 Data Block 的偏移量）以及 Footer。</li></ul><ul id="09a63231-1668-4869-8ee5-08861521de13" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>高效查詢</strong>：由於檔案內部有序，可以使用 Binary Search 快速定位資料塊。</li></ul><ul id="8a2238e2-4955-4a4c-bf02-503667a78193" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>不可變性</strong>：一旦寫入磁碟就再也不會修改，更新操作是透過寫入「新版本」來達成。</li></ul><hr id="33da15e2-9005-8083-9ccc-e90b0dcb3a1b" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8074-8cbd-da420f5dddce" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8002-a0f0-f2297de4be21" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p></div></aside><hr id="33da15e2-9005-8014-b3be-eacd9979a3cc" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-807e-8c4f-e2b9c43fd8d9" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8014-8cb2-e4cd56e12794" class="" dir="auto">Reference: </p></div></aside><hr id="33da15e2-9005-80d0-a680-f6f1418ca9de" dir="auto"/></div></details><details id="33da15e2-9005-8086-94ff-d3f254e3f0f0" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Sorted run</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8028-81ef-fc98b8a6e149" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8082-8764-e8b7e4c6abc0" class="" dir="auto">指一組在邏輯上連續且內部的 Key <strong>互不重疊</strong>的已排序資料集合。</p></div></aside><hr id="33da15e2-9005-80cf-971a-e66d10c98fb3" dir="auto"/><ul id="2f457db0-451d-4a22-acdf-d4099a6fd741" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>讀取優化</strong>：在一個 Sorted Run 中查詢時，你只需要檢查一個檔案（或一個層級的一個位置），因為你知道 Key 不會重複出現在同一個 Run 的其他地方。</li></ul><ul id="e05082c9-9ce4-4603-9e3d-973a81f658c6" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>層級關係</strong>：在 Leveled Compaction 中，每一層（Level 1 以上）都是一個大的 Sorted Run。</li></ul><hr id="33da15e2-9005-805a-86ea-d866146fe6b8" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-80e5-8bc7-d985fc63d27e" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8082-b108-e87731c03d00" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p></div></aside><hr id="33da15e2-9005-8060-9db3-fe8ce9c4bb06" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-80bc-aa17-d31772781aa5" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-80de-b425-c2e4f63a8df2" class="" dir="auto">Reference: </p></div></aside><hr id="33da15e2-9005-809e-8705-e318d5956636" dir="auto"/></div></details><details id="33da15e2-9005-80ec-9897-e371fa82e53c" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Flush</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-80d4-935d-eb74bde60689" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-80e9-9215-f5505459823e" class="" dir="auto">將記憶體中已滿或達到門檻的 Memtable 轉化為不可變的 SSTable 並寫入磁碟的過程。</p></div></aside><hr id="33da15e2-9005-80c6-a6d6-f741065bc790" dir="auto"/><ul id="d70f1e15-4333-4e73-85f7-952fc1e4cd6b" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>觸發條件</strong>：通常是 Memtable 達到預設大小（例如 64 MB）。</li></ul><ul id="d96adf61-c33f-49bf-9c9e-6c64cbdf012a" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>效能點</strong>：Flush 是一個純順序寫入的操作，速度極快。</li></ul><ul id="a72f93e4-a5a3-411e-8049-7eed1303ddc4" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>資源回收</strong>：Flush 完成後，對應的 WAL 檔案會被刪除，記憶體空間會被釋放。</li></ul><hr id="33da15e2-9005-80c6-af5d-ef7b5d1132c8" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-803c-9117-dd6c0e0a74e3" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-809c-8ac6-dde04f27b356" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p></div></aside><hr id="33da15e2-9005-80a3-83fa-fe0874ac32b7" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-802d-a958-eb97fe23bb71" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-80a5-9504-ecce3bfbf509" class="" dir="auto">Reference: </p></div></aside><hr id="33da15e2-9005-80ee-8c64-f1ab6a806ddb" dir="auto"/></div></details><details id="33da15e2-9005-80c7-a9a0-f6b55e2940d6" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Compaction</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8025-bb73-ce0ee961d197" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8036-9d69-df1ec705edca" class="" dir="auto">LSM-Tree 的背景維護機制，負責將多個 SSTable 合併成較少且更具組織性的 SSTable。</p></div></aside><hr id="33da15e2-9005-8000-86ef-ca46de3e71dc" dir="auto"/><ul id="0b32c20f-9bf9-4657-b590-d2ce70487c88" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>功能</strong>：<ol type="1" id="590f3198-e8f4-46bf-aa83-bd80faea0d07" class="numbered-list" start="1" dir="auto"><li>清除過期的舊版本資料。</li></ol><ol type="1" id="405fe3b8-f7fb-430c-ab12-c20e3a1018ce" class="numbered-list" start="2" dir="auto"><li>處理 <strong>Tombstones</strong>（物理刪除已標記刪除的資料）。</li></ol><ol type="1" id="9a560177-7b58-465a-92a9-d86ae5c4fcb8" class="numbered-list" start="3" dir="auto"><li>減少 SSTable 數量以降低讀取放大。</li></ol></li></ul><ul id="fb4c5b31-e45f-4362-8297-e245ddaa594c" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>本質</strong>：本質上是多路歸併排序（Multi-way Merge Sort）。</li></ul><hr id="33da15e2-9005-8041-af9b-de7d5823b8a8" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-80fb-a6d1-ca53962faf24" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8074-98ae-c207a596c1cd" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p><p id="33da15e2-9005-8052-b6a5-f762bf16b0a9" class="" dir="auto"><strong>寫入放大 (WAF)</strong>：資料被反覆讀出並重新寫入，會消耗磁碟頻寬與 SSD 壽命。</p></div></aside><hr id="33da15e2-9005-800a-a2c4-cd7b31069a3c" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8096-8168-e74ed513835c" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-80fa-9ad2-e09260a5feaf" class="" dir="auto">Reference: </p></div></aside><hr id="33da15e2-9005-8087-aa71-e3d3e8aaa12a" dir="auto"/></div></details><details id="33da15e2-9005-8047-bbc4-fcb737a76b79" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Leveled compaction</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-80df-a05b-f1469c4ca913" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8089-88bf-cdf134a3246f" class="" dir="auto">一種積極的壓縮策略，確保除 Level 0 外，每一層內的所有 SSTable 之間的 Key Range 互不重疊。</p></div></aside><hr id="33da15e2-9005-80b5-988a-fe762e307bab" dir="auto"/><ul id="fc6f38d7-6a52-43cd-bea5-e2b4924269ea" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>讀取效能</strong>：由於每層 Key 不重疊，讀取時每一層最多只需查一個 SSTable。</li></ul><ul id="b22d3313-bd54-4260-a28d-331aa1675147" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>空間利用</strong>：空間放大率低，能快速清理垃圾。</li></ul><ul id="4b421279-9228-4e0a-9fe2-e460e41abe40" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>寫入成本</strong>：寫入放大最高，因為資料在每一層都要頻繁地合併與重寫。</li></ul><hr id="33da15e2-9005-808c-94d5-d9878a807577" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-807e-ade5-fffb9c47aaf8" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8059-8c63-e8641eaea0fb" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p></div></aside><hr id="33da15e2-9005-8042-8cef-d746b27442a5" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-80bf-a11f-d6996a1dbe8d" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8041-86aa-f43e5e51bf59" class="" dir="auto">Reference: </p></div></aside><hr id="33da15e2-9005-80df-82f5-f81f6a5a6d34" dir="auto"/></div></details><details id="33da15e2-9005-8080-9dfb-c51506b2aca3" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Tiered compaction</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8079-841b-e5d38dca0cfb" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8055-81d8-f2f06f3e40ed" class="" dir="auto">一種較為「懶惰」的策略，將多個大小相似的 SSTable 直接合併成一個更大的 SSTable，而不保證層級內 Key 不重疊。</p></div></aside><hr id="33da15e2-9005-8030-a414-d11f5716ea1e" dir="auto"/><ul id="d6d77e36-59a1-4f10-a823-39bf945ed028" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>寫入效率</strong>：寫入放大極低，非常適合寫入壓力巨大的場景。</li></ul><ul id="8eff1cc3-561d-4204-8592-6335e03768f7" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>讀取挑戰</strong>：因為同一層可能有重疊的 Key，讀取時可能要查遍該層所有的 SSTable。</li></ul><hr id="33da15e2-9005-8010-9b3d-e9ec07d75bba" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8063-bf4a-f9d50d5e3aa7" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-805d-91e1-e654b4ada833" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p></div></aside><hr id="33da15e2-9005-807d-bb61-ee299c86d09b" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8069-a821-fe6507ed1470" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8083-9f79-cfa966d34336" class="" dir="auto">Reference: </p></div></aside><hr id="33da15e2-9005-8034-8435-f887804960e2" dir="auto"/></div></details><details id="33da15e2-9005-806d-94a6-c52283e174ab" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Write amplification</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-80af-980b-e12398cdc22c" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8014-96e5-ef00fd4f88cb" class="" dir="auto">實際寫入磁碟的資料量與應用層請求寫入資料量的比值。<span data-notion-inline-equation="\text{WAF} = \frac{\text{Actual Disk Writes}}{\text{Logical Writes}}" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">WAF</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.3612em;vertical-align:-0.4811em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8801em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">Logical Writes</span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">Actual Disk Writes</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.4811em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p></div></aside><hr id="33da15e2-9005-80e5-858b-dae6ffba2158" dir="auto"/><ul id="bbcd554f-7b07-4bc2-bc8c-84398385ec32" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>成因</strong>：在 LSM-Tree 中，主要是由 Compaction 造成的。</li></ul><ul id="57d52cb3-3e6b-4731-afdb-3842e63af203" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>權衡</strong>：較高的 WAF 通常是為了換取較低的 Read Amp 或 Space Amp。</li></ul><hr id="33da15e2-9005-8025-b11f-f52a22a1d41c" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-805a-bd58-c18a79c3b4ed" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-808e-8525-e401080ab89f" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p></div></aside><hr id="33da15e2-9005-802b-b22e-f082bb014c12" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-804e-8c79-e617879d09fe" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-804c-af1e-ecf15caf1d87" class="" dir="auto">Reference: </p></div></aside><hr id="33da15e2-9005-807e-998a-d54fe798d14b" dir="auto"/></div></details><details id="33da15e2-9005-8044-8a29-dc3173b2e80f" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Read amplification</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8082-bd84-f517e344ba48" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8066-bebb-dd9855d8c278" class="" dir="auto">查詢一筆資料時，底層實際觸發的磁碟 I/O 次數。</p></div></aside><hr id="33da15e2-9005-8085-9a13-c6f27de36501" dir="auto"/><ul id="0eeaf704-171c-4c09-b898-e616c2c6d258" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>最差情況</strong>：查詢不存在的 Key，必須查遍所有層級與 Memtable。</li></ul><ul id="28f80a1d-dcb9-4eb7-8646-998bb7c71050" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>優化工具</strong>：Bloom Filter 是降低讀取放大的「神級補丁」。</li></ul><hr id="33da15e2-9005-80f2-8908-fd912e0f2856" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-80a3-8f0f-d4423fa07a0f" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8037-99bb-d360cd132bc4" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p></div></aside><hr id="33da15e2-9005-804b-b86d-c89d126aad06" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-80ba-8813-df1d7e5e3500" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-80ad-94cc-d15f1ca1827b" class="" dir="auto">Reference: </p></div></aside><hr id="33da15e2-9005-80f9-8fa8-fc82cb5cc725" dir="auto"/></div></details><details id="33da15e2-9005-806a-966c-f85530ce3ab7" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Space amplification</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8008-9b40-fa040afa3581" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-80a6-b142-f8573b83288a" class="" dir="auto">資料庫檔案在磁碟上實際佔用的空間與實際有效資料量（Snapshot size）的比值。</p></div></aside><hr id="33da15e2-9005-8044-a983-e886e8fd3130" dir="auto"/><ul id="9e3e071e-6f41-445c-8831-9d52bf9d4750" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>成因</strong>：SSTable 中存在的舊版本資料、重複 Key 以及尚未被 Compaction 清理的 Tombstones。</li></ul><ul id="a66b7949-5a3f-46f8-819b-5fd962fbfffd" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>極端情況</strong>：在 Tiered Compaction 下，空間放大可能達到數倍。</li></ul><hr id="33da15e2-9005-8086-8564-fff49e550fd7" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-80b3-b610-e888249f7876" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-80dd-a7e5-dfcce06cc701" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p></div></aside><hr id="33da15e2-9005-8092-a6d9-f54d0fbc0662" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-807f-9390-d87a6fdfea72" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-80e2-a194-f05d9d715728" class="" dir="auto">Reference: </p></div></aside><hr id="33da15e2-9005-800d-ba99-c3270416f66e" dir="auto"/></div></details></div></details><details id="33aa15e2-9005-8083-9280-ef297aa3fd99" open="" class="toggle" dir="auto"><summary><strong>Test</strong></summary><div class="indented"><details id="33aa15e2-9005-803d-95de-e4adae741ed2" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Key Concepts</strong></mark></summary><div class="indented"><details id="33aa15e2-9005-808d-8b76-effd76abac5f" open="" class="toggle" dir="auto"><summary>理解 LSM-Tree 的寫入路徑：資料先寫入 memory 中的 memtable，滿了之後 flush 成 immutable 的 SSTable 到磁碟上</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8041-8784-e073a843ca5b" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8056-b870-f47b914ebb85" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-801f-9f1d-cb42de77499e" class="" dir="auto">資料會先寫入記憶體中的 Memtable，當 Memtable 滿了之後就會被「凍結」，並一次性循序寫入磁碟，成為不可變更的 SSTable。</p></div></p><hr id="33aa15e2-9005-8058-8d3f-cec1cba164ff" dir="auto"/><p id="33aa15e2-9005-806e-8060-f72c87da93e8" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-8006-bac8-f4e0f07dd756" class="" dir="auto">Memtable (記憶體表), Immutable SSTable, Flush (刷寫), Sequential I/O</p></div></p><hr id="33aa15e2-9005-8094-aaec-e59ce2318b56" dir="auto"/><p id="33aa15e2-9005-8069-917f-e4c3a45f8e32" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-80ba-87de-f639cb11a7be" class="" dir="auto">LSM-Tree 的核心精神是「化隨機寫入為循序寫入」。如果每筆資料進來都直接寫硬碟，會產生大量緩慢的 Random Disk I/O。因此，LSM-Tree 讓資料先進入記憶體（通常實作為 Skip List 或紅黑樹），在記憶體中快速地維持排序。等到資料累積到一定大小（例如 64MB），系統就會將整塊排好序的資料，一口氣「循序寫入 (Sequential Write)」到硬碟上，形成一個唯讀的 SSTable 檔案。</p></div></p></div></aside><hr id="33aa15e2-9005-80a0-b8f9-c3663fbf04e5" dir="auto"/></div></details><details id="33aa15e2-9005-8097-bc5a-e4385fa3c8cb" open="" class="toggle" dir="auto"><summary>理解 leveled compaction 與 tiered compaction 兩種策略的差異，以及它們各自在 write amplification、read amplification、space amplification 之間的取捨</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80b8-9388-f3d0368dc47e" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8002-a38b-e466139d698d" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-8003-b797-d094d2ac6264" class="" dir="auto">Tiered 著重寫入效能（幾個小檔直接併成一個大檔）；Leveled 著重讀取效能與空間利用（嚴格分層、保證同層 Key 不重疊）。</p></div></p><hr id="33aa15e2-9005-80cb-b5d7-e4549de3015e" dir="auto"/><p id="33aa15e2-9005-80c4-928e-c4380badfc5e" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-80a2-a521-c32cab692af6" class="" dir="auto">Tiered Compaction (Size-tiered), Leveled Compaction, Key Overlap</p></div></p><hr id="33aa15e2-9005-80b9-b578-db87dd801f9b" dir="auto"/><p id="33aa15e2-9005-804b-8b32-f902d5ef9aca" class="" dir="auto">Detail<div class="indented"><ul id="2d789500-ec8c-43ff-bced-432cc3f94956" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Tiered (層級式)</strong>：當某一層累積了 4 個 SSTable，就直接把它們合併成下一層的 1 個巨大 SSTable。好處是合併速度極快（Write Amplification 低）；壞處是同一層的 SSTable 會有 Key 重疊的問題，讀取時必須翻遍好幾個檔案（Read Amplification 高）。</li></ul><ul id="c8b822b7-1b29-47f8-b69a-a75559da1f0b" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Leveled (分層式)</strong>：每一層都有嚴格的容量限制（例如 L1 是 100MB, L2 是 1GB），且<strong>保證同一層內的 SSTable Key 區間絕對不重疊</strong>。這代表查詢時，每一層最多只要查一個檔案，讀取極快；但代價是每次合併時，要把下一層所有範圍重疊的檔案都拉出來一起重寫，導致非常嚴重的寫入放大。</li></ul></div></p></div></aside><hr id="33aa15e2-9005-805d-8f1d-cd984f909b8e" dir="auto"/></div></details><details id="33aa15e2-9005-8005-abe2-f060474ec01f" open="" class="toggle" dir="auto"><summary>理解三種 amplification（write、read、space）之間存在不可能三角的權衡關係，無法同時最小化三者</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8044-a416-e35359334394" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80d6-864a-fe6c6d185c43" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-806e-931c-d6864eb57988" class="" dir="auto">寫入放大 (WA)、讀取放大 (RA)、空間放大 (SA) 三者互相牽制，系統只能優化其中一兩個，勢必得犧牲另一個。</p></div></p><hr id="33aa15e2-9005-802b-be99-dd00ebd5733e" dir="auto"/><p id="33aa15e2-9005-802f-9130-dd7613ba1648" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-80b5-825d-e29cf3253119" class="" dir="auto">RUM Conjecture (Read-Update-Memory Conjecture), Write/Read/Space Amplification, Trade-off。</p></div></p><hr id="33aa15e2-9005-8035-bb51-f36e285abc56" dir="auto"/><p id="33aa15e2-9005-8024-a58b-c7a850935389" class="" dir="auto">Detail<div class="indented"><p id="a81c21e8-9eb1-4953-bdc8-bf0f7aa353db" class="" dir="auto">這被稱為資料庫系統的 RUM 猜想。</p><ul id="198827df-84e5-4f9b-850b-78641de5dcb6" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Write Amplification (WA)</strong>：寫入 1KB 的資料，磁碟實際上被寫了多少 KB（因為 Compaction 會不斷重寫舊資料）。這會消耗 SSD 壽命。</li></ul><ul id="fecd7b27-5e7f-4a9f-be39-a94a09e2176f" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Read Amplification (RA)</strong>：為了讀取一筆資料，系統需要多讀取多少無關的 Block 或檔案。</li></ul><ul id="de04a809-7bda-460f-aeaa-a9427f8f8f93" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Space Amplification (SA)</strong>：資料庫佔用的硬碟空間是實際有效資料的幾倍（因為舊版本的資料還沒被 Compaction 清掉）。<br/>B+Tree 是低 RA、高 WA；<br/>Tiered LSM-Tree 是低 WA、高 RA/SA；<br/>Leveled LSM-Tree 則是低 RA/SA、極高 WA。</li></ul></div></p></div></aside><hr id="33aa15e2-9005-80aa-a7ad-e08fa4648842" dir="auto"/></div></details><details id="33aa15e2-9005-80d9-a2e8-cda822000bc8" open="" class="toggle" dir="auto"><summary>理解讀取路徑中 Bloom filter 如何被用來跳過不包含目標 key 的 SSTable，避免不必要的 disk read</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80ce-80ef-d5bdc40a736c" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80cd-a68d-f769678c1576" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-8054-ba21-f72bf2ce5e32" class="" dir="auto">放在記憶體中的「擋板」，用來快速回答「某個 Key 是否在這個 SSTable 裡面」，幫系統跳過 99% 不必要的磁碟讀取。</p></div></p><hr id="33aa15e2-9005-801b-8c4f-c49a17db1041" dir="auto"/><p id="33aa15e2-9005-803b-b7a3-ce9a51e6f9b6" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-8034-bf9a-c252532527e0" class="" dir="auto">I/O Optimization, False Positive, Point Query</p></div></p><hr id="33aa15e2-9005-8035-be54-ca6769c30322" dir="auto"/><p id="33aa15e2-9005-809f-81a7-e663448b60c0" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-809d-b0f4-f4dd33037f6f" class="" dir="auto">在 LSM-Tree 中，找一筆資料 (Point Query) 最壞的情況是從 Memtable 一路查到最底層的 SSTable。如果去硬碟裡翻開檔案才發現「這個 Key 根本不在這裡」，那是非常昂貴的浪費。因此，系統會在記憶體中為每個 SSTable 準備一個 Bloom filter。查詢時先問它，如果回答「不在」，就直接跳過這個檔案（節省 1 次 Disk I/O）；如果回答「可能在」，才真正去讀取硬碟驗證。</p></div></p></div></aside><hr id="33aa15e2-9005-8011-bfe4-f38154a9f6ae" dir="auto"/></div></details><details id="33aa15e2-9005-8051-9de1-c689d6cddeae" open="" class="toggle" dir="auto"><summary>了解為什麼 LSM-Tree 偏好 sequential write：將隨機寫入轉換為循序寫入的設計哲學，讓它在 write-intensive workload 中表現優異</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80a1-a5b9-e004fb97ae98" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8057-8c87-f8d2698edfdc" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-800a-90f8-e6b65ea9bcb1" class="" dir="auto">硬體（不論 HDD 或 SSD）處理循序寫入的速度遠大於隨機寫入。LSM-Tree 將所有的增刪改都當成「Append」來操作，壓榨出硬體的極限頻寬</p></div></p><hr id="33aa15e2-9005-8049-a0d8-f3f402833f43" dir="auto"/><p id="33aa15e2-9005-80dc-9ee4-cdfba7fd1c94" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-8067-bc7b-ffbafc619535" class="" dir="auto">Append-Only, In-place Update vs Out-of-place Update, Hardware Sympathy</p></div></p><hr id="33aa15e2-9005-8041-b3cf-c8cb1a42e3dd" dir="auto"/><p id="33aa15e2-9005-809e-9b2f-fff09a8c9c37" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-8017-983b-de57cc1602ed" class="" dir="auto">B+Tree 採用 In-place update，更新一筆資料必須去硬碟找到特定的 Page 覆寫，產生隨機 I/O。LSM-Tree 完全放棄了這種作法（Out-of-place update）。不管是 Insert 還是 Update，甚至是 Delete（寫入一筆特殊的 Tombstone 標記），LSM-Tree 統統把它們當作是一筆「新的紀錄」Append 進 Memtable。因為完全沒有隨機寫入，LSM-Tree 可以輕易吞下每秒數萬到數十萬筆的高強度 Write-Intensive 負載。</p></div></p></div></aside><hr id="33aa15e2-9005-80a3-9944-f7af7149ba70" dir="auto"/></div></details></div></details><details id="33aa15e2-9005-80ad-8337-dd104c29e4b5" open="" class="toggle" dir="auto"><summary><mark class="highlight-teal" data-notion-highlight="teal"><strong>Test your understanding</strong></mark></summary><div class="indented"><details id="33aa15e2-9005-8089-80db-f32b81f925db" open="" class="toggle" dir="auto"><summary>為什麼 LSM-Tree 要先把資料寫入 memtable 再 flush 到 disk，而不是直接 append 到 SSTable 檔案的尾端？（提示：SSTable 裡的 key 需要滿足什麼性質？）</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80b0-8027-f465c4668666" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80ee-aa94-d496f4dec07b" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-80c5-a301-dc5781a231d4" class="" dir="auto">因為 SSTable 必須是「排序好 (Sorted)」的，使用者的隨機寫入直接進硬碟無法維持排序。Memtable 提供了一個便宜的記憶體排序空間。</p></div></p><hr id="33aa15e2-9005-801e-b732-f88402bd6277" dir="auto"/><p id="33aa15e2-9005-80ba-92f3-c8147c50983b" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-806e-b312-de996be54e0a" class="" dir="auto">In-memory Sorting (記憶體排序), Sorted String Table。</p></div></p><hr id="33aa15e2-9005-80c5-8eb9-c0b096abe6e7" dir="auto"/><p id="33aa15e2-9005-8053-becb-dc25fecaab2a" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-805b-bf48-d2808f60b6b4" class="" dir="auto">SSTable 全名是 Sorted String Table。排序的好處是可以用二元搜尋 (Binary Search) 快速定位，也能高效率支援 Range Query。然而，外在的寫入請求順序是隨機混亂的。如果在硬碟上直接維持排序，代價極高。因此必須將 Memtable 當作緩衝區，資料先進入 RAM 裡的 Skip List 進行排序，等累積到一定量（例如幾十 MB），再「一口氣」將這塊已經排好序的資料循序寫成磁碟上的 SSTable。</p></div></p></div></aside><hr id="33aa15e2-9005-8001-ab8a-f8674f6b48d9" dir="auto"/></div></details><details id="33aa15e2-9005-804d-b501-e0d34329512c" open="" class="toggle" dir="auto"><summary>假設一個 LSM-Tree 有 5 層（L0-L4），每層容量是上一層的 10 倍，使用 leveled compaction。一筆 1 KB 的資料從寫入到最終落在 L4，最壞情況下 disk 上一共會寫入多少 bytes？請估算 write amplification。</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-800d-aff5-c6c9ad24a108" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-805a-8bd2-d9547a5e185d" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-8030-b629-dbc84c8f05b2" class="" dir="auto">寫入放大倍數 (WA) 約為 40 倍。一筆 1 KB 的資料最壞情況下會在硬碟上造成約 40 KB 的總寫入量。</p></div></p><hr id="33aa15e2-9005-8063-af71-c32fabaef70b" dir="auto"/><p id="33aa15e2-9005-80fe-aff3-e8041a0da20b" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-8033-b2a0-dc1d862ed163" class="" dir="auto">Size Ratio (大小比例), Compaction Multiplier, Fanout Factor。</p></div></p><hr id="33aa15e2-9005-8084-88ab-fc29c73b4a64" dir="auto"/><p id="33aa15e2-9005-8073-9891-cc0b23a8cab4" class="" dir="auto">Detail<div class="indented"><p id="98035637-dfa7-44ae-a4a2-be2a0b6e7731" class="" dir="auto">在 Leveled Compaction 中，假設相鄰兩層容量比例為 T=10。當資料從 <span data-notion-inline-equation="L_i" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span> 被挑選並合併到 <span data-notion-inline-equation="L_{i+1}" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8917em;vertical-align:-0.2083em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mbin mtight">+</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span></span></span></span></span> 時，因為 <span data-notion-inline-equation="L_{i+1}" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8917em;vertical-align:-0.2083em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mbin mtight">+</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span></span></span></span></span> 的容量是 10 倍，這筆資料最壞情況下會跟 <span data-notion-inline-equation="L_{i+1}" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8917em;vertical-align:-0.2083em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mbin mtight">+</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span></span></span></span></span> 裡 10 份跟它範圍重疊的檔案一起被抓出來重寫。<br/>因此，每往下一層移動，寫入放大就是 10。<br/>資料從 L0 一路合併到 L4，總共經歷 4 次降層 (L0-&gt;L1, L1-&gt;L2, L2-&gt;L3, L3-&gt;L4)。<br/>總 Write Amplification 約為 <span data-notion-inline-equation="4 \times 10 = \textbf{40}" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">10</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord text"><span class="mord textbf">40</span></span></span></span></span></span>。這就是為什麼 LevelDB/RocksDB 在高壓寫入下容易遇到 I/O 瓶頸的原因。</p></div></p></div></aside><hr id="33aa15e2-9005-8036-8191-f9addd23e3f3" dir="auto"/></div></details><details id="33aa15e2-9005-80a0-81df-c71e200a6db2" open="" class="toggle" dir="auto"><summary>你正在設計一個 time-series database，用來存 IoT sensor data。特性是寫入量極大、幾乎不更新、查詢主要集中在最近幾小時的資料。你會選 leveled 還是 tiered compaction？為什麼？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8005-94e5-ed6e7d6235c4" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-801e-8dd4-cb313176e41b" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-80d5-9d02-c54a80b057f4" class="" dir="auto">絕對選擇 <strong>Tiered Compaction</strong>。因為它能提供極高的寫入吞吐量，且該情境完全不在乎 Tiered 的缺點。</p></div></p><hr id="33aa15e2-9005-8038-b38f-f5b7df771880" dir="auto"/><p id="33aa15e2-9005-8065-ba94-e6a5bb83d408" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-805d-ba8c-d5f983775688" class="" dir="auto">Time-Series Data (時序資料), Write-Intensive Workload</p></div></p><hr id="33aa15e2-9005-8084-a4e6-cd4b8594deb0" dir="auto"/><p id="33aa15e2-9005-803e-9faf-f6da970e7d82" class="" dir="auto">Detail<div class="indented"><p id="91ebd90d-ba79-43da-8c4d-26616c80decb" class="" dir="auto">IoT 情境有三個極端特徵：</p><ol type="1" id="408cda65-624c-4741-99c5-e3fc75a5c47d" class="numbered-list" start="1" dir="auto"><li><strong>寫入極大</strong>：需要把硬碟寫入頻寬壓榨到極致，Tiered 的低 WA 完美契合。</li></ol><ol type="1" id="60bf5295-4173-43bd-b966-674d2f28e76d" class="numbered-list" start="2" dir="auto"><li><strong>幾乎不更新/刪除</strong>：這意味著不會有大量舊版本佔用空間，Space Amplification 根本不是問題。</li></ol><ol type="1" id="53e5528f-c7a0-4496-82ac-6473b21d761f" class="numbered-list" start="3" dir="auto"><li><strong>只查最近幾小時</strong>：最近的資料通常都還停留在 Memtable 或是剛刷下去的 L0 SSTable 裡面，直接就能查到。Tiered 最怕的「去底層撈舊資料導致的高 Read Amplification」在這個情境下幾乎不會發生。</li></ol></div></p></div></aside><hr id="33aa15e2-9005-80ce-a01b-c15725b25285" dir="auto"/></div></details><details id="33aa15e2-9005-8035-be30-e8b4ab34126f" open="" class="toggle" dir="auto"><summary>LSM-Tree 的讀取路徑需要從最新的 SSTable 一路查到最舊的。如果 Bloom filter 的 false positive rate 是 2%，系統中有 50 個 SSTable，平均會有幾次「不必要的」disk read？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80a4-8ef6-c4ec4aa9e066" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8064-abac-fddcb16d78c1" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-800e-ba4b-fe5267f630fc" class="" dir="auto">期望值為 <strong>1 次</strong>額外的 Disk Read</p></div></p><hr id="33aa15e2-9005-8038-9f33-f8f951472efa" dir="auto"/><p id="33aa15e2-9005-80b0-9515-f87c842d1b8d" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-808d-842f-fc1d4e4fae6e" class="" dir="auto">Probabilistic Filtering (機率性過濾), Expected Value</p></div></p><hr id="33aa15e2-9005-80ea-955b-db42e57c46be" dir="auto"/><p id="33aa15e2-9005-8019-988c-c2b2123c8a48" class="" dir="auto">Detail<div class="indented"><p id="d19bfd57-978e-4dc3-9c09-7e141c3e5b40" class="" dir="auto">在最壞的情況下（你要找的 Key 根本不在資料庫中，或者藏在系統最古老的角落），讀取路徑需要掃描前面 50 個 SSTable。<br/>有了 Bloom filter 當擋板，每個 SSTable 有 2% 的機率會發生 False Positive（說「可能在」但其實不在）。<br/>計算期望值：<span data-notion-inline-equation="50 \times 0.02 = 1" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">50</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0.02</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></span>。<br/>結論：原本你需要白跑 50 次笨重的磁碟讀取，現在 Bloom filter 幫你成功擋下了 49 次，只有 1 次會因為誤判而去讀硬碟。這就是為什麼 Bloom filter 被稱為 LSM-Tree 讀取效能的救星。</p></div></p></div></aside><hr id="33aa15e2-9005-8074-96c4-d80252ea6352" dir="auto"/></div></details></div></details><details id="33aa15e2-9005-80d5-9f92-cd96d49c4ed0" open="" class="toggle" dir="auto"><summary><mark class="highlight-red" data-notion-highlight="red"><strong>Quiz Pool</strong></mark></summary><div class="indented"><ol type="1" id="33aa15e2-9005-8088-bb52-f7bd8ad15a0d" class="numbered-list" start="1" dir="auto"><li>針對某 LSM-Tree 查詢機制，工程師比較了 point query：GET(key) 與 range scan：SCAN(key_start, key_end) 的效能。<br/>他發現，當查詢大量完全不存在於資料庫中的 key 時，point query 幾乎不會產生 disk I/O。<br/>但是 range scan（即使該範圍內根本沒有任何資料）卻觸發了明顯的 block reads。導致這個巨大效能差異的根本原因為何？<blockquote id="33aa15e2-9005-80d7-9129-d07907265cc7" class="" dir="auto"><ol type="1" id="33aa15e2-9005-806e-898e-c0c55feb61ac" class="numbered-list" start="1" dir="auto"><li>Bloom filter 只能處理精確匹配，無法用於範圍過濾。因此，只要查詢範圍與 SSTable 的 key 範圍重疊，系統就必須將該 SSTable 的 data block 載入記憶體檢查，進而產生 I/O。</li></ol><ol type="1" id="33da15e2-9005-80db-8f20-cf71bfd4610c" class="numbered-list" start="2" dir="auto"><li>range scan 需要將範圍內的所有可能 key 逐一送入 Bloom filter 進行 hash 檢查。當掃描範圍過大時，會引發極嚴重的 CPU 運算瓶頸。</li></ol><ol type="1" id="33da15e2-9005-80f4-bbef-d330653e5351" class="numbered-list" start="3" dir="auto"><li>在 Leveled Compaction 的架構中，L1 到 LN 的每一層內部的 SSTable 都存在嚴重的 key 範圍重疊。range scan 為了合併多版本資料，必須強制開啟每一層的所有 SSTable。</li></ol><ol type="1" id="33da15e2-9005-805d-b6d0-c268a306c4f9" class="numbered-list" start="4" dir="auto"><li>當 range scan 在上層 SSTable 遇到 tombstone 時，系統無法確定該 tombstone 是否涵蓋了整個查詢範圍，因此必須去更底層的 SSTable 尋找被刪除的原始資料。</li></ol></blockquote><details id="33aa15e2-9005-8064-b516-d4418a5f29e5" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8021-be70-c3e117bb8515" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-809d-ad7b-c2cbb3e136de" class="" dir="auto">
+</p><hr id="33aa15e2-9005-80c5-8b6a-d0855ac52480" dir="auto"/><p id="33aa15e2-9005-8050-8079-c31409271608" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-80d2-96bf-c788f919e8dd" class="" dir="auto">
+</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8066-bc35-ce999ad16f33" dir="auto"/><ol type="1" id="33aa15e2-9005-80d3-8acf-fb84e770f01a" class="numbered-list" start="2" dir="auto"><li>某資料庫底層使用 LSM-Tree。團隊將合併策略由 leveled 改為 tiered compaction，並縮小 Bloom filter。請問此調整對系統的三大放大效應（write、read、space amplification）的影響為何？<blockquote id="33aa15e2-9005-8098-be0a-d0a25152024c" class="" dir="auto"><ol type="1" id="33aa15e2-9005-805d-b838-cd3efc993a92" class="numbered-list" start="1" dir="auto"><li>寫入放大降低。但 tiered 策略囤積舊版本資料，加上 FPR 上升導致查詢需掃描更多 SSTable，使讀取與空間放大均大幅增加。</li></ol><ol type="1" id="33da15e2-9005-80e5-a767-eea78414ba6c" class="numbered-list" start="2" dir="auto"><li>空間放大降低，因 tiered 會積極合併重疊的 SSTable。但寫入會從 sequential 退化為 random write，使寫入放大飆升。</li></ol><ol type="1" id="33da15e2-9005-8051-bf3a-d313e199ead1" class="numbered-list" start="3" dir="auto"><li>三種放大效應皆降低。Tiered 確保每層 SSTable 的 key 範圍不重疊，讀取時最多只需查詢一個檔案，不受 FPR 影響。</li></ol><ol type="1" id="33da15e2-9005-8059-9ce7-c7a67555ccfa" class="numbered-list" start="4" dir="auto"><li>寫入與空間放大皆降低，因 tiered 減少合併且 Bloom filter 變小省下了空間。但 FPR 上升使得讀取放大增加。</li></ol></blockquote><details id="33aa15e2-9005-8055-a506-c6bfa376b994" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8007-b0a2-d6d3f0f36066" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80c1-aabb-e17af1b01439" class="" dir="auto">
+</p><hr id="33aa15e2-9005-802c-bcae-c98e32258e8c" dir="auto"/><p id="33aa15e2-9005-803a-9517-ea1a2eebcdf7" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-80f1-9b6a-c08e726982dc" class="" dir="auto">
+</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80a7-9288-c8b5e6227610" dir="auto"/><ol type="1" id="33aa15e2-9005-8038-b49f-fbaea66b6393" class="numbered-list" start="3" dir="auto"><li>一個儲存系統的工程師正在為兩種不同的 workload 選擇架構，兩者都需要支援 point query，資料都存在 SSD 上：<aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-80ef-b167-e3a42e21e745" dir="ltr"><div style="width:100%"><ul id="33da15e2-9005-80eb-9662-ff23139b3b05" class="bulleted-list" dir="auto"><li style="list-style-type:disc">系統 P：write-heavy，讀取相對少，且有大量查詢是找不存在的 key</li></ul><ul id="33da15e2-9005-801b-867e-f5375b316276" class="bulleted-list" dir="auto"><li style="list-style-type:disc">系統 Q：read-heavy，已有大量資料，寫入量低，幾乎所有查詢的 key 都存在</li></ul></div></aside><p id="33da15e2-9005-80ec-8779-e56823294dd7" class="" dir="auto">工程師評估了以下四個設計決策，請找出分析<strong>有誤</strong>的一項：</p><blockquote id="33aa15e2-9005-8075-93ce-c91f7c59e531" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8033-9525-cf1e1565546a" class="numbered-list" start="1" dir="auto"><li>若系統 Q 改用 LSM-Tree 並配備 Bloom filter，由於幾乎所有查詢的 key 都存在，Bloom filter 的 false positive 情況極少。因此可以藉由 Bloom filter 在高準確率下直接找到對應的 SSTable，讓 read amplification 大幅縮減。</li></ol><ol type="1" id="33da15e2-9005-8080-b25f-f7289dc73287" class="numbered-list" start="2" dir="auto"><li>系統 Q 適合 B+Tree：從 root 走到 leaf 的路徑確定，幾乎所有查詢都只需要 1 次真正的 disk I/O（上層 inner node 常駐 cache），因為讀取路徑本身就很短，不需要 Bloom filter 來輔助過濾。</li></ol><ol type="1" id="33da15e2-9005-80b8-b03f-fbc610d4fa70" class="numbered-list" start="3" dir="auto"><li>若系統 P 改用 B+Tree，大量 random write 會讓 SSD 的 FTL 難以集中 valid page，GC 需要搬移更多資料，軟體層的 write amplification 與硬體層的 GC write amplification 會疊加，吞吐量大幅下降。</li></ol><ol type="1" id="33da15e2-9005-802b-86d8-d4b9e22ca97a" class="numbered-list" start="4" dir="auto"><li>系統 P 適合 LSM-Tree：寫入只需進 memtable 和 append WAL 即可返回，避免了 B+Tree 的 random disk I/O，但讀取需要逐層查詢多個 SSTable，對找不存在的 key 尤其昂貴，因此每個 SSTable 配上 Bloom filter 可以大幅降低這個代價。</li></ol></blockquote><details id="33aa15e2-9005-802c-aadb-c5a676b5f302" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-808a-b782-cd75d04bb119" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80b7-b554-f860b1c84a94" class="" dir="auto">
+</p><hr id="33aa15e2-9005-800f-b91e-d6ffa743070b" dir="auto"/><p id="33aa15e2-9005-8000-b36e-c1c49f07718f" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-802e-8682-ebd73d70131b" class="" dir="auto">
+</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8075-a1e0-d02dd93a1382" dir="auto"/><ol type="1" id="33aa15e2-9005-803d-967f-c9e360feb952" class="numbered-list" start="4" dir="auto"><li>某系統的業務邏輯會頻繁地寫入一筆資料，幾分鐘後再將其刪除。幾天後工程師發現，雖然資料總量沒有明顯增加，但 point query 的延遲卻異常升高。系統已配置 Bloom filter，為什麼仍會發生這種情況？<blockquote id="33aa15e2-9005-80f2-907b-f997585e0c00" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8055-bd95-db6f83a2743c" class="numbered-list" start="1" dir="auto"><li>因為頻繁的 delete 操作會讓 SSTable 內的 Bloom filter 產生 hash collision，導致誤判率飆升至 100%。</li></ol><ol type="1" id="33da15e2-9005-8034-bf46-e949f42e9eb7" class="numbered-list" start="2" dir="auto"><li>因為 delete 會立刻觸發 compaction，大量 background disk I/O 佔用了系統頻寬，拖慢了前端的讀取效能。</li></ol><ol type="1" id="33da15e2-9005-8028-b930-d2f84f2342b9" class="numbered-list" start="3" dir="auto"><li>因為短時間內的頻繁修改，會觸發 memtable 的 in-place update 鎖定衝突，導致讀取被阻塞。</li></ol><ol type="1" id="33da15e2-9005-80ca-b860-c01571f0ecf9" class="numbered-list" start="4" dir="auto"><li>因為 Bloom filter 無法過濾 tombstone。查詢被刪除的 key 時，Bloom filter 會回答「存在」，導致系統仍必須去讀取硬碟，才知道原來是 tombstone。</li></ol></blockquote><details id="33aa15e2-9005-8096-9f1a-db78f3a1f517" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8084-b2eb-f72ea5cda2f6" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80d3-ac3d-d3eaf71b3ab3" class="" dir="auto">
+</p><hr id="33aa15e2-9005-80da-a50e-fa63a918c94d" dir="auto"/><p id="33aa15e2-9005-8097-89f9-d01d67b0185a" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8049-83ab-d9dcb856b344" class="" dir="auto">
+</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8018-bea5-e6fdad4da05b" dir="auto"/><ol type="1" id="33aa15e2-9005-80c8-a727-ff2c74657c19" class="numbered-list" start="5" dir="auto"><li>假設某通訊軟體的系統架構採用了 LSM-Tree 作為底層資料庫。在跨年倒數的 10 分鐘內，系統會迎來平常 100 倍以上的爆發性寫入（傳送新年快樂）。<br/>如果在跨年夜當下，系統發出了「disk I/O 寫入頻寬滿載（write stall）」的嚴重警報。下列哪一項調整最能緩解當下的 write stall？<blockquote id="33aa15e2-9005-80c9-bc68-f2c8692bf570" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8098-adbd-ef3a513d1ac1" class="numbered-list" start="1" dir="auto"><li>維持原有的 Leveled compaction 不變，因為跨年夜過後大家會頻繁回顧昨晚的訊息，必須犧牲當下的寫入速度，確保後續的讀取體驗。</li></ol><ol type="1" id="33da15e2-9005-8046-ab6f-e2ee56776b5a" class="numbered-list" start="2" dir="auto"><li>調低 memtable flush threshold（例如從 64MB 降到 16MB），讓資料更頻繁地寫成小的 SSTable，以減輕記憶體壓力並加速寫入。</li></ol><ol type="1" id="33da15e2-9005-8089-ad7a-da3ee8fd6302" class="numbered-list" start="3" dir="auto"><li>暫時切換成 Tiered compaction，先讓寫入快速落盤，容忍短暫的空間膨脹，等離峰時間再轉換回 Leveled compaction。</li></ol><ol type="1" id="33da15e2-9005-80a0-8894-cb8399fa93e9" class="numbered-list" start="4" dir="auto"><li>暫時關閉 WAL 以節省循序寫入的 I/O，只要 memtable 撐住就不會出問題。</li></ol></blockquote><details id="33aa15e2-9005-80e6-85ef-c9be8edbd640" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8074-b2bf-cd86e17c8644" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-806e-8776-e4ba7abb638f" class="" dir="auto">
+</p><hr id="33aa15e2-9005-80fc-99d1-cccdca092e53" dir="auto"/><p id="33aa15e2-9005-804b-92ff-eeecbed5589e" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-808f-8691-ebcd085498c0" class="" dir="auto">
+</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8091-be8b-d9f49b50ab64" dir="auto"/><ol type="1" id="33aa15e2-9005-80e0-ab77-ca7430d36f0f" class="numbered-list" start="6" dir="auto"><li>一位工程師為了降低 LSM-tree 儲存引擎的 read amplification，實施了兩項變更：<aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8001-823e-d0d2de2b6678" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8029-b2d5-cbd75dcc1846" class="" dir="auto">(1) 為每個 SSTable 附加 Bloom filter。<br/>(2) 將 tiered compaction 切換為 leveled compaction。</p></div></aside><p id="33da15e2-9005-8083-90b3-c6c069112ae4" class="" dir="auto">請問這兩項變更如何影響系統的各項 amplification？</p><blockquote id="33aa15e2-9005-8036-8552-ff0a62aca2cc" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8098-bb57-de63255ab2bc" class="numbered-list" start="1" dir="auto"><li>Bloom filter 透過允許系統跳過不包含該 key 的 SSTable 來減少 read amplification；而 leveled compaction 減少了 read amplification，但增加了 write amplification。</li></ol><ol type="1" id="33da15e2-9005-8047-b1d8-eec353820fe9" class="numbered-list" start="2" dir="auto"><li>Bloom filter 透過在記憶體中批次更新索引來減少 write amplification，而 leveled compaction 減少了 space amplification，但代價是顯著增加了 read amplification。</li></ol><ol type="1" id="33da15e2-9005-8086-a098-f914b99da533" class="numbered-list" start="3" dir="auto"><li>Bloom filter 增加了 space amplification，因為它們儲存了實際 key 的副本；而 leveled compaction 透過確保每層 SSTable 的 key range 不重疊，從而消除了 write amplification。</li></ol><ol type="1" id="33da15e2-9005-80b2-bee4-efd99f3edfdc" class="numbered-list" start="4" dir="auto"><li>Bloom filter 減少了 write amplification，因為它們減少了 MemTable 必須執行 flush 的次數；而 leveled compaction 減少了 read amplification，且不會影響 CPU 或 I/O 負載。</li></ol></blockquote><details id="33aa15e2-9005-80e2-ba66-e3f91827c2a0" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8005-8c5f-c449acfa379c" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80b0-9342-c0868abf3702" class="" dir="auto">
+</p><hr id="33aa15e2-9005-80ff-b071-f3e08f2b0d3b" dir="auto"/><p id="33aa15e2-9005-807e-bf27-f6c72692ce45" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-800b-9066-d6aa6c8963b5" class="" dir="auto">
+</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-807f-8abf-da352265adf1" dir="auto"/><ol type="1" id="33aa15e2-9005-80bb-b648-e877db1eb8b3" class="numbered-list" start="7" dir="auto"><li>假設為了延長 SSD 的物理壽命，將目前的 Leveled compaction 改為 Tiered compaction 以降低 write amplification。<br/>綜合 LSM-Tree 的 compaction 特性與 SSD 底層 FTL 的運作原理，判斷下列哪一個論點最能準確指出這項提議的隱藏風險？<blockquote id="33aa15e2-9005-80c0-aa58-cd08bae242e3" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80b2-bc67-ccbd6515435a" class="numbered-list" start="1" dir="auto"><li>Tiered compaction 為了延遲合併，在執行 Compaction 時會採用 In-place update 覆蓋舊資料，導致本來連續的寫入退化為 random write，抵觸了 LSM-Tree &#x27;never update in place&#x27; 的初衷，從而加劇 SSD 磨損。</li></ol><ol type="1" id="33da15e2-9005-807c-9a3b-c27d063c1360" class="numbered-list" start="2" dir="auto"><li>Tiered compaction 中雖然有高達近 8x 的 space amplification，但 LSM-Tree 可以透過 Bloom filter 通知 SSD 的 FTL 哪些 Page 是不用的舊版本，提早進行物理抹除。提議的盲點在於 Tiered 產生的 read amplification 會大幅消耗 SSD 頻寬。</li></ol><ol type="1" id="33da15e2-9005-8025-90c4-cdaa8c4b1c8f" class="numbered-list" start="3" dir="auto"><li>Tiered compaction 具有高 space amplification。無用的舊版本與 tombstone 不被清除，對 FTL 而言這些資料對應的 physical page 仍然是 valid，GC 在回收 block 時必須搬移更多 valid page 才能騰出空間，導致硬體層的 write amplification 升高，可能抵銷軟體層省下的寫入量。</li></ol><ol type="1" id="33da15e2-9005-8007-b807-e53d8d9cfa60" class="numbered-list" start="4" dir="auto"><li>Leveled compaction 的 write amplification 雖然高，但其產生的所有寫入都會繞過 SSD 的 FTL，直接與 flash 晶片溝通。而 Tiered compaction 仍需經過 FTL 的地址轉換，因此最終對 flash 的實體寫入量仍然較高。</li></ol></blockquote><details id="33aa15e2-9005-8056-838b-fabc350b8889" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-803b-9efd-ed8b117e13f3" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8040-ba5e-d7a2aefc2a00" class="" dir="auto">
+</p><hr id="33aa15e2-9005-8033-ba4c-e2712ed15edd" dir="auto"/><p id="33aa15e2-9005-8016-be89-fac37656cc2c" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-807d-aba4-f32e4b5cf288" class="" dir="auto">
+</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8092-8585-fd50dbfca735" dir="auto"/><ol type="1" id="33aa15e2-9005-80d9-923c-d382cc80fa08" class="numbered-list" start="8" dir="auto"><li>某 LSM-Tree key-value store 對每個 SSTable 配置標準 Bloom filter（FPR = 1%）。分析發現，查詢某些從未寫入過系統的 key 時，仍會觸發對部分 SSTable 的實際讀取。以下哪一個解釋最合理？<blockquote id="33aa15e2-9005-80b9-bee3-f98c70bd51e1" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8096-871d-c38a7a3486da" class="numbered-list" start="1" dir="auto"><li>每個 SSTable 的 Bloom Filter 是獨立建立的，即使 key 不存在於任何 SSTable，也可能各自發生 false positive，導致查詢路徑中出現多次不必要的 SSTable 存取</li></ol><ol type="1" id="33da15e2-9005-80c7-b8bc-e53d2d81aefc" class="numbered-list" start="2" dir="auto"><li>為了保證效率，系統通常會對所有 SSTable 採用相同的 hash 算法，使得不同 filter 對同一 key 的原始 hash 值是相同的，進而導致同一 key 一定會命中所有 Bloom Filter；若這些 bit 在舊 SSTable 中剛好被其他 key 設為 1，就會導致跨多個 SSTable 的誤判</li></ol><ol type="1" id="33da15e2-9005-801b-a47f-ee66ffbd3aae" class="numbered-list" start="3" dir="auto"><li>因為 Bloom Filter 會保留歷史資訊，所以仍然會命中舊的 SSTable</li></ol><ol type="1" id="33da15e2-9005-80fb-9550-c8f77f2a4c4d" class="numbered-list" start="4" dir="auto"><li>當 Bloom Filter 的 FPR 為 1% 時，系統應保證每次查詢最多只會發生一次 false positive ；若出現多次，代表 Bloom Filter 已經過度飽和</li></ol></blockquote><details id="33aa15e2-9005-808e-b734-fd7cb21d49c6" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80e0-a54f-c970f309b954" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80aa-ac1f-c315e9091324" class="" dir="auto">
+</p><hr id="33aa15e2-9005-8011-b8f1-e8c7efe6deb8" dir="auto"/><p id="33aa15e2-9005-8092-9eca-cd4f099e6b75" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8094-ab81-f7c8071f5232" class="" dir="auto">
+</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80f5-a281-feaffb249286" dir="auto"/><ol type="1" id="33aa15e2-9005-808e-8299-ff6ac82d08b6" class="numbered-list" start="9" dir="auto"><li>某 LSM-tree 系統目前有 50 個 SSTable，每個 SSTable 都配有 Bloom filter（FPR = 2%）。為了優化讀取效能，團隊決定將所有 SSTable 合併為 1 個，並為合併後的 SSTable 配置足夠記憶體的 Bloom filter（FPR 維持 2%）。請分析此舉對系統效能的影響。<blockquote id="33aa15e2-9005-80e4-9673-ceebb7ae9032" class="" dir="auto"><ol type="1" id="33aa15e2-9005-802a-8d21-e7d64c394db9" class="numbered-list" start="1" dir="auto"><li>搜尋「不存在的 key」時，預期磁碟 I/O 次數會從 1 次降至 0.02 次，讀取效能提升，但會產生嚴重的寫入放大。</li></ol><ol type="1" id="33da15e2-9005-8008-a3a3-d9b444ffbf8d" class="numbered-list" start="2" dir="auto"><li>合併後搜尋「不存在的 key」時，磁碟 I/O 次數會降至 0，因為 Bloom filter 會因為檔案變大而變得絕對精準。</li></ol><ol type="1" id="33da15e2-9005-8018-8736-ce6ff3670f17" class="numbered-list" start="3" dir="auto"><li>系統應頻繁合併 SSTable 以確保 SSTable 數量永遠維持在 1，因為 SSTable 數目越少，讀取與寫入效能都會達到最優化。</li></ol><ol type="1" id="33da15e2-9005-801b-9ee0-f61e7e2ef4f1" class="numbered-list" start="4" dir="auto"><li>合併後由於檔案變大，Bloom filter 需要處理更多的 keys，這會導致其誤判率自動上升，抵銷了檔案變少的好處。</li></ol></blockquote><details id="33aa15e2-9005-801d-bdbf-d83cf7d0977b" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80c2-ba1b-ee3fa86c2b2a" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80da-bc09-e39da544390b" class="" dir="auto">
+</p><hr id="33aa15e2-9005-8042-a0aa-d48d04fa30ee" dir="auto"/><p id="33aa15e2-9005-801e-977f-fab9c66ae8dc" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-801b-ab44-ed64ee9b5a42" class="" dir="auto">
+</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8001-b120-f81dfc3e90ee" dir="auto"/><ol type="1" id="33aa15e2-9005-804d-8074-d47cb2c98a03" class="numbered-list numbered-list-digits-2" start="10" dir="auto"><li>你正在實作一個 LSM-Tree storage engine，並觀察到系統在 crash 後，<br/>某些「尚未 flush 成 SSTable 的最新資料」仍然可以被成功恢復。<p id="130bc7e2-fa16-4580-8fab-78afb97e7492" class="" dir="auto">請問以下哪一個機制最直接負責確保這些資料在系統 crash 後仍然存在？</p><blockquote id="33aa15e2-9005-80a8-ad35-c6b2c9e5bf80" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80bd-b6c9-e96161f63712" class="numbered-list" start="1" dir="auto"><li>memtable 本身是 in-memory sorted structure，因此可以在重啟後重建資料</li></ol><ol type="1" id="33da15e2-9005-80de-a2f7-cae102d277bc" class="numbered-list" start="2" dir="auto"><li>SSTable 是 immutable 且已排序，因此可以回推未 flush 的資料</li></ol><ol type="1" id="33da15e2-9005-804f-9a2a-d53583293948" class="numbered-list" start="3" dir="auto"><li>compaction 會將多個 SSTable 合併，因此可以在 crash 後還原最新狀態</li></ol><ol type="1" id="33da15e2-9005-8059-aae1-f0d49bf35d9a" class="numbered-list" start="4" dir="auto"><li>Write-Ahead Log（WAL）透過 append-only 的 sequential write，確保在 crash 後可以重建 memtable</li></ol></blockquote><details id="33aa15e2-9005-80e2-9c74-ce994403f8b5" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80ca-b9e7-c2f0002a4c8b" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-807c-853c-fe4a28aa3a45" class="" dir="auto">
+</p><hr id="33aa15e2-9005-8058-b4a1-e3d9afefb73a" dir="auto"/><p id="33aa15e2-9005-8047-8db3-e0edcb55a838" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-80b4-b324-d04fcbd98468" class="" dir="auto">
+</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80ce-8e61-d2dbae1e8356" dir="auto"/><ol type="1" id="33aa15e2-9005-806a-b514-c43cdee4aa8d" class="numbered-list numbered-list-digits-2" start="11" dir="auto"><li>某資料庫部署在 QLC SSD 上，寫入量極高且頻繁更新既有 key。<br/>查詢多集中在最近的資料，偶爾查詢歷史資料。<br/>系統使用 LSM-tree 搭配 tiered compaction，並為每個 SSTable 配置 Bloom filter（FPR = 1%）。<br/>請問以下哪一項是這個設計最大的風險？<blockquote id="33aa15e2-9005-80f0-91f5-e8cde3b5ed1f" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80eb-bae6-dca8b8ad75c6" class="numbered-list" start="1" dir="auto"><li>Tiered compaction 下，SSTable 不會立即合併，point query 必須依序對多個 SSTable 進行 Bloom filter 查詢與 disk read，即使 FPR = 1%，在高查詢頻率下累積的 I/O 開銷仍會成為瓶頸。</li></ol><ol type="1" id="33da15e2-9005-80ab-92fd-cf40fc4ef97f" class="numbered-list" start="2" dir="auto"><li>歷史資料查詢時，資料分散在多個較深的 level，Bloom filter 的 false positive 會觸發跨 level 的額外 disk read；在 QLC 的高讀取延遲下，cold data 查詢的 P99 latency 將會惡化。</li></ol><ol type="1" id="33da15e2-9005-8010-854c-d8ce6169df92" class="numbered-list" start="3" dir="auto"><li>Tiered compaction 造成的高 space amplification 會使 SSD 提前進入高使用率狀態，FTL GC 被迫頻繁搬移資料，導致硬體層 write amplification 上升，加速 QLC 壽命消耗。</li></ol><ol type="1" id="33da15e2-9005-805e-847c-cb35efc38b2b" class="numbered-list" start="4" dir="auto"><li>LSM-Tree 的 compaction 過程需要讀取舊 SSTable 再寫回合併結果，這些 merge 操作在 QLC 上會產生額外的 random read，部分抵銷了 sequential write 對壽命的保護效果。</li></ol></blockquote><details id="33aa15e2-9005-80ef-a4b1-e9b5ae8d4ffd" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80d1-9627-d19353e3b16a" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80a3-bb9f-f52f8a75b500" class="" dir="auto">
+</p><hr id="33aa15e2-9005-8085-aa83-d8c8c4d42a8e" dir="auto"/><p id="33aa15e2-9005-80b1-a622-cffddfeecd74" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8024-a9f1-ff7710aea8a8" class="" dir="auto">
+</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-803e-bf65-ce0ed08c16f7" dir="auto"/><ol type="1" id="33aa15e2-9005-8008-acc5-c2087107523f" class="numbered-list numbered-list-digits-2" start="12" dir="auto"><li>當 LSM-Tree 累積的 SSTable 數量逐漸增加時，point lookup 的 read amplification 也會隨之加劇。為了有效過濾不必要的 I/O，系統在設計上通常會將記憶體資源優先投資在下列哪一項機制？<blockquote id="33aa15e2-9005-804b-8e33-ea2ad8aa288d" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8095-82d6-f4f2f0be60f3" class="numbered-list" start="1" dir="auto"><li>為每一層資料建立完整的重複 page cache 副本</li></ol><ol type="1" id="33da15e2-9005-8063-9997-eafeb45152b7" class="numbered-list" start="2" dir="auto"><li>將 WAL 的內容完整保留在記憶體中，以便讀取時直接查詢而不必存取磁碟</li></ol><ol type="1" id="33da15e2-9005-80cf-a876-e699e332afca" class="numbered-list" start="3" dir="auto"><li>讓 memtable 擴大到足以容納所有既有磁碟資料</li></ol><ol type="1" id="33da15e2-9005-8013-b505-d20d073c5d89" class="numbered-list" start="4" dir="auto"><li>保存多個 SSTable 的 Bloom filters 與索引 metadata 的記憶體開銷</li></ol></blockquote><details id="33aa15e2-9005-80bc-ad8e-d695103a0598" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8057-83ee-f52c72d83dba" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-805a-8a24-d9e378423c22" class="" dir="auto">
+</p><hr id="33aa15e2-9005-80c0-8f35-d500b708c9a4" dir="auto"/><p id="33aa15e2-9005-804f-8ff2-d9434c680a6a" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-80ae-9d38-ff3605e92db4" class="" dir="auto">
+</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8096-862b-cf701072749e" dir="auto"/><ol type="1" id="33aa15e2-9005-801a-92b8-e1a9c277d212" class="numbered-list numbered-list-digits-2" start="13" dir="auto"><li>在為儲存系統選擇索引結構與 SSD 類型時，需要考慮資料結構的寫入特性與 NAND flash 的物理限制。<br/>以下關於 LSM-tree 和 B+tree 分別搭配 TLC SSD 與 QLC SSD 的敘述，何者錯誤？<blockquote id="33aa15e2-9005-80fb-b0cd-f616a6094190" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80c3-bc8a-c08b30f600e8" class="numbered-list" start="1" dir="auto"><li>B+tree 的 in-place update 會產生大量 random write，搭配 QLC 時會比搭配 TLC 更快地消耗 P/E cycle。</li></ol><ol type="1" id="33da15e2-9005-8032-aa09-f4b049290d91" class="numbered-list" start="2" dir="auto"><li>在寫入密集的場景下，LSM-tree 搭配 TLC SSD 比搭配 QLC SSD 更合適，因為 TLC 有較高的 P/E cycle 能更好地承受 compaction 帶來的額外寫入。</li></ol><ol type="1" id="33da15e2-9005-800c-b61c-cfe3421bc22a" class="numbered-list" start="3" dir="auto"><li>LSM-tree 將 random write 轉為 sequential write，降低了 SSD 內部 GC 的負擔，因此是 QLC SSD 的最佳搭配。</li></ol><ol type="1" id="33da15e2-9005-8038-b4c7-f02a1513e3aa" class="numbered-list" start="4" dir="auto"><li>LSM-tree 將 random write 轉成 sequential write，因此搭配 QLC 時可以大幅減少 SSD內部產生的 GC，因此 compaction 的 WAF 是主要的寫入放大來源</li></ol></blockquote><details id="33aa15e2-9005-80d2-b252-c5736bc1b650" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80b4-8c51-c556edca8b26" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8093-9255-edd9ff5d8212" class="" dir="auto">
+</p><hr id="33aa15e2-9005-8025-a3ac-c819109bd921" dir="auto"/><p id="33aa15e2-9005-807c-bff9-fb757dbedf5f" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8008-934d-e3d87d5281cb" class="" dir="auto">
+</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8067-bfa8-c66042c1fc7f" dir="auto"/><ol type="1" id="33aa15e2-9005-8004-af70-f40d0e6d3ac7" class="numbered-list numbered-list-digits-2" start="14" dir="auto"><li>你正在設計一個資料庫系統，其 workload 特性為「低頻率讀取，但高頻率寫入」。<br/>系統的主要目標是最大化寫入吞吐量，並允許較高的 read amplification 與 space overhead。<p id="0955fe46-667a-4eab-93fe-7be787d1f996" class="" dir="auto">在以下四種設計選擇中，請判斷哪一個最適合此情境。</p><blockquote id="33aa15e2-9005-807f-ad1f-ecf5c183cd23" class="" dir="auto"><ol type="1" id="33aa15e2-9005-805d-83e4-dd466816cc0b" class="numbered-list" start="1" dir="auto"><li>使用 LSM Tree 搭配 Tiered Compaction，可降低 write amplification 並提升高頻寫入效能。</li></ol><ol type="1" id="33da15e2-9005-8078-bc39-f6ff3a99021b" class="numbered-list" start="2" dir="auto"><li>使用 LSM Tree 搭配 Leveled Compaction，可在維持低 write amplification 的同時提供穩定讀取效能。</li></ol><ol type="1" id="33da15e2-9005-80e8-bf67-fbd3b8894fbe" class="numbered-list" start="3" dir="auto"><li>使用 LSM Tree 但不進行 compaction，讓 SSTable 持續累積以完全避免 write amplification。</li></ol><ol type="1" id="33da15e2-9005-801f-86c4-c6ebdb9a840c" class="numbered-list" start="4" dir="auto"><li>使用 B+ Tree，因其結構穩定且不需要額外背景維護機制，能有效支援高頻寫入。</li></ol></blockquote><details id="33aa15e2-9005-80b0-be24-de1f2a504e70" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8003-82a7-cbef3eefb1ca" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80e2-ae39-f2d7e6b7d1ad" class="" dir="auto">
+</p><hr id="33aa15e2-9005-80e0-9def-d28c03a0e0c0" dir="auto"/><p id="33aa15e2-9005-8085-bf9a-d79278d52329" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8084-9437-fa6c8b897093" class="" dir="auto">
+</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80f1-854d-c3b3ce6d1cc1" dir="auto"/><ol type="1" id="33aa15e2-9005-8025-93a4-cd715e1db294" class="numbered-list numbered-list-digits-2" start="15" dir="auto"><li>對 LSM-tree 資料庫發出大量刪除指令後，磁碟可用空間不但沒有立即釋放，反而出現暫時減少的現象。<br/>下列哪一項機制是造成此現象的主因？<blockquote id="33aa15e2-9005-80de-9a3f-d9c8debaa780" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8035-a3c9-e3386cdf78c2" class="numbered-list" start="1" dir="auto"><li>系統將刪除視為新寫入，會向 memTable 寫入 tombstone ，實體空間需待未來 compaction 時才釋放。</li></ol><ol type="1" id="33da15e2-9005-80c7-b1ef-deae10548930" class="numbered-list" start="2" dir="auto"><li>系統會尋找並修改 WAL ，將該資料的歷史寫入紀錄刪除，過程將暫時佔用額外空間。</li></ol><ol type="1" id="33da15e2-9005-805c-b371-eafc5419f496" class="numbered-list" start="3" dir="auto"><li>收到刪除指令立刻做 compaction ，並重寫相關的 SSTable ，重寫期間需要額外緩衝空間完成。</li></ol><ol type="1" id="33da15e2-9005-8070-a884-d9713c4077e9" class="numbered-list" start="4" dir="auto"><li>系統會更新各層的 bloom filter ，將該資料對應的 bit 設為 0 ，這個操作會佔用到新的空間。</li></ol></blockquote><details id="33aa15e2-9005-809c-be1d-d517f52e4b79" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-800b-b46c-eef43bd7cd0f" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80ab-a7c3-d68e11f54315" class="" dir="auto">
+</p><hr id="33aa15e2-9005-80b2-a0e4-f44ba93b42b8" dir="auto"/><p id="33aa15e2-9005-8021-95e6-f69225c4df38" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-801a-9d3c-d83829d17c01" class="" dir="auto">
+</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80e5-97ee-da5f8a1c84a5" dir="auto"/><ol type="1" id="33aa15e2-9005-8066-9dfb-e1cc15e1b0c0" class="numbered-list numbered-list-digits-2" start="16" dir="auto"><li>假設一個 LSM-Tree 儲存引擎為了追求極高的 write throughput ，選擇採用 tiered compaction 而非 leveled compaction 。在資料量持續增長且有大量更新的操作下，關於此系統的表現，下列哪一個推論最為合理？<blockquote id="33aa15e2-9005-80dc-962f-f6cc3f52d8fe" class="" dir="auto"><ol type="1" id="33aa15e2-9005-807d-8362-fe8d8133b64f" class="numbered-list" start="1" dir="auto"><li>由於每一層內部允許存在多個 key 範圍重疊的 SSTables ，這會導致顯著的 space amplification。</li></ol><ol type="1" id="33da15e2-9005-8058-90ec-d1846af23e17" class="numbered-list" start="2" dir="auto"><li>系統的 write amplification 會比採用 leveled compaction 時更高，因為每層都有多個重複的 key 需要頻繁合併。</li></ol><ol type="1" id="33da15e2-9005-802e-8fc5-ce4d09c186ce" class="numbered-list" start="3" dir="auto"><li>執行 point query 時的效能會得到提升，因為系統只需要檢查每一層中最新的一個 SSTable 即可確定資料是否存在。</li></ol><ol type="1" id="33da15e2-9005-80ef-b295-c8fcf7edb214" class="numbered-list" start="4" dir="auto"><li>這種設計可以確保每一層的資料都是 globally sorted ，因此在收集特定資料範圍時不需要使用 priority queue 進行合併輸出。</li></ol></blockquote><details id="33aa15e2-9005-8084-be61-c3dec13f3ef4" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8044-8d14-e818fd47b068" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8060-8492-edafbab95271" class="" dir="auto">
+</p><hr id="33aa15e2-9005-8090-af9c-e3623ca77ce7" dir="auto"/><p id="33aa15e2-9005-8017-9f61-de30a5d1975b" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8071-b317-e692f0113042" class="" dir="auto">
+</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80bb-9d47-c783bf4b5185" dir="auto"/><ol type="1" id="33aa15e2-9005-8090-9912-dd6498529387" class="numbered-list numbered-list-digits-2" start="17" dir="auto"><li>一棵LSM-tree 的相鄰層級大小比(size ratio) 為T=10。 Level 0 (記憶體內緩衝區) 為64 MB, 並使用分層壓縮(leveled compaction)。在最壞情況下, 一筆最初寫入內存表(memtable) 並最終到達Level 3 的鍵值對(key-value pair), 其寫入放大(write amplification)是多少?<blockquote id="33aa15e2-9005-8050-8f78-eb4209aa776c" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8098-a05b-de3bf046bdea" class="numbered-list" start="1" dir="auto"><li>T×L=10×3=30</li></ol><ol type="1" id="33da15e2-9005-80a2-b019-e9c783ee09cc" class="numbered-list" start="2" dir="auto"><li><span data-notion-inline-equation="T^L" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8413em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">L</span></span></span></span></span></span></span></span></span></span></span></span>=<span data-notion-inline-equation="10^3" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span></span></span></span></span>=1000</li></ol><ol type="1" id="33da15e2-9005-8011-b784-dd22de574f8b" class="numbered-list" start="3" dir="auto"><li>L=3</li></ol><ol type="1" id="33da15e2-9005-80fc-b3fa-f9bd8e8ceb91" class="numbered-list" start="4" dir="auto"><li>T+L=10+3=13</li></ol></blockquote><details id="33aa15e2-9005-80df-b343-cfef1c806b2f" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80fe-b900-e9d4a6ced861" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80dc-8035-eaf7934c899e" class="" dir="auto">
+</p><hr id="33aa15e2-9005-80ef-8521-f03419cb53bc" dir="auto"/><p id="33aa15e2-9005-8056-a3fa-cc899d7efb1e" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8095-b57e-d71102e7d599" class="" dir="auto">
+</p></div></p></div></aside></div></details></li></ol></div></details></div></details></div></div><hr id="33aa15e2-9005-80f6-9ae5-cc1d20621b7e" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8014-aa1e-ffcd193e64d1" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8039-8850-d3a64413b159" class="" dir="auto">
+</p></div></aside></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

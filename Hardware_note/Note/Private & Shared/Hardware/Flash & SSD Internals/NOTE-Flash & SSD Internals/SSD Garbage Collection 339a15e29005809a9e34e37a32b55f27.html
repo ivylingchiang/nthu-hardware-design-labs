@@ -1,0 +1,771 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>SSD Garbage Collection</title><meta name="data-notion-page-icon" content="🧱"/><link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2290%22%3E%F0%9F%A7%B1%3C%2Ftext%3E%3C%2Fsvg%3E"/><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+/* Override strong tags inside headings to maintain consistent weight */
+h1 strong,
+h2 strong,
+h3 strong {
+	font-weight: 600;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 10px;
+	padding: 1rem;
+}
+
+/* For default-background callouts, render the border outline. */
+.callout.block-color-default_background {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+figure,
+aside,
+details {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+
+	table.collection-content {
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	table.collection-content th,
+	table.collection-content td {
+		overflow-wrap: anywhere;
+	}
+
+	table.collection-content td > .user,
+	table.collection-content td > time {
+		white-space: pre-wrap;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content-wrapper {
+	overflow-x: auto;
+}
+
+@media only print {
+	.collection-content-wrapper {
+		overflow-x: visible;
+	}
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.collection-content td {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.column-list {
+	display: flex;
+	gap: 46px;
+}
+
+.column {
+	min-width: 0;
+	overflow: hidden;
+}
+
+.column > *:first-child {
+	margin-top: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding-inline: 0.125rem;
+	padding-block: 0.375rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+table {
+	border-collapse: collapse;
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol.numbered-list.numbered-list-digits-2 {
+	padding-inline-start: 2em;
+}
+
+ol.numbered-list.numbered-list-digits-3plus {
+	padding-inline-start: 2.4em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+/*
+ * Render emoji icons using a ::before pseudo-element to keep the glyph
+ * out of the DOM textContent traversal. This avoids double-rendering icons
+ * in callouts and page titles.
+ * NOTE(slim/html-export-pseudo-icons): I can't tagref this because it will
+ * flag as a duplicate tag after codegen.
+ */
+.icon[data-emoji]::before {
+	content: attr(data-emoji);
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.callout img.notion-static-icon {
+	width: 1em;
+	height: 1em;
+}
+
+.callout p {
+	margin: 0;
+}
+
+.callout h1,
+.callout h2,
+.callout h3 {
+	margin: 0 0 0.6rem;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	margin-right: 0.4em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+blockquote.quote-large {
+	font-size: 1.25em;
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.tab {
+	margin: 1.25em 0;
+	padding-inline: 1rem;
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.highlight-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.highlight-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.highlight-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.highlight-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.highlight-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.highlight-default_background {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray_background {
+	background: rgba(42, 28, 0, 0.07);
+}
+.highlight-brown_background {
+	background: rgba(139, 46, 0, 0.086);
+}
+.highlight-orange_background {
+	background: rgba(224, 101, 1, 0.129);
+}
+.highlight-yellow_background {
+	background: rgba(211, 168, 0, 0.137);
+}
+.highlight-teal_background {
+	background: rgba(0, 100, 45, 0.09);
+}
+.highlight-blue_background {
+	background: rgba(0, 124, 215, 0.094);
+}
+.highlight-purple_background {
+	background: rgba(102, 0, 178, 0.078);
+}
+.highlight-pink_background {
+	background: rgba(197, 0, 93, 0.086);
+}
+.highlight-red_background {
+	background: rgba(223, 22, 0, 0.094);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.block-color-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.block-color-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.block-color-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.block-color-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.block-color-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(240, 239, 237, 1);
+}
+.block-color-brown_background {
+	background: rgba(245, 237, 233, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 235, 222, 1);
+}
+.block-color-yellow_background {
+	background: rgba(249, 243, 220, 1);
+}
+.block-color-teal_background {
+	background: rgba(232, 241, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(229, 242, 252, 1);
+}
+.block-color-purple_background {
+	background: rgba(243, 235, 249, 1);
+}
+.block-color-pink_background {
+	background: rgba(250, 233, 241, 1);
+}
+.block-color-red_background {
+	background: rgba(252, 233, 231, 1);
+}
+.select-value-color-default { background-color: rgba(42, 28, 0, 0.07); }
+.select-value-color-gray { background-color: rgba(28, 19, 1, 0.11); }
+.select-value-color-brown { background-color: rgba(127, 51, 0, 0.156); }
+.select-value-color-orange { background-color: rgba(196, 88, 0, 0.203); }
+.select-value-color-yellow { background-color: rgba(209, 156, 0, 0.282); }
+.select-value-color-green { background-color: rgba(0, 96, 38, 0.156); }
+.select-value-color-blue { background-color: rgba(0, 118, 217, 0.203); }
+.select-value-color-purple { background-color: rgba(92, 0, 163, 0.141); }
+.select-value-color-pink { background-color: rgba(183, 0, 78, 0.152); }
+.select-value-color-red { background-color: rgba(206, 24, 0, 0.164); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style><style>@import url('https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex-swap.min.css')</style></head><body><article id="339a15e2-9005-809a-9e34-e37a32b55f27" class="page serif" data-notion-page-icon="🧱"><header><img class="page-cover-image" src="https://app.notion.com/images/page-cover/met_william_morris_1877_willow.jpg" style="object-position:center 90%"/><div class="page-header-icon page-header-icon-with-cover"><span class="icon" data-emoji="🧱"></span></div><h1 class="page-title" dir="auto"><mark class="highlight-blue" data-notion-highlight="blue">SSD Garbage Collection</mark></h1><p class="page-description" dir="auto"></p><table class="properties"><tbody></tbody></table></header><div class="page-body"><div id="339a15e2-9005-8035-a786-c1cfa24a5df8" class="column-list" data-notion-column-list="" dir="auto"><div id="339a15e2-9005-800c-bcbb-d5a7b0afbfa9" style="width:18.75%" class="column" data-notion-column-ratio="0.1875" dir="auto"><hr id="339a15e2-9005-8036-b224-c94eebf9e0d7" dir="auto"/><figure id="339a15e2-9005-8054-86dc-d09c9b55987c" class="image" data-notion-image="Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg" dir="ltr"><a href="Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg"><img style="width:548.375px" src="Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg"/></a></figure><p id="339a15e2-9005-808c-aa0c-d5259faf1b37" class="" dir="auto">
+</p></div><div id="339a15e2-9005-8093-9e70-c84f6ac24480" style="width:81.25%" class="column" data-notion-column-ratio="0.8125" dir="auto"><h3 id="339a15e2-9005-804d-94b6-d7ea82db5fc3" class="" dir="auto">SSD Garbage Collection</h3><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8015-bf73-f34b98d9c204" dir="ltr"><div style="width:100%"><p id="1db4ced5-0886-4714-9038-f279d1b1cbd6" class="" dir="auto">你可能有過這種經驗：一邊工作一邊用 Steam 裝遊戲，寫入大量資料的時候，系統突然頓了一下，滑鼠移動不太順，或是正在存檔的程式卡了半秒鐘。那個短暫的卡頓，很可能就是你 SSD 內部的 garbage collection（GC）正在跟你的工作搶頻寬。</p><p id="24af0bcf-c0a4-4bd8-8e1d-f1129db70e68" class="" dir="auto">FTL 的 out-of-place write 策略解決了「不能覆寫」的問題，但製造了一個新問題：隨著寫入持續進行，NAND flash 上會累積越來越多的 invalid page（舊版本的資料），而這些 page 所在的 block 無法直接重新使用，因為一個 block 裡通常同時包含 valid page 和 invalid page。如果不處理，SSD 最終會耗盡所有空白 page 而無法寫入。GC 就是 SSD 韌體中負責回收這些空間的機制，它的設計直接決定了 SSD 的寫入效能、延遲一致性、以及使用壽命。</p></div></aside><blockquote id="339a15e2-9005-8060-b9fb-ced27983c3e8" class="" dir="auto">Reference: <a href="https://industrial.adata.com/tw/technology/Garbage_Collection">垃圾回收 (Garbage Collection)</a></blockquote><hr id="339a15e2-9005-80bb-b3d4-de5c04db80b3" dir="auto"/><details id="339a15e2-9005-8003-8956-ef88a32d946d" open="" class="toggle" dir="auto"><summary><strong>Classification</strong></summary><div class="indented"><p id="339a15e2-9005-8081-99e1-f7c2fbdeb428" class="" dir="auto">
+</p><hr id="339a15e2-9005-80a2-b13a-cfc237ea941e" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8093-80fb-e20fe4da2211" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-807b-a925-ecebd0a2c815" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Extra Component</mark></p><hr id="339a15e2-9005-8077-be78-fbaba897ca91" dir="auto"/><p id="339a15e2-9005-807b-a4bd-f5402b21fd2d" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Reference:</mark></p></div></aside><hr id="339a15e2-9005-8067-9c42-c845bc1e258d" dir="auto"/></div></details><details id="339a15e2-9005-807f-b153-d303fee428fe" open="" class="toggle" dir="auto"><summary><strong>Key Word Definition/ Discussion</strong></summary><div class="indented"><details id="339a15e2-9005-80bb-9049-d07829cfdefc" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Garbage collection</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-807a-b71f-d96ef3a6b3b3" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8046-aba3-d02a16a6f5dc" class="" dir="auto">GC 的存在是因為 NAND Flash 的物理特性：&quot;Write by Page, Erase by Block&quot;。</p><p id="4e8d5682-e853-469e-99a8-7a2b064001b6" class="" dir="auto">SSD 控制器用來：</p><blockquote id="7bd87aff-d79a-4a01-9fd1-1974af7d59e1" class="" dir="auto">回收包含無效資料（invalid pages）的 block，重新變成可寫入空間的機制</blockquote></div></aside><hr id="339a15e2-9005-807e-b8a4-efb5dbec2906" dir="auto"/><h3 id="c350d8fa-b2e8-49ba-9049-eddda2170c46" class="" dir="auto"><strong>GC 的基本流程</strong></h3><p id="e5825efc-055b-466d-aeb8-a33fcfea0034" class="" dir="auto">GC 的運作可以分成三個步驟：</p><ol type="1" id="f66a92cd-af21-44b7-a7d6-8a6ad6d99e21" class="numbered-list" start="1" dir="auto"><li><strong>選擇 victim block</strong>：從所有包含 invalid page 的 block 中，依據某種策略選出一個 block 來回收。</li></ol><ol type="1" id="c7b5b173-f8d2-4ef4-b4f0-c85169db5bcf" class="numbered-list" start="2" dir="auto"><li><strong>搬移 valid page</strong>：把 victim block 中仍然有效的 page 讀出來，寫到其他有空白 page 的 block 中，同時更新 FTL mapping table。</li></ol><ol type="1" id="06e4bcae-5ed3-4ddd-b28e-85c51705e7bc" class="numbered-list" start="3" dir="auto"><li><strong>抹除 victim block</strong>：整個 block erase，變成可以重新寫入的 free block。</li></ol><figure id="339a15e2-9005-8020-b278-f394040816f8" class="image" data-notion-image="SSD%20Garbage%20Collection/6a3b50f5-8330-404e-8d82-d30e48c69f69.png" dir="ltr"><a href="SSD%20Garbage%20Collection/6a3b50f5-8330-404e-8d82-d30e48c69f69.png"><img style="width:612.9729729729729px" src="SSD%20Garbage%20Collection/6a3b50f5-8330-404e-8d82-d30e48c69f69.png"/></a></figure><p id="f775e2c4-8c0a-4465-a115-eaaf016a357e" class="" dir="auto">這裡的核心開銷在步驟 2：搬移 valid page。每搬移一個 page 就需要一次 read 和一次 write，而這些 read/write 與使用者的 I/O 共享 NAND flash 的頻寬。如果一個 block 裡有 200 個 valid page（總共 256 個），那回收這個 block 需要 200 次額外的 read + write，但只換來 256 個空白 page。效率不高。反之，如果一個 block 裡只有 10 個 valid page，那只需 10 次搬移就能換來 256 個空白 page，效率很好。</p><p id="621ecc83-10bb-459e-8e12-a8a6259c1a6e" class="" dir="auto">這就引出了 victim block selection 的策略問題。</p><hr id="339a15e2-9005-80a1-a337-d6e235766898" dir="auto"/><p id="339a15e2-9005-80cd-81c3-cafb254f4f53" class="" dir="auto"><strong>Write Amplification Factor (WAF)</strong><div class="indented"><p id="55b73b2e-a393-4099-907a-2e98ad1f9d98" class="" dir="auto">頻繁搬移資料會導致 SSD 實際寫入的資料量大於 Host 端要求的資料量，這就是所謂的「寫入放大」現象。</p><figure id="ca4daddd-1b10-40d1-91ef-fa489fec37b3" class="equation" data-notion-equation="	WAF = \frac{\text{Actual Write to Flash}}{\text{Host Write Request}}" dir="auto"><style>@import url('https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex-swap.min.css')</style><div class="equation-container"><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.13889em;">F</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.2519em;vertical-align:-0.8804em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">Host Write Request</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">Actual Write to Flash</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8804em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></div></figure><blockquote id="5188889d-3363-4af3-a6f7-7bf2a3b1b937" class="" dir="auto"><p id="06413c2b-19ae-4db4-bae4-7a8d45fbf411" class="" dir="auto"><strong>關鍵結論：</strong> 當 SSD 空間越滿，回收效率越差，寫入放大越嚴重。</p></blockquote><p id="bb7e7d2d-b677-47ba-8a17-c6cd99b17a72" class="" dir="auto">假設 Block 的有效資料比例為u (utilization)，則回收該 Block 的理論寫入放大倍率為：WAF <span data-notion-inline-equation="\approx \frac{1}{1-u}" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4831em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.2484em;vertical-align:-0.4033em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mbin mtight">−</span><span class="mord mathnormal mtight">u</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.4033em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p></div></p><hr id="339a15e2-9005-80c4-a989-fedfcd191d5c" dir="auto"/><p id="ccb3adab-559d-4498-bebc-a998d6c69025" class="" dir="auto"><strong>數據關係對照：</strong><div class="indented"><table id="cee6f6a4-cb16-4f73-bf1e-f93161ef0530" class="simple-table" dir="ltr"><tbody><tr id="c2f65f70-8af1-4de6-adca-cae172bd54d7" dir="ltr"><td id="^dLZ" class="" style="width:246.8000030517578px"><strong>有效資料比例 (u)</strong></td><td id="ydgs" class="" style="width:205px"><strong>理論 WAF 值</strong></td><td id="Ny]_" class="" style="width:374.0375061035156px"><strong>說明</strong></td></tr><tr id="96efad3f-3377-495b-a17a-c08e2144b661" dir="ltr"><td id="^dLZ" class="" style="width:246.8000030517578px">20% </td><td id="ydgs" class="" style="width:205px">$1.25$</td><td id="Ny]_" class="" style="width:374.0375061035156px">空間充足，回收效率極高</td></tr><tr id="2fd05c3d-67f9-46f8-8832-67709eebebd0" dir="ltr"><td id="^dLZ" class="" style="width:246.8000030517578px">50%</td><td id="ydgs" class="" style="width:205px">$2.0$</td><td id="Ny]_" class="" style="width:374.0375061035156px">寫入量翻倍</td></tr><tr id="fbbf8d8b-1a95-46b9-b74f-3a9b1a1c3891" dir="ltr"><td id="^dLZ" class="" style="width:246.8000030517578px">80% </td><td id="ydgs" class="" style="width:205px">$5.0$</td><td id="Ny]_" class="" style="width:374.0375061035156px">寫入量放大 5 倍，效能大幅下降</td></tr><tr id="cdc5ec5a-9967-4e53-9506-553186227a87" dir="ltr"><td id="^dLZ" class="" style="width:246.8000030517578px">95%</td><td id="ydgs" class="" style="width:205px">$20.0$</td><td id="Ny]_" class="" style="width:374.0375061035156px">嚴重寫入放大，壽命損耗極快</td></tr></tbody></table></div></p><hr id="0c25f4a7-669e-4b8e-bf9b-911452134a1f" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80de-aaf6-c3511d1cabc5" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80e2-9c47-c9b1c98847be" class="" dir="auto">Reference: </p></div></aside><hr id="339a15e2-9005-807d-9e61-d131986be87f" dir="auto"/></div></details><details id="339a15e2-9005-803b-b044-e7d9d3cb398b" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Invalid page vs Valid page</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80d3-95a0-e3d9ba0c4bcd" dir="ltr"><div style="width:100%"><p id="13d05238-4929-470d-a10f-234a8999126c" class="" dir="auto"><strong>Valid page</strong>：目前 mapping table 指向的最新資料</p><p id="f2e3bbcf-991d-4c12-aac4-083eea2e1e12" class="" dir="auto"><strong>Invalid page</strong>：舊資料（已被更新覆蓋，但還在 flash 裡）</p></div></aside><hr id="339a15e2-9005-80a1-974b-df6f9e611d63" dir="auto"/><p id="95205ed5-8bc8-470e-a1f3-5df9a19bd235" class="" dir="auto">每個 page 有 metadata：</p><ul id="08c6ac9c-29d9-45f0-a4e7-a5287b927af6" class="bulleted-list" dir="auto"><li style="list-style-type:disc">valid bit</li></ul><ul id="d01ed79c-c7b9-493f-bcd1-cfa51e5942fb" class="bulleted-list" dir="auto"><li style="list-style-type:disc">LBA mapping info</li></ul><p id="233c7d3c-5529-4c49-bcb9-e1ce5dc4cdc9" class="" dir="auto">Controller 透過這些來判斷 page 狀態</p><hr id="339a15e2-9005-80b4-a500-df92d4cebd6f" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8084-8871-ca363d8a0cac" dir="ltr"><div style="width:100%"><p id="7a501fdb-5a27-4833-a636-134cba50a694" class="" dir="auto">作業系統在刪除檔案時，只會移除檔案系統的目錄指標，不會主動通知 SSD。這會導致 SSD 誤認這些垃圾資料為Valid Page，在 GC 時盲目搬移，造成嚴重的效能浪費。</p><p id="aa16cb1c-c0f0-4d76-b8ed-f86419b2842a" class="" dir="auto"><strong>解法</strong>：OS 必須支援並發送<strong>TRIM 指令</strong>，明確告知 SSD 哪些 LBA (Logical Block Address) 的資料已刪除，讓 SSD 標記為Invalid Page。</p></div></aside><hr id="339a15e2-9005-80d6-9b4f-d2e28338c5eb" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80ce-84af-c21bdb0a42cd" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8096-8248-c7b10613c5c2" class="" dir="auto">Reference: </p></div></aside><hr id="339a15e2-9005-8019-b036-eb33f5013831" dir="auto"/></div></details><details id="339a15e2-9005-804a-9d0d-fd15eb9fe8e4" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Greedy policy vs Cost-benefit policy</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8033-acad-f074a24dda1b" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-809f-940b-c88e71daed9b" class="" dir="auto"><mark class="highlight-default" data-notion-highlight="default">Greedy policy: 選 invalid page 最多的 block</mark></p><p id="339a15e2-9005-8055-95f3-fd092afbd576" class="" dir="auto"><mark class="highlight-default" data-notion-highlight="default">Cost-benefit policy: 同時考慮utilization（使用率）&amp; age（資料年齡）</mark></p></div></aside><hr id="339a15e2-9005-8070-b8ca-c402feca4d1f" dir="auto"/><p id="c06f6ad1-e4d5-4774-b5e7-727e4a9016e8" class="" dir="auto"><strong>Greedy policy</strong> 是最直覺的策略：<div class="indented"><p id="339a15e2-9005-8027-a009-c3e271c6906e" class="" dir="auto">挑選 invalid page 數量最多的 block 作為 victim。邏輯很簡單，invalid page 越多代表需要搬移的 valid page 越少，回收的成本最低、效率最高。</p><p id="3b704ab4-3aa9-486d-bcd3-124f9ad87f20" class="" dir="auto">Greedy 在大多數情況下表現不差，但它有一個盲點：它不考慮資料的「年齡」。假設有兩個 block：</p><ul id="7fbeed74-96e0-4722-a701-39c0ac6ed84f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Block A：50% invalid page，但 valid page 裡的資料是「冷資料」（很久沒被更新）</li></ul><ul id="3ce1ad5e-6e49-49c5-81e8-9cdead1f001f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Block B：60% invalid page，但 valid page 裡的資料是「熱資料」（頻繁被更新）</li></ul><p id="1a30edd6-ff6c-48bd-a0c5-88c16842adc6" class="" dir="auto">Greedy 會選 Block B（invalid 比例高）。但 Block B 的 valid page 很快就會被更新而變成 invalid，如果我們等一下，Block B 可能自然地累積更多 invalid page，到時候回收成本更低。相比之下，Block A 的冷資料可能永遠不會被更新，如果不主動回收，這些 valid page 會一直霸佔空間。</p></div></p><hr id="339a15e2-9005-8041-9ce1-da6c07f5a951" dir="auto"/><p id="339a15e2-9005-80a3-aa70-c1552d7e3dc3" class="" dir="auto"><strong>Cost-benefit policy</strong> 就是考慮這個因素的策略。<div class="indented"><p id="339a15e2-9005-807a-a6dc-f8739abe7cfe" class="" dir="auto">它的選擇公式大致是：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="339a15e2-9005-8051-ac87-f1d1c0789079" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">benefit = (1 - utilization) * age / (2 * utilization)</code></pre><p id="339a15e2-9005-8013-bc78-c029dbd52110" class="" dir="auto">其中 utilization 是 block 中 valid page 的比例，age 是 block 中資料的平均年齡（距離上次被寫入的時間）。這個公式傾向選擇那些「utilization 低且資料老舊」的 block，因為老舊資料不太可能自己變成 invalid，不主動清理就會一直浪費空間。</p></div></p><hr id="339a15e2-9005-8086-bc4b-e387adc485bf" dir="auto"/><figure id="339a15e2-9005-80a0-b9a8-d5eee3dbf07b" class="image" data-notion-image="SSD%20Garbage%20Collection/54683299-f34f-4566-b670-f728a03c0856.png" dir="ltr"><a href="SSD%20Garbage%20Collection/54683299-f34f-4566-b670-f728a03c0856.png"><img style="width:515.5297532656023px" src="SSD%20Garbage%20Collection/54683299-f34f-4566-b670-f728a03c0856.png"/></a></figure><p id="339a15e2-9005-8032-a69c-f3706bfaee72" class="" dir="auto">實務上，許多 SSD 使用 greedy 的變種或更複雜的 heuristic，因為 cost-benefit 需要追蹤每個 block 的年齡資訊，增加了實作複雜度。</p><hr id="339a15e2-9005-80ed-b165-c8105dbf18e8" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-804f-afd5-d8634822bf4d" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-804a-8568-cde2ebb2dba7" class="" dir="auto">Reference: </p></div></aside><hr id="339a15e2-9005-80bb-bb29-f651bd9d9c5c" dir="auto"/></div></details><details id="339a15e2-9005-80ec-80f6-e27548d0cf11" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Over-provisioning</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80a7-a894-cc67bdddf4b8" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80ef-8417-df80babde069" class="" dir="auto">給 GC 留的緩衝空間</p></div></aside><hr id="339a15e2-9005-8054-bc4a-da0c08b0f5b8" dir="auto"/><p id="b8fa07e9-d006-464d-a1a8-a619261492b8" class="" dir="auto">SSD 的實際 NAND flash 容量比使用者看到的容量大。例如一顆標示為 1 TB 的 SSD，內部可能有 1.12 TB 的 NAND flash。多出來的 12% 就是 <strong>over-provisioning</strong>（OP），使用者無法存取這些空間。</p><p id="180865d8-6006-46be-9304-8c0db17f1d50" class="" dir="auto">OP 的主要用途就是讓 GC 有足夠的「週轉空間」。想像一個類比：你有一個書架，所有格子都塞滿了書。如果你想整理某一格（把不要的書丟掉），你需要一個暫時放書的地方。如果書架完全滿了，連一個暫放的空間都沒有，整理就無法進行。OP 就是那個暫放空間。</p><div id="339a15e2-9005-80d9-870d-c57214544b10" class="column-list" data-notion-column-list="" dir="auto"><div id="339a15e2-9005-804a-a9da-c8428f639ced" style="width:43.75%" class="column" data-notion-column-ratio="0.4375" dir="auto"><table id="60c613a1-1b4c-47cf-b063-75e963191c27" class="simple-table" dir="ltr"><thead class="simple-table-header"><tr id="12b46fe4-abef-4f66-ba02-2a19ba7dc6bf" dir="ltr"><th id="{W?R" class="simple-table-header-color simple-table-header" style="width:205px">類型</th><th id="Ngr=" class="simple-table-header-color simple-table-header" style="width:154px">OP</th></tr></thead><tbody><tr id="13a785e0-c7e0-456d-894c-072ae10bb754" dir="ltr"><td id="{W?R" class="" style="width:205px">Consumer SSD</td><td id="Ngr=" class="" style="width:154px">~7%</td></tr><tr id="708da3e7-e312-441f-8bac-e2dfd443361a" dir="ltr"><td id="{W?R" class="" style="width:205px">Enterprise SSD</td><td id="Ngr=" class="" style="width:154px">~28%</td></tr></tbody></table><p id="339a15e2-9005-80d3-9e37-c5e9a631a51d" class="" dir="auto">
+</p></div><div id="339a15e2-9005-809e-b9ee-eb327fa9d53a" style="width:56.25%" class="column" data-notion-column-ratio="0.5625" dir="auto"><table id="d950af44-410e-496b-a9f2-de45ca96cb41" class="simple-table" dir="ltr"><thead class="simple-table-header"><tr id="ff0a8748-0243-4a38-82e1-bc7b9c5907c9" dir="ltr"><th id="V;r?" class="simple-table-header-color simple-table-header" style="width:214px">OP 高</th><th id="IAFr" class="simple-table-header-color simple-table-header" style="width:205px">OP 低</th></tr></thead><tbody><tr id="5cecbe8a-ebd8-4afa-8222-84211726ad73" dir="ltr"><td id="V;r?" class="" style="width:214px">GC 輕鬆</td><td id="IAFr" class="" style="width:205px">GC 緊急</td></tr><tr id="aee12900-4e83-4a34-bf52-9804a690eed1" dir="ltr"><td id="V;r?" class="" style="width:214px">WA 低</td><td id="IAFr" class="" style="width:205px">WA 高</td></tr><tr id="e0da9f86-fd8e-4d1c-bb77-2929783baef3" dir="ltr"><td id="V;r?" class="" style="width:214px">latency 穩定</td><td id="IAFr" class="" style="width:205px">latency 波動</td></tr></tbody></table></div></div><hr id="339a15e2-9005-80a3-b535-f5b327140608" dir="auto"/><figure id="339a15e2-9005-8072-b356-e4e2959e6cf3" class="image" data-notion-image="SSD%20Garbage%20Collection/d93a9550-f0c1-4e72-a285-1d15d2eca1d6.png" dir="ltr"><a href="SSD%20Garbage%20Collection/d93a9550-f0c1-4e72-a285-1d15d2eca1d6.png"><img style="width:420.8114558472554px" src="SSD%20Garbage%20Collection/d93a9550-f0c1-4e72-a285-1d15d2eca1d6.png"/></a></figure><hr id="339a15e2-9005-804d-88d4-d6257ce65cb5" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80bb-9fcb-ddafde1bebfb" dir="ltr"><div style="width:100%"><p id="f3c30e10-244e-43f8-afaf-cbdc536c91d3" class="" dir="auto">OP 比例直接影響 GC 的效率：</p><ul id="2c30e039-e3f8-4fb0-b22a-15829165c568" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>OP 越高</strong>：free block 越多，GC 不需要在空間極度緊張時才運作，可以從容地選擇最佳 victim block。搬移的 valid page 比例較低，write amplification 較小。</li></ul><ul id="069d351d-1032-468d-8519-2e74340f22f5" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>OP 越低</strong>：free block 稀缺，GC 經常在「快沒空間了」的緊急狀態下運作，被迫選擇 valid page 比例較高的 block 來回收，write amplification 增加。</li></ul><p id="13710e9f-12e4-4515-893b-91dfdd5b9625" class="" dir="auto">企業級 SSD 的 OP 通常為 28%（標示 800 GB 但內部有 1024 GB NAND），而消費級 SSD 通常只有 7%（標示 1 TB 但內部有 1074 GB NAND）。這也是企業級 SSD 在持續寫入下效能更穩定的原因之一。這就是為什麼企業級 SSD 比消費級貴好幾倍：你買的不只是更高的耐久度，更是那多出來 20% 的「隱藏容量」帶來的 GC 效率優勢。資料中心為了穩定的 tail latency，願意花三倍的錢買只多了一點 OP 的 SSD。</p><p id="4f0bbaf7-45e7-4ca9-859f-1bb17c9952dc" class="" dir="auto">OP 還有另一個用途：當某些 block 的 P/E cycle 耗盡或出現壞 cell 時，OP 區域的 block 可以作為替換，延長 SSD 的可用壽命。</p></div></aside><hr id="339a15e2-9005-80b8-9ffa-e7fd3b5d2cdf" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8001-85f1-c1040fa4c706" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-802b-b104-ea57686c74f5" class="" dir="auto">Reference: </p></div></aside><hr id="339a15e2-9005-80f1-8b89-dc1cd3dc2fdb" dir="auto"/></div></details><details id="339a15e2-9005-8047-a753-f3d7678a8b5d" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Wear leveling</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80c0-85ac-e45686b862dc" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8027-b981-c4cb3fff3388" class="" dir="auto">平衡 P/E cycle 使用</p></div></aside><hr id="339a15e2-9005-80ba-8f4a-c801f59b1cda" dir="auto"/><p id="717513fb-642f-403e-99fe-c1f476b91e59" class="" dir="auto">每個 block 的 P/E cycle 有上限（例如 TLC 約 3,000 次）。如果某些 block 被頻繁地 erase 而其他 block 幾乎不動，那些高使用率的 block 會先壞掉。即使其他 block 還很健康，SSD 的有效容量也會因為壞 block 的累積而縮小，最終影響可靠性。</p><p id="45e5e0fc-57a1-4ae5-9a85-8bbf3cf79786" class="" dir="auto"><strong>Wear leveling</strong> 的目標是讓所有 block 的 P/E cycle 使用量盡量平均。這分為兩種策略：</p><p id="0aaf9f3b-4e0d-4173-a898-a7e2e12486be" class="" dir="auto"><strong>Dynamic wear leveling</strong>：在 GC 選擇 victim block 時，優先選擇 P/E cycle 較低的 block 作為搬移目的地。這種方式只影響被 GC 處理過的 block，對於一直存放冷資料而從未被 GC 動過的 block 沒有效果。</p><p id="dd65ec98-7289-4a8a-9a2d-ac2e919d588a" class="" dir="auto"><strong>Static wear leveling</strong>：主動把存放在低 P/E cycle block 上的冷資料搬到高 P/E cycle 的 block 上，然後把低 P/E cycle 的 block 釋放出來給 GC 使用。這樣冷資料不會一直霸佔「年輕」的 block，讓所有 block 的磨損更加均勻。</p><figure id="339a15e2-9005-801f-b0fb-f035d95da1dc" class="image" data-notion-image="SSD%20Garbage%20Collection/image.png" dir="ltr"><a href="SSD%20Garbage%20Collection/image.png"><img style="width:950.25px" src="SSD%20Garbage%20Collection/image.png"/></a></figure><p id="8a0439f7-931a-416b-bc41-de49cf1f6a24" class="" dir="auto">Static wear leveling 的開銷比 dynamic 大（需要額外搬移本來不需要動的資料），但對延長 SSD 整體壽命更有效。實際的 SSD 韌體通常會結合兩種策略，在效能和壽命之間取得平衡。</p><p id="d9bca6dc-2faa-4822-9987-6fef9fd11903" class="" dir="auto">值得注意的是，wear leveling 和 GC 的 victim selection 策略有時會衝突。Greedy GC 想回收 invalid page 最多的 block（效率最高），但 wear leveling 可能要求對低 P/E cycle 的 block 做更多操作。SSD 韌體需要在這些目標之間做適當的權衡。</p><hr id="339a15e2-9005-80fd-b658-d4f85dca5b4d" dir="auto"/><ul id="8190f33f-46d9-49dd-a8fc-2244742cab83" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>GC 的目標</strong>：挑選 Invalid 最多的 Block 來回收，追求「最低的搬移開銷與最高效率」。</li></ul><ul id="6ecc834a-19f2-4058-86eb-4db6f624c800" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>WL 的目標</strong>：挑選 P/E Cycle 最低的 Block 來操作，追求「壽命平均」，這通常意味著要強制搬移有效資料。<br/>兩者在底層邏輯上是互相拉扯的。過度追求 WL 會導致 WAF 暴增（搬移太多非必要資料）；完全偏向 GC 則會使 SSD 提早陣亡。優質的 SSD 韌體必須在這兩個指標間設定動態閾值，取得最佳權衡。</li></ul><hr id="339a15e2-9005-80b5-b868-fe1eff778af8" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8000-a40d-d9dcf011753b" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8038-8fe1-c960711a9958" class="" dir="auto">Reference: </p></div></aside><hr id="339a15e2-9005-8052-802b-dec397453088" dir="auto"/></div></details><details id="339a15e2-9005-801f-bf83-e75ea642d8dc" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Victim selection</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80b7-80ab-d1566654087b" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80bb-bae7-fae7b292ce27" class="" dir="auto">GC 選擇哪個 block 來回收的策略</p></div></aside><hr id="339a15e2-9005-80f0-88c3-f51aab44a1c7" dir="auto"/><div id="339a15e2-9005-8029-bb9b-e65f5c8b9599" class="column-list" data-notion-column-list="" dir="auto"><div id="339a15e2-9005-809f-825c-c20807435e9c" style="width:50%" class="column" data-notion-column-ratio="0.5" dir="auto"><p id="9b7fae9f-6536-4565-a74e-71884bfad70a" class="" dir="auto">選擇時會考慮：</p><ul id="6472cde1-f1b5-4c21-ac76-19614207de2b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">invalid page 數量</li></ul><ul id="093142ba-96dd-4236-870d-2b7e7627e73a" class="bulleted-list" dir="auto"><li style="list-style-type:disc">valid page 數量</li></ul><ul id="bc7417bc-12c0-4e78-bf36-050e613c75ee" class="bulleted-list" dir="auto"><li style="list-style-type:disc">block age</li></ul><ul id="1585912b-71e8-4b44-bc65-8f6629374e1d" class="bulleted-list" dir="auto"><li style="list-style-type:disc">erase count（P/E cycles）</li></ul><ul id="07fa8131-696a-4d5f-b482-82b95d38c1b8" class="bulleted-list" dir="auto"><li style="list-style-type:disc">是否為 hot / cold data</li></ul></div><div id="339a15e2-9005-8070-ae9a-d3b1febf56cc" style="width:50%" class="column" data-notion-column-ratio="0.5" dir="auto"><p id="83587ad7-68c6-4ee0-ac37-6c75ffa3c93d" class="" dir="auto">常見策略：</p><ul id="ba46d63d-b200-48cc-9e82-db2e30bf39fc" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Greedy</li></ul><ul id="1ab15ba8-d8b9-4f2c-ac69-f58481107f27" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Cost-benefit</li></ul><ul id="76c1cec9-fa75-4038-aa29-954a2047366c" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Wear-aware policy（結合 wear leveling）</li></ul></div></div><hr id="339a15e2-9005-8004-a848-e8e288025997" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80f8-96ed-c5dfb97b39ee" dir="ltr"><div style="width:100%"><p id="aa9155d3-3f65-433f-bdd7-dd53b24ee36f" class="" dir="auto">Host Write<br/>↓<br/>Out-of-place write<br/>↓<br/>產生 invalid pages<br/>↓<br/>GC（回收空間）<br/>↓<br/>Victim selection（策略）<br/>↓<br/>搬 valid pages（成本來源）<br/>↓<br/>Erase block<br/>↓<br/>Free space</p></div></aside><hr id="339a15e2-9005-8078-b07e-ff481705e02b" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80a8-aab7-e56f06f4cd8a" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-803d-8211-fb53c566d1e8" class="" dir="auto">Reference: </p></div></aside><hr id="339a15e2-9005-8068-ae63-f417a1f965f5" dir="auto"/></div></details></div></details><details id="339a15e2-9005-80d9-8565-d726f6599889" open="" class="toggle" dir="auto"><summary><strong>Test</strong></summary><div class="indented"><details id="339a15e2-9005-8012-9083-cb6fc1c40add" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Key Concepts</strong></mark></summary><div class="indented"><details id="339a15e2-9005-80fc-ab3d-f62bbcf0c5e7" open="" class="toggle" dir="auto"><summary>理解為什麼 SSD 需要 garbage collection：out-of-place write 導致 invalid page 累積，block 無法直接重新利用</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8025-999b-e439cf776e37" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-804e-928c-c6313343b44f" class="" dir="auto">Answer<div class="indented"><p id="339a15e2-9005-803c-9947-fef452b8ed8a" class="" dir="auto">因為 SSD 採用 out-of-place write，更新資料時舊資料不會被覆寫，而是變成 invalid page，這些空間無法直接重用，因此需要 GC 來回收 block。</p></div></p><hr id="339a15e2-9005-80da-b087-c39d1794afef" dir="auto"/><p id="339a15e2-9005-8007-99f1-e7bf84becc43" class="" dir="auto">Key Concept<div class="indented"><p id="89578ea4-2b31-482e-a527-1687da640f8c" class="" dir="auto">Out-of-place write與 Erase-before-write</p></div></p><hr id="339a15e2-9005-80a8-b981-ed6a3bf26aa6" dir="auto"/><p id="339a15e2-9005-808e-a261-f9d3c72ddc01" class="" dir="auto">Detail<div class="indented"><p id="8da7b508-217f-4a58-bc28-ba4412208c58" class="" dir="auto">當資料要更新時，SSD 不能直接在原位覆蓋，必須將新資料寫在一個新的空白 Page，並將舊 Page 標記為 <strong>Invalid（無效）</strong>。隨著時間推移，Block 會充滿無效 Page，但因為抹除操作必須以整個 Block 為單位，不能單獨抹除一個 Page，所以需要 GC 將多個 Block 中的有效資料搬移、集中，最後將整塊舊 Block 抹除以回收空間。</p></div></p></div></aside><hr id="339a15e2-9005-80d5-9c3e-d54e8042b4b9" dir="auto"/></div></details><details id="339a15e2-9005-805b-ad81-e62960b58787" open="" class="toggle" dir="auto"><summary>理解 GC 的基本流程：選擇 victim block、將 valid page 搬移到其他 block、抹除整個 block 以回收空間</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80cd-b908-f8ce6da64d5c" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8061-bc81-fcbdd05c19d6" class="" dir="auto">Answer<div class="indented"><p id="c4abc9f8-654a-4693-af44-ae288b8e6f0f" class="" dir="auto">挑選受害者（Victim）→ 搬移有效資料（Valid Page Copy）→ 抹除（Erase）</p></div></p><hr id="339a15e2-9005-8038-85e2-e6a0355d0e57" dir="auto"/><p id="339a15e2-9005-807e-8d84-d8dcf09f798e" class="" dir="auto">Key Concept<div class="indented"><p id="339a15e2-9005-80aa-a05e-c86ac8a51727" class="" dir="auto">釋放連續的空白空間</p></div></p><hr id="339a15e2-9005-8066-b9c8-e3729a7f5a8d" dir="auto"/><p id="339a15e2-9005-8072-831f-d8d5abd0128f" class="" dir="auto">Detail<div class="indented"><ol type="1" id="e9fe6e1d-d3f9-4ba7-a4ba-1bc01e975a7a" class="numbered-list" start="1" dir="auto"><li>選擇 Victim Block: 根據演算法（如 Greedy）挑選無效資料最多的 Block。</li></ol><ol type="1" id="8d78fa32-d6eb-4a46-ad70-689a30a83047" class="numbered-list" start="2" dir="auto"><li>Valid Page Move: 將該 Block 內剩餘的有效資料讀出並寫入另一個乾淨的 Block。</li></ol><ol type="1" id="685c76f1-0992-4e49-b4bb-1a9808c6b902" class="numbered-list" start="3" dir="auto"><li>Block Erase: 確定資料遷走後，將整個 Victim Block 抹除，其狀態變回可用空間（Free Block）。</li></ol></div></p></div></aside><hr id="339a15e2-9005-8033-aaaa-cbbe22ede043" dir="auto"/></div></details><details id="339a15e2-9005-804f-8d8a-cbaf3d5db488" open="" class="toggle" dir="auto"><summary>了解 over-provisioning 的用途，知道預留額外空間如何讓 GC 有足夠的緩衝空間運作</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80db-a625-c2a2db9741e7" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8033-8807-cd7ec25c4e7a" class="" dir="auto">Answer<div class="indented"><p id="339a15e2-9005-809a-bfc7-d4353a88802f" class="" dir="auto">提供額外的緩衝空間，減少 GC 頻率並降低寫入放大（WAF）。</p></div></p><hr id="339a15e2-9005-8002-a4e1-d6abd9372a83" dir="auto"/><p id="339a15e2-9005-8074-89e9-f670e505bed8" class="" dir="auto">Key Concept<div class="indented"><p id="339a15e2-9005-805f-9707-cfa3595d6942" class="" dir="auto">Write Amplification</p></div></p><hr id="339a15e2-9005-80d2-8c40-fcd314f1352e" dir="auto"/><p id="339a15e2-9005-8051-814e-cb6215c62e10" class="" dir="auto">Detail<div class="indented"><p id="339a15e2-9005-807b-9c3f-d3cd3f21bbc5" class="" dir="auto">OP 是使用者看不見的預留空間。如果 SSD 塞得太滿，GC 每次能回收的空間極少，卻要搬移大量有效資料，導致效能低落。有了 OP，控制器有更多的「餘裕」來調度，就像大風吹遊戲中多放幾張椅子，讓換位子的過程更順暢。</p></div></p></div></aside><hr id="339a15e2-9005-80e5-9e71-e3f92435371a" dir="auto"/></div></details><details id="339a15e2-9005-80e9-b6ce-f7b3387d7160" open="" class="toggle" dir="auto"><summary>理解 greedy policy 與 cost-benefit policy 在 victim block selection 上的差異與適用情境</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8045-b8b0-f2b9e31a6681" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8032-8323-e01e1099634c" class="" dir="auto">Answer<div class="indented"><p id="339a15e2-9005-8051-93e8-d86880dc850b" class="" dir="auto">Greedy 只看現在誰最空；Cost-benefit 考慮了資料的冷熱（年齡）。</p></div></p><hr id="339a15e2-9005-80b4-b498-f0cc7adf44bd" dir="auto"/><p id="339a15e2-9005-8042-b676-d6afeb130c8c" class="" dir="auto">Key Concept<div class="indented"><p id="339a15e2-9005-80b8-beee-d88fa21c2231" class="" dir="auto"><strong>Data Locality</strong>（資料局部性）與冷熱分離</p></div></p><hr id="339a15e2-9005-808d-a0cc-db3cb205ef10" dir="auto"/><p id="339a15e2-9005-8041-9bf6-c9f8a39f81ac" class="" dir="auto">Detail<div class="indented"><ul id="a71294e2-3456-40b7-9b81-1a1bcf234e93" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Greedy</strong>: 永遠選有效 Page 最少的。缺點是若該 Block 是冷資料，搬移後它可能很久都不會再變動，造成不必要的寫入。</li></ul><ul id="1663b777-4887-436d-82bd-131e1c42d84e" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Cost-benefit</strong>: 公式考慮了 <code>(1-u)*age</code>。如果一個 Block 雖然有效資料多一點點，但它已經放很久了（冷資料），選它回收能讓系統趨於穩定；反之，太年輕（熱資料）的 Block 即使很空也不急著收，因為它可能很快又會產生更多無效 Page。</li></ul></div></p></div></aside><hr id="339a15e2-9005-8048-8969-fb7317b917b9" dir="auto"/></div></details><details id="339a15e2-9005-8053-b0f3-eae0b5beb476" open="" class="toggle" dir="auto"><summary>知道 wear leveling 的目的是讓所有 block 的 P/E cycle 使用量盡量平均，避免部分 block 提早損壞</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8080-afdf-ce470c607783" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8041-8e7d-eaf42ae64cf0" class="" dir="auto">Answer<div class="indented"><p id="339a15e2-9005-80bb-9f5e-dd2e46b11236" class="" dir="auto">平均分配每個 Block 的 P/E cycle，防止特定 Block 過早損壞。</p></div></p><hr id="339a15e2-9005-80cb-8603-c3a4441d4c34" dir="auto"/><p id="339a15e2-9005-80b6-b4a4-c399d330fa81" class="" dir="auto">Key Concept<div class="indented"><p id="339a15e2-9005-80e7-aa64-d295e5602e71" class="" dir="auto">延長 <strong>SSD 壽命（Endurance）</strong></p></div></p><hr id="339a15e2-9005-80b0-a619-ef91bae3d4e1" dir="auto"/><p id="339a15e2-9005-8091-9d6f-fd30407ac235" class="" dir="auto">Detail<div class="indented"><p id="339a15e2-9005-807a-b140-d2c286d75065" class="" dir="auto">NAND Block 有抹寫次數限制。<strong>Dynamic Wear Leveling</strong> 在寫入時選擦拭次數少的 Block；<strong>Static Wear Leveling</strong> 則會主動搬移長期不動的冷資料，把該 Block 騰出來給熱資料使用，確保「長壽」的 Block 也能分擔工作負荷。</p></div></p></div></aside><hr id="339a15e2-9005-8051-89d3-eb76dc6879c5" dir="auto"/></div></details></div></details><details id="339a15e2-9005-80ed-805b-dd8c05a2ff2c" open="" class="toggle" dir="auto"><summary><mark class="highlight-teal" data-notion-highlight="teal"><strong>Test your understanding</strong></mark></summary><div class="indented"><details id="339a15e2-9005-80cd-bbf0-d343f2fa6e3a" open="" class="toggle" dir="auto"><summary>一個 block 有 256 個 page，其中 200 個是 valid。GC 回收這個 block 需要多少次額外的 NAND flash read 和 write 操作？回收後得到多少個空白 page？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-801e-bc30-d0546abf800f" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-806b-9e35-f53a6b737e70" class="" dir="auto">Answer<div class="indented"><p id="339a15e2-9005-809a-9e54-d1d525a4a19b" class="" dir="auto">200 次 Read + 200 次 Write；回收後得到 56 個空白 Page</p></div></p><hr id="339a15e2-9005-80e8-888b-f093a34afeb3" dir="auto"/><p id="339a15e2-9005-8048-9c77-f41180cf858e" class="" dir="auto">Key Concept<div class="indented"><p id="339a15e2-9005-8072-ba2f-e06176dcdf46" class="" dir="auto">Valid Page Copy overhead</p></div></p><hr id="339a15e2-9005-8057-a620-dce93b75a1a4" dir="auto"/><p id="339a15e2-9005-8006-a632-c3c2c8e72073" class="" dir="auto">Detail<div class="indented"><p id="339a15e2-9005-8072-ba4f-c75a25f06cb7" class="" dir="auto">為了回收這一個 Block，必須把那 200 個有效 Page 搬走，這產生了額外的 200 次讀與寫。最終整個 Block 抹除後，我們獲得了 256 個空白 Page，但其中 200 個空間被剛才搬走的資料占用了，淨增加的可用空間僅為 256 - 200 = 56。這也體現了為何有效資料占比高時 GC 效率極低。</p></div></p></div></aside><hr id="339a15e2-9005-805d-bd67-f9cd45c14ce5" dir="auto"/></div></details><details id="339a15e2-9005-8030-8164-e1c1e23384ca" open="" class="toggle" dir="auto"><summary>為什麼 greedy policy 在冷熱資料混合的 workload 下可能不是最佳策略？請用具體的 block 狀態舉例說明 cost-benefit policy 會做出什麼不同的決策。</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80d4-840b-eb4a35b7b8d4" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-805a-985d-e4988a564953" class="" dir="auto">Answer<div class="indented"><p id="339a15e2-9005-806e-a433-e9208888eff9" class="" dir="auto">Greedy 可能會頻繁搬移「即將變為無效」的熱資料，浪費寫入次數。</p></div></p><hr id="339a15e2-9005-808a-8cff-c823623c69bb" dir="auto"/><p id="339a15e2-9005-80ee-8c28-e8b70fd3cf39" class="" dir="auto">Key Concept<div class="indented"><p id="339a15e2-9005-80ea-9d80-fd270fffe892" class="" dir="auto">Write Efficiency</p></div></p><hr id="339a15e2-9005-804d-b95a-d61a19755c52" dir="auto"/><p id="339a15e2-9005-809c-8ac0-de328f9dc768" class="" dir="auto">Detail<div class="indented"><p id="339a15e2-9005-8016-82cf-cea3f99504f9" class="" dir="auto">假設 Block A 有 10 個 valid pages 但資料很熱（馬上會更新），Block B 有 20 個 valid pages 但資料極冷。Greedy 會選 A，搬移 10 頁。但如果等一下，A 的 10 頁可能自己變無效了，根本不用搬。Cost-benefit 會考量年齡，選擇回收 Block B，讓熱資料有更多時間在 A 裡面「自行失效」。</p></div></p></div></aside><hr id="339a15e2-9005-8019-bfb1-e9c049e1c1c5" dir="auto"/></div></details><details id="339a15e2-9005-8040-a286-d6219d355391" open="" class="toggle" dir="auto"><summary>一顆企業級 SSD 有 28% OP，一顆消費級 SSD 有 7% OP。在持續 random write workload 下，哪顆 SSD 的 write amplification 會比較低？為什麼？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80aa-9b1a-ebaa7d8649e4" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8065-aa05-c63dfcda5843" class="" dir="auto">Answer<div class="indented"><p id="339a15e2-9005-8075-9f19-c1968298f4e2" class="" dir="auto">28% OP 的 SSD 寫入放大（WAF）會明顯較低。</p></div></p><hr id="339a15e2-9005-803e-b4f9-ee442b4c8812" dir="auto"/><p id="339a15e2-9005-8040-adb2-efc08e08db1a" class="" dir="auto">Key Concept<div class="indented"><p id="339a15e2-9005-804d-87a2-d5b59c522034" class="" dir="auto">Probability of finding empty blocks</p></div></p><hr id="339a15e2-9005-805b-a5c0-e8fc4dc84175" dir="auto"/><p id="339a15e2-9005-80fc-bed6-c144365a4f8c" class="" dir="auto">Detail<div class="indented"><p id="339a15e2-9005-8018-bee1-c405c94b0990" class="" dir="auto">較大的 OP 意味著 SSD 內部有更多閒置空間。在隨機寫入下，較高的 OP 能確保每個 Block 被挑選為 Victim 時，其有效資料占比（Utilization）平均較低，搬移成本隨之下降，根據公式 WAF 約等於 <span data-notion-inline-equation="1 / (1 - \text{Utilization})" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1/</span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">Utilization</span></span><span class="mclose">)</span></span></span></span></span></p></div></p></div></aside><hr id="339a15e2-9005-804d-abbc-ee0b09f6ebc9" dir="auto"/></div></details><details id="339a15e2-9005-8053-8ced-e17cf7990c3d" open="" class="toggle" dir="auto"><summary>如果一顆 SSD 只使用 dynamic wear leveling 而沒有 static wear leveling，在什麼情境下會出現部分 block 提早耗盡 P/E cycle 的問題？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8007-b039-f4d637a7fbbc" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80d4-8808-cf1bc17f6167" class="" dir="auto">Answer<div class="indented"><p id="339a15e2-9005-806c-9230-e7e4ffb85310" class="" dir="auto">存放在冷資料（如作業系統檔案）的 Block 會一直保持低 P/E cycle，而其他 Block 會提早損耗。</p></div></p><hr id="339a15e2-9005-80f2-a900-c7f5e4967657" dir="auto"/><p id="339a15e2-9005-8016-90b6-d5999a87b079" class="" dir="auto">Key Concept<div class="indented"><p id="e3b9d37d-b8c0-4f08-a709-81d91c41c56e" class="" dir="auto">Static vs. Dynamic leveling</p></div></p><hr id="339a15e2-9005-8099-ab18-efa69e5faad6" dir="auto"/><p id="339a15e2-9005-80e9-a1d0-e587a54caae0" class="" dir="auto">Detail<div class="indented"><p id="339a15e2-9005-808a-966d-c18045b1b1d2" class="" dir="auto">Dynamic 只針對「當前要寫入的資料」選 Block。如果有些資料寫入後幾年不動，占用的 Block 就永遠不會被抹除。這會導致可用的循環 Block 變少，剩下的 Block 必須更頻繁地被抹寫，縮短整體壽命。</p></div></p></div></aside><hr id="339a15e2-9005-80b6-859c-d7b5337c826f" dir="auto"/></div></details><details id="339a15e2-9005-8000-bf2c-d95f86d77b4b" open="" class="toggle" dir="auto"><summary>GC 的 victim selection 和 wear leveling 的目標可能會衝突。請描述一個具體的情境，說明 SSD 韌體在這兩個目標之間需要做什麼取捨。</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-806d-8af7-de6cbac12942" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80a3-8410-c129a167a9fe" class="" dir="auto">Answer<div class="indented"><p id="339a15e2-9005-8003-b848-dd6c654fb70f" class="" dir="auto">GC 想選「最空」的 Block（為了效率）；Wear Leveling 想選「P/E cycle 最少」的 Block（為了壽命）。</p></div></p><hr id="339a15e2-9005-805b-a310-d90bb1b8c010" dir="auto"/><p id="339a15e2-9005-801d-a71e-e1a84eec3994" class="" dir="auto">Key Concept<div class="indented"><p id="339a15e2-9005-80ae-9194-e66359407684" class="" dir="auto">Efficiency vs. Endurance Trade-off</p></div></p><hr id="339a15e2-9005-8029-9398-fb6df2c78107" dir="auto"/><p id="339a15e2-9005-809f-a641-e99ff64c1aea" class="" dir="auto">Detail<div class="indented"><p id="339a15e2-9005-8081-a5fb-de7bb2494b6c" class="" dir="auto">某個 Block 可能包含大量無效資料（GC 的完美目標），但它的 P/E cycle 已經很高了。如果為了效率回收它，會讓它更接近損壞。韌體必須在兩者間取捨，有時為了長遠壽命，會忍痛回收一個有效資料較多、但 P/E cycle 較低的 Block。</p></div></p></div></aside><hr id="339a15e2-9005-8059-bf67-ccb092fc53ac" dir="auto"/></div></details></div></details><details id="339a15e2-9005-80aa-b9e5-cfb858b62f2b" open="" class="toggle" dir="auto"><summary><mark class="highlight-red" data-notion-highlight="red"><strong>Quiz Pool</strong></mark></summary><div class="indented"><ol type="1" id="339a15e2-9005-803a-ac8f-df61a91f707f" class="numbered-list" start="1" dir="auto"><li>假設某 SSD 控制器面臨儲存空間不足，需要在以下兩個 Block 中挑選 garbage collection 的 victim block：<aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-809e-81d5-d16e2ac5b970" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8035-97dc-f434c3095a20" class="" dir="auto">Block X：Valid pages 佔 25%，資料平均年齡為 60 單位。<br/>Block Y：Valid pages 佔 10%，資料平均年齡為 2 單位。</p></div></aside><p id="339a15e2-9005-8090-b238-f6b1242bcc5b" class="" dir="auto">若比較 Greedy policy 與 Cost-benefit policy（benefit = (1 - utilization) * age / (2 * utilization)）在處理此情境時的行為差異與系統影響，這兩種演算法會如何評估與選擇？</p><blockquote id="339a15e2-9005-80de-b643-dc40ddf87368" class="" dir="auto"><ol type="1" id="339a15e2-9005-80c6-8458-efa72f964568" class="numbered-list" start="1" dir="auto"><li>Cost-benefit policy 的設計目的，是為了在空間極度緊張時，能提供比 Greedy policy 更低的即時搬移延遲。</li></ol><ol type="1" id="339a15e2-9005-804d-b24a-e0abd8283df0" class="numbered-list" start="2" dir="auto"><li>Cost-benefit policy 會優先選擇回收 Block X。</li></ol><ol type="1" id="339a15e2-9005-805d-8f66-ce179715c771" class="numbered-list" start="3" dir="auto"><li>Greedy policy 會選擇 Block X 作為 victim，因為其 Valid pages 數量較多，回收後能得到最大的絕對空間。</li></ol><ol type="1" id="339a15e2-9005-8030-a931-e8846d5292bb" class="numbered-list" start="4" dir="auto"><li>若依照 Greedy policy 進行回收，選擇 Block Y 會帶來比選擇 Block X 更高的 write amplification。</li></ol></blockquote><details id="339a15e2-9005-80d3-b00a-eaeca6351536" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8070-9510-df82a6be2571" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8084-8598-c3f1289dab28" class="" dir="auto">Cost-benefit policy 會優先選擇回收 Block X</p><hr id="339a15e2-9005-80a8-bd0e-c470ae7edb7c" dir="auto"/><p id="339a15e2-9005-804e-aa3a-ed55ea8798a0" class="" dir="auto">解析: <div class="indented"><p id="339a15e2-9005-80fb-88d4-fdb3aca95277" class="" dir="auto">將數值代入公式：Block X 為 <code>((1 - 0.25) * 60) / (2 * 0.25) = 90</code>；Block Y 為 <code>((1 - 0.10) * 2) / (2 * 0.10) = 9</code>。 Cost-benefit 策略會優先選擇分數高的 Block X。</p></div></p><hr id="339a15e2-9005-80b8-8c44-e584b7d185bb" dir="auto"/><p id="339a15e2-9005-804f-b802-d3d22042eed3" class="" dir="auto">(1) Cost-benefit policy 的設計初衷是為了在考量搬移成本與回收效益的平衡下，選擇最適合的 victim block。 它並非專門為了在空間緊張時降低即時搬移延遲而設計，而是為了優化長期效率。</p><p id="339a15e2-9005-8094-85f8-ccb532645222" class="" dir="auto">(3) Greedy policy 的核心原則是「挑選 invalid page 數量最多的 block 作為 victim」。 因為 Invalid page 越多，代表控制器需搬移的 Valid page 就越少，回收成本越低。 在這題中，Block Y 的 invalid pages 高達 90%，而 Block X 只有 75%。因此，Greedy policy 會選擇 Block Y。</p><p id="339a15e2-9005-80e2-a64d-ccbd8a2536e2" class="" dir="auto">(4) 回收 Block Y 只需要搬移 10% 的資料，而回收 Block X 需要搬移高達 25% 的資料。因此，單看這一次回收，選擇 Block Y 需要寫入的資料量較少，WA 較低。</p></div></aside></div></details></li></ol><hr id="339a15e2-9005-8017-94cf-e17213bde7e0" dir="auto"/><ol type="1" id="339a15e2-9005-80e1-95e2-f41eef5c5e7a" class="numbered-list" start="2" dir="auto"><li>在 SSD 的 garbage collection (GC) 中，controller 需要選擇 block 進行回收。 回收時仍然有效 (valid) 的 pages 需要被複製到新的 block，然後整個 block 才能被 erase。 除了單純依據 valid pages 數量進行選擇外，許多 SSD controller 也會採用 <strong>Hot/Cold separation (Window-based)</strong> 的策略：<aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80ef-9853-e6ea6072c040" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80b1-a264-f9819cbe9e92" class="" dir="auto"><strong>Hot data</strong>：更新頻繁的資料</p><p id="339a15e2-9005-805c-b513-ecd2eb93209d" class="" dir="auto"><strong>Cold data</strong>：很少更新的資料</p></div></aside><p id="339a15e2-9005-801a-9144-cddc53b8002f" class="" dir="auto">controller 會盡量將 hot data 與 cold data 分開寫入不同的 blocks。 以下哪一項最能解釋為何這種策略有助於降低 <strong>write amplification</strong>？</p><blockquote id="339a15e2-9005-80a7-a78d-fe5e06bfd03c" class="" dir="auto"><ol type="1" id="339a15e2-9005-80c6-ad03-c540513db70b" class="numbered-list" start="1" dir="auto"><li>將 cold data 集中在同一 block，可以讓 GC 更容易找到包含大量 cold data 的 blocks，從而提升回收效率。</li></ol><ol type="1" id="339a15e2-9005-80c0-b216-cc2a10a13973" class="numbered-list" start="2" dir="auto"><li>將 hot data 與 cold data 分開寫入，可以讓每個 block 的有效頁面數量更平均，降低 GC 選擇 block 的難度。</li></ol><ol type="1" id="339a15e2-9005-808b-8766-ffe18de0e8b2" class="numbered-list" start="3" dir="auto"><li>若 hot data 與 cold data 混在同一 block，hot data 很快變成 invalid，但 GC 時仍需要搬移仍然有效的 cold data。</li></ol><ol type="1" id="339a15e2-9005-805f-be8a-eb1e4ab3c2a8" class="numbered-list" start="4" dir="auto"><li>將 hot data 集中在同一 block，可以讓 GC 更頻繁地回收這些 block，因此整體 GC 成本會降低。</li></ol></blockquote><details id="339a15e2-9005-8080-9b62-c7e24b85d9b5" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-808a-b7cb-f568777ae509" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80b7-8c0c-d8ce11f33df5" class="" dir="auto">若 hot data 與 cold data 混在同一 block，hot data 很快變成 invalid，但 GC 時仍需要搬移仍然有效的 cold data。</p><hr id="339a15e2-9005-80a1-8d86-d69df33129ee" dir="auto"/><p id="339a15e2-9005-80db-b178-ee835dd697ec" class="" dir="auto">解析: <div class="indented"><p id="339a15e2-9005-8049-86ab-d5728c57614d" class="" dir="auto">若 hot 與 cold data 位於同一個 block，hot data 可能很快被覆寫而變成 invalid， 但 cold data 仍然保持 valid。當 GC 回收該 block 時，controller 必須複製這些仍然有效的 cold pages，增加資料搬移量，導致 write amplification 上升。 若將 hot 與 cold data 分開，hot blocks 可能很快全部變成 invalid，GC 時幾乎不需要搬移資料，因此可以降低 write amplification。</p></div></p><hr id="339a15e2-9005-804f-9455-d95927a475b5" dir="auto"/><p id="339a15e2-9005-80cc-b97c-dd757b0519a9" class="" dir="auto">(1) Cold data 的特性是很少被更新，因此在 GC 時通常仍然是 valid。 如果 GC 回收主要包含 cold data 的 block，controller 仍然需要複製大量 valid pages，回收成本會很高。 Hot/Cold separation 的目的不是優先回收 cold blocks，而是避免在 GC 時搬移不必要的 cold data。</p><p id="339a15e2-9005-80a5-b137-ca5f910aeac3" class="" dir="auto">(2) Hot blocks 確實可能更快累積 invalid pages，但 GC 的成本主要來自回收時需要搬移的 valid pages 數量，而不是 GC 執行的頻率。 若 hot 與 cold data 混在同一 block，即使 hot pages 很快 invalid，仍然需要複製 cold pages，反而會增加資料搬移量。</p><p id="339a15e2-9005-80e2-86b8-f126cc5fa79b" class="" dir="auto">(3) Hot/Cold separation 的主要目的不是讓 valid pages 分布更平均，而是讓具有相似更新頻率的資料位於同一 block。這樣 hot blocks 可以快速累積 invalid pages，使 GC 在回收時需要搬移的 valid pages 減少，從而降低 write amplification。</p></div></aside></div></details></li></ol><hr id="339a15e2-9005-80ad-971d-d88b2bc141cb" dir="auto"/><ol type="1" id="339a15e2-9005-80c9-b026-cffa674bde92" class="numbered-list" start="3" dir="auto"><li>假設有一個已經使用 90%容量的 SSD，Host OS 想要寫入一個 8KB 檔案， 與容量幾乎未使用的 SSD 相比，已使用 90%的在寫入過程有突然的 latency spike， 以下哪個選項最能解釋這個 latency spike。<blockquote id="339a15e2-9005-804f-9abd-e2bdd2bad31f" class="" dir="auto"><ol type="1" id="339a15e2-9005-808e-a7ca-e82ecb59e775" class="numbered-list" start="1" dir="auto"><li>FTL 必須對 file system 做 defragmentation，以確保寫入的檔案資料放在連續的位置</li></ol><ol type="1" id="339a15e2-9005-80d1-bde8-faadf876fcd4" class="numbered-list" start="2" dir="auto"><li>由於 free space 的 block 可能有較高 P/E cycle，Dynamic Wear Leveling 將 cold data 先移入目前 free space 然後才執行寫入</li></ol><ol type="1" id="339a15e2-9005-8053-a6cb-caedb9d8cb3a" class="numbered-list" start="3" dir="auto"><li>SSD 控制器被迫等待來自作業系統的同步 TRIM 指令，以確認哪些特定的 block 可以安全地覆寫</li></ol><ol type="1" id="339a15e2-9005-8099-a11d-e334a5a171ab" class="numbered-list" start="4" dir="auto"><li>GC 必須從包含大量 valid page 的 block 中讀取資料並寫到新的 block，以釋放 free space</li></ol></blockquote><details id="339a15e2-9005-80ee-af1d-d84fa4996f5b" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8090-b668-dbac59c350d3" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8069-949c-c4c8a4f3f6b2" class="" dir="auto">GC 必須從包含大量 valid page 的 block 中讀取資料並寫到新的 block，以釋放 free space</p><hr id="339a15e2-9005-802d-bc43-e7135fbe483b" dir="auto"/><p id="339a15e2-9005-804b-a0e0-dbe3be507e1c" class="" dir="auto">解析: <div class="indented"><p id="339a15e2-9005-80e5-ad85-d2fe73e0152f" class="" dir="auto">當 SSD 使用率高達 90%時，GC 通常只能選到 valid page 比例較高的 block 作為 victim，這會導致需要搬移大量的 valid data， 造成較高的 write amplification 與 latency spike。</p></div></p><hr id="339a15e2-9005-8023-9601-f99422b0ba4f" dir="auto"/><p id="339a15e2-9005-8009-b6ac-c7356d16185a" class="" dir="auto">(1) SSD 不像傳統 HDD 那樣透過需要物理上透過旋轉在 platter 找到對的位置，FTL 可以將 logical address 轉到 physical address， 不需要像 HDD 做 defragmentation。</p><p id="339a15e2-9005-809a-93f4-d80a808b9b86" class="" dir="auto">(2) TRIM 雖然能告知 SSD 哪些資料已無效以加速 GC，但它通常是非同步的，SSD 控制器並不會在每次寫入新資料前都停下來等待 TRIM 的確認。</p><p id="339a15e2-9005-8044-8219-d400f6e5d565" class="" dir="auto">(3) Static Wear Leveling 才會執行這種動作，Dynamic Wear Leveling 只是優先使用目前 free block 中較少 P/E cycle 的 block。</p></div></aside></div></details></li></ol><hr id="339a15e2-9005-807d-9789-edb05c92ca03" dir="auto"/><ol type="1" id="339a15e2-9005-80c6-b2c1-d097a9d9b0d1" class="numbered-list" start="4" dir="auto"><li>在一個大型圖書館系統中，資料庫分為「書籍記錄區」和「日誌區」。 前者包含<strong>大量長期不會更新的冷資料與頻繁更新少量的熱資料</strong>，而後者則是<strong>純熱資料，極高頻率寫入</strong>。 若此資料庫使用 SSD 作為儲存的媒介，且此資料庫兩個區域有獨立的 GC 與 wear leveling 決策，不考慮跨區域資料搬移的情況。 請問以下哪種 victim selection 和 wear leveling 的策略分別最適合「書籍記錄區」和「日誌區」？ (以整體長期 endurance 為優先，並兼顧 GC 效率。) 選項將以(victim selection, wear leveling)的格式呈現，第一個 pair 對應「書籍記錄區」，第二個 pair 則對應「日誌區」。<blockquote id="339a15e2-9005-80d9-81a7-cf042dda4365" class="" dir="auto"><ol type="1" id="339a15e2-9005-80b3-bc85-fe6a1b61b433" class="numbered-list" start="1" dir="auto"><li>(cost-benefit, static wear leveling), (greedy, dynamic wear leveling)</li></ol><ol type="1" id="339a15e2-9005-80a4-98b3-cebb6c3ea266" class="numbered-list" start="2" dir="auto"><li>(cost-benefit, dynamic wear leveling), (cost-benefit, dynamic wear leveling)</li></ol><ol type="1" id="339a15e2-9005-8011-92c8-f1cfc1872ed9" class="numbered-list" start="3" dir="auto"><li>(cost-benefit, static wear leveling), (cost-benefit, static wear leveling)</li></ol><ol type="1" id="339a15e2-9005-8044-a213-c3c59443493d" class="numbered-list" start="4" dir="auto"><li>(cost-benefit, dynamic wear leveling), (greedy, dynamic wear leveling)</li></ol></blockquote><details id="339a15e2-9005-809c-9f61-c3e8a21c4535" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8039-89ed-d023bb237399" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80b5-b022-ec58c000da90" class="" dir="auto">(cost-benefit, static wear leveling), (greedy, dynamic wear leveling)</p><hr id="339a15e2-9005-806f-ae65-cd7d3429b646" dir="auto"/><p id="339a15e2-9005-8011-a9f0-ea29372c5973" class="" dir="auto">解析: <div class="indented"><p id="339a15e2-9005-80c6-b8e7-e19da325de4e" class="" dir="auto">書籍記錄區包含冷資料和熱資料，更新頻率不一，因為 cost-benefit 會考慮 block 中有效頁比例與資料年齡/效益 ，所以在冷熱混合環境下，比純 greedy 更能避免選到搬移成本高、回收效益低的 block。 static wear leveling 可以確保不會發生冷資料塞滿整個 block，導致磨損不均的情形發生。 而日誌區是純熱資料，寫入頻率極高，適合使用 greedy 策略來快速回收空間，同時搭配 dynamic wear leveling 來均衡磨損。</p></div></p><hr id="339a15e2-9005-800f-b88f-cf0eee2e6758" dir="auto"/><p id="339a15e2-9005-8039-9fa7-d745735e968d" class="" dir="auto">(2) 因為日誌區全為熱資料，資料更新頻率很高，所以平均每個 block 中資料的 age 都會很小，此時使用 greedy 策略能最大化 GC 效率。 書籍記錄區包含冷資料和熱資料，若發生冷資料長期佔據某些擦寫次數低的 block，dynamic wear leveling 則無法處理此種情況發生，導致無法均勻的磨損。</p><p id="339a15e2-9005-8007-9b3b-c8beee657f6f" class="" dir="auto">(3) 因為日誌區全為熱資料，資料更新頻率很高，所以平均每個 block 中資料的 age 都會很小，此時使用 greedy 策略能最大化 GC 效率。 而在日誌區使用 static wear leveling 則沒有什麼必要，因為日誌區幾乎沒有長期靜態資料，因此通常不需要去搬移冷資料來平衡磨損。</p><p id="339a15e2-9005-802a-a9aa-c24c7e99f1e5" class="" dir="auto">(4) 書籍記錄區包含冷資料和熱資料，若發生冷資料長期佔據某些擦寫次數低的 block，dynamic wear leveling 則無法處理此種情況發生，導致無法均勻的磨損。</p></div></aside></div></details></li></ol><hr id="339a15e2-9005-8094-85a9-dc52f9488cd3" dir="auto"/><ol type="1" id="339a15e2-9005-8084-8250-c9f6cae4234f" class="numbered-list" start="5" dir="auto"><li>在一個企業級資料庫中，寫入負載通常具有高度的 <strong>Skew (資料傾斜)</strong> 特性（例如 80% 的寫入集中在 20% 的熱資料上）。儲存工程師預期，與完全隨機的 Uniform random workload 相比，SSD 內部的 garbage collection (GC) 應該能輕易區分冷熱資料，從而大幅降低 <strong>Write Amplification Factor (WAF, 寫入放大率)</strong>。<p id="339a15e2-9005-80ac-9127-f6cb43e3d517" class="" dir="auto">然而，根據最新的儲存系統測量研究（如《<code>SSD-iq</code>》論文），許多商用資料中心 SSD 在面對高度 Skew 的負載時，WAF 不僅沒有顯著下降，甚至不減反增。請問造成這種反直覺現象的底層架構原因通常是什麼？</p><blockquote id="339a15e2-9005-8044-a76f-fe3abd96c261" class="" dir="auto"><ol type="1" id="339a15e2-9005-8056-99be-ea408838dca5" class="numbered-list" start="1" dir="auto"><li>主機端 (Host) 作業系統對熱資料頻繁發送 <strong>TRIM</strong> 指令，導致 SSD 控制器為了優先處理龐大的 TRIM 佇列而暫停背景 GC。這迫使 SSD 必須在處理使用者寫入時同步執行 <strong>On-demand GC</strong>，大幅增加了寫入放大的乘數效應。</li></ol><ol type="1" id="339a15e2-9005-800e-8c8c-e44c31f9c83e" class="numbered-list" start="2" dir="auto"><li>高度傾斜的寫入會觸發 SSD 控制器的硬體保護機制。為了避免冷資料區段發生嚴重的 <strong>Read disturb (讀取干擾)</strong>，控制器會動態徵用並縮減 <strong>Over-Provisioning (OP)</strong> 空間來備份資料。OP 空間一旦縮小，GC 就缺乏足夠的緩衝區來進行有效整理，進而推高了 WAF。</li></ol><ol type="1" id="339a15e2-9005-80ea-8b1b-c8ed198846e0" class="numbered-list" start="3" dir="auto"><li>許多商用 SSD 內部僅實作了基礎的 <strong>Greedy (貪婪)</strong> GC 演算法（永遠挑選 invalid pages 最多的 Block 回收）。Greedy 在 Uniform 負載下表現接近最佳，但在高度 Skew 的負載下，它會在搬移有效資料 (Copy-forward) 時將冷、熱資料混寫入同一個新 Block 中，導致該 Block 很快又因熱資料更新而產生碎塊，無法有效降低 WAF。</li></ol><ol type="1" id="339a15e2-9005-802b-963b-d16158943dd4" class="numbered-list" start="4" dir="auto"><li>傾斜的負載破壞了空間區域性 (Spatial locality)，導致 <strong>Demand-based FTL (DFTL)</strong> 的 Cached Mapping Table (CMT) 發生嚴重的 Cache thrashing。頻繁的 Cache miss 迫使控制器不斷將 Translation pages 寫回 NAND flash，產生了海量的內部寫入並放大了 WAF。</li></ol></blockquote><details id="339a15e2-9005-8004-84b9-d4f483185429" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8027-8614-f8d71ae3bc1e" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8097-821b-fa25c36fe812" class="" dir="auto">許多商用 SSD 內部僅實作了基礎的 <strong>Greedy (貪婪)</strong> GC 演算法（永遠挑選 invalid pages 最多的 Block 回收）。Greedy 在 Uniform 負載下表現接近最佳，但在高度 Skew 的負載下，它會在搬移有效資料 (Copy-forward) 時將冷、熱資料混寫入同一個新 Block 中，導致該 Block 很快又因熱資料更新而產生碎塊，無法有效降低 WAF。</p><hr id="339a15e2-9005-80f5-98cc-c7fe68e7f9a4" dir="auto"/><p id="339a15e2-9005-8092-b451-f0cbea158080" class="" dir="auto">解析: <div class="indented"><p id="339a15e2-9005-8029-a9d0-e34ddafb23c1" class="" dir="auto">這是正確的。《<code>SSD-iq</code>》論文的實驗證實，多數商用 SSD 仍依賴類似 Greedy 的 GC 策略。當面對 Skewed workload 時，如果 GC 沒有實作完善的冷熱分離機制 (Hot/cold data Separation)，搬家時就會將冷資料與熱資料混在一起寫入新的 Free Block。不久後，熱資料再次被覆寫變成 Invalid，冷資料卻依然 Valid，這使得 SSD 必須不斷重複搬運冷資料，導致 WAF 居高不下甚至惡化。</p></div></p><hr id="339a15e2-9005-80fe-8616-fe6e2abff8ff" dir="auto"/><p id="339a15e2-9005-80fb-a82c-ec3d1cdb975e" class="" dir="auto">(1) 這是對 TRIM 指令作用的嚴重誤解。<strong>TRIM</strong> 指令的作用是提早告訴 SSD 哪些 LBAs 上的資料已經失效。這能讓 GC 在挑選 Block 與搬運資料時，直接<strong>跳過</strong>這些被 TRIM 掉的 Page，從而<strong>大幅降低</strong>搬運量與 WAF。頻繁的 TRIM 會拯救 GC 效能，而非推高 WAF。<br/>(2) 這混淆了不同的硬體機制。<strong>Over-Provisioning (OP)</strong> 空間的大小通常是硬體出廠或透過指令靜態配置的，控制器不會因為 Read disturb 而「動態縮減」OP 空間去當備份區。Read disturb 的標準解法是定期進行背景資料重寫 (background data refresh)。<br/>(4) 這是一個反向迷思。高度傾斜 (Skewed) 的負載代表存取集中在少數熱點資料上，這反而意味著<strong>極高的 Locality (區域性)</strong>。在這種情況下，DFTL 的 CMT 命中率會非常高，表現極佳，絕不會發生嚴重的 Cache thrashing。</p></div></aside></div></details></li></ol><hr id="339a15e2-9005-8022-987c-e494637aab4e" dir="auto"/><ol type="1" id="339a15e2-9005-8076-9ff7-fd8d1a3b67c3" class="numbered-list" start="6" dir="auto"><li>在 SSD 管理中，垃圾回收需要權衡有效空間、資料更新與損耗平衡。 我們定義一個公式： <code>Score = 0.4 * (1 - u) + 0.3 * age_n + 0.3 * (1 - wear_n)</code><p id="339a15e2-9005-802d-ac9f-c28863f05e0b" class="" dir="auto">其中：</p><ul id="339a15e2-9005-801d-8e42-cddf16afadb9" class="bulleted-list" dir="auto"><li style="list-style-type:disc">u： 有效資料佔用率。</li></ul><ul id="339a15e2-9005-80ad-99e8-d2519778fb9b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">age_n： 區塊年齡 / 當前系統中所有區塊的最大年齡。</li></ul><ul id="339a15e2-9005-80fd-b554-cc1c89f71203" class="bulleted-list" dir="auto"><li style="list-style-type:disc">wear_n： 擦除次數 / 當前系統中所有區塊的最大擦除次數。</li></ul><p id="339a15e2-9005-8089-916a-fe01e97fdadf" class="" dir="auto">Block：</p><ul id="339a15e2-9005-803f-b066-e45074475f0e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Block A： u = 0.1, age = 1, wear = 3</li></ul><ul id="339a15e2-9005-80ce-89eb-ce4c654a2e68" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Block B： u = 0.3, age = 2, wear = 2</li></ul><ul id="339a15e2-9005-800d-953c-e18ffd35165e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Block C： u = 0.5, age = 3, wear = 1</li></ul><p id="339a15e2-9005-80d0-96f9-e016ad839640" class="" dir="auto">請問選擇最小有效空間與選擇最大 Score，這兩個選法的 Victim Block 是？</p><blockquote id="339a15e2-9005-8041-a6d9-de515934b861" class="" dir="auto"><ol type="1" id="339a15e2-9005-809d-a649-c3efb6320aed" class="numbered-list" start="1" dir="auto"><li>A, C</li></ol><ol type="1" id="339a15e2-9005-80c1-8482-d7a675f69ca3" class="numbered-list" start="2" dir="auto"><li>A, A</li></ol><ol type="1" id="339a15e2-9005-8094-ae8b-ce017c7fa409" class="numbered-list" start="3" dir="auto"><li>C, A</li></ol><ol type="1" id="339a15e2-9005-8030-9618-d38ed0aaf3fa" class="numbered-list" start="4" dir="auto"><li>C, C</li></ol></blockquote><details id="339a15e2-9005-80f3-a484-f5e436c4fe03" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-803b-b7f5-fc2b1e0db8df" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80f0-a56f-f4e9ea96084a" class="" dir="auto">A, C</p><hr id="339a15e2-9005-8096-ab17-e9f8628ea276" dir="auto"/><p id="339a15e2-9005-809e-9a0e-c4883a21f8b8" class="" dir="auto">解析: <div class="indented"><p id="54800aec-1017-4da6-bbf4-dc911c9d83f0" class="" dir="auto">選法一中，最小有效空間是 Block A。 </p><p id="339a15e2-9005-80f5-8824-d53dec559f6b" class="" dir="auto">選法二中，分別計算 Score：</p><ul id="0522bb34-5488-4d34-a43e-39a613afb2a6" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Block A：(1-0.1) * 0.4 + (1/3) * 0.3 + (1-1) * 0.3 = 0.46。</li></ul><ul id="5032c86e-8bae-40cf-8e36-3c9b5ab9124d" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Block B：(1-0.3) * 0.4 + (2/3) * 0.3 + (1-2/3) * 0.3 = 0.58。</li></ul><ul id="0575bdec-5d07-460a-97a9-fea6493699e0" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Block C：(1-0.5) * 0.4 + (1) * 0.3 + (1-1/3) * 0.3 = 0.7。 </li></ul><p id="339a15e2-9005-800e-8caf-ec210f866f51" class="" dir="auto">故選擇 Block C。</p></div></p></div></aside></div></details></li></ol><hr id="339a15e2-9005-8018-b8b3-f22a7adaa4f4" dir="auto"/><ol type="1" id="339a15e2-9005-803e-8e98-c3348167781c" class="numbered-list" start="7" dir="auto"><li>網路上常見一種建議：「SSD 不要裝太滿，保留 10-20% 的空間可以提升效能與壽命。」某位使用者聽從這個建議，在一顆廠商預設 7% over-provisioning 的 1 TB 消費級 SSD 上只存放了約 800 GB 的資料，刻意將剩餘約 20% 的使用者可見空間保持閒置。對於這個做法，下列哪個詮釋最為妥當？<blockquote id="339a15e2-9005-80d9-b77e-c400be3ee398" class="" dir="auto"><ol type="1" id="339a15e2-9005-80f7-9d32-c3a58aa91989" class="numbered-list" start="1" dir="auto"><li>使用者必須透過 SSD 廠商提供的工具軟體手動設定 over-provisioning 比例，否則剩餘空間無法被 controller 利用。</li></ol><ol type="1" id="339a15e2-9005-8093-b5be-f2d9a8b75c04" class="numbered-list" start="2" dir="auto"><li>不需要任何前提條件。只要使用者不將空間寫滿，SSD 的 controller 就能自動偵測並利用這些剩餘空間，效果等同於廠商出廠預留的 over-provisioning。</li></ol><ol type="1" id="339a15e2-9005-80b1-b0e1-c943c93ce064" class="numbered-list" start="3" dir="auto"><li>這個做法要能實際降低 WAF，前提是 host 端必須有對該 SSD 發送 TRIM 指令。若未發送 TRIM，SSD 無法得知哪些空間已被釋放，那些曾經被寫入過的區域仍會被視為 valid data，無法被 controller 當作可用的 free block。</li></ol><ol type="1" id="339a15e2-9005-80ed-94e8-fe0fe0fa690d" class="numbered-list" start="4" dir="auto"><li>這個做法完全沒有意義。SSD 的 controller 只會使用廠商出廠時硬體層級預留的 over-provisioning 空間，無論使用者留多少空間都不會影響 GC 的效率或 WAF。</li></ol></blockquote><details id="339a15e2-9005-801c-b1a9-d60200e50df1" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-804f-bb59-c3524b82f57a" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-80f0-a770-c962299e5164" class="" dir="auto">這個做法要能實際降低 WAF，前提是 host 端必須有對該 SSD 發送 TRIM 指令。若未發送 TRIM，SSD 無法得知哪些空間已被釋放，那些曾經被寫入過的區域仍會被視為 valid data，無法被 controller 當作可用的 free block。</p><hr id="339a15e2-9005-80ee-b244-d5789ee285da" dir="auto"/><p id="339a15e2-9005-80e3-b78e-f620321bb4b0" class="" dir="auto">解析: <div class="indented"><p id="339a15e2-9005-802a-b5f8-ca5eddbe9a04" class="" dir="auto">正確。使用者層面的剩餘空間要能被 SSD 利用，前提是 SSD 知道那些 LBA 上的資料已不再有效。TRIM 正是 host 通知 SSD「這些 LBA 不再需要」的機制。收到 TRIM 後，controller 可將對應的 physical page 標記為 invalid，使這些空間等效於額外的 over-provisioning。若未發送 TRIM，SSD 會持續將那些已刪除的資料視為 valid，GC 時仍會搬移它們，使用者留的空間就無法發揮降低 WAF 的效果。</p></div></p><hr id="339a15e2-9005-809b-8305-f40afcd0fae3" dir="auto"/><p id="339a15e2-9005-809c-961c-e199a56ae542" class="" dir="auto">(1) 廠商工具的 over-provisioning 設定功能，本質上只是建立一個使用者不可存取的隱藏分割區來保留空間。這是實現 over-provisioning 的一種方式，但並非唯一途徑。只要 host 有發送 TRIM，controller 就能將任何被標記為不再使用的空間當作可用的 free block，不需要透過廠商工具額外設定。</p><p id="339a15e2-9005-80cf-98a4-c2818fa65f82" class="" dir="auto">(2) 如果這些空間從未被寫入過，SSD 確實知道它們是空的。但在正常使用中，SSD 的可用空間往往經歷過「寫入 → 刪除 → 再寫入」的循環。一旦某個 LBA 被寫入過，即使後來被 host 刪除，SSD 在未收到 TRIM 的情況下仍會將其視為 valid data。因此「不需要任何前提條件」的說法不正確。</p><p id="339a15e2-9005-80b8-8580-d5e38a715e97" class="" dir="auto">(4) 廠商預留的 over-provisioning 確實是 controller 永遠可用的固定空間，但 controller 同樣能利用使用者層面的可用空間。當 TRIM 通知 SSD 某些 LBA 已不再使用時，對應的 physical page 會被標記為 invalid，GC 可直接回收這些空間而不需搬移資料。這等效於增加了可用的 free block，與 over-provisioning 的效果類似。</p></div></aside></div></details></li></ol><hr id="339a15e2-9005-8093-9bf2-ec33334881e1" dir="auto"/><ol type="1" id="339a15e2-9005-80ad-8b94-d149f45004cc" class="numbered-list" start="8" dir="auto"><li>某 SSD 採用 NAND flash，workload 為持續的 random write，但系統完全不實作 garbage collection。請問隨著時間推進，系統最終會出現何種現象？<blockquote id="339a15e2-9005-80f6-80a8-f283e2a1aa8f" class="" dir="auto"><ol type="1" id="339a15e2-9005-80c9-b07c-ee766ce21ca1" class="numbered-list" start="1" dir="auto"><li>因為 erase 操作延遲過高，必須透過 GC 分攤成本</li></ol><ol type="1" id="339a15e2-9005-8022-8e65-c4249cfac5ed" class="numbered-list" start="2" dir="auto"><li>系統可持續運作，但 write latency 逐漸上升</li></ol><ol type="1" id="339a15e2-9005-8056-89f9-dc509d9f17f0" class="numbered-list" start="3" dir="auto"><li>因為 invalid pages 會隨寫入操作逐漸累積，最終耗盡可用空間</li></ol><ol type="1" id="339a15e2-9005-8061-a9dc-e6de2a4e0646" class="numbered-list" start="4" dir="auto"><li>因為 mapping table 規模會隨時間膨脹，必須透過 GC 壓縮</li></ol></blockquote><details id="339a15e2-9005-80d2-a0f0-ccd7c0818826" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-8073-abad-f5626bc96137" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8092-9ad3-ea7510c09db5" class="" dir="auto">因為 invalid pages 會隨寫入操作逐漸累積，最終耗盡可用空間</p><hr id="339a15e2-9005-80dd-8c4a-f2433ccaef90" dir="auto"/><p id="339a15e2-9005-80c7-886a-caff7923f73e" class="" dir="auto">解析: <div class="indented"><p id="339a15e2-9005-80fd-a710-f17e5c06a977" class="" dir="auto">因為採用 out-of-place write ，在寫入過程中舊資料會變成 invalid 。 隨著 invalid 的資料越來越多， free pages 也就越來越少， 在沒有 garbage collection 處理的狀況下 free pages 總有一天會變成 0 ，最終沒有可以使用的空間。</p></div></p><hr id="339a15e2-9005-803b-b062-eec0cbfb700f" dir="auto"/><p id="339a15e2-9005-8006-aeca-cd6e5eb6bb83" class="" dir="auto">(1) 題目的系統沒有 GC，因此不會觸發 block erase 來回收空間； 另外， GC 存在的目的是回收 invalid page 佔用的空間，而非分攤 erase 的延遲成本。</p><p id="339a15e2-9005-80ef-80ed-f63fe437d920" class="" dir="auto">(2) 在有 garbage collection 的情況下是對的。 但因為題目提到沒有 garbage collection ， 因此不會出現 erase block 、搬資料或 latency 逐漸變高，而是最後直接寫不進去</p><p id="339a15e2-9005-809a-9f1e-c914bb69a543" class="" dir="auto">(4) page-level mapping 的 mapping table 大小是固定的，不會隨寫入次數增加而膨脹； GC 的目的是回收 invalid page 的空間，不是壓縮 mapping table。</p></div></aside></div></details></li></ol><hr id="339a15e2-9005-8042-857d-d68e61bb83ae" dir="auto"/></div></details></div></details></div></div><hr id="339a15e2-9005-8068-8a9b-e5ae5e55b81b" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="339a15e2-9005-80dd-a8bc-ee1ef8894eb6" dir="ltr"><div style="width:100%"><p id="339a15e2-9005-8054-bccb-c04970b83a46" class="" dir="auto">
+</p></div></aside></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

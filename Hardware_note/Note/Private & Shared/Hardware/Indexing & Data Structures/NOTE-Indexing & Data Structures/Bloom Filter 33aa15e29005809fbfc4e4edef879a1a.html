@@ -1,0 +1,770 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Bloom Filter</title><meta name="data-notion-page-icon" content="🧱"/><link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2290%22%3E%F0%9F%A7%B1%3C%2Ftext%3E%3C%2Fsvg%3E"/><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+/* Override strong tags inside headings to maintain consistent weight */
+h1 strong,
+h2 strong,
+h3 strong {
+	font-weight: 600;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 10px;
+	padding: 1rem;
+}
+
+/* For default-background callouts, render the border outline. */
+.callout.block-color-default_background {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+figure,
+aside,
+details {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+
+	table.collection-content {
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	table.collection-content th,
+	table.collection-content td {
+		overflow-wrap: anywhere;
+	}
+
+	table.collection-content td > .user,
+	table.collection-content td > time {
+		white-space: pre-wrap;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content-wrapper {
+	overflow-x: auto;
+}
+
+@media only print {
+	.collection-content-wrapper {
+		overflow-x: visible;
+	}
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.collection-content td {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.column-list {
+	display: flex;
+	gap: 46px;
+}
+
+.column {
+	min-width: 0;
+	overflow: hidden;
+}
+
+.column > *:first-child {
+	margin-top: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding-inline: 0.125rem;
+	padding-block: 0.375rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+table {
+	border-collapse: collapse;
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol.numbered-list.numbered-list-digits-2 {
+	padding-inline-start: 2em;
+}
+
+ol.numbered-list.numbered-list-digits-3plus {
+	padding-inline-start: 2.4em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+/*
+ * Render emoji icons using a ::before pseudo-element to keep the glyph
+ * out of the DOM textContent traversal. This avoids double-rendering icons
+ * in callouts and page titles.
+ * NOTE(slim/html-export-pseudo-icons): I can't tagref this because it will
+ * flag as a duplicate tag after codegen.
+ */
+.icon[data-emoji]::before {
+	content: attr(data-emoji);
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.callout img.notion-static-icon {
+	width: 1em;
+	height: 1em;
+}
+
+.callout p {
+	margin: 0;
+}
+
+.callout h1,
+.callout h2,
+.callout h3 {
+	margin: 0 0 0.6rem;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	margin-right: 0.4em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+blockquote.quote-large {
+	font-size: 1.25em;
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.tab {
+	margin: 1.25em 0;
+	padding-inline: 1rem;
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.highlight-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.highlight-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.highlight-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.highlight-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.highlight-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.highlight-default_background {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray_background {
+	background: rgba(42, 28, 0, 0.07);
+}
+.highlight-brown_background {
+	background: rgba(139, 46, 0, 0.086);
+}
+.highlight-orange_background {
+	background: rgba(224, 101, 1, 0.129);
+}
+.highlight-yellow_background {
+	background: rgba(211, 168, 0, 0.137);
+}
+.highlight-teal_background {
+	background: rgba(0, 100, 45, 0.09);
+}
+.highlight-blue_background {
+	background: rgba(0, 124, 215, 0.094);
+}
+.highlight-purple_background {
+	background: rgba(102, 0, 178, 0.078);
+}
+.highlight-pink_background {
+	background: rgba(197, 0, 93, 0.086);
+}
+.highlight-red_background {
+	background: rgba(223, 22, 0, 0.094);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.block-color-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.block-color-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.block-color-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.block-color-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.block-color-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(240, 239, 237, 1);
+}
+.block-color-brown_background {
+	background: rgba(245, 237, 233, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 235, 222, 1);
+}
+.block-color-yellow_background {
+	background: rgba(249, 243, 220, 1);
+}
+.block-color-teal_background {
+	background: rgba(232, 241, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(229, 242, 252, 1);
+}
+.block-color-purple_background {
+	background: rgba(243, 235, 249, 1);
+}
+.block-color-pink_background {
+	background: rgba(250, 233, 241, 1);
+}
+.block-color-red_background {
+	background: rgba(252, 233, 231, 1);
+}
+.select-value-color-default { background-color: rgba(42, 28, 0, 0.07); }
+.select-value-color-gray { background-color: rgba(28, 19, 1, 0.11); }
+.select-value-color-brown { background-color: rgba(127, 51, 0, 0.156); }
+.select-value-color-orange { background-color: rgba(196, 88, 0, 0.203); }
+.select-value-color-yellow { background-color: rgba(209, 156, 0, 0.282); }
+.select-value-color-green { background-color: rgba(0, 96, 38, 0.156); }
+.select-value-color-blue { background-color: rgba(0, 118, 217, 0.203); }
+.select-value-color-purple { background-color: rgba(92, 0, 163, 0.141); }
+.select-value-color-pink { background-color: rgba(183, 0, 78, 0.152); }
+.select-value-color-red { background-color: rgba(206, 24, 0, 0.164); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style><style>@import url('https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex-swap.min.css')</style></head><body><article id="33aa15e2-9005-809f-bfc4-e4edef879a1a" class="page serif" data-notion-page-icon="🧱"><header><img class="page-cover-image" src="https://app.notion.com/images/page-cover/met_william_morris_1877_willow.jpg" style="object-position:center 90%"/><div class="page-header-icon page-header-icon-with-cover"><span class="icon" data-emoji="🧱"></span></div><h1 class="page-title" dir="auto"><mark class="highlight-blue" data-notion-highlight="blue">Bloom Filter</mark></h1><p class="page-description" dir="auto"></p><table class="properties"><tbody></tbody></table></header><div class="page-body"><div id="33aa15e2-9005-8092-8a0c-c49be659addf" class="column-list" data-notion-column-list="" dir="auto"><div id="33aa15e2-9005-8050-be38-f749ab77488b" style="width:18.75%" class="column" data-notion-column-ratio="0.1875" dir="auto"><hr id="33aa15e2-9005-809a-81f0-ffe72f9dcc26" dir="auto"/><figure id="33aa15e2-9005-805e-9aab-e0bf7343c2bd" class="image" data-notion-image="../../Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg" dir="ltr"><a href="../../Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg"><img style="width:548.375px" src="../../Flash%20&amp;%20SSD%20Internals/NOTE-Flash%20&amp;%20SSD%20Internals/Flash%20Translation%20Layer/fab9f5b6ce20643cecc7477e92d3e351.jpg"/></a></figure><p id="33aa15e2-9005-8021-bac6-d585f802d21e" class="" dir="auto">
+</p></div><div id="33aa15e2-9005-80a1-80e6-cfef2caf3140" style="width:81.25%" class="column" data-notion-column-ratio="0.8125" dir="auto"><h3 id="33aa15e2-9005-80e1-a56e-cb0092700891" class="" dir="auto">Bloom Filter</h3><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8028-9adf-d757632a0df5" dir="ltr"><div style="width:100%"><p id="2542bdba-393c-4637-94fe-74950fbc8503" class="" dir="auto">Nini 經營一座大鳥園，裡面有 1000 個鳥籠。今天客人指名想看一種很稀有的鳥：「藍喙彩羽大鴅」。</p><p id="33da15e2-9005-8076-9b39-c9921f0a87bc" class="" dir="auto">最笨的方法，就是 Nini 一籠一籠跑去找。如果這隻鳥真的不在園裡，她還是得把整座鳥園幾乎翻完，才能回答：「沒有這隻鳥。」</p><p id="a63f031f-bce0-410a-8506-c28979b7b391" class="" dir="auto">所以 Nini 先做了一本很小的鳥類特徵索引簿，不記每隻鳥在哪一籠，只記一些快速判斷用的特徵。每當新鳥進園，Nini 就根據幾個特徵（鳥喙顏色、翅膀長度、尾羽形狀、叫聲頻率），在索引簿上做記號。客人問「藍喙彩羽大鴅」在不在時，Nini 不必先衝進鳥園，只要先翻這本小簿子：只要有任何一個特徵記號對不上，她就能立刻說「這隻鳥一定不在園裡」，完全不用跑去查鳥籠。如果所有特徵都對得上，她也只能說「有可能在」，這時才值得真的進鳥園找。</p><p id="22fcb150-c273-4e0c-b762-1c101e7cd541" class="" dir="auto">這就是 Bloom filter：它不能保證「一定存在」，但可以很快保證「一定不存在」，用很少的記憶體，省掉大量白跑的 disk I/O。</p></div></aside><blockquote id="33aa15e2-9005-805f-94ad-f7620b5532e1" class="" dir="auto">Reference: </blockquote><hr id="33aa15e2-9005-80f4-9eb2-ea0779923e2b" dir="auto"/><details id="33aa15e2-9005-8053-9851-f9fbbf8a139d" open="" class="toggle" dir="auto"><summary><strong>Classification</strong></summary><div class="indented"><p id="33aa15e2-9005-80dd-bcaf-f785203ec1f2" class="" dir="auto">
+</p><hr id="33aa15e2-9005-8062-b0d0-f381d63d093e" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8084-b7da-f1d22ecb578d" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-802a-a08d-f32e0a1ea05e" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Extra Component</mark></p><hr id="33aa15e2-9005-80b0-80f3-e4112d26fe23" dir="auto"/><p id="33aa15e2-9005-8022-a6e7-f6cdcfe8ef5d" class="" dir="auto"><mark class="highlight-gray" data-notion-highlight="gray">Reference:</mark></p></div></aside><hr id="33aa15e2-9005-8092-a716-cd13fb7bae6d" dir="auto"/></div></details><details id="33aa15e2-9005-8010-a0c2-c39820b54bc8" open="" class="toggle" dir="auto"><summary><strong>Key Word Definition/ Discussion</strong></summary><div class="indented"><details id="33aa15e2-9005-8027-8386-f79847454afa" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Bloom filter</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8025-ba2b-fe122eeb029a" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-802d-a9e1-e60ce22d3e79" class="" dir="auto">Bloom Filter 是一種空間效率極高的<strong>機率型資料結構</strong>，由一個長度為 <code>m</code> 的 <strong>bit array</strong> 和 $k$ 個獨立的 <strong>hash functions</strong> 組成。它用於測試一個元素是否屬於一個集合，能給出「絕對不存在」或「可能存在」的答案。</p></div></aside><hr id="33aa15e2-9005-80a6-a50b-f315feafec1d" dir="auto"/><p id="aead1fb2-37a4-45fb-b66d-ba963583662b" class="" dir="auto"><strong>Bloom filter 的組成</strong><div class="indented"><p id="33da15e2-9005-8017-941f-c8e2aca18916" class="" dir="auto">一個長度為m 的 bit array（所有 bit 初始為 0），加上k 個獨立的 hash function。</p><p id="94db44e3-cc80-429a-a478-0e7fad83723c" class="" dir="auto">插入一個元素時，用k 個 hash function 分別算出k 個位置，把這k 個 bit 都設為 1。查詢一個元素時，同樣算出k 個位置，檢查這k 個 bit 是否全部為 1。如果全部是 1，回答「可能存在」；如果任何一個是 0，回答「絕對不存在」。</p></div></p><figure id="33da15e2-9005-807b-a492-d0892a452ad0" class="image" data-notion-image="Bloom%20Filter/image.png" dir="ltr"><a href="Bloom%20Filter/image.png"><img style="width:950.25px" src="Bloom%20Filter/image.png"/></a></figure><p id="33da15e2-9005-8092-b73b-f8a92b9e0492" class="" dir="auto">注意 bit array 裡面只有 0 和 1，沒有存任何原始資料。你沒辦法從 Bloom filter 裡面「取出」元素，也沒辦法列舉裡面有哪些元素。它只能回答一個問題：這個東西在不在？而且回答還不是百分之百準確。</p><hr id="33da15e2-9005-8000-9861-fb5d4c332315" dir="auto"/><p id="316e7dbe-c3b4-4157-9aaf-f25c9b5a70dd" class="" dir="auto"><strong>False Positive 與 False Negative</strong><div class="indented"><p id="257cc1a3-58a1-443f-a5ce-1a4a98cc8a9c" class="" dir="auto">Bloom filter 保證沒有 false negative。如果一個元素確實被插入過，查詢時它對應的 k<em>k</em> 個 bit 一定都是 1（因為插入時已經設為 1 了，而且 Bloom filter 不支援刪除，bit 一旦設為 1 就不會變回 0）。所以「存在的東西一定查得到」。</p><p id="a00148d2-3155-40a0-ac3a-86f75bf68b37" class="" dir="auto">但 Bloom filter 允許 false positive。一個從未被插入的元素，查詢時對應的 <em>k</em> 個 bit 可能「恰好」都被其他元素設成了 1。這時 Bloom filter 會錯誤地回答「可能存在」。你把它當成「在裡面」，結果去 disk 上一查，發現根本沒有。</p><p id="1ba65eee-f727-4c80-a845-9dd381285389" class="" dir="auto">這是 Bloom filter 的根本性質：它說「不在」就真的不在，它說「在」則未必。在儲存系統的應用場景中，false positive 只是浪費一次 disk read，不會造成正確性問題。但 false negative 如果發生（告訴你不在但其實在），就等於資料不見了，這才是災難。Bloom filter 的設計正好符合這個需求。</p></div></p><hr id="33da15e2-9005-80c4-8742-e80bf8b25459" dir="auto"/><p id="42722dc7-d551-4b92-bd9a-4cf98a7bd68e" class="" dir="auto"><strong>false positive rate (FPR) 取決於三個參數</strong>：<div class="indented"><p id="33da15e2-9005-8053-98c6-c396d0875499" class="" dir="auto">bit array 大小 <em>m</em>、hash function 數量 <em>k</em>、已插入的元素數量 <em>n</em>。</p><p id="c4a9562b-1765-4edb-82a8-8989c0ecf551" class="" dir="auto">一百萬個元素，只用 1.14 MB 就能達到 99% 的過濾準確率。相比之下，如果你用 hash set 存這些元素（假設每個 key 平均 20 bytes），至少需要 20 MB，Bloom filter 的空間效率是 hash set 的 17 倍以上。</p></div></p><hr id="33da15e2-9005-8050-844d-d8b18e80aeba" dir="auto"/><p id="45ea1be9-fa61-4cae-8849-90ec78730a5d" class="" dir="auto"><strong>怎麼選參數</strong></p><p id="9d918fda-e405-4db4-a91d-ae5ec8bfcf7d" class="" dir="auto">你通常知道兩件事：預計要存多少元素（<em>n</em>），以及可以接受多少的 false positive rate（目標 FPR）。要算出需要多大的 bit array（<em>m</em>）和幾個 hash function（<em>k</em>）。</p><p id="43f0a54d-7c46-41a4-88bf-3410b2e630fe" class="" dir="auto"><strong>Bloom Filter 有 Diminishing Return </strong>：<div class="indented"><p id="33da15e2-9005-8013-b1eb-fefe3b0004e5" class="" dir="auto"><em>m</em>/<em>n</em> 從 10 增加到 15（多 50% 的記憶體），FPR 從 0.82% 降到 0.03%，降了 27 倍。但繼續從 15 增加到 20（再多 33% 的記憶體），FPR 只從 0.03% 降到 0.001%，降幅變得很小。所以大部分系統選在 m/n=8∼12 之間就夠了。</p></div></p><hr id="33da15e2-9005-8093-847c-c931438f748d" dir="auto"/><p id="9f77b166-d409-4948-8c0b-cfa005feb831" class="" dir="auto"><strong>為什麼不能刪除？</strong><div class="indented"><p id="734f04e7-2926-4483-8eb4-caa7d50adb32" class="" dir="auto">標準 Bloom filter 不支援刪除，因為多個元素的 hash 位置可能重疊。如果你把某個元素對應的 bit 設回 0，可能會把另一個元素的 bit 一起清掉，導致本來存在的元素被誤判為不存在，也就是產生 false negative。</p><p id="41d7fe34-1379-4309-9920-17a907222079" class="" dir="auto">如果需要刪除功能，可以使用 <strong>counting Bloom filter</strong>：把每個 bit 換成一個計數器（通常 4 bits），插入時計數器加 1，刪除時減 1。這樣就能安全地刪除而不影響其他元素。代價是空間從每位置 1 bit 變成 4 bits，記憶體用量是標準版的 4 倍。</p></div></p><hr id="33da15e2-9005-80d0-a907-fcd77c0043b1" dir="auto"/><p id="ffe2fbac-fb23-4238-9fde-73884b146482" class="" dir="auto"><strong>在 LSM-Tree 中的應用</strong><div class="indented"><p id="d3097f69-4750-4aab-bf9d-7c3715be9b34" class="" dir="auto">Bloom filter 最經典的應用場景之一就是 LSM-Tree。LSM-Tree 的 read path 需要逐層搜尋多個 SSTable 檔案，查一個不存在的 key 可能要白跑好幾層 disk I/O。如果在每個 SSTable 配上 Bloom filter，查詢前先問一句「這個 key 在不在這個檔案裡？」，回答「不在」就直接跳過，省掉大量無謂的 disk read。下次上課我們會深入講 LSM-Tree 的結構，到時候會更清楚 Bloom filter 在裡面扮演多重要的角色。</p></div></p><p id="c9060f74-f3af-4e88-839b-b67fc5321c7a" class="" dir="auto"><strong>延伸：Cuckoo Filter</strong><div class="indented"><p id="0b33510d-861c-4a02-8e9e-5f66229a049d" class="" dir="auto">標準 Bloom filter 有兩個比較麻煩的限制：不能刪除，而且查詢效能會隨著 bit array 填滿而下降（越來越多 bit 是 1，false positive rate 上升）。2014 年 CMU 的研究者提出了 cuckoo filter，用不同的思路解決了這些問題。</p><p id="503f0933-36bb-41ee-b04c-bf33068a47f3" class="" dir="auto">Cuckoo filter 不用 bit array，而是把元素的 fingerprint（一小段 hash 值）存進一張類似 hash table 的結構，用 cuckoo hashing 的方式處理碰撞：一個元素有兩個候選位置，插入時如果兩個都滿了，就把其中一個「踢走」到它的另一個候選位置，像杜鵑鳥把別人的蛋踢出巢一樣。因為存的是 fingerprint 而不是單純的 bit，刪除時可以精確移除特定元素的 fingerprint，不會影響其他元素。</p><p id="98ffa691-4b13-4b1d-8d6b-63af2abcf8f3" class="" dir="auto">在相同的 FPR 下，cuckoo filter 的空間效率和 Bloom filter 差不多，但額外支援了刪除操作，而且每次查詢只需要檢查 2 個位置（對 cache 非常友善），比 Bloom filter 的 k<em>k</em> 次 random access 更快。不過 cuckoo filter 有容量上限，塞太滿的時候插入可能失敗，這點和 Bloom filter 的「永遠能插入」不同。</p></div></p><hr id="33da15e2-9005-8046-a218-dad771e0495f" dir="auto"/><p id="33da15e2-9005-8056-a00d-df3f5109ee2b" class="" dir="auto"><strong>運作流程</strong>：<div class="indented"><p id="33da15e2-9005-808f-8517-df76cf2e6d33" class="" dir="auto"><strong>插入</strong>：將元素通過 k 個 hash functions 得到 k 個索引，並將位元陣列中對應的位置全部設為 1。</p><p id="33da15e2-9005-803c-84c7-ec2bb0b8546d" class="" dir="auto"><strong>查詢</strong>：檢查該元素對應的 k 個位置。若有任何一個位元為 0，則該元素<strong>必定不在</strong>集合中；若全部為 1，則該元素<strong>可能在</strong>集合中。</p></div></p><p id="33da15e2-9005-8098-85d6-f04378233804" class="" dir="auto"><strong>關鍵屬性</strong>：<div class="indented"><p id="33da15e2-9005-80d5-b32d-e59fa0ddad34" class="" dir="auto"><strong>No False Negatives</strong>：如果東西在裡面，一定查得到。</p><p id="33da15e2-9005-8056-a766-f201b8e2fcf1" class="" dir="auto"><strong>不可取出性</strong>：陣列不儲存原始資料，因此無法列舉集合內容，也無法還原 Key。</p><p id="33da15e2-9005-80e2-ad1b-cfbbe1ae8f61" class="" dir="auto"><strong>靜態性</strong>：標準 Bloom Filter 一旦建立，大小 m 就固定了，且不支援刪除。</p></div></p><hr id="33aa15e2-9005-80b8-91b5-c47253faae3a" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-809b-887d-f5269e23f429" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80ee-8b49-ef9dd650d00f" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p><p id="33da15e2-9005-8042-8c34-f8a63ca31414" class="" dir="auto"><strong>過載崩潰</strong>：當插入元素數量 n 超出預期（n &gt; m/k 太多時），bit array 會幾乎全變成 1，此時 False Positive Rate 會趨近 100%，失去過濾功能。</p><p id="33da15e2-9005-802c-9692-d5b0cac0fc20" class="" dir="auto"><strong>不支援刪除</strong>：隨意將位元由 1 變為 0 會破壞其他元素的完整性。如果強烈需要刪除，請考慮 <strong>Counting Bloom Filter</strong>。</p><p id="33da15e2-9005-80cb-8ee9-f5e04a2b29cb" class="" dir="auto"><strong>雜湊選擇</strong>：如果 k 個 hash functions 相關性太高，會導致位元分布不均，誤判率會比理論值高出許多。</p></div></aside><hr id="33aa15e2-9005-804c-8b4d-c9a5ef165fea" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80f8-9d6e-c8598a859f5a" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8088-8f47-de21f868783e" class="" dir="auto">Reference: <a href="https://hur.st/bloomfilter/">https://hur.st/bloomfilter/</a></p></div></aside><hr id="33aa15e2-9005-800e-a7a4-d330b9eda6b7" dir="auto"/></div></details><details id="33da15e2-9005-8049-9307-eb17457c5522" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Hash function</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-802a-b379-d9954a534abb" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-80cd-8530-d19465520906" class="" dir="auto">在 Bloom Filter 中，雜湊函數負責將任意長度的輸入數據映射到 [0, m-1] 的範圍內，作為位元陣列的索引。</p></div></aside><hr id="33da15e2-9005-807f-b1db-f1ed14ba06e3" dir="auto"/><p id="33da15e2-9005-8045-b0a3-cfa6e2842463" class="" dir="auto"><strong>效能要求</strong>：<div class="indented"><p id="33da15e2-9005-80b1-9c71-c5ccf36da02f" class="" dir="auto">因為一次操作需要 k 次雜湊，通常使用 <strong>Non-cryptographic hash</strong>（如 MurmurHash3, CityHash, xxHash），運算速度極快且分布均勻。</p></div></p><p id="33da15e2-9005-8010-b9be-da83dfe0d3bc" class="" dir="auto"><strong>優化技巧</strong>：<div class="indented"><p id="33da15e2-9005-8066-a57b-e5e723c8f014" class="" dir="auto">實務上不需要真的寫 k 個演算法，通常利用兩個雜湊值 h1(x) 與 h2(x) 透過公式 <span data-notion-inline-equation="g_i(x) = h1(x) + i \cdot h2(x)" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">h</span><span class="mord">1</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">h</span><span class="mord">2</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span></span></span></span></span> 來模擬出 k 個雜湊函數。</p></div></p><hr id="33da15e2-9005-8011-86e3-e164af457bb5" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-803c-bc1b-fb00ccbe9427" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-801b-8887-d3e348062392" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p><p id="33da15e2-9005-801d-8998-c0b9bd45209e" class="" dir="auto"><strong>運算開銷</strong>：k 值的設定是雙面刃。k 越大，FPR 越低，但 CPU 計算雜湊的次數就越多。</p></div></aside><hr id="33da15e2-9005-80b2-9323-fb8b0c19d777" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8020-a757-d90f847f0f1d" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-80db-a767-fe95fc8a2534" class="" dir="auto">Reference: </p></div></aside><hr id="33da15e2-9005-80a3-bdd5-c677b8148073" dir="auto"/></div></details><details id="33da15e2-9005-806c-9627-d6a9e3de760d" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Bit array</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-800f-a603-ef9f70f0e960" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-80a7-85f2-f46c068d46d5" class="" dir="auto">一組連續的記憶體空間，最小單位是 1 bit。這是 Bloom Filter 節省空間的核心實體。</p></div></aside><hr id="33da15e2-9005-8002-803f-f85ac4016804" dir="auto"/><p id="33da15e2-9005-806e-b514-e7779823389d" class="" dir="auto">存取效率：由於是連續空間，對硬體緩存（Cache）友善；但當 m 非常大時，隨機存取 k 個不同位置可能會造成 Cache Miss。</p><hr id="33da15e2-9005-8041-b7c9-eb14cb57ad9e" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-809b-9f03-e3f60bd9cfdd" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-80e0-823f-f24fbc9f70ca" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p><p id="33da15e2-9005-80f4-8cb9-e3e2bdd924f1" class="" dir="auto"><strong>記憶體對齊</strong>：在程式實作時，通常是用 <code>byte</code> 或 <code>long</code> 陣列模擬，存取特定 bit 需要正確的位元運算（Bitwise offset）。</p></div></aside><hr id="33da15e2-9005-805b-931f-da5cba85713f" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8090-af5b-e8101ef8605e" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8020-b084-e9d0616bca9c" class="" dir="auto">Reference: </p></div></aside><hr id="33da15e2-9005-8014-9b23-e4b9bd4be88b" dir="auto"/></div></details><details id="33da15e2-9005-805a-8c8d-fc7a661af175" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>False positive</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8068-abff-e3f75b89a168" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8053-8dd9-e4e8a82827e3" class="" dir="auto">當查詢一個不存在的元素，但其對應的 k 個位置剛好都被其他元素標記為 1 時，導致過濾器錯誤回報「存在」。</p></div></aside><hr id="33da15e2-9005-8036-a5e9-d1fda1ad3732" dir="auto"/><p id="33da15e2-9005-8046-af24-cf5795406176" class="" dir="auto"><strong>數學期望</strong>：<span data-notion-inline-equation="FPR \approx (1 - e^{-kn/m})^k" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.00773em;">FPR</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.138em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.888em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mathnormal mtight">kn</span><span class="mord mtight">/</span><span class="mord mathnormal mtight">m</span></span></span></span></span></span></span></span></span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8491em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span></span></span></span></span></span></span></span></span>。</p><p id="33da15e2-9005-8003-8a03-f0732be8b84f" class="" dir="auto"><strong>系統設計觀點</strong>：在資料庫場景中，False Positive 只是增加了一次不必要的 Disk I/O，這被視為「效能損失」而非「正確性錯誤」。</p><hr id="33da15e2-9005-8018-99ae-d82ee94e4e84" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8014-86da-e7773e68b62a" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-807f-aebe-ed36e8f2b8cf" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p><p id="33da15e2-9005-8012-b351-ec1dc5b5bcc2" class="" dir="auto"><strong>累積風險</strong>：如果後端查詢（Disk Read）極其昂貴，必須將 FPR 設定得極低，這會導致記憶體需求 m 顯著增加</p></div></aside><hr id="33da15e2-9005-807d-8e52-cc4c5f97cf72" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-809a-871a-fc926c372e38" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-80dd-92cd-f10fc6aea7c6" class="" dir="auto">Reference: </p></div></aside><hr id="33da15e2-9005-8058-9ff7-fdaf3c77df09" dir="auto"/></div></details><details id="33da15e2-9005-80fa-8382-d6e1c8ef14e5" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Probabilistic data structure</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-806c-b46b-fa4c442a9644" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-800e-9184-d99fd0e22800" class="" dir="auto">一類以「不保證 100% 精確」為代價，換取極高空間效率與查詢速度的演算法與資料結構。</p></div></aside><hr id="33da15e2-9005-8037-8345-f42ab265512b" dir="auto"/><p id="33da15e2-9005-809a-8c92-f054507a89fe" class="" dir="auto"><strong>成員</strong>：除了 Bloom Filter，還包括 <strong>HyperLogLog</strong>（算不重複數量）、<strong>Count-Min Sketch</strong>（算頻率）。</p><hr id="33da15e2-9005-807e-a367-d646a3c2ea2e" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-80ef-a56f-d52e326c75f1" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-804d-b6ba-dbb937c30a8e" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p><p id="33da15e2-9005-8018-8f4c-fe1d1be7411b" class="" dir="auto"><strong>場景誤用</strong>：不可用於對錯誤「零容忍」的場景（如：銀行帳戶餘額查詢）。</p></div></aside><hr id="33da15e2-9005-80f7-9bc5-c75f910e6998" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-803f-90e0-f0f240f0297d" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-80e3-ad1f-d3fd963db2e7" class="" dir="auto">Reference: </p></div></aside><hr id="33da15e2-9005-8056-962d-c566e5d814e8" dir="auto"/></div></details><details id="33da15e2-9005-80b0-bbfc-dc0f67fe038d" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Space efficiency</strong></mark></summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-80ee-9dec-ca820fd403e8" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-808d-a9a2-eac7a2cdd042" class="" dir="auto">Bloom Filter 儲存單個元素所需的空間與元素本身的長度無關，僅與要求的誤判率有關。</p></div></aside><hr id="33da15e2-9005-80ff-a7f0-f45314286407" dir="auto"/><p id="33da15e2-9005-80cf-af6d-ee573cba9b7c" class="" dir="auto"><strong>優勢對比</strong>：在 FPR = 1% 時，每個元素僅需約 9.6 bits。相比之下，存儲原始字串可能需要數百 bits。</p><hr id="33da15e2-9005-80a7-b88e-f55296c6ba7b" dir="auto"/><aside class="block-color-brown_background callout" data-notion-callout="" data-notion-callout-background="brown_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-8031-a1f2-cb86f5d578ae" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-80aa-a05b-f6468961b24c" class="" dir="auto"><mark class="highlight-brown" data-notion-highlight="brown"><strong>Pitfall: </strong></mark></p><p id="33da15e2-9005-80de-9c6b-e295e110d8b8" class="" dir="auto"><strong>Diminishing Returns (邊際遞減)</strong>：當你已經投入一定記憶體後，再增加記憶體所能降低的誤判率會越來越不明顯。通常設定在 <span data-notion-inline-equation="m/n \approx 10" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">m</span><span class="mord">/</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">10</span></span></span></span></span> 是最經濟的選擇。</p></div></aside><hr id="33da15e2-9005-80fe-bd10-cb3dbb5b5790" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33da15e2-9005-80bf-b623-fa3a9e852d34" dir="ltr"><div style="width:100%"><p id="33da15e2-9005-8037-a466-ddd988b7600c" class="" dir="auto">Reference: </p></div></aside><hr id="33da15e2-9005-8014-bcfb-d31de1bbe980" dir="auto"/></div></details></div></details><details id="33aa15e2-9005-8073-a9ec-e4f242f99fe6" open="" class="toggle" dir="auto"><summary><strong>Test</strong></summary><div class="indented"><details id="33aa15e2-9005-800a-a83e-c0b89867ce91" open="" class="toggle" dir="auto"><summary><mark class="highlight-blue" data-notion-highlight="blue"><strong>Key Concepts</strong></mark></summary><div class="indented"><details id="33aa15e2-9005-8069-9fbf-f0b3521f4aa6" open="" class="toggle" dir="auto"><summary>理解 Bloom filter 的結構：使用 k 個 hash function 將元素映射到一個 bit array，插入時設定對應位元為 1，查詢時檢查所有對應位元</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80e7-b1a3-ec09646e0f17" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80c5-afd4-e77ceef4e4b6" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-80c8-98c0-fd008ce7448b" class="" dir="auto">Bloom filter 由一個長度為 m 的 Bit Array（初始全為 0）和 k 個不同的 Hash Function 組成。不存資料本身，只存資料 hash 後的「特徵點」。</p></div></p><hr id="33aa15e2-9005-805b-8d01-e36ea5fb6e1a" dir="auto"/><p id="33aa15e2-9005-8004-9471-cc0745ab49ee" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-808e-8a93-faa090033c5c" class="" dir="auto">Bit Array, Multiple Hash Functions, Space Efficiency。</p></div></p><hr id="33aa15e2-9005-80a5-828e-fb750bb5881c" dir="auto"/><p id="33aa15e2-9005-808d-9ebd-ccf9c8fb9131" class="" dir="auto">Detail<div class="indented"><p id="bdddedcb-1870-4506-9865-7822c1e6ae8f" class="" dir="auto">它不像是 Hash Map 會把原始資料字串存下來。當插入元素時，資料會分別經過 k 個 hash function，得出 k 個介於 0 到 m-1 的數字（索引位置），然後將陣列中這 k 個位置的 bit 設為 1。查詢時，做一樣的動作，檢查那 k 個位置：如果全部是 1，回答「可能存在」；如果有任何一個是 0，回答「絕對不存在」。</p></div></p></div></aside><hr id="33aa15e2-9005-80a6-b438-ca3b90216a05" dir="auto"/></div></details><details id="33aa15e2-9005-8026-bfa0-e2b8d5fa9c87" open="" class="toggle" dir="auto"><summary>理解 Bloom filter 保證沒有 false negative（存在的元素一定會被判定為存在），但允許 false positive（不存在的元素可能被誤判為存在）</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-807f-abee-c9ce68141d27" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80dc-8323-ddae42ac2326" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-803e-a88e-ee4632c49370" class="" dir="auto">只要你存過，那幾個 bit 一定是 1，所以絕對查得到（無 FN）。但如果沒存過，那幾個 bit 有可能被「其他人」不小心設成 1 了，導致誤判（有 FP）。</p></div></p><hr id="33aa15e2-9005-804c-ad46-f03c71216f53" dir="auto"/><p id="33aa15e2-9005-80ab-b885-f8985149da6a" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-809f-a757-e80204daf7cf" class="" dir="auto">False Positive (誤報), False Negative (漏報), Hash Collision (雜湊碰撞)。</p></div></p><hr id="33aa15e2-9005-80f2-8799-f55435764db7" dir="auto"/><p id="33aa15e2-9005-80a2-944b-c4268d48705d" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-80cf-aa28-f9eeaf59c433" class="" dir="auto">這源於 bit 的狀態不可逆（只能 0 變 1）。曾經插入的元素，其對應的 k 個 bit 永遠保持 1，因此查詢該元素時永遠會過關，這是保證「No False Negative」的根本。相對地，由於不同資料可能算出一樣的 hash 位置（Collision），當陣列逐漸變擠，你查詢一個新資料時，它對應的 k 個位置可能「剛好」都被先前其他資料設為 1 了，系統無從分辨，只能給出 False Positive。</p></div></p></div></aside><hr id="33aa15e2-9005-80af-9fbc-c5fd7be33529" dir="auto"/></div></details><details id="33aa15e2-9005-8029-a3d0-dcd999ba81e6" open="" class="toggle" dir="auto"><summary>理解 false positive rate 與 bit array 大小 m、hash function 數量 k、以及已插入元素數量 n 之間的數學關係</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-802d-8577-d95bebe07028" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8097-b3cc-c52f01bad3dd" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-8022-8fd3-e43eef3cc0ae" class="" dir="auto">陣列越長 (m)，FPR 越低；<br/>存入的元素越多 (n)，FPR 越高；<br/>Hash 函數數量 (k) 則有一個「黃金比例」能達到最佳的 FPR。</p></div></p><hr id="33aa15e2-9005-800f-a7f6-feb48a175af9" dir="auto"/><p id="33aa15e2-9005-8067-a476-e80f43c997ce" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-8037-873e-e67801befacd" class="" dir="auto">False Positive Rate (FPR), Bit/Element Ratio (m/n), Diminishing Returns (邊際效益遞減)。</p></div></p><hr id="33aa15e2-9005-8028-b438-e983b25f3108" dir="auto"/><p id="33aa15e2-9005-8037-9cbc-d4c8f11f2aaf" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-80e2-98e9-f0a80d3d44ef" class="" dir="auto"><strong>FPR 的數學期望值大約是 </strong><span data-notion-inline-equation="(1 - e^{-kn/m})^k" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.138em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.888em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mathnormal mtight">kn</span><span class="mord mtight">/</span><span class="mord mathnormal mtight">m</span></span></span></span></span></span></span></span></span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8491em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span></span></span></span></span></span></span></span></span><strong>。</strong></p><p id="33da15e2-9005-80ca-aea1-f4d197b37d57" class="" dir="auto">簡單來說，如果 Bit array 被填滿 1 的比例太高，FP 的機率就會飆升。<br/>為了降低 FPR，我們需要提高每個元素能分配到的 bit 數量（也就是增加 m/n 的比值）。<br/>然而增加 m 會遇到邊際效益遞減：<div class="indented"><p id="33da15e2-9005-806f-9cf2-c6af6be69dbf" class="" dir="auto">一開始增加記憶體可以讓 FPR 呈指數級下降，但降到極低時，再加倍記憶體也只會微幅改善。(大概比例是8 - 12是最好的)</p></div></p></div></p></div></aside><hr id="33aa15e2-9005-8056-ad76-dc707f9ad985" dir="auto"/></div></details><details id="33aa15e2-9005-80cc-9844-c92ca5a1166e" open="" class="toggle" dir="auto"><summary>知道如何根據預期的元素數量與可接受的 false positive rate 來選擇合適的 bit array 大小與 hash function 數量</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8059-ba10-c99273bfd567" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8096-86ae-f11df5325ed2" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-80b9-a13a-e6d18b64436e" class="" dir="auto">工程師不需要瞎猜參數，可透過對數公式，由 n 與 FPR 嚴格推導出最佳的陣列大小 m，再推導出最佳的 Hash 次數 k。</p></div></p><hr id="33aa15e2-9005-80b0-a684-fe89487521d1" dir="auto"/><p id="33aa15e2-9005-80fb-b526-e937193bc672" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-80dc-b810-cfa9249e5234" class="" dir="auto">Optimal Parameter Selection, Memory Allocation。</p></div></p><hr id="33aa15e2-9005-80ac-975f-dfcc9c068496" dir="auto"/><p id="33aa15e2-9005-805b-8571-f3dd603d9aaa" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-801c-b5af-ebe16c3e0461" class="" dir="auto">在系統設計時，我們會先評估「最大資料量 $n$」以及「業務能接受的誤判率 FPR」。接著帶入兩條黃金公式：</p><p id="33da15e2-9005-8084-92ca-d5ba45f8b827" class="" dir="auto">1. 最佳的 bit array 大小：<span data-notion-inline-equation="m = -\frac{n \ln(\text{FPR})}{(\ln 2)^2}" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.53em;vertical-align:-0.52em;"></span><span class="mord">−</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.01em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mop mtight"><span class="mtight">l</span><span class="mtight">n</span></span><span class="mspace mtight" style="margin-right:0.1952em;"></span><span class="mord mtight">2</span><span class="mclose mtight"><span class="mclose mtight">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7463em;"><span style="top:-2.786em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.485em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">n</span><span class="mspace mtight" style="margin-right:0.1952em;"></span><span class="mop mtight"><span class="mtight">l</span><span class="mtight">n</span></span><span class="mopen mtight">(</span><span class="mord text mtight"><span class="mord mtight">FPR</span></span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.52em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p><p id="33da15e2-9005-8030-9782-c687f6fe18b2" class="" dir="auto">2. 最佳的 hash 函數數量：<span data-notion-inline-equation="k = \frac{m}{n} \ln 2" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.0404em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6954em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">m</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">ln</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">2</span></span></span></span></span></p><p id="33da15e2-9005-804b-b992-c6026de2f81c" class="" dir="auto">透過這兩條公式，我們可以精確地預估系統需要開出多少 MB 的記憶體。</p></div></p></div></aside><hr id="33aa15e2-9005-8030-8f87-d1685ffb5e08" dir="auto"/></div></details></div></details><details id="33aa15e2-9005-80d1-b1d6-ed302b95d7d6" open="" class="toggle" dir="auto"><summary><mark class="highlight-teal" data-notion-highlight="teal"><strong>Test your understanding</strong></mark></summary><div class="indented"><details id="33aa15e2-9005-8029-86fb-ff2ed9da39b5" open="" class="toggle" dir="auto"><summary>為什麼 Bloom filter 保證沒有 false negative，但無法避免 false positive？請從 bit array 的操作機制解釋。</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80b8-8893-dda995dba651" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-800c-91f3-cd5213893541" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-809a-8239-db634fbf79da" class="" dir="auto">無 FN 是因為設為 1 的 bit 永遠不會變回 0；無法避免 FP 是因為不同資料產生的 Hash 位置會不可避免地產生重疊。</p></div></p><hr id="33aa15e2-9005-80d5-80b7-fe685cf4a323" dir="auto"/><p id="33aa15e2-9005-8027-baee-edcba21f3f05" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-809d-8629-d6dd5dff3fb2" class="" dir="auto">Irreversible State (不可逆狀態), Bit Overlap。</p></div></p><hr id="33aa15e2-9005-8014-83b7-e43f7d0a1342" dir="auto"/><p id="33aa15e2-9005-800d-8d49-f8727dd3b185" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-80dd-b5d5-e58bfdcd1515" class="" dir="auto">從 Bit 操作來看，Bloom Filter <strong>不支援把 1 設回 0 的操作</strong>。這代表「凡走過必留下痕跡」，只要存進去，痕跡永遠在，所以絕不會漏報（FN）。但也因為空間 (m) 是有限的，隨著資料量 (n) 增加，越來越多位元變成 1。當系統去檢查一個從未輸入過的字串時，它 Hash 出來的 k 個位置，可能「碰巧」踩在別人留下的 1 上面。因為我們沒有儲存原始字串來做 100% 比對，所以無法避免 FP。</p></div></p></div></aside><hr id="33aa15e2-9005-80a8-a0c9-e5b693461d8b" dir="auto"/></div></details><details id="33aa15e2-9005-801f-9873-d88a07b2f841" open="" class="toggle" dir="auto"><summary>一個系統要追蹤 5,000,000 個 URL 是否出現在黑名單中，可接受的 false positive rate 為 0.1%。請計算需要多大的 bit array（多少 MB）以及最佳的 hash function 數量 k。</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8042-aa2f-ce2c9bb0d467" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80f2-8eeb-d4402b99b27d" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-8038-9e2b-f2681cff4657" class="" dir="auto">需要約 8.57 MB 的 Bit Array，且最佳的 Hash function 數量為 10 個。</p></div></p><hr id="33aa15e2-9005-80af-81d2-dacf39fc6027" dir="auto"/><p id="33aa15e2-9005-808d-bd88-e6bb4580cef9" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-8050-9e98-cd1b55640064" class="" dir="auto">Parameter Calculation, Storage Overhead。</p></div></p><hr id="33aa15e2-9005-809e-a943-c5dd7c886d1f" dir="auto"/><p id="33aa15e2-9005-80ee-a8d4-f851c352e858" class="" dir="auto">Detail<div class="indented"><p id="33aa15e2-9005-8065-9469-de32ab84c366" class="" dir="auto"><strong>計算 m</strong>：<div class="indented"><p id="33da15e2-9005-80c3-bed3-fafb24309acd" class="" dir="auto">公式 <span data-notion-inline-equation="m = \frac{-n \ln(\text{FPR})}{(\ln 2)^2}" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.53em;vertical-align:-0.52em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.01em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mop mtight"><span class="mtight">l</span><span class="mtight">n</span></span><span class="mspace mtight" style="margin-right:0.1952em;"></span><span class="mord mtight">2</span><span class="mclose mtight"><span class="mclose mtight">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7463em;"><span style="top:-2.786em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.485em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mathnormal mtight">n</span><span class="mspace mtight" style="margin-right:0.1952em;"></span><span class="mop mtight"><span class="mtight">l</span><span class="mtight">n</span></span><span class="mopen mtight">(</span><span class="mord text mtight"><span class="mord mtight">FPR</span></span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.52em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p><p id="33da15e2-9005-8084-81ae-c05c8c8ca3a7" class="" dir="auto"> n = 5,000,000, FPR = 0.001</p><p id="33da15e2-9005-807d-8ca5-e6176c94a959" class="" dir="auto"><span data-notion-inline-equation="m = \frac{-5,000,000 \times (-6.9077)}{0.48045} \approx 71,887,938 \text{ bits}" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.355em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.01em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">0.48045</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.485em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">5</span><span class="mpunct mtight">,</span><span class="mord mtight">000</span><span class="mpunct mtight">,</span><span class="mord mtight">000</span><span class="mbin mtight">×</span><span class="mopen mtight">(</span><span class="mord mtight">−</span><span class="mord mtight">6.9077</span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord">71</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">887</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">938</span><span class="mord text"><span class="mord"> bits</span></span></span></span></span></span></p><p id="33da15e2-9005-80e3-9ac5-fe52ab0bd396" class="" dir="auto">將 Bits 換算為 Megabytes：<span data-notion-inline-equation="71,887,938 \div 8 \div 1024 \div 1024 \approx \textbf{8.57 MB}" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">71</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">887</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">938</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">÷</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">÷</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1024</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">÷</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1024</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6861em;"></span><span class="mord text"><span class="mord textbf">8.57 MB</span></span></span></span></span></span>。</p></div></p><p id="33da15e2-9005-80c2-adb5-ca76276cb051" class="" dir="auto"><strong>計算 k</strong>：<div class="indented"><p id="33da15e2-9005-807c-94c8-d3b8fc6090a9" class="" dir="auto">公式 <span data-notion-inline-equation="k = \frac{m}{n} \ln 2" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.0404em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6954em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">m</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">ln</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">2</span></span></span></span></span></p><p id="33da15e2-9005-80d3-8328-ee3670f671f8" class="" dir="auto">平均每個元素分配到的 bits (m/n) 約為 14.37</p><p id="33da15e2-9005-80b1-ad83-d8fbc740dbc8" class="" dir="auto"><span data-notion-inline-equation="k = 14.37 \times 0.6931 \approx 9.96" class="notion-text-equation-token" contenteditable="false"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">14.37</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0.6931</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">9.96</span></span></span></span></span>  </p></div></p><p id="33da15e2-9005-80db-b8f2-d1526b977d62" class="" dir="auto"><em>結論：只花不到 9MB 的 RAM 就能過濾 500 萬筆資料，這就是 Bloom filter 驚人的空間效率！</em></p></div></p></div></aside><hr id="33aa15e2-9005-809e-9b80-c45d4f5f73f2" dir="auto"/></div></details><details id="33aa15e2-9005-8057-9c0d-d59bc156520b" open="" class="toggle" dir="auto"><summary>為什麼標準 Bloom filter 不支援刪除操作？如果硬把某個元素對應的 bit 設回 0，可能產生什麼後果？Counting Bloom filter 如何解決這個問題，代價是什麼？</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-806b-9bee-df000e13d19c" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8007-9d14-dfec0bcccf8e" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-80c2-adc9-e0fffea0e38e" class="" dir="auto">因為 Bit 是共用的，硬設為 0 會波及其他元素，產生致命的 False Negative。Counting Bloom filter 將 bit 改為整數計數器，能支援刪除但代價是記憶體爆增。</p></div></p><hr id="33aa15e2-9005-8042-97c6-e17700a84ada" dir="auto"/><p id="33aa15e2-9005-805a-8a6a-d1252a040167" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-80b7-a52d-d0210b546ff7" class="" dir="auto">Shared Bits, False Negative Hazard, Counting Bloom Filter</p></div></p><hr id="33aa15e2-9005-8071-aa38-f9486bdb36ef" dir="auto"/><p id="33aa15e2-9005-80eb-933b-dd36800008bf" class="" dir="auto">Detail<div class="indented"><p id="34effa57-be04-439a-8fd6-8cc6d299d44b" class="" dir="auto">假設字串 A 和字串 B 的 Hash 位置剛好都包含index 5。如果你刪除字串 A，並把index 5設回 0，這時字串 B 的資料就「被破壞」了。下次你查詢 B 時，系統看到index 5是 0，就會斷言「B 絕對不存在」，產生系統無法容忍的 False Negative。</p><p id="7d2475d1-c45f-4360-a988-1c09f63f8de1" class="" dir="auto"><strong>Counting Bloom filter</strong>的解法是將每個位置從1 bit變成例如4 bits的計數器（Counter）。插入時+1，刪除時-1，歸零才代表全空。代價非常直接：每單位空間消耗膨脹 4 倍，犧牲了原本極致的 Space Efficiency。</p></div></p></div></aside><hr id="33aa15e2-9005-80e3-b377-cae160d25a52" dir="auto"/></div></details><details id="33aa15e2-9005-80ae-9583-ccce95fa279a" open="" class="toggle" dir="auto"><summary>在什麼情境下 Bloom filter 的效益最大？在什麼情境下效益很小甚至不值得用？請從 workload 的 read/write 比例和 key 存在率的角度分析。</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-803d-985a-ef917f4a5bfe" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80cd-8540-ccea6d8b0935" class="" dir="auto">Answer<div class="indented"><p id="33aa15e2-9005-8088-9e1c-ec9f192efcba" class="" dir="auto">在「讀多寫少」且「大部分查詢的資料都不存在」時效益最大；若「寫入/更新極頻繁」或「絕大部分查詢都會命中」則不值得用。</p></div></p><hr id="33aa15e2-9005-8026-a52f-db0690aa03ce" dir="auto"/><p id="33aa15e2-9005-8060-969e-fa15b8a356f3" class="" dir="auto">Key Concept<div class="indented"><p id="33aa15e2-9005-8033-a9c4-eb63ec7ee89e" class="" dir="auto">I/O Filter (I/O 擋板), Read/Write Ratio, Hit/Miss Rate</p></div></p><hr id="33aa15e2-9005-8013-9c60-ce8fb379f6cc" dir="auto"/><p id="33aa15e2-9005-80fc-84a8-db0bd0e061d4" class="" dir="auto">Detail<div class="indented"><ul id="3d911be1-9d47-4f88-a1d9-68c692376a53" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>效益最大 (做為擋板)</strong>：<p id="33da15e2-9005-8072-a2d5-f7f64c741383" class="" dir="auto">例如惡意網址黑名單、防止快取穿透 (Cache Penetration)、LSM-Tree 的磁碟讀取優化。在這些情境下，超過 99% 的查詢都是「不在資料庫裡」的。Bloom filter 可以純靠記憶體瞬間給出「絕對不存在」的答案，幫資料庫擋下海量的無效 Disk I/O。</p></li></ul><ul id="24031ab2-b04b-4e66-a11c-dd3db225c4e3" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>效益極小 (甚至拖慢效能)</strong>：<p id="33da15e2-9005-8093-b0cb-dd00f12e5fe9" class="" dir="auto">如果系統大部分時間都在 <code>UPDATE</code> 或 <code>DELETE</code>（Bloom filter 處理很差），或是系統的使用者查詢的通常是「一定存在於資料庫裡的熱門資料」。因為只要回答「可能存在」，你終究還是得去查 Disk 驗證。這時 Bloom Filter 不僅沒省到 I/O，反而白白浪費了 CPU (算 Hash) 與 RAM (存 Array)。</p></li></ul></div></p></div></aside><hr id="33aa15e2-9005-800e-987f-f42e292f6863" dir="auto"/></div></details></div></details><details id="33aa15e2-9005-8094-bf5a-f60931c571e0" open="" class="toggle" dir="auto"><summary><mark class="highlight-red" data-notion-highlight="red"><strong>Quiz Pool</strong></mark></summary><div class="indented"><ol type="1" id="33aa15e2-9005-8091-89c1-c7b288cd441b" class="numbered-list" start="1" dir="auto"><li>一個 key-value store 的查詢工作負載中，90% 的 read 查詢對應的 key 都確實存在於資料庫中，只有 10% 的 read 查詢是查不存在的 key。工程師想在每個 SSTable 前加上 Bloom filter (FPR = 1%) 來加速讀取效率。請問在這個工作負載下，Bloom filter 對 <strong>read 效能</strong>的提升幅度，相比於「90% key 不存在、10% key 存在」的工作負載會有什麼差異？<blockquote id="33aa15e2-9005-8036-a76a-fa18a25e0b27" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80ca-8df3-f76bc0840b62" class="numbered-list" start="1" dir="auto"><li>提升幅度相同，因為 Bloom filter 的 FPR 固定為 1%，與工作負載中 key 的存在率無關。</li></ol><ol type="1" id="33aa15e2-9005-80f2-9507-e2d47334f9a7" class="numbered-list" start="2" dir="auto"><li>提升幅度較大，因為存在的 key 佔多數，Bloom filter 可以快速確認它們確實存在，省掉不必要的搜尋。</li></ol><ol type="1" id="33aa15e2-9005-80b2-b6ee-f2852dde490b" class="numbered-list" start="3" dir="auto"><li>提升幅度較大，因為較高的 key 存在率代表資料分布更集中，雜湊函數的碰撞率下降，FPR 也跟著降低。</li></ol><ol type="1" id="33aa15e2-9005-8007-a672-f9ef044ebdaf" class="numbered-list" start="4" dir="auto"><li>提升幅度較小，因為 Bloom filter 只能省掉「查不到的 key」的 disk I/O，而這類查詢在此工作負載中只佔 10% 。</li></ol></blockquote><details id="33aa15e2-9005-800e-a143-fb08ec1e202b" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-805c-93c6-e24bc421ea1d" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-806f-859d-f23f571edab0" class="" dir="auto">提升幅度較小，因為 Bloom filter 只能省掉「查不到的 key」的 disk I/O，而這類查詢在此工作負載中只佔 10% 。</p><hr id="33aa15e2-9005-80c1-9e61-dbc1265cff28" dir="auto"/><p id="33aa15e2-9005-800c-b0ea-fe33a14fd978" class="" dir="auto">解析: <div class="indented"><p id="342228eb-2e8d-4b1f-b953-dd2094719610" class="" dir="auto">Bloom filter 的核心價值在於「能準確判定key 絕對不存在」，從而規避不必要的disk I/O。然而，若key 確實存在於SSTable 中，Bloom filter 只能回傳「可能存在」，系統仍須執行實體磁盤讀取以取得value。 在此工作負載中，不存在的key 僅佔10%。即便Bloom filter 誤判率(FPR) 低至1%，其所能節省的disk I/O 頂多僅佔整體的9.9% (10%×99%)。相較之下，若不存在查詢佔90%，最多可省掉約89.1% 的disk read，效益差距懸殊。</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8077-b92d-f25e65cc2ff9" dir="auto"/><ol type="1" id="33aa15e2-9005-80b1-98a9-c2d5124c428a" class="numbered-list" start="2" dir="auto"><li>某個團隊正在為一個 LSM-tree based 的 key-value store 設計查詢加速機制。資料主要存放在 SSD 上； 若無法先用 memory metadata 過濾，就必須往下檢查多個 SSTable，造成額外 I/O。團隊正在評估是否導入 標準 Bloom filter。<p id="33aa15e2-9005-808f-bcfb-f91f4a944bf1" class="" dir="auto">以下哪一個情境最適合使用標準 Bloom filter，且最能發揮其效益？</p><blockquote id="33aa15e2-9005-80af-9adc-e7ed075b4add" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80be-80fe-d93504a116f2" class="numbered-list" start="1" dir="auto"><li>系統對 false positive 完全不能接受，因此團隊決定使用標準 Bloom filter，因為它可以同時保證沒有 false negative，也沒有 false positive。</li></ol><ol type="1" id="33aa15e2-9005-80f4-b833-d99e90549b7f" class="numbered-list" start="2" dir="auto"><li>系統是 read-heavy，且有大量查詢是在找不存在的 key。若 Bloom filter 判定某 key 不存在，就可以直接跳過多個 SSTable，減少不必要的 SSD I/O；而系統幾乎不需要刪除操作。</li></ol><ol type="1" id="33aa15e2-9005-808a-93e3-c96a9b694737" class="numbered-list" start="3" dir="auto"><li>系統是 write-heavy，且大部分查詢的 key 都真的存在。團隊希望 Bloom filter 直接回覆 key 一定存在，藉此避免大部分資料讀取。</li></ol><ol type="1" id="33aa15e2-9005-80a6-9325-c72a0c5c29e4" class="numbered-list" start="4" dir="auto"><li>系統需要頻繁刪除元素。團隊認為只要把某元素對應的 bit 全部設回 0，就能安全刪除，而且不會影響其他元素。</li></ol></blockquote><details id="33aa15e2-9005-8073-9f5c-ccff51d77a44" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8061-8e5e-c83b5be67e3d" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8092-9da5-de24230664f8" class="" dir="auto">系統是 read-heavy，且有大量查詢是在找不存在的 key。若 Bloom filter 判定某 key 不存在，就可以直接跳過多個 SSTable，減少不必要的 SSD I/O；而系統幾乎不需要刪除操作。</p><hr id="33aa15e2-9005-8048-ba3c-ffdce34c17ee" dir="auto"/><p id="33aa15e2-9005-806a-9786-f286cb197218" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-80a3-ac8c-f648938c232f" class="" dir="auto">標準 Bloom filter 最適合用在 read-heavy、negative lookup 很多、而且底層查詢成本高的情境。 它能先在記憶體中擋掉大量不存在的查詢，避免白跑多個 SSTable 或 SSD read；若系統又幾乎不需要刪除， 那麼標準 Bloom filter 就很適合。</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8000-999a-e797f0ecf73f" dir="auto"/><ol type="1" id="33aa15e2-9005-80c0-9d2e-ca36d7af103a" class="numbered-list" start="3" dir="auto"><li>一個儲存引擎在每個 Slotted Page 的 header 中實作了 Bloom Filter，以避免在解析 slot directory 時消耗不必要的 CPU 週期。 當一個 record 從頁面中被刪除時，引擎會更新 slot directory 並移除指標，但不會修改 Bloom Filter 中的 bits（因為標準的 Bloom Filter 並不支援位元清除功能）。 如果隨後針對該已刪除的 key 進行搜尋，Bloom Filter 中的這些「過時」資訊會如何影響儲存引擎的運作？<blockquote id="33aa15e2-9005-80db-8627-d327e0b217de" class="" dir="auto"><ol type="1" id="33aa15e2-9005-806e-a50d-f02107fe7cad" class="numbered-list" start="1" dir="auto"><li>它會產生 False Negative，導致引擎在未檢查其他 page 的情況下，錯誤地回報該 key 不存在於資料庫中的任何地方。</li></ol><ol type="1" id="33aa15e2-9005-8015-9f63-e8577c1a3f8b" class="numbered-list" start="2" dir="auto"><li>它會導致 False Positive，即 filter 顯示該 key「可能」存在，進而迫使引擎去檢查 slot directory，最後才發現該 record 其實並不存在。</li></ol><ol type="1" id="33aa15e2-9005-8090-bed8-f3d505a43ce9" class="numbered-list" start="3" dir="auto"><li>它會強迫引擎將該 Bloom Filter 視為失效 invalidated，從而繞過 filter，並對後續該 page 的所有請求都預設執行 data area 的 full scan 。</li></ol><ol type="1" id="33aa15e2-9005-8072-8783-da8acd409e15" class="numbered-list" start="4" dir="auto"><li>它會在頁面 header 中觸發 Hash Collision Conflict，在該頁面重新寫入（rewrite）之前，阻止任何新的 record 被 hash 進入該特定的 Bloom Filter。</li></ol></blockquote><details id="33aa15e2-9005-803a-98b8-fbd9fa8f714e" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80a8-bca9-e585b7c55f49" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8065-88e6-ca60aec4ce0a" class="" dir="auto">它會導致 False Positive，即 filter 顯示該 key「可能」存在，進而迫使引擎去檢查 slot directory，最後才發現該 record 其實並不存在。</p><hr id="33aa15e2-9005-8026-8e28-e09bae14bd4a" dir="auto"/><p id="33aa15e2-9005-8092-bc06-f32735e76e09" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-805d-8749-cdfeb1259119" class="" dir="auto">因為多個 key 可能共享同一個 bit，所以無法輕易刪除 bit。系統仍能保持正確性，因為最終檢查 slot directory（真實數據來源）時會確認該資料已不存在。</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-808b-bd9d-f3293c09eeec" dir="auto"/><ol type="1" id="33aa15e2-9005-800e-9468-c0349f40745f" class="numbered-list" start="4" dir="auto"><li>在 Bloom Filter 中，假設位元陣列大小<em>m</em>與插入元素數量<em>n</em>固定。當我們不斷增加雜湊函數的數量<em>k</em>時，下列關於系統表現的敘述何者最準確？<blockquote id="33aa15e2-9005-80f3-81f4-cb92cdadb9e9" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80fb-adc1-f889cc4a3964" class="numbered-list" start="1" dir="auto"><li>增加 <em>k</em> 會導致『查詢操作』的計算開銷增加，但由於位元陣列大小 <em>m</em> 不變，因此對 CPU cache locality 沒有影響。</li></ol><ol type="1" id="33aa15e2-9005-8052-bfb7-f6ebda6f17d0" class="numbered-list" start="2" dir="auto"><li>若 <em>k</em> 增加到讓位元陣列中 1 的比例達到 100%，則 Bloom Filter 會開始產生 False Negative。</li></ol><ol type="1" id="33aa15e2-9005-8076-a730-c9bcf286b32d" class="numbered-list" start="3" dir="auto"><li>False Positive Rate 會先下降後上升。其背後的物理意義是：較小的 <em>k</em> 導致雜湊組合能力不足（碰撞多），而較大的 <em>k</em> 則導致位元陣列過於擁擠（1 太多）。</li></ol><ol type="1" id="33aa15e2-9005-80e4-9162-e922c2e5af8f" class="numbered-list" start="4" dir="auto"><li>False Positive Rate 會隨著 <em>k</em> 的增加而遞減，因為更多的雜湊函數代表更強的唯一性檢查。</li></ol></blockquote><details id="33aa15e2-9005-80f0-9962-eabefb2c04ab" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-805d-8a90-e2f5128398b6" dir="ltr"><div style="width:100%"><p id="163701d4-60c0-4f18-af84-4171131567ac" class="" dir="auto">False Positive Rate 會先下降後上升。其背後的物理意義是：較小的k 導致雜湊組合能力不足（碰撞多），而較大的k 則導致位元陣列過於擁擠（1 太多）。</p><hr id="33aa15e2-9005-80ec-9f34-fb0efeb3b663" dir="auto"/><p id="33aa15e2-9005-8063-8bcb-ed45ae67ba29" class="" dir="auto">解析: <div class="indented"><p id="631363ab-b8aa-4347-8f95-ed8d30f888b8" class="" dir="auto">當k 較小時，雖然位元陣列很空（1 少），但因為檢查點太少，容易發生隨機碰撞。當k 較大時，每個元素標記過多位元，導致位元陣列中 1 的密度過高（趨近飽和），查詢時所有位元都命中 1 的機率反而上升。</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8047-8458-c05c49998fca" dir="auto"/><ol type="1" id="33aa15e2-9005-802d-b9c0-ced46eb145d8" class="numbered-list" start="5" dir="auto"><li><mark class="highlight-red" data-notion-highlight="red">在一座使用 LSM-Tree 架構的儲存系統中，工程師發現現有的 Bloom filter（設定m/n=10,k=7,FPR≈0.82%）在處理特定 workload 時，仍產生過多不必要的 disk read。為了優化效能，團隊計畫將m/n提升至 15（並配合調整最佳</mark><em><mark class="highlight-red" data-notion-highlight="red">k</mark></em><mark class="highlight-red" data-notion-highlight="red">值），同時有成員提議為了支援過期資料的清理，應直接將對應的 bit 設為 0 以實現刪除功能。根據 Bloom filter 的設計邏輯，下列敘述何者最精確？</mark><blockquote id="33aa15e2-9005-80e1-b2c6-d02ae990569d" class="" dir="auto"><ol type="1" id="33aa15e2-9005-807e-aaa9-c708123c6265" class="numbered-list" start="1" dir="auto"><li>記憶體空間將增加 6 倍，且雖然 FPR 會降至 0.03%，但標準 Bloom filter 在執行刪除操作後會導致 FPR 逐漸惡化。</li></ol><ol type="1" id="33aa15e2-9005-80d4-9914-fdcd0e8633af" class="numbered-list" start="2" dir="auto"><li>記憶體空間將增加 1.5 倍，且若將 bit 設為 0 來執行刪除，會因為 hash 碰撞導致本來不存在的元素被誤判為存在，產生嚴重的 false positive。</li></ol><ol type="1" id="33aa15e2-9005-80b0-bada-f2be3892d7a7" class="numbered-list" start="3" dir="auto"><li>記憶體空間將增加 1.5 倍，但根據 diminishing return 原則，FPR 從 m/n=10提升至 15 的改善幅度微乎其微，不建議此更動。</li></ol><ol type="1" id="33aa15e2-9005-806c-929d-d391ff2a01ed" class="numbered-list" start="4" dir="auto"><li>記憶體空間將增加 1.5 倍，FPR 會大幅下降至約 0.03%（約 27 倍），但手動將 bit 設為 0 會導致系統產生 false negative。</li></ol></blockquote><details id="33aa15e2-9005-8077-9ff5-ca8d9735484c" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8023-b018-f12ad35e0eeb" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80b9-a54a-dab7d5968566" class="" dir="auto">記憶體空間將增加 1.5 倍，FPR 會大幅下降至約 0.03%（約 27 倍），但手動將 bit 設為 0 會導致系統產生 false negative。</p><hr id="33aa15e2-9005-808e-819c-ccb880e379b2" dir="auto"/><p id="33aa15e2-9005-80e9-93d5-c2850b6198c0" class="" dir="auto">解析: <div class="indented"><p id="b5343ce6-7dcc-446d-96bf-8ec320843cf4" class="" dir="auto">根據大抄，m/n從 10 增加到 15 會使記憶體用量增加 50%，而 FPR 會從 0.82% 顯著降至 0.03%，展現極佳的過濾效率提升。然而，標準 Bloom filter 不支援刪除操作，因為多個元素的 hash 位置可能重疊。若強制將 bit 設為 0，可能會清掉其他元素共享的 bit，導致本來存在的元素被誤判為不存在，即產生 false negative，這在儲存系統中等同於資料遺失。</p></div></p><hr id="33da15e2-9005-80b4-97b3-fa9d2f1a44e8" dir="auto"/><p id="33da15e2-9005-80f1-999d-e07053c09a34" class="" dir="auto">(1) 記憶體增加 6 倍是升級為 counting Bloom filter（每個位置 4 bits）後的計算結果，僅提升m/n比例至 15 只會帶來 1.5 倍的空間增長。此外，標準 Bloom filter 刪除 bit 的核心風險是導致 false negative，而非僅是 FPR 的惡化。</p><p id="33da15e2-9005-80ea-95be-c32a6461a328" class="" dir="auto">(2) 將 bit 設為 0 會讓原本為 1 的位置變成 0。根據查詢邏輯，只要有一個位置為 0 就會判定為「絕對不存在」。因此，刪除操作會導致原本存在的資料被判定為不存在（false negative），而非增加誤判存在的機率（false positive）。</p><p id="33da15e2-9005-8060-a13a-c02888f0a656" class="" dir="auto">(3) 這是對 diminishing return 的誤解。大抄指出從m/n=10增加到 15 時，FPR 會大幅下降約 27 倍，這仍屬於高效益的優化區間。真正的 diminishing return 是在m/n超過 15（例如從 15 增加到 20）之後，FPR 的降幅才會顯著變小，不再具備明顯的記憶體投資報酬率。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80c8-950d-db0d67616ca9" dir="auto"/><ol type="1" id="33aa15e2-9005-80be-9179-dd3ddb9bf8f7" class="numbered-list" start="6" dir="auto"><li><mark class="highlight-red" data-notion-highlight="red">某高 QPS 的 in-memory key-value service 使用 Bloom filter 做 negative lookup pruning。 效能分析顯示：95% 的查詢 key 實際上不存在，Bloom filter 的 FPR 為 0.6%，false positive 觸發的 exact lookup 成本約 800 ns。 Bloom filter 本身每次查詢的 hash 計算成本約 10 ns，但因為 probe 的位置分散在 bit array 的不同區域，平均造成 4 次 cache miss（每次 40 ns）。 團隊希望降低平均查詢延遲，且不明顯增加記憶體用量。下列哪一個調整方向最合理？</mark><blockquote id="33aa15e2-9005-8009-9206-fe36f4ffc434" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8004-b042-e5cc6a2be624" class="numbered-list" start="1" dir="auto"><li>改用 Counting Bloom filter，因為 counter 比 bit 擁有更多資訊量，所以能在不改變主要成本結構的情況下，同時改善 Bloom filter 的查詢效率。</li></ol><ol type="1" id="33aa15e2-9005-8016-a06a-e1a3141e5697" class="numbered-list" start="2" dir="auto"><li>改用更快的 hash function 實作，如此能大幅降低 Bloom filter 的計算成本，能直接改善平均查詢成本。</li></ol><ol type="1" id="33aa15e2-9005-8005-8dee-c6317ddd840e" class="numbered-list" start="3" dir="auto"><li>調整 Bloom filter 的設計，使每次查詢時所需檢查的 bit 盡量集中在少數幾個相鄰的記憶體區塊，而不是分散在整個 bit array 中</li></ol><ol type="1" id="33aa15e2-9005-80d2-b000-fc5fcd8c11eb" class="numbered-list" start="4" dir="auto"><li>進一步增大 bit array，降低 FPR，如此可以大幅降低昂貴的 exact lookup 成本，進而降低平均查詢成本。</li></ol></blockquote><details id="33aa15e2-9005-8043-8d90-fefe2191a2a9" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80d3-9aa7-ff7818cd9352" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8084-9e37-eda27444b37c" class="" dir="auto">調整 Bloom filter 的設計，使每次查詢時所需檢查的 bit 盡量集中在少數幾個相鄰的記憶體區塊，而不是分散在整個 bit array 中</p><hr id="33aa15e2-9005-808f-be1c-ce552d6f3ddc" dir="auto"/><p id="33aa15e2-9005-8078-b67e-e960090d6432" class="" dir="auto">解析: <div class="indented"><p id="df3d99d3-9427-4f66-ad9a-cea774877d65" class="" dir="auto">主要的成本結構如下：</p><p id="9abcf69b-228b-4b9e-8e5c-918a9cbcb406" class="" dir="auto">hash 計算成本：10 ns<br/>cache miss 成本：4 次 × 40 ns = 160 ns<br/>false positive 成本：0.95 × 0.6% × 800 ns = 4.56 ns 從此可以看出 cache miss 是主要的成本來源。 將查詢時所需檢查的 bit 盡量集中在少數幾個相鄰的記憶體區塊，可以增加 cache locality，減少 cache miss 的次數，從而顯著降低平均查詢延遲。</p></div></p><hr id="33da15e2-9005-8097-bc6a-da25f47864ba" dir="auto"/><p id="33da15e2-9005-80f4-bf4b-d30a2d616268" class="" dir="auto">(1) Counting Bloom filter 的主要用途是支援較安全的 deletion，不是改善 cache locality。 而且 counter array 通常更大，cache miss 數量反而會增加，導致平均查詢延遲變更糟。</p><p id="33da15e2-9005-8076-9849-e203eadb3e08" class="" dir="auto">(2) 因為目前 Bloom filter 的 hash 計算成本只有 10 ns，相較於 cache miss 的 160 ns 相對要低得多。 因此即使改用更快的 hash function，對整體平均查詢延遲的改善也非常有限。</p><p id="33da15e2-9005-8046-9e4a-f87eb380ec32" class="" dir="auto">(3) 首先因為團隊不希望明顯增加記憶體用量，所以增大 bit array 和團隊設計理念不相符。 而且因為系統的主要瓶頸在於 Bloom filter 的 cache miss 成本，這個選項雖然能降低 FPR，但會顯著增加記憶體用量，造成 cache miss 數量增加，反而會讓平均查詢延遲變更糟。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80e7-b3f7-f264e3bdfad8" dir="auto"/><ol type="1" id="33aa15e2-9005-8056-8549-f1a3e654d18d" class="numbered-list" start="7" dir="auto"><li><a href="https://ieeexplore.ieee.org/document/6195533">Rottenstreich et al.</a> 提出了 Bloom Paradox 的觀察： Bloom Filter 的效果取決於查詢中「不存在的 key」比例。 如果大部分查詢的 key 都存在（hit rate 很高）， Bloom Filter 幾乎無法過濾查詢，反而可能降低效能。<p id="33aa15e2-9005-80f6-993d-c1e891088317" class="" dir="auto">請問以下哪一個選項最能正確說明其原因？</p><blockquote id="33aa15e2-9005-8014-a07d-eaaf5e94bd75" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80dc-935b-e5679f2281b5" class="numbered-list" start="1" dir="auto"><li>當 hit rate 很高時，Bloom Filter 會開始產生 false negative，導致部分存在的資料無法被查詢到。</li></ol><ol type="1" id="33aa15e2-9005-80ba-b710-cb6641adb4cf" class="numbered-list" start="2" dir="auto"><li>當 hit rate 很高時，Bloom Filter 的 false positive rate 會顯著上升，導致查詢結果錯誤。</li></ol><ol type="1" id="33aa15e2-9005-8016-b868-c37749aae5dd" class="numbered-list" start="3" dir="auto"><li>當 hit rate 很高時，Bloom Filter 幾乎總是回傳 positive，仍需進行實際 lookup，反而增加額外查詢成本。</li></ol><ol type="1" id="33aa15e2-9005-802f-8523-d64e228b64db" class="numbered-list" start="4" dir="auto"><li>Bloom Filter 的額外記憶體使用在高 hit rate 的情況下會加重系統負擔，因此不適合使用。</li></ol></blockquote><details id="33aa15e2-9005-8097-b636-f70735c70235" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80bd-a595-cbd903f86c41" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80b9-8d44-d29947ea2c3a" class="" dir="auto">當 hit rate 很高時，Bloom Filter 幾乎總是回傳 positive，仍需進行實際 lookup，反而增加額外查詢成本。</p><hr id="33aa15e2-9005-80ec-883b-d722ad5ee276" dir="auto"/><p id="33aa15e2-9005-809c-838c-ee16455e06cf" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-80a6-89a0-c39599383724" class="" dir="auto">當 key 大多存在時，Bloom Filter 無法有效過濾查詢， 幾乎每次都回傳 positive，導致仍需進行實際 lookup。 此時 Bloom Filter 會增加額外的 hash 計算與記憶體存取， 因此可能造成額外成本，形成 Bloom Paradox，使其不適合使用。</p></div></p><hr id="33da15e2-9005-80d3-84c3-ed281b242949" dir="auto"/><p id="33da15e2-9005-8048-bbcf-cf40b21a8d22" class="" dir="auto">(1) Bloom Filter 的特性是「可能 false positive，但不會 false negative」， 無論 hit rate 多高，都不會產生 false negative。</p><p id="33da15e2-9005-8049-a8fd-f62671eb76e4" class="" dir="auto">(2) false positive rate 與 Bloom Filter 的大小（m）與 hash 數量（k）有關， 並不會因為 hit rate 高而顯著上升。 且 Bloom Filter 不會產生 false negative，因此不影響查詢正確性。</p><p id="33da15e2-9005-8056-b599-f00c4e68b9c3" class="" dir="auto">(4) Bloom Filter 的空間使用主要取決於預期元素數量與目標 false positive rate， 並不會因為 hit rate 提高而增加。 因此這不是 Bloom Filter 不適用的主要原因。</p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8079-9db3-f69f2fd5d873" dir="auto"/><ol type="1" id="33aa15e2-9005-80eb-ad69-c839d12d6f8f" class="numbered-list" start="8" dir="auto"><li>某個 LSM-Tree based 的 key-value store 需要頻繁刪除過期資料。 工程師甲提議把每個 SSTable 上的標準 Bloom filter（每個位置 1 bit）換成 counting Bloom filter （每個位置改用 4-bit 計數器），以便安全地支援刪除操作。<p id="33aa15e2-9005-808d-af59-e8c307072668" class="" dir="auto">工程師乙針對這個提議提出了兩個觀察：</p><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-807f-a13f-c239faae8a0a" dir="ltr"><div style="width:100%"><ul id="33aa15e2-9005-8033-9dda-f3dd36851379" class="bulleted-list" dir="auto"><li style="list-style-type:disc">觀察 A：「Counting Bloom filter 的記憶體用量是標準版的 4 倍。」</li></ul><ul id="33aa15e2-9005-8087-9d84-f522270e23c1" class="bulleted-list" dir="auto"><li style="list-style-type:disc">觀察 B：「換成 counting Bloom filter 之後，就完全不會有 false positive 了。」</li></ul></div></aside><p id="33aa15e2-9005-8097-b276-e7b76dfb2564" class="" dir="auto">下列哪個選項對兩個觀察的判斷都正確？</p><blockquote id="33aa15e2-9005-80a9-9eee-e344bcffcc28" class="" dir="auto"><ol type="1" id="33aa15e2-9005-801b-8928-f4f7c191193a" class="numbered-list" start="1" dir="auto"><li>觀察 A 錯誤，觀察 B 錯誤。4-bit 計數器讓每個位置能表示 0～15，記憶體不只變 4 倍；且 false positive 依然無法消除。</li></ol><ol type="1" id="33aa15e2-9005-80e0-847f-ec4a42d573a1" class="numbered-list" start="2" dir="auto"><li>觀察 A 正確，觀察 B 錯誤。每個位置從 1 bit 換成 4 bits，記憶體確實變 4 倍；但 counting Bloom filter 只是允許安全刪除，false positive 仍然存在。</li></ol><ol type="1" id="33aa15e2-9005-8097-9e4e-e05ef789c093" class="numbered-list" start="3" dir="auto"><li>觀察 A 正確，觀察 B 正確。Counting Bloom filter 把每個 bit 換成 4-bit 計數器，記憶體變 4 倍；計數器讓插入與刪除精確配對，所以消除了 false positive。</li></ol><ol type="1" id="33aa15e2-9005-8061-a32a-ecf1e7aef429" class="numbered-list" start="4" dir="auto"><li>觀察 A 錯誤，觀察 B 正確。4-bit 計數器只有在計數器值有限時才會多用記憶體，大多數位置計數器是 0，實際用量幾乎不變；而刪除操作精確，所以 false positive 確實消除了。</li></ol></blockquote><details id="33aa15e2-9005-804c-85c7-fd105aa3a6d6" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8078-9768-e5cf867ff950" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80b0-9195-d046d61face4" class="" dir="auto">觀察 A 正確，觀察 B 錯誤。每個位置從 1 bit 換成 4 bits，記憶體確實變 4 倍；但 counting Bloom filter 只是允許安全刪除，false positive 仍然存在。</p><hr id="33aa15e2-9005-804c-a6a0-c91c9aef0038" dir="auto"/><p id="33aa15e2-9005-8029-9753-ec5cb7329ed6" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8020-9fe0-d842c3d9a655" class="" dir="auto">計數器讓刪除操作可以精確 undo：插入時計數器加 1，刪除時減 1， 不會誤清其他元素共享的計數器，因此不會產生 false negative。 但 false positive 的根本原因是 hash collision，計數器改變不了這一點。</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80a2-833e-fa8ed62d197d" dir="auto"/><ol type="1" id="33aa15e2-9005-8064-8d54-f31fbb53922a" class="numbered-list" start="9" dir="auto"><li>某系統將標準 Bloom filter（bit array 長度 <code>m</code>，最佳 hash function 數量 <code>k</code>）升級為 Counting Bloom filter（每個位置改為 4-bit counter）。記憶體預算不變，因此可用位置數從 <code>m</code> 縮減為 <code>m/4</code>。在儲存量 <code>n</code> 不變的情況下，<code>k</code> 應如何調整以維持最佳 FPR？<blockquote id="33aa15e2-9005-8071-9ffc-c12c265f220a" class="" dir="auto"><ol type="1" id="33aa15e2-9005-8030-958a-cb0f3eb4a101" class="numbered-list" start="1" dir="auto"><li>維持<em>k</em>′=<em>k</em> 不變。雖然計數器變大了，但總消耗的 memory bit length 不變，決定命中機率的最佳 <code>k</code> 值只跟 bit array 長度和期待容量有關，不隨型別變化。</li></ol><ol type="1" id="33aa15e2-9005-80dd-9804-c778556597e9" class="numbered-list" start="2" dir="auto"><li>團隊必須 <strong>調低</strong> <code>k&#x27;</code> 的大小。因為可用長度變成了四分之一，若不調低 <code>k&#x27;</code> 會讓陣列太快飽和，反而會迅速推升 False Positive Rate。</li></ol><ol type="1" id="33aa15e2-9005-80f2-a91c-e46cfa90b22e" class="numbered-list" start="3" dir="auto"><li>團隊必須 <strong>調低</strong> <code>k&#x27;</code> 的大小，主要原因是 Counting Bloom Filter 刪除時有可能發生 False Negative，減少 <code>k&#x27;</code> 會降低每次刪除時誤扣掉其它元素計數的機率。</li></ol><ol type="1" id="33aa15e2-9005-80f9-8d94-e907feb6e078" class="numbered-list" start="4" dir="auto"><li>團隊必須 <strong>調高</strong> <code>k&#x27;</code> 的大小。因為總格數變少使得 collision 碰撞率大增，必須靠更多次不同的 hash 來提高不同 data 分離度，降低誤判。</li></ol></blockquote><details id="33aa15e2-9005-8026-acde-d62a5a9ab856" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8023-b452-c314e33288d5" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8088-9191-fa0307ff20fc" class="" dir="auto">團隊必須 調低 k&#x27; 的大小。因為可用長度變成了四分之一，若不調低 k&#x27; 會讓陣列太快飽和，反而會迅速推升 False Positive Rate。</p><hr id="33aa15e2-9005-80a1-ad15-f89877bbb981" dir="auto"/><p id="33aa15e2-9005-809e-a68c-e447e57debfd" class="" dir="auto">解析: <div class="indented"><p id="3b7ffc9d-75a2-4404-8ba1-0fd0dbb38509" class="" dir="auto">最佳的k值與可用的格數m成正比。由於每個空間膨脹為 4-bits，導致總格數m&#x27;縮減為原先的四分之一。在可用欄位變少的情況下，若每個元素還是映射k次，陣列中大多數位置會迅速變為非零，導致幾乎每次查詢都命中，FPR 極高。因此，為了在新架構下維持相對較佳的表現，必須按比例調低 hash 的次數至k′=k/4。</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-8021-8131-df61d2df013f" dir="auto"/><ol type="1" id="33aa15e2-9005-800d-af05-cebf014ab1b8" class="numbered-list numbered-list-digits-2" start="10" dir="auto"><li>工程師在優化 LSM-tree 的讀取效能時，考慮將現有每個元素的位元分配（m/n）從 15 提升至 25。下列哪一個判斷最符合工程實務上的權衡？<blockquote id="33aa15e2-9005-80ff-8ff9-c496c2ae777d" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80ee-aaff-c7d19ad9f5e8" class="numbered-list" start="1" dir="auto"><li>不建議使用此更動。因為增加位元陣列大小 <em>m</em> 會導致最佳的雜湊函數數量 <em>k</em> 隨之增加，進而引發 false negative 的風險。</li></ol><ol type="1" id="33aa15e2-9005-8040-b3e0-eec72aec64a8" class="numbered-list" start="2" dir="auto"><li>建議使用此更動。因為即使 <em>m</em>/<em>n</em> 提升至 25，其總體記憶體消耗仍遠低於傳統 hash set，且能同時滿足支援刪除操作的需求。</li></ol><ol type="1" id="33aa15e2-9005-808c-b311-d3ee1b53d703" class="numbered-list" start="3" dir="auto"><li>不建議使用此更動。因為當 <em>m</em>/<em>n</em> 超過 15 之後，再增加記憶體對降低 FPR 的邊際效益會顯著遞減，且仍無法消除 false positive。</li></ol><ol type="1" id="33aa15e2-9005-8032-a289-d1f4f27bfef6" class="numbered-list" start="4" dir="auto"><li>建議使用此更動。因為 <em>m</em>/<em>n</em> 與 FPR 呈線性反比關係，將空間提升至 25 bits 將能直接減少約 60% 的誤判率，進一步保護 disk。</li></ol></blockquote><details id="33aa15e2-9005-8073-82c7-eca41ab14a46" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8022-95a3-c72697f6b4fd" dir="ltr"><div style="width:100%"><p id="e1d77d08-5dcc-4873-b3cd-0fefc34fd29b" class="" dir="auto">不建議使用此更動。因為當m/n 超過 15 之後，再增加記憶體對降低 FPR 的邊際效益會顯著遞減，且仍無法消除 false positive。</p><hr id="33aa15e2-9005-8096-be83-fe7e6078901c" dir="auto"/><p id="33aa15e2-9005-8083-9eab-f9d70c29b9f8" class="" dir="auto">解析: <div class="indented"><p id="329b5a4c-c82e-430e-96a9-c4ff67e29aed" class="" dir="auto">從m/n=10 增加到 15 時，FPR 會從 0.82% 降至 0.03%（降幅達 27 倍）；但從 15 再往上增加（如至 20 以上），FPR 的下降幅度會變得很小。在記憶體資源有限的儲存系統中，這類高m/n 的配置通常不具效益。此外，Bloom filter 是機率性結構，無論m 多大都無法達到 100% 準確率。</p></div></p></div></aside></div></details></li></ol><hr id="33aa15e2-9005-80df-ba86-e44363166332" dir="auto"/><ol type="1" id="33aa15e2-9005-801c-a271-ce1047a4ebdb" class="numbered-list numbered-list-digits-2" start="11" dir="auto"><li>某團隊為一個 key-value store 設計 Bloom filter，原本預估會插入 <em>n</em>=1,000,000 個 key， 並希望 false positive rate 約為 1%，因此依公式選了對應的 bit array 大小 <em>m</em> 與 hash 數量 <em>k</em>。<p id="33aa15e2-9005-80c0-a172-e81f1909186e" class="" dir="auto">上線三個月後，實際 key 數成長到 2,000,000，但團隊不想重建 filter，提議「把查詢時的 hash 數量從 <em>k</em> 提高到 2<em>k</em>， 這樣就能把 FPR 壓回來，而且不影響正確性」。</p><p id="33aa15e2-9005-80b5-a9b7-fed472caabbf" class="" dir="auto">下列哪個判斷最正確？</p><blockquote id="33aa15e2-9005-8066-b141-db89f7a9b5f4" class="" dir="auto"><ol type="1" id="33aa15e2-9005-80aa-9fc0-c164945ec585" class="numbered-list" start="1" dir="auto"><li>提議可行，而且查詢 hash 數量越大，FPR 一定單調下降，不受 m 與 n 影響。</li></ol><ol type="1" id="33aa15e2-9005-80a7-81d1-c2d751fa5992" class="numbered-list" start="2" dir="auto"><li>不需要任何調整。Bloom filter 既然保證沒有 false negative，就代表 n 成長只會影響查詢成本，不會影響 FPR。</li></ol><ol type="1" id="33aa15e2-9005-808a-a74e-d3844b56aaf5" class="numbered-list" start="3" dir="auto"><li>提議可行。因為 Bloom filter 本來就允許 false positive，只要在查詢時多檢查幾個 bit，就不會影響 correctness。</li></ol><ol type="1" id="33aa15e2-9005-802b-83a8-d7cdb1c95475" class="numbered-list" start="4" dir="auto"><li>提議不可行。當 n 超出原始估計時，應重建更大的 Bloom filter，而不是只在查詢端單獨增加 hash 數量。</li></ol></blockquote><details id="33aa15e2-9005-8046-b078-dcb0066c5b7c" open="" class="toggle" dir="auto"><summary>Answer</summary><div class="indented"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-80bb-8f87-f500a68c97df" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-80e2-bb6c-f74612cf9add" class="" dir="auto">提議不可行。當 n 超出原始估計時，應重建更大的 Bloom filter，而不是只在查詢端單獨增加 hash 數量。</p><hr id="33aa15e2-9005-806a-8ad4-ca2ed3f60e05" dir="auto"/><p id="33aa15e2-9005-80c7-aba8-cfff2be1cf48" class="" dir="auto">解析: <div class="indented"><p id="33aa15e2-9005-8037-ae66-f701b5bb6e25" class="" dir="auto">Bloom filter 的參數是整體設計的一部分：m、k、n 彼此耦合。 n 增加但 m 不變時，bit array 會更快飽和，FPR 上升是預期結果。 正確作法是重建更大 m，並用一致的 k 重新插入； 不能只改查詢邏輯，否則會引入 false negative。</p></div></p><hr id="33da15e2-9005-803d-8071-e121c2a62543" dir="auto"/><p id="33da15e2-9005-8055-8c7f-f776b3351b1e" class="" dir="auto">(1) 這個說法忽略了插入與查詢必須使用同一組 hash 定義。若插入時只設了 k 個位置， 查詢卻改成檢查 2k 個位置，對已存在元素也可能因新增檢查位元為 0 而被判定不存在， 會導致 false negative，破壞 Bloom filter 的核心保證。</p><p id="33da15e2-9005-80a6-9193-cc4c4943f027" class="" dir="auto">(2) 沒有 false negative 不代表 FPR 恆定。 在固定 m 下，n 增加會提高位元被設為 1 的機率，進而提升 false positive rate。</p><p id="33da15e2-9005-800a-a392-cca44451a58e" class="" dir="auto">(3) FPR 並非只由 k 決定，還受 m 與 n 影響，且在固定 m、n 下存在最佳 k。 k 過大反而會讓 bit array 更快趨近全 1，造成 FPR 惡化。</p></div></aside></div></details></li></ol></div></details></div></details></div></div><hr id="33aa15e2-9005-802e-a85c-d67eb34999fe" dir="auto"/><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="33aa15e2-9005-8073-b57b-e1895806f440" dir="ltr"><div style="width:100%"><p id="33aa15e2-9005-8097-a56a-c75b7bed684f" class="" dir="auto">
+</p></div></aside></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>
